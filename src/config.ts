@@ -1,8 +1,5 @@
-import type {
-  CameraMode,
-  NormalizedConfig,
-  RingViewConfig,
-} from "./types";
+import { localize, type TranslationKey } from "./localize";
+import type { CameraMode, NormalizedConfig, RingViewConfig } from "./types";
 
 export const CARD_TYPE = "custom:ring-view";
 export const CARD_TAG = "ring-view";
@@ -20,33 +17,38 @@ const CAMERA_MODES = new Set(["last_recording", "live"]);
 const ASPECT_RATIOS = new Set(["auto", "16:9", "4:3", "1:1"]);
 const FIT_MODES = new Set(["cover", "contain"]);
 
-function assertCameraEntity(value: unknown, label: string): asserts value is string {
+function assertCameraEntity(
+  value: unknown,
+  labelKey: TranslationKey,
+): asserts value is string {
   if (typeof value !== "string" || !value.startsWith("camera.")) {
-    throw new Error(`${label} must be a camera entity.`);
+    throw new Error(
+      localize(undefined, "config.entity_required", {
+        label: localize(undefined, labelKey),
+      }),
+    );
   }
 }
 
 export function validateConfig(config: RingViewConfig): void {
   if (!config || typeof config !== "object") {
-    throw new Error("Invalid card configuration.");
+    throw new Error(localize(undefined, "config.invalid"));
   }
-  assertCameraEntity(config.recording_entity, "Last recording entity");
-  assertCameraEntity(config.live_entity, "Live camera entity");
+  assertCameraEntity(config.recording_entity, "config.recording_entity");
+  assertCameraEntity(config.live_entity, "config.live_entity");
 
   if (config.default_mode && !CAMERA_MODES.has(config.default_mode)) {
-    throw new Error("default_mode must be last_recording or live.");
+    throw new Error(localize(undefined, "config.default_mode"));
   }
   if (config.aspect_ratio && !ASPECT_RATIOS.has(config.aspect_ratio)) {
-    throw new Error("aspect_ratio is invalid.");
+    throw new Error(localize(undefined, "config.aspect_ratio"));
   }
   if (config.fit_mode && !FIT_MODES.has(config.fit_mode)) {
-    throw new Error("fit_mode is invalid.");
+    throw new Error(localize(undefined, "config.fit_mode"));
   }
 }
 
-export function normalizeConfig(
-  config: RingViewConfig,
-): NormalizedConfig {
+export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
   validateConfig(config);
   return {
     type: config.type ?? CARD_TYPE,

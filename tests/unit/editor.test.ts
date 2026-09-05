@@ -126,4 +126,52 @@ describe("visual editor", () => {
       { name: "card_appearance", flatten: true, icon: true },
     ]);
   });
+
+  it("localizes native form labels, help, and options from the Home Assistant language", async () => {
+    const editor = document.createElement("ring-view-editor");
+    editor.hass = {
+      ...hass,
+      language: "de-DE",
+      locale: { language: "de-DE" },
+    };
+    editor.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+    });
+    document.body.append(editor);
+    await editor.updateComplete;
+
+    const form = editor.shadowRoot?.querySelector("ha-form") as
+      | (HTMLElement & {
+          schema?: ConfigFormSchema[];
+          computeLabel?: (schema: ConfigFormSchema) => string | undefined;
+          computeHelper?: (schema: ConfigFormSchema) => string | undefined;
+        })
+      | null;
+    expect(form?.computeLabel?.({ name: "recording_entity" })).toBe(
+      "Kamera für letzte Aufnahme",
+    );
+    expect(form?.computeLabel?.({ name: "viewer_behavior" })).toBe(
+      "Anzeigeverhalten",
+    );
+    expect(form?.computeLabel?.({ name: "name" })).toBe("Kameraname (optional)");
+    expect(form?.computeHelper?.({ name: "live_muted" })).toContain(
+      "mit Ton zu starten",
+    );
+
+    const viewerBehavior = form?.schema?.find(
+      (field) => field.name === "viewer_behavior",
+    );
+    const defaultMode = viewerBehavior?.schema?.find(
+      (field) => field.name === "default_mode",
+    );
+    expect(defaultMode?.selector).toMatchObject({
+      select: {
+        options: [
+          { value: "last_recording", label: "Letzte Aufnahme" },
+          { value: "live", label: "Live" },
+        ],
+      },
+    });
+  });
 });

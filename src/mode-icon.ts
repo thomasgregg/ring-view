@@ -1,6 +1,7 @@
 import { mdiHistory } from "@mdi/js";
 import { html, type TemplateResult } from "lit";
-import type { CameraMode } from "./types";
+import { localize } from "./localize";
+import type { CameraMode, HomeAssistant } from "./types";
 
 export function renderModeIcon(mode: CameraMode): TemplateResult {
   if (mode === "live") {
@@ -14,6 +15,9 @@ export function renderModeIcon(mode: CameraMode): TemplateResult {
   `;
 }
 
-export function modeLabel(mode: CameraMode): string {
-  return mode === "live" ? "Live" : "Last recording";
+export function modeLabel(mode: CameraMode, hass?: HomeAssistant): string {
+  return localize(
+    hass,
+    mode === "live" ? "common.live" : "common.last_recording",
+  );
 }

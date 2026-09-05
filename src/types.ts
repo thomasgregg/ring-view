@@ -19,10 +19,12 @@ export interface HassEntity {
 
 export interface HomeAssistant {
   states: Record<string, HassEntity>;
+  language?: string;
   locale?: { language: string };
   themes?: unknown;
   hassUrl(path?: string): string;
   callWS<T>(message: Record<string, unknown>): Promise<T>;
+  localize?(key: string, values?: Record<string, unknown>): string;
   formatEntityName?(stateObj: HassEntity, name?: string): string;
 }
 

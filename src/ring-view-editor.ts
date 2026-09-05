@@ -2,6 +2,11 @@ import { mdiImageOutline, mdiPlayCircleOutline } from "@mdi/js";
 import { LitElement, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { normalizeConfig } from "./config";
+import {
+  localize,
+  localizeHaOrFallback,
+  type TranslationKey,
+} from "./localize";
 import { ensureNativeCameraAvailable } from "./media/native-camera-adapter";
 import { editorStyles } from "./styles";
 import type {
@@ -12,98 +17,121 @@ import type {
 } from "./types";
 import { validateEntities } from "./utilities/entity-validation";
 
-const CONFIG_SCHEMA: ConfigFormSchema[] = [
-  {
-    name: "recording_entity",
-    required: true,
-    selector: { entity: { domain: "camera" } },
-  },
-  {
-    name: "live_entity",
-    required: true,
-    selector: { entity: { domain: "camera" } },
-  },
-  {
-    name: "viewer_behavior",
-    type: "expandable",
-    flatten: true,
-    iconPath: mdiPlayCircleOutline,
-    schema: [
-      {
-        name: "default_mode",
-        selector: {
-          select: {
-            mode: "dropdown",
-            options: [
-              { value: "last_recording", label: "Last recording" },
-              { value: "live", label: "Live" },
-            ],
+function configSchema(hass: HomeAssistant): ConfigFormSchema[] {
+  return [
+    {
+      name: "recording_entity",
+      required: true,
+      selector: { entity: { domain: "camera" } },
+    },
+    {
+      name: "live_entity",
+      required: true,
+      selector: { entity: { domain: "camera" } },
+    },
+    {
+      name: "viewer_behavior",
+      type: "expandable",
+      flatten: true,
+      iconPath: mdiPlayCircleOutline,
+      schema: [
+        {
+          name: "default_mode",
+          selector: {
+            select: {
+              mode: "dropdown",
+              options: [
+                {
+                  value: "last_recording",
+                  label: localize(hass, "common.last_recording"),
+                },
+                { value: "live", label: localize(hass, "common.live") },
+              ],
+            },
           },
         },
-      },
-      { name: "live_muted", selector: { boolean: {} } },
-    ],
-  },
-  {
-    name: "card_appearance",
-    type: "expandable",
-    flatten: true,
-    iconPath: mdiImageOutline,
-    schema: [
-      { name: "name", selector: { text: {} } },
-      { name: "show_name", selector: { boolean: {} } },
-      {
-        name: "",
-        type: "grid",
-        schema: [
-          {
-            name: "aspect_ratio",
-            selector: {
-              select: {
-                mode: "dropdown",
-                options: [
-                  { value: "16:9", label: "Widescreen (16:9)" },
-                  { value: "4:3", label: "Standard (4:3)" },
-                  { value: "1:1", label: "Square (1:1)" },
-                  { value: "auto", label: "Automatic" },
-                ],
+        { name: "live_muted", selector: { boolean: {} } },
+      ],
+    },
+    {
+      name: "card_appearance",
+      type: "expandable",
+      flatten: true,
+      iconPath: mdiImageOutline,
+      schema: [
+        { name: "name", selector: { text: {} } },
+        { name: "show_name", selector: { boolean: {} } },
+        {
+          name: "",
+          type: "grid",
+          schema: [
+            {
+              name: "aspect_ratio",
+              selector: {
+                select: {
+                  mode: "dropdown",
+                  options: [
+                    {
+                      value: "16:9",
+                      label: localize(hass, "editor.aspect_widescreen"),
+                    },
+                    {
+                      value: "4:3",
+                      label: localize(hass, "editor.aspect_standard"),
+                    },
+                    {
+                      value: "1:1",
+                      label: localize(hass, "editor.aspect_square"),
+                    },
+                    {
+                      value: "auto",
+                      label: localize(hass, "editor.aspect_auto"),
+                    },
+                  ],
+                },
               },
             },
-          },
-          {
-            name: "fit_mode",
-            selector: {
-              select: {
-                mode: "dropdown",
-                options: [
-                  { value: "cover", label: "Crop to fill" },
-                  { value: "contain", label: "Fit entire image" },
-                ],
+            {
+              name: "fit_mode",
+              selector: {
+                select: {
+                  mode: "dropdown",
+                  options: [
+                    {
+                      value: "cover",
+                      label: localize(hass, "editor.fit_cover"),
+                    },
+                    {
+                      value: "contain",
+                      label: localize(hass, "editor.fit_contain"),
+                    },
+                  ],
+                },
               },
             },
-          },
-        ],
-      },
-    ],
-  },
-];
+          ],
+        },
+      ],
+    },
+  ];
+}
 
-const LABELS: Record<string, string> = {
-  recording_entity: "Last recording camera",
-  live_entity: "Live camera",
-  viewer_behavior: "Viewer behavior",
-  default_mode: "Open viewer on",
-  live_muted: "Start live audio muted",
-  card_appearance: "Card appearance",
-  name: "Camera name (optional)",
-  show_name: "Show name on card",
-  aspect_ratio: "Image shape",
-  fit_mode: "Image crop",
+const LABELS: Record<string, TranslationKey> = {
+  recording_entity: "editor.recording_entity",
+  live_entity: "editor.live_entity",
+  viewer_behavior: "editor.viewer_behavior",
+  default_mode: "editor.default_mode",
+  live_muted: "editor.live_muted",
+  card_appearance: "editor.card_appearance",
+  name: "editor.name",
+  show_name: "editor.show_name",
+  aspect_ratio: "editor.aspect_ratio",
+  fit_mode: "editor.fit_mode",
 };
 
-const HELPERS: Record<string, string> = {
-  default_mode: "Opening directly on Live starts a Ring live session.",
-  live_muted: "Leave off to start with sound when the browser allows it.",
+const HELPERS: Record<string, TranslationKey> = {
+  default_mode: "editor.helper_default_mode",
+  live_muted: "editor.helper_live_muted",
 };
 
 @customElement("ring-view-editor")
@@ -139,7 +167,11 @@ export class RingViewEditor extends LitElement {
     return html`
       ${warnings.length
         ? html`
-            <div class="warnings" role="status" aria-label="Configuration warnings">
+            <div
+              class="warnings"
+              role="status"
+              aria-label=${localize(this.hass, "editor.warnings")}
+            >
               ${warnings.map(
                 (warning) => html`
                   <ha-alert alert-type="warning">${warning.message}</ha-alert>
@@ -151,7 +183,7 @@ export class RingViewEditor extends LitElement {
       <ha-form
         .hass=${this.hass}
         .data=${this.config}
-        .schema=${CONFIG_SCHEMA}
+        .schema=${configSchema(this.hass)}
         .computeLabel=${this.computeLabel}
         .computeHelper=${this.computeHelper}
         @value-changed=${this.valueChanged}
@@ -159,11 +191,23 @@ export class RingViewEditor extends LitElement {
     `;
   }
 
-  private computeLabel = (schema: ConfigFormSchema): string | undefined =>
-    LABELS[schema.name];
+  private computeLabel = (schema: ConfigFormSchema): string | undefined => {
+    const key = LABELS[schema.name];
+    if (!key) return undefined;
+    const label = localize(this.hass, key);
+    if (schema.name !== "name") return label;
+    const optional = localizeHaOrFallback(
+      this.hass,
+      "ui.panel.lovelace.editor.card.config.optional",
+      "common.optional",
+    );
+    return `${label} (${optional})`;
+  };
 
-  private computeHelper = (schema: ConfigFormSchema): string | undefined =>
-    HELPERS[schema.name];
+  private computeHelper = (schema: ConfigFormSchema): string | undefined => {
+    const key = HELPERS[schema.name];
+    return key ? localize(this.hass, key) : undefined;
+  };
 
   private valueChanged = (event: CustomEvent<{ value: RingViewConfig }>): void => {
     if (!this.config) return;

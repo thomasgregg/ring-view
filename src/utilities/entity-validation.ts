@@ -1,3 +1,4 @@
+import { localize } from "../localize";
 import type { HassEntity, HomeAssistant, NormalizedConfig } from "../types";
 
 export const CAMERA_STREAM_FEATURE = 2;
@@ -34,33 +35,35 @@ export function validateEntities(
   if (entityIsUnavailable(recording)) {
     warnings.push({
       kind: "recording",
-      message: `${friendlyName(recording, config.recording_entity)} is unavailable.`,
+      message: localize(hass, "warning.unavailable", {
+        name: friendlyName(recording, config.recording_entity),
+      }),
     });
   } else if (!recordingHasMedia(recording)) {
     warnings.push({
       kind: "recording",
-      message:
-        "The last recording camera has neither a recording URL nor a usable camera image.",
+      message: localize(hass, "warning.recording_media"),
     });
   }
 
   if (entityIsUnavailable(live)) {
     warnings.push({
       kind: "live",
-      message: `${friendlyName(live, config.live_entity)} is unavailable.`,
+      message: localize(hass, "warning.unavailable", {
+        name: friendlyName(live, config.live_entity),
+      }),
     });
   } else if (!supportsStream(live)) {
     warnings.push({
       kind: "live",
-      message: "The live camera does not advertise camera streaming support.",
+      message: localize(hass, "warning.live_stream"),
     });
   }
 
   if (!customElements.get("ha-camera-stream")) {
     warnings.push({
       kind: "compatibility",
-      message:
-        "Home Assistant’s native camera component is not loaded yet. The card will attempt to load it when opened.",
+      message: localize(hass, "warning.compatibility"),
     });
   }
 

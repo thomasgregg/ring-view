@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-09-06
+
+### Added
+
+- Add English and German translations for the visual editor, card tooltips,
+  viewer controls, loading and error states, warnings, and accessibility
+  announcements.
+- Follow Home Assistant's active BCP 47 language setting, including regional
+  German variants such as `de-DE`, `de-AT`, and `de-CH`, with English as the
+  fallback for unsupported languages.
+- Reuse Home Assistant's own shared translation for common UI text where the
+  frontend exposes it, while keeping complete bundled translations for reliable
+  custom-card rendering.
+
 ## [0.2.0] - 2026-09-06
 
 ### Changed

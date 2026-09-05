@@ -18,6 +18,7 @@ A Home Assistant Lovelace card that keeps a recent Ring recording and a real Rin
 - Native Home Assistant WebRTC/HLS/MJPEG selection through `ha-camera-stream`
 - Fullscreen, keyboard navigation, focus trapping, safe-area handling, and screen-reader status messages
 - Home Assistant-native card editor with camera-only entity pickers, compact expandable sections, and capability warnings
+- English and German UI that automatically follows the active Home Assistant language
 - No Ring credentials, direct Ring requests, analytics, Browser Mod, or persisted camera URLs
 
 ## Requirements and compatibility
@@ -83,6 +84,14 @@ grid_options:
 All options shown above match the built-in defaults except `name` and `grid_options`, which are optional. The graphical editor keeps the two camera sources visible and places the less-frequent viewer and appearance choices in compact, native expandable sections. Home Assistant supplies the live preview on the right, so the editor does not render a second copy.
 
 Version 0.2 uses this flat configuration only. The older nested `preview`, `appearance`, `viewer`, and `performance` options are intentionally not supported.
+
+## Languages
+
+Ring View automatically follows the active Home Assistant language. English and
+German are included across the editor, card tooltips, viewer states, warnings,
+and accessibility announcements. Regional German locales such as `de-DE`,
+`de-AT`, and `de-CH` use German; other languages fall back to English. No card
+configuration is needed.
 
 ### Preview semantics
 

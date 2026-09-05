@@ -5,6 +5,7 @@ import { keyed } from "lit/directives/keyed.js";
 import { styleMap } from "lit/directives/style-map.js";
 import { customElement, property, state } from "lit/decorators.js";
 import { aspectRatioNumber } from "./config";
+import { localize, localizeHaOrFallback } from "./localize";
 import "./media/native-camera-adapter";
 import type {
   NativeAdapterFailure,
@@ -93,7 +94,7 @@ export class RingViewDialog extends LitElement {
       this.lifecycle.dispose();
       this.session = this.lifecycle.current();
       this.mediaStatus = "error";
-      this.statusAnnouncement = "Camera entity is unavailable.";
+      this.statusAnnouncement = localize(this.hass, "viewer.entity_unavailable");
     }
   }
 
@@ -125,8 +126,12 @@ export class RingViewDialog extends LitElement {
               <button
                 class="icon-button close"
                 type="button"
-                aria-label="Close camera viewer"
-                title="Close"
+                aria-label=${localize(this.hass, "viewer.close_aria")}
+                title=${localizeHaOrFallback(
+                  this.hass,
+                  "ui.common.close",
+                  "common.close",
+                )}
                 @click=${this.close}
               >
                 ${this.icon(mdiClose)}
@@ -144,14 +149,18 @@ export class RingViewDialog extends LitElement {
 
   private renderModeSwitch(): TemplateResult {
     return html`
-      <div class="mode-switch" role="tablist" aria-label="Camera view">
+      <div
+        class="mode-switch"
+        role="tablist"
+        aria-label=${localize(this.hass, "viewer.camera_view")}
+      >
         <button
           id="ring-view-tab-recording"
           class="mode-button recording"
           type="button"
           role="tab"
-          aria-label="Last recording"
-          title="Last recording"
+          aria-label=${localize(this.hass, "common.last_recording")}
+          title=${localize(this.hass, "common.last_recording")}
           aria-selected=${String(this.mode === "last_recording")}
           tabindex=${this.mode === "last_recording" ? "0" : "-1"}
           @click=${() => this.selectMode("last_recording")}
@@ -164,7 +173,8 @@ export class RingViewDialog extends LitElement {
           class="mode-button live"
           type="button"
           role="tab"
-          title="Live"
+          aria-label=${localize(this.hass, "common.live")}
+          title=${localize(this.hass, "common.live")}
           aria-selected=${String(this.mode === "live")}
           tabindex=${this.mode === "live" ? "0" : "-1"}
           @click=${() => this.selectMode("live")}
@@ -257,10 +267,12 @@ export class RingViewDialog extends LitElement {
         <div class="state-layer" role="status">
           <div class="state-card">
             <div class="state-title">${friendlyName(entity, this.activeEntityId())}</div>
-            <div class="state-detail">Camera entity is unavailable.</div>
+            <div class="state-detail">
+              ${localize(this.hass, "viewer.entity_unavailable")}
+            </div>
             <div class="state-actions">
               <button class="action-button primary" type="button" @click=${this.retry}>
-                Retry
+                ${localize(this.hass, "common.retry")}
               </button>
               ${this.renderAlternateModeButton()}
             </div>
@@ -273,7 +285,9 @@ export class RingViewDialog extends LitElement {
       return html`
         <div class="state-layer" role="status">
           <div class="state-card">
-            <div class="state-title">Playback paused while this tab is hidden.</div>
+            <div class="state-title">
+              ${localize(this.hass, "viewer.suspended")}
+            </div>
           </div>
         </div>
       `;
@@ -286,8 +300,8 @@ export class RingViewDialog extends LitElement {
             <div class="spinner" aria-hidden="true"></div>
             <div class="state-title">
               ${this.mode === "live"
-                ? "Connecting to Ring live view…"
-                : "Loading last recording…"}
+                ? localize(this.hass, "viewer.connecting_live")
+                : localize(this.hass, "viewer.loading_recording")}
             </div>
           </div>
         </div>
@@ -298,13 +312,15 @@ export class RingViewDialog extends LitElement {
       return html`
         <div class="state-layer" role="alert">
           <div class="state-card">
-            <div class="state-title">Native camera playback is unavailable.</div>
+            <div class="state-title">
+              ${localize(this.hass, "viewer.native_unavailable_title")}
+            </div>
             <div class="state-detail">
-              This Home Assistant version did not provide the expected camera component.
+              ${localize(this.hass, "viewer.native_unavailable_detail")}
             </div>
             <div class="state-actions">
               <button class="action-button primary" type="button" @click=${this.openMoreInfo}>
-                Open Home Assistant camera
+                ${localize(this.hass, "viewer.open_ha_camera")}
               </button>
               ${this.renderAlternateModeButton()}
             </div>
@@ -319,15 +335,17 @@ export class RingViewDialog extends LitElement {
           <div class="state-card">
             <div class="state-title">
               ${this.mode === "live"
-                ? "Live view could not be started."
-                : "No Ring recording is currently available."}
+                ? localize(this.hass, "viewer.live_failed")
+                : localize(this.hass, "viewer.recording_unavailable")}
             </div>
             ${this.mode === "last_recording"
-              ? html`<div class="state-detail">A Ring Protect subscription may be required.</div>`
+              ? html`<div class="state-detail">
+                  ${localize(this.hass, "viewer.ring_protect")}
+                </div>`
               : nothing}
             <div class="state-actions">
               <button class="action-button primary" type="button" @click=${this.retry}>
-                Retry
+                ${localize(this.hass, "common.retry")}
               </button>
               ${this.renderAlternateModeButton()}
             </div>
@@ -343,7 +361,10 @@ export class RingViewDialog extends LitElement {
     const alternate = this.mode === "live" ? "last_recording" : "live";
     return html`
       <button class="action-button" type="button" @click=${() => this.selectMode(alternate)}>
-        ${alternate === "live" ? "Switch to Live" : "Switch to Last recording"}
+        ${localize(
+          this.hass,
+          alternate === "live" ? "viewer.switch_live" : "viewer.switch_recording",
+        )}
       </button>
     `;
   }
@@ -360,8 +381,12 @@ export class RingViewDialog extends LitElement {
     this.recordingMuted = false;
     this.liveHasAudio = undefined;
     this.recordingVideoFailed = false;
-    this.statusAnnouncement =
-      mode === "live" ? "Live view selected." : "Last recording selected.";
+    this.statusAnnouncement = localize(
+      this.hass,
+      mode === "live"
+        ? "viewer.mode_selected_live"
+        : "viewer.mode_selected_recording",
+    );
     this.startMedia();
   }
 
@@ -372,7 +397,7 @@ export class RingViewDialog extends LitElement {
     }
     if (entityIsUnavailable(this.activeEntity())) {
       this.mediaStatus = "error";
-      this.statusAnnouncement = "Camera entity is unavailable.";
+      this.statusAnnouncement = localize(this.hass, "viewer.entity_unavailable");
       return;
     }
     this.mediaStatus = "pending";
@@ -390,8 +415,8 @@ export class RingViewDialog extends LitElement {
       this.mode === "live"
         ? this.liveAudioStatus()
         : this.recordingMuted
-          ? "Last recording loaded. Audio is muted because the browser blocked audible autoplay."
-          : "Last recording loaded. Audio is available.";
+          ? localize(this.hass, "viewer.recording_loaded_muted")
+          : localize(this.hass, "viewer.recording_loaded_audio");
   };
 
   private handleMediaCapabilities = (
@@ -407,19 +432,21 @@ export class RingViewDialog extends LitElement {
     // is requested.
     this.liveHasAudio = this.liveHasAudio === true || event.detail.hasAudio;
     if (this.mediaStatus === "ready" && this.liveHasAudio) {
-      this.statusAnnouncement = "Live view connected. Audio is available.";
+      this.statusAnnouncement = localize(this.hass, "viewer.live_connected_audio");
     } else if (this.mediaStatus === "ready" && this.liveHasAudio === false) {
-      this.statusAnnouncement = "Live view connected. No audio track was detected.";
+      this.statusAnnouncement = localize(this.hass, "viewer.live_connected_no_audio");
     }
   };
 
   private liveAudioStatus(): string {
-    if (this.liveMuted) return "Live view connected. Audio is muted.";
-    if (this.liveHasAudio === true) return "Live view connected. Audio is available.";
-    if (this.liveHasAudio === false) {
-      return "Live view connected. No audio track was detected.";
+    if (this.liveMuted) return localize(this.hass, "viewer.live_connected_muted");
+    if (this.liveHasAudio === true) {
+      return localize(this.hass, "viewer.live_connected_audio");
     }
-    return "Live view connected. Audio status is still being detected.";
+    if (this.liveHasAudio === false) {
+      return localize(this.hass, "viewer.live_connected_no_audio");
+    }
+    return localize(this.hass, "viewer.live_detecting_audio");
   }
 
   private handleRecordingVideoError = (): void => {
@@ -429,7 +456,7 @@ export class RingViewDialog extends LitElement {
     // The Ring URL is temporary and can expire between state refreshes. Fall
     // back to Home Assistant's authenticated MJPEG renderer for this attempt.
     this.recordingVideoFailed = true;
-    this.statusAnnouncement = "Trying Home Assistant camera playback.";
+    this.statusAnnouncement = localize(this.hass, "viewer.trying_ha");
     this.startMedia();
   };
 
@@ -460,7 +487,10 @@ export class RingViewDialog extends LitElement {
         // the native media controls can then be used to enable sound.
         this.recordingMuted = true;
         video.muted = true;
-        this.statusAnnouncement = "The browser blocked recording audio. Retrying muted.";
+        this.statusAnnouncement = localize(
+          this.hass,
+          "viewer.recording_audio_blocked",
+        );
         void video.play().then(() => {
           this.recordingPlaybackPending = false;
           this.recordingPlaybackStarted = true;
@@ -480,13 +510,16 @@ export class RingViewDialog extends LitElement {
     if (event.detail === "component-unavailable") {
       this.lifecycle.clearTimeout();
       this.mediaStatus = "compatibility";
-      this.statusAnnouncement = "Native camera playback is unavailable.";
+      this.statusAnnouncement = localize(
+        this.hass,
+        "viewer.native_unavailable_title",
+      );
       return;
     }
     if (this.mode === "live" && !this.liveMuted && !this.audioFallbackAttempted) {
       this.audioFallbackAttempted = true;
       this.liveMuted = true;
-      this.statusAnnouncement = "Live audio was muted so playback can start.";
+      this.statusAnnouncement = localize(this.hass, "viewer.live_audio_muted");
       this.startMedia();
       return;
     }
@@ -496,7 +529,7 @@ export class RingViewDialog extends LitElement {
   private failMedia(allowAutomaticRetry: boolean): void {
     if (allowAutomaticRetry && this.mode === "live" && this.retryCount < 1) {
       this.retryCount += 1;
-      this.statusAnnouncement = "Retrying Ring live view.";
+      this.statusAnnouncement = localize(this.hass, "viewer.retrying_live");
       this.startMedia();
       return;
     }
@@ -505,8 +538,8 @@ export class RingViewDialog extends LitElement {
     this.mediaStatus = "error";
     this.statusAnnouncement =
       this.mode === "live"
-        ? "Live view could not be started."
-        : "No Ring recording is currently available.";
+        ? localize(this.hass, "viewer.live_failed")
+        : localize(this.hass, "viewer.recording_unavailable");
   }
 
   private retry = (): void => {
@@ -544,7 +577,7 @@ export class RingViewDialog extends LitElement {
     if (this.config?.name) return this.config.name;
     return friendlyName(
       this.hass?.states[this.config!.recording_entity],
-      "Camera",
+      localize(this.hass, "common.camera"),
     );
   }
 

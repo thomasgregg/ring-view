@@ -10,6 +10,7 @@ import {
   initialMode,
   normalizeConfig,
 } from "./config";
+import { localize } from "./localize";
 import { posterUrl, sizedPosterUrl } from "./media/poster-provider";
 import { modeLabel, renderModeIcon } from "./mode-icon";
 import "./ring-view-dialog";
@@ -113,6 +114,8 @@ export class RingView extends LitElement {
     const previous = changed.get("hass") as HomeAssistant | undefined;
     if (!previous) return true;
     return (
+      previous.language !== this.hass.language ||
+      previous.locale?.language !== this.hass.locale?.language ||
       previous.states[this.config.recording_entity] !==
         this.hass.states[this.config.recording_entity] ||
       previous.states[this.config.live_entity] !== this.hass.states[this.config.live_entity]
@@ -149,7 +152,10 @@ export class RingView extends LitElement {
     const previewEntity = this.hass.states[previewId];
     const name =
       this.config.name ||
-      friendlyName(this.hass.states[this.config.recording_entity], "Camera");
+      friendlyName(
+        this.hass.states[this.config.recording_entity],
+        localize(this.hass, "common.camera"),
+      );
     const openingMode = initialMode(this.config);
     const unavailable = entityIsUnavailable(previewEntity);
     const style = {
@@ -164,8 +170,14 @@ export class RingView extends LitElement {
           style=${styleMap(style)}
           role="button"
           tabindex="0"
-          aria-label=${`Open ${name} viewer — ${modeLabel(openingMode)}`}
-          title=${openingMode === "live" ? "Open live view" : "Open last recording"}
+          aria-label=${localize(this.hass, "card.open_viewer", {
+            name,
+            mode: modeLabel(openingMode, this.hass),
+          })}
+          title=${localize(
+            this.hass,
+            openingMode === "live" ? "card.open_live" : "card.open_recording",
+          )}
           @click=${this.openViewer}
           @keydown=${this.handleKeyDown}
         >
@@ -173,11 +185,13 @@ export class RingView extends LitElement {
             ? html`
                 <img
                   src=${this.lastPoster ?? ""}
-                  alt=${`${name} preview`}
+                  alt=${localize(this.hass, "card.preview_alt", { name })}
                   @error=${this.handlePreviewError}
                 />
               `
-            : html`<div class="placeholder">Camera preview unavailable</div>`}
+            : html`<div class="placeholder">
+                ${localize(this.hass, "card.preview_unavailable")}
+              </div>`}
           ${this.config.show_name ? html`<div class="name">${name}</div>` : nothing}
           <div
             class=${`mode-indicator ${openingMode === "live" ? "live" : "recording"}`}
@@ -344,7 +358,7 @@ if (!window.customCards.some((card) => card.type === CARD_TAG)) {
   window.customCards.push({
     type: CARD_TAG,
     name: CARD_NAME,
-    description: "View the latest recording and start a separate live camera stream.",
+    description: localize(undefined, "card.description"),
     preview: true,
     getEntitySuggestion: (
       hass: HomeAssistant,

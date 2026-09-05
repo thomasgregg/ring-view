@@ -43,4 +43,27 @@ describe("entity validation", () => {
     expect(warnings.some((warning) => /does not advertise/.test(warning.message))).toBe(true);
     expect(JSON.stringify(warnings)).not.toContain("top-secret-url");
   });
+
+  it("returns warnings in the active Home Assistant language", () => {
+    const config = normalizeConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+    });
+    const hass: HomeAssistant = {
+      language: "de-AT",
+      states: {
+        "camera.recording": entity("camera.recording", {
+          entity_picture: "/camera.jpg",
+        }),
+        "camera.live": entity("camera.live", { supported_features: 0 }),
+      },
+      hassUrl: (path = "") => path,
+      callWS: async () => ({}) as never,
+    };
+    expect(
+      validateEntities(hass, config).map((warning) => warning.message),
+    ).toContain(
+      "Die Live-Kamera meldet keine Unterstützung für Kamera-Streaming.",
+    );
+  });
 });

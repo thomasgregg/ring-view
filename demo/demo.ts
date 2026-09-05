@@ -71,9 +71,12 @@ if (!customElements.get("ha-camera-stream")) {
   customElements.define("ha-camera-stream", DemoCameraStream);
 }
 
+const query = new URLSearchParams(location.search);
+const language = query.get("lang") || "en";
+document.documentElement.lang = language;
+
 await import("../src/index");
 
-const query = new URLSearchParams(location.search);
 if (query.get("theme") === "dark") document.documentElement.dataset.theme = "dark";
 
 const recording: HassEntity = {
@@ -96,6 +99,8 @@ const live: HassEntity = {
 };
 
 let hass: HomeAssistant = {
+  language,
+  locale: { language },
   states: {
     [recording.entity_id]: recording,
     [live.entity_id]: live,

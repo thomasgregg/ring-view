@@ -62,6 +62,7 @@ beforeEach(() => {
   window.localStorage.clear();
   TestCameraStream.active = 0;
   TestCameraStream.autoLoad = true;
+  document.documentElement.lang = "en";
   document.body.replaceChildren();
   history.replaceState({}, "", "/");
 });

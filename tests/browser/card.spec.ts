@@ -158,3 +158,20 @@ test("shows a stable loading shell on a slow connection", async ({ page }) => {
   const frame = page.locator(".media-frame");
   expect((await frame.boundingBox())?.height).toBeGreaterThan(150);
 });
+
+test("uses Home Assistant's German locale throughout the card and viewer", async ({
+  page,
+}) => {
+  await page.goto("/demo/?lang=de-DE&delay=8000");
+  const card = page.getByRole("button", {
+    name: "Kameraansicht „Entrance“ öffnen — Letzte Aufnahme",
+  });
+  await expect(card).toHaveAttribute("title", "Letzte Aufnahme öffnen");
+  await card.click();
+  await expect(page.getByRole("tab", { name: "Letzte Aufnahme" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Kameraansicht schließen" }),
+  ).toBeVisible();
+  await page.getByRole("tab", { name: "Live" }).click();
+  await expect(page.getByText("Ring-Live-Ansicht wird verbunden…")).toBeVisible();
+});
