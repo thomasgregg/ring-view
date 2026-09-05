@@ -3,6 +3,7 @@ import "../../src/index";
 import type { HomeAssistant, HassEntity } from "../../src/types";
 import type { RingView } from "../../src/ring-view";
 import type { RingViewDialog } from "../../src/ring-view-dialog";
+import type { RingViewNativeCameraAdapter } from "../../src/media/native-camera-adapter";
 import { TestCameraStream } from "../setup";
 
 const camera = (id: string, features: number): HassEntity => ({
@@ -258,9 +259,10 @@ describe("card stream lifecycle", () => {
     dialog?.shadowRoot?.querySelector<HTMLElement>("#ring-view-tab-live")?.click();
     await flush();
 
-    const adapter = dialog?.shadowRoot?.querySelector<HTMLElement>(
-      "ring-view-native-camera-adapter",
-    );
+    const adapter =
+      dialog?.shadowRoot?.querySelector<RingViewNativeCameraAdapter>(
+        "ring-view-native-camera-adapter",
+      );
     const stream = adapter?.shadowRoot?.querySelector<
       TestCameraStream & { controls?: boolean }
     >(
@@ -268,9 +270,7 @@ describe("card stream lifecycle", () => {
     );
     expect(stream?.controls).toBe(true);
     expect(stream?.muted).toBe(true);
-    expect(
-      dialog?.shadowRoot?.querySelector(".live-surface-guard"),
-    ).not.toBeNull();
+    expect(adapter?.passiveSurface).toBe(true);
     expect(dialog?.shadowRoot?.querySelector(".audio-button")).toBeNull();
     expect(
       dialog?.shadowRoot?.querySelector('[aria-label="Enter fullscreen"]'),

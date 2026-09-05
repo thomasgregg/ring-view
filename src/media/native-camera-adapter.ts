@@ -69,6 +69,8 @@ export class RingViewNativeCameraAdapter extends LitElement {
   @property({ type: Number, attribute: false }) public aspectRatio?: number;
   @property({ attribute: false }) public fitMode: "cover" | "contain" | "fill" =
     "cover";
+  @property({ type: Boolean, attribute: "passive-surface" })
+  public passiveSurface = false;
 
   @state() private nativeAvailable = Boolean(customElements.get(NATIVE_TAG));
   private eventHost?: HTMLElement;
@@ -130,6 +132,7 @@ export class RingViewNativeCameraAdapter extends LitElement {
     }
     this.detachEventListeners();
     this.eventHost = stream;
+    stream.addEventListener("click", this.handleSurfaceClick, true);
     stream.addEventListener("load", this.handleNativeLoad, true);
     stream.addEventListener("streams", this.handleStreams as EventListener, true);
     if (!root) return;
@@ -180,6 +183,7 @@ export class RingViewNativeCameraAdapter extends LitElement {
   private detachEventListeners(): void {
     this.mediaObserver?.disconnect();
     this.mediaObserver = undefined;
+    this.eventHost?.removeEventListener("click", this.handleSurfaceClick, true);
     this.eventHost?.removeEventListener("load", this.handleNativeLoad, true);
     this.eventHost?.removeEventListener(
       "streams",
@@ -195,6 +199,15 @@ export class RingViewNativeCameraAdapter extends LitElement {
     this.eventRoot?.removeEventListener("load", this.handleShadowLoad, true);
     this.eventRoot = undefined;
   }
+
+  private handleSurfaceClick = (event: MouseEvent): void => {
+    if (!this.passiveSurface || event.detail === 0 || !this.eventHost) return;
+    const rect = this.eventHost.getBoundingClientRect();
+    const controlStripHeight = this.controls ? 64 : 0;
+    if (event.clientY >= rect.bottom - controlStripHeight) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  };
 
   private handleNativeLoad = (event: Event): void => {
     // Home Assistant explicitly emits a CustomEvent from ha-camera-stream when

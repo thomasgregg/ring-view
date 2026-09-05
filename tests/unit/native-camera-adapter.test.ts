@@ -116,4 +116,41 @@ describe("native camera adapter", () => {
     );
     expect(layoutStyle?.textContent).toContain("--video-max-height: 100%");
   });
+
+  it("suppresses live-surface clicks without blocking the native control strip", async () => {
+    const adapter = document.createElement(
+      "ring-view-native-camera-adapter",
+    ) as RingViewNativeCameraAdapter;
+    adapter.stateObj = recording;
+    adapter.controls = true;
+    adapter.passiveSurface = true;
+    document.body.append(adapter);
+    await adapter.updateComplete;
+    await flush();
+
+    const stream = adapter.shadowRoot?.querySelector("ha-camera-stream");
+    vi.spyOn(stream!, "getBoundingClientRect").mockReturnValue({
+      bottom: 500,
+    } as DOMRect);
+
+    const surfaceClick = new MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+      clientY: 200,
+      composed: true,
+      detail: 1,
+    });
+    stream?.dispatchEvent(surfaceClick);
+    expect(surfaceClick.defaultPrevented).toBe(true);
+
+    const controlClick = new MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+      clientY: 470,
+      composed: true,
+      detail: 1,
+    });
+    stream?.dispatchEvent(controlClick);
+    expect(controlClick.defaultPrevented).toBe(false);
+  });
 });

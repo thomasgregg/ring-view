@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.1.13] - 2026-09-06
+
+### Fixed
+
+- Preserve Home Assistant's native hover-to-reveal media controls across the
+  entire live image while continuing to suppress accidental surface clicks.
+
 ## [0.1.12] - 2026-09-05
 
 ### Fixed

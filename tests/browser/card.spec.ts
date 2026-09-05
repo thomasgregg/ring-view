@@ -112,20 +112,42 @@ test("renders native-style header controls without duplicate media actions", asy
   await expect(page.getByRole("dialog")).toHaveCSS("color", "rgb(242, 243, 244)");
 });
 
-test("keeps the live image passive while preserving the native control strip", async ({
+test("keeps the live image passive without covering native hover controls", async ({
   page,
 }) => {
   await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
   await page.getByRole("tab", { name: "Live" }).click();
 
-  const frame = page.locator(".media-frame");
-  const guard = page.locator(".live-surface-guard.with-controls");
-  await expect(guard).toBeVisible();
-
-  const frameBox = await frame.boundingBox();
-  const guardBox = await guard.boundingBox();
-  expect(guardBox?.y).toBe(frameBox?.y);
-  expect((frameBox?.height ?? 0) - (guardBox?.height ?? 0)).toBe(64);
+  const adapter = page.locator("ring-view-native-camera-adapter");
+  await expect(adapter).toBeVisible();
+  const clickResults = await adapter.evaluate((element) => {
+    const nativeAdapter = element as HTMLElement & { passiveSurface?: boolean };
+    const stream = nativeAdapter.shadowRoot?.querySelector("ha-camera-stream");
+    if (!stream) return null;
+    const rect = stream.getBoundingClientRect();
+    const dispatchClick = (clientY: number) => {
+      const event = new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+        clientY,
+        composed: true,
+        detail: 1,
+      });
+      stream.dispatchEvent(event);
+      return event.defaultPrevented;
+    };
+    return {
+      passiveSurface: nativeAdapter.passiveSurface,
+      surfacePrevented: dispatchClick(rect.top + 10),
+      controlsPrevented: dispatchClick(rect.bottom - 10),
+    };
+  });
+  expect(clickResults).toEqual({
+    passiveSurface: true,
+    surfacePrevented: true,
+    controlsPrevented: false,
+  });
+  await expect(page.locator(".live-surface-guard")).toHaveCount(0);
 });
 
 test("shows a stable loading shell on a slow connection", async ({ page }) => {

@@ -219,6 +219,7 @@ export class RingViewDialog extends LitElement {
                   .allowExoPlayer=${true}
                   .aspectRatio=${ratio}
                   .fitMode=${this.config!.appearance.fit_mode}
+                  .passiveSurface=${this.mode === "live"}
                   @native-media-ready=${this.handleMediaReady}
                   @native-media-error=${this.handleMediaError}
                   @native-media-capabilities=${this.handleMediaCapabilities}
@@ -244,17 +245,6 @@ export class RingViewDialog extends LitElement {
               ></video>
             `,
             )
-          : nothing}
-        ${this.mode === "live" && canRender
-          ? html`
-              <div
-                class=${classMap({
-                  "live-surface-guard": true,
-                  "with-controls": this.config!.viewer.show_controls,
-                })}
-                aria-hidden="true"
-              ></div>
-            `
           : nothing}
         ${this.renderStateLayer(unavailable, useRecordingVideo)}
       </div>
