@@ -71,8 +71,12 @@ live_entity: camera.front_door_live_view
 name: Entrance
 
 default_mode: last_recording
+remember_last_mode: false
+autoplay_recording: true
 live_muted: false
 show_name: false
+preview_source: last_recording
+show_mode_icon: true
 aspect_ratio: "16:9"
 fit_mode: cover
 
@@ -81,9 +85,9 @@ grid_options:
   rows: 3
 ```
 
-All options shown above match the built-in defaults except `name` and `grid_options`, which are optional. The graphical editor keeps the two camera sources visible and places the less-frequent viewer and appearance choices in compact, native expandable sections. Home Assistant supplies the live preview on the right, so the editor does not render a second copy.
+All options shown above match the built-in defaults except `name` and `grid_options`, which are optional. The graphical editor keeps the two camera sources visible and places viewer behavior and card appearance in compact, native expandable sections. Home Assistant supplies the live preview on the right, so the editor does not render a second copy.
 
-Version 0.2 uses this flat configuration only. The older nested `preview`, `appearance`, `viewer`, and `performance` options are intentionally not supported.
+Version 0.2 and later use this flat configuration only. The older nested `preview`, `appearance`, `viewer`, and `performance` options are intentionally not supported.
 
 ## Languages
 
@@ -95,14 +99,14 @@ configuration is needed.
 
 ### Preview semantics
 
-Like Home Assistant's native picture card, the dashboard always asks Home
-Assistant's authenticated camera proxy for a still from the last-recording
-camera, sized to the rendered card and the screen pixel density. It refreshes
-that still image every ten seconds only while the card and browser tab are
-visible, and updates the requested size after a meaningful resize. It never mounts
-`ha-camera-stream`, preconnects to the live entity, or starts a Ring live session
-on the dashboard. The icon at the top right describes what opening the card will
-do without covering the image with text:
+Like Home Assistant's native picture card, the dashboard asks Home Assistant's
+authenticated camera proxy for a still, sized to the rendered card and the
+screen pixel density. `preview_source` can use the last-recording camera, the
+live camera, or follow the view that will open. The still refreshes every ten
+seconds only while the card and browser tab are visible and is resized after a
+meaningful layout change. The dashboard never mounts `ha-camera-stream` or
+preconnects a live renderer. The optional icon at the top right describes what
+opening the card will do without covering the image with text:
 
 - A **history** icon when the viewer opens on the latest recording
 - A **red dot** when the viewer opens on Live

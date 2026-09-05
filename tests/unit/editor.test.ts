@@ -67,7 +67,11 @@ describe("visual editor", () => {
       name: "Entrance",
       show_name: true,
       default_mode: "last_recording",
+      remember_last_mode: false,
+      autoplay_recording: true,
       live_muted: false,
+      preview_source: "last_recording",
+      show_mode_icon: true,
       aspect_ratio: "16:9",
       fit_mode: "cover",
     });
@@ -155,6 +159,9 @@ describe("visual editor", () => {
       "Anzeigeverhalten",
     );
     expect(form?.computeLabel?.({ name: "name" })).toBe("Kameraname (optional)");
+    expect(form?.computeLabel?.({ name: "show_name" })).toBe(
+      "Kameranamen anzeigen",
+    );
     expect(form?.computeHelper?.({ name: "live_muted" })).toContain(
       "mit Ton zu starten",
     );
@@ -165,11 +172,40 @@ describe("visual editor", () => {
     const defaultMode = viewerBehavior?.schema?.find(
       (field) => field.name === "default_mode",
     );
+    expect(viewerBehavior?.schema?.map((field) => field.name)).toEqual([
+      "default_mode",
+      "remember_last_mode",
+      "autoplay_recording",
+      "live_muted",
+    ]);
     expect(defaultMode?.selector).toMatchObject({
       select: {
         options: [
           { value: "last_recording", label: "Letzte Aufnahme" },
           { value: "live", label: "Live" },
+        ],
+      },
+    });
+
+    const cardAppearance = form?.schema?.find(
+      (field) => field.name === "card_appearance",
+    );
+    expect(cardAppearance?.schema?.map((field) => field.name)).toEqual([
+      "name",
+      "show_name",
+      "preview_source",
+      "show_mode_icon",
+      "",
+    ]);
+    const previewSource = cardAppearance?.schema?.find(
+      (field) => field.name === "preview_source",
+    );
+    expect(previewSource?.selector).toMatchObject({
+      select: {
+        options: [
+          { value: "last_recording", label: "Standbild der letzten Aufnahme" },
+          { value: "live", label: "Standbild der Live-Kamera" },
+          { value: "default", label: "Der Startansicht folgen" },
         ],
       },
     });

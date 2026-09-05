@@ -50,6 +50,8 @@ function configSchema(hass: HomeAssistant): ConfigFormSchema[] {
             },
           },
         },
+        { name: "remember_last_mode", selector: { boolean: {} } },
+        { name: "autoplay_recording", selector: { boolean: {} } },
         { name: "live_muted", selector: { boolean: {} } },
       ],
     },
@@ -61,6 +63,29 @@ function configSchema(hass: HomeAssistant): ConfigFormSchema[] {
       schema: [
         { name: "name", selector: { text: {} } },
         { name: "show_name", selector: { boolean: {} } },
+        {
+          name: "preview_source",
+          selector: {
+            select: {
+              mode: "dropdown",
+              options: [
+                {
+                  value: "last_recording",
+                  label: localize(hass, "editor.preview_recording"),
+                },
+                {
+                  value: "live",
+                  label: localize(hass, "editor.preview_live"),
+                },
+                {
+                  value: "default",
+                  label: localize(hass, "editor.preview_default"),
+                },
+              ],
+            },
+          },
+        },
+        { name: "show_mode_icon", selector: { boolean: {} } },
         {
           name: "",
           type: "grid",
@@ -121,17 +146,26 @@ const LABELS: Record<string, TranslationKey> = {
   live_entity: "editor.live_entity",
   viewer_behavior: "editor.viewer_behavior",
   default_mode: "editor.default_mode",
+  remember_last_mode: "editor.remember_last_mode",
+  autoplay_recording: "editor.autoplay_recording",
   live_muted: "editor.live_muted",
   card_appearance: "editor.card_appearance",
   name: "editor.name",
   show_name: "editor.show_name",
+  preview_source: "editor.preview_source",
+  show_mode_icon: "editor.show_mode_icon",
   aspect_ratio: "editor.aspect_ratio",
   fit_mode: "editor.fit_mode",
 };
 
 const HELPERS: Record<string, TranslationKey> = {
   default_mode: "editor.helper_default_mode",
+  remember_last_mode: "editor.helper_remember_last_mode",
+  autoplay_recording: "editor.helper_autoplay_recording",
   live_muted: "editor.helper_live_muted",
+  show_name: "editor.helper_show_name",
+  preview_source: "editor.helper_preview_source",
+  show_mode_icon: "editor.helper_show_mode_icon",
 };
 
 @customElement("ring-view-editor")

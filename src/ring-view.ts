@@ -7,7 +7,6 @@ import {
   CARD_NAME,
   CARD_TAG,
   CARD_TYPE,
-  initialMode,
   normalizeConfig,
 } from "./config";
 import { localize } from "./localize";
@@ -18,6 +17,7 @@ import type { RingViewDialog } from "./ring-view-dialog";
 import { cardStyles } from "./styles";
 import type { GridOptions, HomeAssistant, NormalizedConfig, RingViewConfig } from "./types";
 import { entityIsUnavailable, friendlyName } from "./utilities/entity-validation";
+import { loadMode } from "./utilities/mode-storage";
 
 const PREVIEW_REFRESH_INTERVAL_MS = 10_000;
 const PREVIEW_FALLBACK_WIDTH = 640;
@@ -156,7 +156,7 @@ export class RingView extends LitElement {
         this.hass.states[this.config.recording_entity],
         localize(this.hass, "common.camera"),
       );
-    const openingMode = initialMode(this.config);
+    const openingMode = loadMode(this.config);
     const unavailable = entityIsUnavailable(previewEntity);
     const style = {
       "--ring-view-aspect-ratio": aspectRatioCss(this.config.aspect_ratio),
@@ -193,12 +193,16 @@ export class RingView extends LitElement {
                 ${localize(this.hass, "card.preview_unavailable")}
               </div>`}
           ${this.config.show_name ? html`<div class="name">${name}</div>` : nothing}
-          <div
-            class=${`mode-indicator ${openingMode === "live" ? "live" : "recording"}`}
-            aria-hidden="true"
-          >
-            ${renderModeIcon(openingMode)}
-          </div>
+          ${this.config.show_mode_icon
+            ? html`
+                <div
+                  class=${`mode-indicator ${openingMode === "live" ? "live" : "recording"}`}
+                  aria-hidden="true"
+                >
+                  ${renderModeIcon(openingMode)}
+                </div>
+              `
+            : nothing}
         </div>
       </ha-card>
       <ring-view-dialog
@@ -210,14 +214,18 @@ export class RingView extends LitElement {
   }
 
   private previewEntityId(): string {
-    return this.config!.recording_entity;
+    const source = this.config!.preview_source;
+    const mode = source === "default" ? loadMode(this.config!) : source;
+    return mode === "live"
+      ? this.config!.live_entity
+      : this.config!.recording_entity;
   }
 
   private openViewer = (): void => {
     const trigger = this.renderRoot.querySelector<HTMLElement>(".preview") ?? undefined;
     this.renderRoot
       .querySelector<RingViewDialog>("ring-view-dialog")
-      ?.show(initialMode(this.config!), trigger);
+      ?.show(loadMode(this.config!), trigger);
   };
 
   private handleKeyDown = (event: KeyboardEvent): void => {

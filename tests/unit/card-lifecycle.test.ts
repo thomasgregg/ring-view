@@ -54,6 +54,90 @@ describe("card stream lifecycle", () => {
     expect(TestCameraStream.active).toBe(0);
   });
 
+  it("uses one name setting for a top-left card label and the viewer title", async () => {
+    const card = document.createElement("ring-view");
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      name: "Entrance",
+      show_name: true,
+    });
+    card.hass = hass;
+    document.body.append(card);
+    await card.updateComplete;
+
+    expect(card.shadowRoot?.querySelector(".name")?.textContent).toBe("Entrance");
+    card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
+    await flush();
+    const dialog = card.shadowRoot?.querySelector<RingViewDialog>("ring-view-dialog");
+    expect(dialog?.shadowRoot?.querySelector("h2")?.textContent).toBe("Entrance");
+  });
+
+  it("keeps the card and viewer name hidden while preserving a dialog label", async () => {
+    const card = await mount();
+    expect(card.shadowRoot?.querySelector(".name")).toBeNull();
+    card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
+    await flush();
+    const dialog = card.shadowRoot?.querySelector<RingViewDialog>("ring-view-dialog");
+    const section = dialog?.shadowRoot?.querySelector<HTMLElement>(".dialog");
+    expect(dialog?.shadowRoot?.querySelector("h2")).toBeNull();
+    expect(section?.getAttribute("aria-label")).toBe("Camera view");
+    expect(section?.hasAttribute("aria-labelledby")).toBe(false);
+  });
+
+  it("waits for an explicit Play action when recording autoplay is disabled", async () => {
+    const card = document.createElement("ring-view");
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      autoplay_recording: false,
+    });
+    card.hass = hass;
+    document.body.append(card);
+    await card.updateComplete;
+    card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
+    await flush();
+
+    const dialog = card.shadowRoot?.querySelector<RingViewDialog>("ring-view-dialog");
+    const play = dialog?.shadowRoot?.querySelector<HTMLElement>(".play-recording");
+    expect(play?.textContent).toContain("Play last recording");
+    expect(TestCameraStream.active).toBe(0);
+    play?.click();
+    await flush();
+    expect(TestCameraStream.active).toBe(1);
+  });
+
+  it("can remember the selected view and hide the card view icon", async () => {
+    const card = document.createElement("ring-view");
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      remember_last_mode: true,
+      show_mode_icon: false,
+    });
+    card.hass = hass;
+    document.body.append(card);
+    await card.updateComplete;
+    expect(card.shadowRoot?.querySelector(".mode-indicator")).toBeNull();
+
+    card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
+    await flush();
+    let dialog = card.shadowRoot?.querySelector<RingViewDialog>("ring-view-dialog");
+    dialog?.shadowRoot?.querySelector<HTMLElement>("#ring-view-tab-live")?.click();
+    await flush();
+    dialog?.close();
+    await flush();
+
+    card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
+    await flush();
+    dialog = card.shadowRoot?.querySelector<RingViewDialog>("ring-view-dialog");
+    expect(
+      dialog?.shadowRoot
+        ?.querySelector("#ring-view-tab-live")
+        ?.getAttribute("aria-selected"),
+    ).toBe("true");
+  });
+
   it("refreshes a native-sized still only while the preview is visible", async () => {
     vi.useFakeTimers();
     let intersectionCallback: IntersectionObserverCallback | undefined;

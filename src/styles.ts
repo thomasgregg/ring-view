@@ -73,16 +73,17 @@ export const cardStyles = css`
 
   .name {
     position: absolute;
-    inset-inline: 0;
-    bottom: 0;
-    padding: 24px 16px 14px;
+    inset: 12px auto auto 16px;
+    max-width: calc(100% - 76px);
+    padding: 0;
     overflow: hidden;
     color: var(--ha-picture-card-text-color, #fff);
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.72));
+    background: none;
     font-size: var(--ha-font-size-l, 16px);
     font-weight: 500;
     line-height: 20px;
     text-overflow: ellipsis;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.82);
     white-space: nowrap;
     pointer-events: none;
   }
@@ -194,6 +195,7 @@ export const dialogStyles = css`
   }
 
   .header-actions {
+    grid-column: 2;
     display: flex;
     align-items: center;
     gap: 2px;
@@ -396,6 +398,21 @@ export const dialogStyles = css`
     background: rgba(0, 0, 0, 0.38);
     font-weight: 600;
     cursor: pointer;
+  }
+
+  .play-recording {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .play-recording svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .play-layer {
+    background: rgba(0, 0, 0, 0.18);
   }
 
   .action-button.primary {

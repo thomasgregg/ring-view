@@ -1,4 +1,4 @@
-import { mdiClose } from "@mdi/js";
+import { mdiClose, mdiPlay } from "@mdi/js";
 import { LitElement, html, nothing, type PropertyValues, type TemplateResult } from "lit";
 import { classMap } from "lit/directives/class-map.js";
 import { keyed } from "lit/directives/keyed.js";
@@ -21,6 +21,7 @@ import type {
   NormalizedConfig,
 } from "./types";
 import { entityIsUnavailable, friendlyName } from "./utilities/entity-validation";
+import { saveMode } from "./utilities/mode-storage";
 import { StreamLifecycle } from "./utilities/stream-lifecycle";
 
 type MediaStatus = "idle" | "pending" | "ready" | "error" | "compatibility";
@@ -39,6 +40,7 @@ export class RingViewDialog extends LitElement {
   @state() private session = 0;
   @state() private suspended = false;
   @state() private recordingMuted = false;
+  @state() private recordingStarted = true;
   @state() private liveMuted = true;
   @state() private liveHasAudio?: boolean;
   @state() private recordingVideoFailed = false;
@@ -58,6 +60,7 @@ export class RingViewDialog extends LitElement {
     this.opener = opener;
     this.mode = mode;
     this.liveMuted = this.config.live_muted;
+    this.recordingStarted = mode === "live" || this.config.autoplay_recording;
     this.retryCount = 0;
     this.audioFallbackAttempted = false;
     this.recordingPlaybackPending = false;
@@ -101,6 +104,7 @@ export class RingViewDialog extends LitElement {
   protected render() {
     if (!this.open || !this.hass || !this.config) return nothing;
     const title = this.dialogTitle();
+    const showTitle = this.config.show_name;
     const ratio = this.config.aspect_ratio;
     const style = {
       "--ring-view-aspect-ratio":
@@ -115,13 +119,18 @@ export class RingViewDialog extends LitElement {
         style=${styleMap(style)}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="ring-view-dialog-title"
+        aria-labelledby=${showTitle ? "ring-view-dialog-title" : nothing}
+        aria-label=${showTitle
+          ? nothing
+          : localize(this.hass, "viewer.camera_view")}
         @keydown=${this.handleKeyDown}
       >
         <div class="body">
           ${this.renderMedia()}
           <header class="header">
-            <h2 id="ring-view-dialog-title">${title}</h2>
+            ${showTitle
+              ? html`<h2 id="ring-view-dialog-title">${title}</h2>`
+              : nothing}
             <div class="header-actions">
               <button
                 class="icon-button close"
@@ -190,7 +199,10 @@ export class RingViewDialog extends LitElement {
     const entity = this.activeEntity();
     const entityId = this.activeEntityId();
     const unavailable = entityIsUnavailable(entity);
-    const canRender = !unavailable && !this.suspended;
+    const canRender =
+      !unavailable &&
+      !this.suspended &&
+      (this.mode === "live" || this.recordingStarted);
     const ratio = aspectRatioNumber(this.config!.aspect_ratio);
     const poster = posterUrl(this.hass!, entity, entityId);
     const fallbackUrl =
@@ -293,6 +305,22 @@ export class RingViewDialog extends LitElement {
       `;
     }
 
+    if (this.mode === "last_recording" && !this.recordingStarted) {
+      return html`
+        <div class="state-layer play-layer">
+          <button
+            class="action-button primary play-recording"
+            type="button"
+            aria-label=${localize(this.hass, "viewer.play_recording")}
+            @click=${this.startRecording}
+          >
+            ${this.icon(mdiPlay)}
+            <span>${localize(this.hass, "viewer.play_recording")}</span>
+          </button>
+        </div>
+      `;
+    }
+
     if (this.mediaStatus === "pending") {
       return html`
         <div class="state-layer" role="status">
@@ -373,7 +401,9 @@ export class RingViewDialog extends LitElement {
     if (!this.config || mode === this.mode) return;
     this.lifecycle.dispose();
     this.mode = mode;
+    saveMode(this.config, mode);
     this.liveMuted = this.config.live_muted;
+    this.recordingStarted = mode === "live" || this.config.autoplay_recording;
     this.retryCount = 0;
     this.audioFallbackAttempted = false;
     this.recordingPlaybackPending = false;
@@ -392,6 +422,10 @@ export class RingViewDialog extends LitElement {
 
   private startMedia(): void {
     if (!this.open || this.suspended) {
+      this.mediaStatus = "idle";
+      return;
+    }
+    if (this.mode === "last_recording" && !this.recordingStarted) {
       this.mediaStatus = "idle";
       return;
     }
@@ -553,6 +587,12 @@ export class RingViewDialog extends LitElement {
     this.startMedia();
   };
 
+  private startRecording = (): void => {
+    if (this.mode !== "last_recording" || this.recordingStarted) return;
+    this.recordingStarted = true;
+    this.startMedia();
+  };
+
   private openMoreInfo = (): void => {
     this.dispatchEvent(
       new CustomEvent("hass-more-info", {
@@ -686,6 +726,7 @@ export class RingViewDialog extends LitElement {
     this.suspended = false;
     this.recordingPlaybackPending = false;
     this.recordingPlaybackStarted = false;
+    this.recordingStarted = true;
     this.recordingMuted = false;
     this.liveHasAudio = undefined;
     this.recordingVideoFailed = false;

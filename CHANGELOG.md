@@ -4,6 +4,26 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-06
+
+### Added
+
+- Restore focused flat options for remembering the last selected view,
+  recording autoplay, the dashboard preview source, and the view icon.
+- Add English and German labels, choices, and contextual help for every
+  restored option.
+
+### Changed
+
+- Make **Show camera name** control the name consistently in both the dashboard
+  card and the detail viewer.
+- Move the optional dashboard name to the top left to match the detail viewer
+  and remove the former bottom gradient label.
+- Preserve an accessible generic name for the detail dialog when the visible
+  camera name is disabled.
+- Keep stream timeout, retry, hidden-tab suspension, native controls, and
+  Escape behavior automatic instead of exposing technical or safety switches.
+
 ## [0.2.1] - 2026-09-06
 
 ### Added

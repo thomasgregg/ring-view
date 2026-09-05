@@ -25,7 +25,9 @@ test("opens, switches recording → live → recording, and tears down", async (
   await expect.poll(() => page.evaluate(() => window.demoPeakStreams)).toBe(1);
   await page.getByRole("button", { name: "Close camera viewer" }).click();
   await expect(page.getByRole("dialog")).toBeHidden();
-  await expect.poll(() => page.evaluate(() => window.demoActiveStreams)).toBe(0);
+  await expect
+    .poll(() => page.evaluate(() => window.demoActiveStreams ?? 0))
+    .toBe(0);
 });
 
 test("supports keyboard opening, tab selection, focus return, and Escape", async ({ page }) => {
@@ -110,6 +112,47 @@ test("renders native-style header controls without duplicate media actions", asy
   await expect(page.getByRole("tab", { name: "Last recording" }).locator(".mode-icon-recording")).toBeVisible();
   await expect(page.getByRole("tab", { name: "Live" }).locator(".mode-icon-live")).toBeVisible();
   await expect(page.getByRole("dialog")).toHaveCSS("color", "rgb(242, 243, 244)");
+});
+
+test("places the optional camera name at the top left in both views", async ({
+  page,
+}) => {
+  await page.goto("/demo/?name=1");
+  const card = page.getByRole("button", { name: /Open Entrance viewer/ });
+  const name = page.locator("ring-view .name");
+  await expect(name).toHaveText("Entrance");
+  const cardBox = await card.boundingBox();
+  const nameBox = await name.boundingBox();
+  expect((nameBox?.y ?? 0) - (cardBox?.y ?? 0)).toBeLessThan(32);
+
+  await card.click();
+  await expect(page.getByRole("heading", { name: "Entrance" })).toBeVisible();
+});
+
+test("hides the camera name from both views when disabled", async ({ page }) => {
+  await expect(page.locator("ring-view .name")).toHaveCount(0);
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  await expect(page.getByRole("dialog", { name: "Camera view" })).toBeVisible();
+  await expect(page.locator("ring-view-dialog h2")).toHaveCount(0);
+});
+
+test("supports restored playback and card appearance choices", async ({ page }) => {
+  await page.goto("/demo/?autoplay=0&icon=0&remember=1");
+  await expect(page.locator("ring-view .mode-indicator")).toHaveCount(0);
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  await expect(page.getByRole("button", { name: "Play last recording" })).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => window.demoActiveStreams ?? 0))
+    .toBe(0);
+  await page.getByRole("button", { name: "Play last recording" }).click();
+  await expect.poll(() => page.evaluate(() => window.demoActiveStreams)).toBe(1);
+  await page.getByRole("tab", { name: "Live" }).click();
+  await page.getByRole("button", { name: "Close camera viewer" }).click();
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  await expect(page.getByRole("tab", { name: "Live" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
 });
 
 test("keeps the live image passive without covering native hover controls", async ({

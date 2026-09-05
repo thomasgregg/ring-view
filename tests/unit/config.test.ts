@@ -11,8 +11,12 @@ describe("configuration", () => {
     expect(config).toMatchObject({
       type: "custom:ring-view",
       default_mode: "last_recording",
+      remember_last_mode: false,
+      autoplay_recording: true,
       live_muted: false,
       show_name: false,
+      preview_source: "last_recording",
+      show_mode_icon: true,
       aspect_ratio: "16:9",
       fit_mode: "cover",
     });
@@ -29,6 +33,13 @@ describe("configuration", () => {
         fit_mode: "fill",
       } as never),
     ).toThrow(/fit_mode/);
+    expect(() =>
+      validateConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        preview_source: "moving_picture",
+      } as never),
+    ).toThrow(/preview_source/);
   });
 
   it("preserves explicit grid sizing", () => {

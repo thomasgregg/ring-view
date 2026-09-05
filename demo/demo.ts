@@ -1,4 +1,8 @@
-import type { HassEntity, HomeAssistant } from "../src/types";
+import type {
+  HassEntity,
+  HomeAssistant,
+  PreviewSource,
+} from "../src/types";
 
 class HaCard extends HTMLElement {}
 
@@ -111,12 +115,22 @@ let hass: HomeAssistant = {
 };
 
 const card = document.createElement("ring-view");
+const requestedPreview = query.get("preview");
+const previewSource: PreviewSource =
+  requestedPreview === "live" || requestedPreview === "default"
+    ? requestedPreview
+    : "last_recording";
 card.setConfig({
   type: "custom:ring-view",
   recording_entity: recording.entity_id,
   live_entity: live.entity_id,
   name: "Entrance",
+  default_mode: query.get("mode") === "live" ? "live" : "last_recording",
+  remember_last_mode: query.get("remember") === "1",
+  autoplay_recording: query.get("autoplay") !== "0",
   show_name: query.get("name") === "1",
+  preview_source: previewSource,
+  show_mode_icon: query.get("icon") !== "0",
 });
 card.hass = hass;
 document.querySelector("#card-root")!.append(card);

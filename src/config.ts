@@ -7,13 +7,18 @@ export const CARD_NAME = "Ring View";
 
 const DEFAULTS = {
   default_mode: "last_recording",
+  remember_last_mode: false,
+  autoplay_recording: true,
   live_muted: false,
   show_name: false,
+  preview_source: "last_recording",
+  show_mode_icon: true,
   aspect_ratio: "16:9",
   fit_mode: "cover",
 } as const;
 
 const CAMERA_MODES = new Set(["last_recording", "live"]);
+const PREVIEW_SOURCES = new Set(["last_recording", "live", "default"]);
 const ASPECT_RATIOS = new Set(["auto", "16:9", "4:3", "1:1"]);
 const FIT_MODES = new Set(["cover", "contain"]);
 
@@ -40,6 +45,9 @@ export function validateConfig(config: RingViewConfig): void {
   if (config.default_mode && !CAMERA_MODES.has(config.default_mode)) {
     throw new Error(localize(undefined, "config.default_mode"));
   }
+  if (config.preview_source && !PREVIEW_SOURCES.has(config.preview_source)) {
+    throw new Error(localize(undefined, "config.preview_source"));
+  }
   if (config.aspect_ratio && !ASPECT_RATIOS.has(config.aspect_ratio)) {
     throw new Error(localize(undefined, "config.aspect_ratio"));
   }
@@ -56,8 +64,14 @@ export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
     live_entity: config.live_entity,
     name: config.name,
     default_mode: config.default_mode ?? DEFAULTS.default_mode,
+    remember_last_mode:
+      config.remember_last_mode ?? DEFAULTS.remember_last_mode,
+    autoplay_recording:
+      config.autoplay_recording ?? DEFAULTS.autoplay_recording,
     live_muted: config.live_muted ?? DEFAULTS.live_muted,
     show_name: config.show_name ?? DEFAULTS.show_name,
+    preview_source: config.preview_source ?? DEFAULTS.preview_source,
+    show_mode_icon: config.show_mode_icon ?? DEFAULTS.show_mode_icon,
     aspect_ratio: config.aspect_ratio ?? DEFAULTS.aspect_ratio,
     fit_mode: config.fit_mode ?? DEFAULTS.fit_mode,
     grid_options: config.grid_options,
