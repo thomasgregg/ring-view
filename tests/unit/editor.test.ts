@@ -27,25 +27,29 @@ const hass: HomeAssistant = {
 };
 
 describe("visual editor", () => {
-  it("emits nested preview updates as a card configuration change", async () => {
+  it("emits the compact flat configuration and removes obsolete options", async () => {
     const editor = document.createElement("ring-view-editor");
     editor.hass = hass;
     editor.setConfig({
       recording_entity: "camera.recording",
       live_entity: "camera.live",
-    });
+      preview: { source: "live" },
+    } as never);
     const listener = vi.fn();
     editor.addEventListener("config-changed", listener);
     document.body.append(editor);
     await editor.updateComplete;
 
-    const previewForm = editor.shadowRoot?.querySelector<HTMLElement>(
-      'ha-form[data-target="preview"]',
-    );
-    previewForm?.dispatchEvent(
+    const form = editor.shadowRoot?.querySelector<HTMLElement>("ha-form");
+    form?.dispatchEvent(
       new CustomEvent("value-changed", {
         detail: {
-          value: { source: "live", show_name: true, show_mode_badge: false },
+          value: {
+            recording_entity: "camera.recording",
+            live_entity: "camera.live",
+            show_name: true,
+            name: "Entrance",
+          },
         },
         bubbles: true,
         composed: true,
@@ -57,11 +61,17 @@ describe("visual editor", () => {
     const event = listener.mock.calls[0]?.[0] as CustomEvent<{
       config: RingViewConfig;
     }>;
-    expect(event.detail.config.preview).toEqual({
-      source: "live",
+    expect(event.detail.config).toMatchObject({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      name: "Entrance",
       show_name: true,
-      show_mode_badge: false,
+      default_mode: "last_recording",
+      live_muted: false,
+      aspect_ratio: "16:9",
+      fit_mode: "cover",
     });
+    expect(event.detail.config).not.toHaveProperty("preview");
   });
 
   it("shows a capability warning for a non-streaming live entity", async () => {
@@ -82,46 +92,38 @@ describe("visual editor", () => {
     expect(editor.shadowRoot?.textContent).toContain(
       "does not advertise camera streaming support",
     );
+    expect(editor.shadowRoot?.querySelector("ha-alert")).not.toBeNull();
   });
 
-  it("keeps the dashboard preview on the right and reveals the name field on demand", async () => {
+  it("uses one native form with two compact expandable groups and no duplicate preview", async () => {
     const editor = document.createElement("ring-view-editor");
     editor.hass = hass;
     editor.setConfig({
       recording_entity: "camera.recording",
       live_entity: "camera.live",
-      preview: { source: "live", show_mode_badge: false, show_name: false },
     });
     document.body.append(editor);
     await editor.updateComplete;
 
-    const layout = editor.shadowRoot?.querySelector(".editor-layout");
-    expect(layout?.lastElementChild?.classList.contains("preview-pane")).toBe(true);
-    expect(editor.shadowRoot?.querySelector(".preview-card img")).not.toBeNull();
-    expect(editor.shadowRoot?.querySelector(".preview-mode-indicator")).toBeNull();
+    const forms = editor.shadowRoot?.querySelectorAll<HTMLElement>("ha-form");
+    expect(forms).toHaveLength(1);
+    expect(editor.shadowRoot?.querySelector(".preview-card")).toBeNull();
+    expect(editor.shadowRoot?.querySelector(".settings-group")).toBeNull();
 
-    const previewForms = editor.shadowRoot?.querySelectorAll<HTMLElement>(
-      'ha-form[data-target="preview"]',
-    );
-    previewForms?.[1]?.dispatchEvent(
-      new CustomEvent("value-changed", {
-        detail: { value: { show_name: true } },
-        bubbles: true,
-        composed: true,
-      }),
-    );
-    await editor.updateComplete;
-
-    expect(editor.shadowRoot?.querySelector(".preview-name")).not.toBeNull();
-    const rootForms = Array.from(
-      editor.shadowRoot?.querySelectorAll<HTMLElement>('ha-form[data-target="root"]') ?? [],
-    );
+    const schema = (forms?.[0] as HTMLElement & { schema?: ConfigFormSchema[] }).schema ?? [];
+    expect(schema.slice(0, 2).map((field) => field.name)).toEqual([
+      "recording_entity",
+      "live_entity",
+    ]);
     expect(
-      rootForms.some((form) =>
-        ((form as HTMLElement & { schema?: ConfigFormSchema[] }).schema ?? []).some(
-          (field) => field.name === "name",
-        ),
-      ),
-    ).toBe(true);
+      schema.filter((field) => field.type === "expandable").map((field) => ({
+        name: field.name,
+        flatten: field.flatten,
+        icon: Boolean(field.iconPath),
+      })),
+    ).toEqual([
+      { name: "viewer_behavior", flatten: true, icon: true },
+      { name: "card_appearance", flatten: true, icon: true },
+    ]);
   });
 });

@@ -11,7 +11,7 @@ npm run test:browser
 npm run build
 ```
 
-The unit suite covers configuration defaults and validation, remembered-mode storage, entity capability states, timeout invalidation, no dashboard stream, single-renderer switching, close teardown, and disconnect teardown.
+The unit suite covers configuration defaults and validation, native editor structure, entity capability states, timeout invalidation, no dashboard stream, single-renderer switching, close teardown, and disconnect teardown.
 
 The browser suite covers opening/closing, recording → live → recording, keyboard operation, focus return, browser Back, entity unavailability while open, phone orientation changes, native-style header controls, slow media readiness, and stream-count invariants.
 
@@ -36,7 +36,7 @@ Verify each item on current stable Home Assistant and, where practical, the prev
 6. Rapid repeated switching never leaves two active media renderers.
 7. iOS and Android Companion apps both play recording and live views.
 8. Native controls and audio behavior work with the configured mute setting.
-9. No authenticated URL or token appears in debug logs or Lovelace storage.
+9. No authenticated URL or token appears in browser logs or Lovelace storage.
 
 ## Visual matrix
 

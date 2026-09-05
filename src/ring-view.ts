@@ -7,6 +7,7 @@ import {
   CARD_NAME,
   CARD_TAG,
   CARD_TYPE,
+  initialMode,
   normalizeConfig,
 } from "./config";
 import { posterUrl, sizedPosterUrl } from "./media/poster-provider";
@@ -14,15 +15,8 @@ import { modeLabel, renderModeIcon } from "./mode-icon";
 import "./ring-view-dialog";
 import type { RingViewDialog } from "./ring-view-dialog";
 import { cardStyles } from "./styles";
-import type {
-  CameraMode,
-  GridOptions,
-  HomeAssistant,
-  NormalizedConfig,
-  RingViewConfig,
-} from "./types";
+import type { GridOptions, HomeAssistant, NormalizedConfig, RingViewConfig } from "./types";
 import { entityIsUnavailable, friendlyName } from "./utilities/entity-validation";
-import { loadMode } from "./utilities/mode-storage";
 
 const PREVIEW_REFRESH_INTERVAL_MS = 10_000;
 const PREVIEW_FALLBACK_WIDTH = 640;
@@ -156,11 +150,11 @@ export class RingView extends LitElement {
     const name =
       this.config.name ||
       friendlyName(this.hass.states[this.config.recording_entity], "Camera");
-    const openingMode = loadMode(this.config);
+    const openingMode = initialMode(this.config);
     const unavailable = entityIsUnavailable(previewEntity);
     const style = {
-      "--ring-view-aspect-ratio": aspectRatioCss(this.config.appearance.aspect_ratio),
-      "--ring-view-fit-mode": this.config.appearance.fit_mode,
+      "--ring-view-aspect-ratio": aspectRatioCss(this.config.aspect_ratio),
+      "--ring-view-fit-mode": this.config.fit_mode,
     };
 
     return html`
@@ -184,17 +178,13 @@ export class RingView extends LitElement {
                 />
               `
             : html`<div class="placeholder">Camera preview unavailable</div>`}
-          ${this.config.preview.show_name ? html`<div class="name">${name}</div>` : nothing}
-          ${this.config.preview.show_mode_badge
-            ? html`
-                <div
-                  class=${`mode-indicator ${openingMode === "live" ? "live" : "recording"}`}
-                  aria-hidden="true"
-                >
-                  ${renderModeIcon(openingMode)}
-                </div>
-              `
-            : nothing}
+          ${this.config.show_name ? html`<div class="name">${name}</div>` : nothing}
+          <div
+            class=${`mode-indicator ${openingMode === "live" ? "live" : "recording"}`}
+            aria-hidden="true"
+          >
+            ${renderModeIcon(openingMode)}
+          </div>
         </div>
       </ha-card>
       <ring-view-dialog
@@ -206,21 +196,14 @@ export class RingView extends LitElement {
   }
 
   private previewEntityId(): string {
-    const source = this.config!.preview.source;
-    const mode: CameraMode =
-      source === "default"
-        ? this.config!.default_mode
-        : source === "live"
-          ? "live"
-          : "last_recording";
-    return mode === "live" ? this.config!.live_entity : this.config!.recording_entity;
+    return this.config!.recording_entity;
   }
 
   private openViewer = (): void => {
     const trigger = this.renderRoot.querySelector<HTMLElement>(".preview") ?? undefined;
     this.renderRoot
       .querySelector<RingViewDialog>("ring-view-dialog")
-      ?.show(loadMode(this.config!), trigger);
+      ?.show(initialMode(this.config!), trigger);
   };
 
   private handleKeyDown = (event: KeyboardEvent): void => {
@@ -320,7 +303,7 @@ export class RingView extends LitElement {
     const cssWidth = renderedWidth > 0 ? renderedWidth : PREVIEW_FALLBACK_WIDTH;
     const renderedHeight = preview.clientHeight || preview.getBoundingClientRect().height;
     const configuredRatio =
-      aspectRatioNumber(this.config.appearance.aspect_ratio) ?? PREVIEW_FALLBACK_RATIO;
+      aspectRatioNumber(this.config.aspect_ratio) ?? PREVIEW_FALLBACK_RATIO;
     const cssHeight = renderedHeight > 0 ? renderedHeight : cssWidth / configuredRatio;
     const width = Math.ceil(cssWidth * pixelRatio);
     const height = Math.ceil(cssHeight * pixelRatio);

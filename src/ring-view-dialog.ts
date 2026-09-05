@@ -1,4 +1,4 @@
-import { mdiClose, mdiPlay } from "@mdi/js";
+import { mdiClose } from "@mdi/js";
 import { LitElement, html, nothing, type PropertyValues, type TemplateResult } from "lit";
 import { classMap } from "lit/directives/class-map.js";
 import { keyed } from "lit/directives/keyed.js";
@@ -20,10 +20,10 @@ import type {
   NormalizedConfig,
 } from "./types";
 import { entityIsUnavailable, friendlyName } from "./utilities/entity-validation";
-import { saveMode } from "./utilities/mode-storage";
 import { StreamLifecycle } from "./utilities/stream-lifecycle";
 
 type MediaStatus = "idle" | "pending" | "ready" | "error" | "compatibility";
+const LIVE_TIMEOUT_SECONDS = 20;
 
 @customElement("ring-view-dialog")
 export class RingViewDialog extends LitElement {
@@ -37,7 +37,6 @@ export class RingViewDialog extends LitElement {
   @state() private mediaStatus: MediaStatus = "idle";
   @state() private session = 0;
   @state() private suspended = false;
-  @state() private recordingStarted = true;
   @state() private recordingMuted = false;
   @state() private liveMuted = true;
   @state() private liveHasAudio?: boolean;
@@ -57,9 +56,7 @@ export class RingViewDialog extends LitElement {
     if (!this.config || !this.hass || this.open) return;
     this.opener = opener;
     this.mode = mode;
-    this.liveMuted = this.config.viewer.live_muted;
-    this.recordingStarted =
-      mode === "live" || this.config.autoplay_recording;
+    this.liveMuted = this.config.live_muted;
     this.retryCount = 0;
     this.audioFallbackAttempted = false;
     this.recordingPlaybackPending = false;
@@ -69,7 +66,6 @@ export class RingViewDialog extends LitElement {
     this.recordingVideoFailed = false;
     this.suspended = false;
     this.open = true;
-    this.debugLog("Viewer opened");
     this.pushHistoryEntry();
     this.attachGlobalListeners();
     this.startMedia();
@@ -104,11 +100,11 @@ export class RingViewDialog extends LitElement {
   protected render() {
     if (!this.open || !this.hass || !this.config) return nothing;
     const title = this.dialogTitle();
-    const ratio = this.config.appearance.aspect_ratio;
+    const ratio = this.config.aspect_ratio;
     const style = {
       "--ring-view-aspect-ratio":
         ratio === "auto" ? "16 / 9" : ratio.replace(":", " / "),
-      "--ring-view-fit-mode": this.config.appearance.fit_mode,
+      "--ring-view-fit-mode": this.config.fit_mode,
     };
 
     return html`
@@ -184,8 +180,8 @@ export class RingViewDialog extends LitElement {
     const entity = this.activeEntity();
     const entityId = this.activeEntityId();
     const unavailable = entityIsUnavailable(entity);
-    const canRender = !unavailable && this.recordingStarted && !this.suspended;
-    const ratio = aspectRatioNumber(this.config!.appearance.aspect_ratio);
+    const canRender = !unavailable && !this.suspended;
+    const ratio = aspectRatioNumber(this.config!.aspect_ratio);
     const poster = posterUrl(this.hass!, entity, entityId);
     const fallbackUrl =
       this.mode === "last_recording" && typeof entity?.attributes.video_url === "string"
@@ -199,7 +195,7 @@ export class RingViewDialog extends LitElement {
       <div
         class=${classMap({
           "media-frame": true,
-          "auto-ratio": this.config!.appearance.aspect_ratio === "auto",
+          "auto-ratio": this.config!.aspect_ratio === "auto",
         })}
         role="tabpanel"
         aria-labelledby=${
@@ -214,11 +210,11 @@ export class RingViewDialog extends LitElement {
                 <ring-view-native-camera-adapter
                   class=${this.mediaStatus === "pending" ? "pending" : ""}
                   .stateObj=${entity}
-                  .controls=${this.config!.viewer.show_controls}
+                  .controls=${true}
                   .muted=${this.mode === "live" ? this.liveMuted : this.recordingMuted}
                   .allowExoPlayer=${true}
                   .aspectRatio=${ratio}
-                  .fitMode=${this.config!.appearance.fit_mode}
+                  .fitMode=${this.config!.fit_mode}
                   .passiveSurface=${this.mode === "live"}
                   @native-media-ready=${this.handleMediaReady}
                   @native-media-error=${this.handleMediaError}
@@ -238,7 +234,7 @@ export class RingViewDialog extends LitElement {
                 playsinline
                 autoplay
                 preload="auto"
-                ?controls=${this.config!.viewer.show_controls}
+                controls
                 .muted=${this.recordingMuted}
                 @canplay=${this.handleRecordingCanPlay}
                 @error=${this.handleRecordingVideoError}
@@ -268,23 +264,6 @@ export class RingViewDialog extends LitElement {
               </button>
               ${this.renderAlternateModeButton()}
             </div>
-          </div>
-        </div>
-      `;
-    }
-
-    if (this.mode === "last_recording" && !this.recordingStarted) {
-      return html`
-        <div class="state-layer">
-          <div class="state-card">
-            <button
-              class="action-button primary"
-              type="button"
-              aria-label="Play last recording"
-              @click=${this.startRecording}
-            >
-              ${this.icon(mdiPlay)} Play last recording
-            </button>
           </div>
         </div>
       `;
@@ -373,9 +352,7 @@ export class RingViewDialog extends LitElement {
     if (!this.config || mode === this.mode) return;
     this.lifecycle.dispose();
     this.mode = mode;
-    saveMode(this.config, mode);
-    this.recordingStarted = mode === "live" || this.config.autoplay_recording;
-    this.liveMuted = this.config.viewer.live_muted;
+    this.liveMuted = this.config.live_muted;
     this.retryCount = 0;
     this.audioFallbackAttempted = false;
     this.recordingPlaybackPending = false;
@@ -385,17 +362,11 @@ export class RingViewDialog extends LitElement {
     this.recordingVideoFailed = false;
     this.statusAnnouncement =
       mode === "live" ? "Live view selected." : "Last recording selected.";
-    this.debugLog(`Mode selected: ${mode}`);
     this.startMedia();
   }
 
-  private startRecording = (): void => {
-    this.recordingStarted = true;
-    this.startMedia();
-  };
-
   private startMedia(): void {
-    if (!this.open || this.suspended || !this.recordingStarted) {
+    if (!this.open || this.suspended) {
       this.mediaStatus = "idle";
       return;
     }
@@ -406,10 +377,9 @@ export class RingViewDialog extends LitElement {
     }
     this.mediaStatus = "pending";
     this.session = this.lifecycle.next();
-    const timeoutSeconds = this.config?.performance.live_timeout_seconds ?? 20;
     this.lifecycle.scheduleTimeout(
       () => this.failMedia(true),
-      timeoutSeconds * 1_000,
+      LIVE_TIMEOUT_SECONDS * 1_000,
     );
   }
 
@@ -422,7 +392,6 @@ export class RingViewDialog extends LitElement {
         : this.recordingMuted
           ? "Last recording loaded. Audio is muted because the browser blocked audible autoplay."
           : "Last recording loaded. Audio is available.";
-    this.debugLog(`Media ready: ${this.mode}`);
   };
 
   private handleMediaCapabilities = (
@@ -512,7 +481,6 @@ export class RingViewDialog extends LitElement {
       this.lifecycle.clearTimeout();
       this.mediaStatus = "compatibility";
       this.statusAnnouncement = "Native camera playback is unavailable.";
-      this.debugLog("Native camera component unavailable");
       return;
     }
     if (this.mode === "live" && !this.liveMuted && !this.audioFallbackAttempted) {
@@ -526,12 +494,7 @@ export class RingViewDialog extends LitElement {
   };
 
   private failMedia(allowAutomaticRetry: boolean): void {
-    if (
-      allowAutomaticRetry &&
-      this.mode === "live" &&
-      this.config?.performance.retry_live_once &&
-      this.retryCount < 1
-    ) {
+    if (allowAutomaticRetry && this.mode === "live" && this.retryCount < 1) {
       this.retryCount += 1;
       this.statusAnnouncement = "Retrying Ring live view.";
       this.startMedia();
@@ -544,7 +507,6 @@ export class RingViewDialog extends LitElement {
       this.mode === "live"
         ? "Live view could not be started."
         : "No Ring recording is currently available.";
-    this.debugLog(`Media failed: ${this.mode}`);
   }
 
   private retry = (): void => {
@@ -662,7 +624,7 @@ export class RingViewDialog extends LitElement {
   };
 
   private handleDocumentKeyDown = (event: KeyboardEvent): void => {
-    if (event.key !== "Escape" || !this.config?.viewer.close_on_escape) return;
+    if (event.key !== "Escape") return;
     if (document.fullscreenElement) return;
     event.preventDefault();
     event.stopPropagation();
@@ -670,7 +632,7 @@ export class RingViewDialog extends LitElement {
   };
 
   private handleVisibilityChange = (): void => {
-    if (!this.open || !this.config?.performance.suspend_when_hidden) return;
+    if (!this.open) return;
     if (document.hidden) {
       this.lifecycle.dispose();
       this.session = this.lifecycle.current();
@@ -696,7 +658,6 @@ export class RingViewDialog extends LitElement {
     this.recordingVideoFailed = false;
     this.detachGlobalListeners();
     if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
-    this.debugLog("Viewer closed");
     this.dispatchEvent(
       new CustomEvent("viewer-closed", { bubbles: true, composed: true }),
     );
@@ -708,10 +669,6 @@ export class RingViewDialog extends LitElement {
     return html`<svg viewBox="0 0 24 24" aria-hidden="true"><path d=${path}></path></svg>`;
   }
 
-  private debugLog(message: string): void {
-    if (!this.config?.performance.debug) return;
-    console.debug("[ring-view]", message);
-  }
 }
 
 declare global {

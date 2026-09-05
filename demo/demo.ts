@@ -111,8 +111,7 @@ card.setConfig({
   recording_entity: recording.entity_id,
   live_entity: live.entity_id,
   name: "Entrance",
-  preview: { show_name: query.get("name") === "1", show_mode_badge: true },
-  performance: { live_timeout_seconds: 10, retry_live_once: true },
+  show_name: query.get("name") === "1",
 });
 card.hass = hass;
 document.querySelector("#card-root")!.append(card);

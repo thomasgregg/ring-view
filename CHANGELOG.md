@@ -4,6 +4,30 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-06
+
+### Changed
+
+- Redesign the visual editor around Home Assistant's native form language: keep
+  the two camera selectors visible and group viewer behavior and card appearance
+  into compact icon-led expandable rows.
+- Remove the editor's duplicate dashboard preview because Home Assistant already
+  provides the authoritative live preview beside the form.
+- Replace the large custom settings cards and warning styling with native
+  `ha-form` expandable sections and `ha-alert` warnings.
+- Reduce the public configuration to the meaningful flat options:
+  `default_mode`, `live_muted`, `show_name`, `name`, `aspect_ratio`, and
+  `fit_mode`.
+
+### Removed
+
+- Remove the nested `preview`, `appearance`, `viewer`, and `performance`
+  configuration groups without backward compatibility.
+- Remove remembered-mode storage, configurable autoplay, preview-source and
+  view-icon switches, media-control and Escape switches, and technical stream
+  tuning from the visual editor and public configuration.
+- Remove the distortion-prone `fill` image mode.
+
 ## [0.1.13] - 2026-09-06
 
 ### Fixed

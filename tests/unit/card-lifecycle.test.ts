@@ -240,7 +240,7 @@ describe("card stream lifecycle", () => {
     card.setConfig({
       recording_entity: "camera.recording",
       live_entity: "camera.live",
-      viewer: { show_controls: true, live_muted: true },
+      live_muted: true,
     });
     card.hass = hass;
     document.body.append(card);

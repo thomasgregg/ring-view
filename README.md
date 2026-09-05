@@ -17,7 +17,7 @@ A Home Assistant Lovelace card that keeps a recent Ring recording and a real Rin
 - Hard stream teardown on mode change, close, card removal, browser Back, and hidden tabs
 - Native Home Assistant WebRTC/HLS/MJPEG selection through `ha-camera-stream`
 - Fullscreen, keyboard navigation, focus trapping, safe-area handling, and screen-reader status messages
-- Visual card editor with camera-only entity pickers and capability warnings
+- Home Assistant-native card editor with camera-only entity pickers, compact expandable sections, and capability warnings
 - No Ring credentials, direct Ring requests, analytics, Browser Mod, or persisted camera URLs
 
 ## Requirements and compatibility
@@ -70,58 +70,38 @@ live_entity: camera.front_door_live_view
 name: Entrance
 
 default_mode: last_recording
-remember_last_mode: false
-autoplay_recording: true
-
-preview:
-  source: last_recording
-  show_name: false
-  show_mode_badge: true
-
-appearance:
-  aspect_ratio: "16:9"
-  fit_mode: cover
-
-viewer:
-  show_controls: true
-  live_muted: false
-  close_on_escape: true
-
-performance:
-  suspend_when_hidden: true
-  live_timeout_seconds: 20
-  retry_live_once: true
-  debug: false
+live_muted: false
+show_name: false
+aspect_ratio: "16:9"
+fit_mode: cover
 
 grid_options:
   columns: 12
   rows: 3
 ```
 
-All options shown above match the built-in defaults except `name` and `grid_options`, which are optional. The graphical card editor exposes the normal configuration settings and keeps **Advanced** collapsed initially.
+All options shown above match the built-in defaults except `name` and `grid_options`, which are optional. The graphical editor keeps the two camera sources visible and places the less-frequent viewer and appearance choices in compact, native expandable sections. Home Assistant supplies the live preview on the right, so the editor does not render a second copy.
+
+Version 0.2 uses this flat configuration only. The older nested `preview`, `appearance`, `viewer`, and `performance` options are intentionally not supported.
 
 ### Preview semantics
 
-`preview.source` selects a snapshot only. Like Home Assistant's native picture
-card, the card asks Home Assistant's authenticated camera proxy for a thumbnail
-sized to the rendered card and the screen pixel density. It refreshes that still
-image every ten seconds only while the card and browser tab are visible, and
-updates the requested size after a meaningful resize. It never mounts
+Like Home Assistant's native picture card, the dashboard always asks Home
+Assistant's authenticated camera proxy for a still from the last-recording
+camera, sized to the rendered card and the screen pixel density. It refreshes
+that still image every ten seconds only while the card and browser tab are
+visible, and updates the requested size after a meaningful resize. It never mounts
 `ha-camera-stream`, preconnects to the live entity, or starts a Ring live session
-on the dashboard. The optional icon at the top right describes what opening
-the card will do without covering the image with text:
+on the dashboard. The icon at the top right describes what opening the card will
+do without covering the image with text:
 
 - A **history** icon when the viewer opens on the latest recording
 - A **red dot** when the viewer opens on Live
 
-### Remembering the selected view
-
-When `remember_last_mode` is enabled, the selection is saved in browser-local storage under a key scoped to the two entity IDs. Nothing is written to Home Assistant, and no entity data or camera URL is stored.
-
 ## Failure behavior
 
 - Missing or unavailable entities are reported immediately.
-- Live connection attempts time out after 10–60 seconds and may retry once.
+- Live connection attempts time out after 20 seconds and retry once.
 - If Home Assistant’s internal camera component cannot load, a recording may fall back to an ephemeral native `<video>` using the current `video_url`. That URL is never copied into configuration, storage, or logs.
 - Live mode offers the normal Home Assistant camera dialog if native rendering is incompatible.
 

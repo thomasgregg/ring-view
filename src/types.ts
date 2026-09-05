@@ -1,7 +1,6 @@
 export type CameraMode = "last_recording" | "live";
-export type PreviewSource = "last_recording" | "live" | "default";
 export type AspectRatio = "auto" | "16:9" | "4:3" | "1:1";
-export type FitMode = "cover" | "contain" | "fill";
+export type FitMode = "cover" | "contain";
 
 export interface HassEntity {
   entity_id: string;
@@ -42,39 +41,18 @@ export interface RingViewConfig {
   live_entity: string;
   name?: string;
   default_mode?: CameraMode;
-  remember_last_mode?: boolean;
-  autoplay_recording?: boolean;
-  preview?: {
-    source?: PreviewSource;
-    show_name?: boolean;
-    show_mode_badge?: boolean;
-  };
-  appearance?: {
-    aspect_ratio?: AspectRatio;
-    fit_mode?: FitMode;
-  };
-  viewer?: {
-    show_controls?: boolean;
-    live_muted?: boolean;
-    close_on_escape?: boolean;
-  };
-  performance?: {
-    suspend_when_hidden?: boolean;
-    live_timeout_seconds?: number;
-    retry_live_once?: boolean;
-    debug?: boolean;
-  };
+  live_muted?: boolean;
+  show_name?: boolean;
+  aspect_ratio?: AspectRatio;
+  fit_mode?: FitMode;
   grid_options?: GridOptions;
 }
 
-export interface NormalizedConfig
-  extends Required<Omit<RingViewConfig, "name" | "grid_options">> {
+export interface NormalizedConfig extends Required<
+  Omit<RingViewConfig, "name" | "grid_options">
+> {
   name?: string;
   grid_options?: GridOptions;
-  preview: Required<NonNullable<RingViewConfig["preview"]>>;
-  appearance: Required<NonNullable<RingViewConfig["appearance"]>>;
-  viewer: Required<NonNullable<RingViewConfig["viewer"]>>;
-  performance: Required<NonNullable<RingViewConfig["performance"]>>;
 }
 
 export interface ConfigFormSchema {
