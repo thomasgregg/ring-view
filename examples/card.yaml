@@ -1,0 +1,33 @@
+type: custom:ring-view
+
+recording_entity: camera.front_door
+live_entity: camera.front_door_live_view
+name: Entrance
+
+default_mode: last_recording
+remember_last_mode: false
+autoplay_recording: true
+
+preview:
+  source: last_recording
+  show_name: false
+  show_mode_badge: true
+
+appearance:
+  aspect_ratio: "16:9"
+  fit_mode: cover
+
+viewer:
+  show_controls: true
+  live_muted: true
+  close_on_escape: true
+
+performance:
+  suspend_when_hidden: true
+  live_timeout_seconds: 20
+  retry_live_once: true
+  debug: false
+
+grid_options:
+  columns: 12
+  rows: 3

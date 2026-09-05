@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Ring View demo</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --primary-color: #03a9f4;
+        --error-color: #db4437;
+        --warning-color: #ff9800;
+        --primary-text-color: #202124;
+        --secondary-text-color: #687078;
+        --primary-background-color: #f3f5f7;
+        --secondary-background-color: #e8ecef;
+        --card-background-color: #fff;
+        --ha-card-background: #fff;
+        --ha-card-border-radius: 14px;
+        --ha-card-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        --divider-color: rgba(0, 0, 0, 0.12);
+        --ha-font-family-body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      :root[data-theme="dark"] {
+        --primary-text-color: #f2f3f4;
+        --secondary-text-color: #b0b6bb;
+        --primary-background-color: #101416;
+        --secondary-background-color: #252b2f;
+        --card-background-color: #1c2124;
+        --ha-card-background: #1c2124;
+        --ha-card-box-shadow: 0 2px 12px rgba(0, 0, 0, 0.42);
+        --divider-color: rgba(255, 255, 255, 0.14);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        color: var(--primary-text-color);
+        background: var(--primary-background-color);
+        font-family: var(--ha-font-family-body);
+      }
+
+      .topbar {
+        height: 64px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 22px;
+        color: #fff;
+        background: #0288d1;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.22);
+        font-size: 20px;
+        font-weight: 500;
+      }
+
+      .menu-icon {
+        width: 24px;
+        height: 18px;
+        border-block: 2px solid currentColor;
+        position: relative;
+      }
+
+      .menu-icon::after {
+        content: "";
+        position: absolute;
+        inset: 7px 0 auto;
+        border-top: 2px solid currentColor;
+      }
+
+      main {
+        width: min(920px, calc(100% - 32px));
+        margin: 32px auto;
+      }
+
+      .section-title {
+        margin: 0 0 12px 4px;
+        color: var(--secondary-text-color);
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+
+      ring-view {
+        max-width: 720px;
+      }
+
+      @media (max-width: 600px) {
+        .topbar {
+          height: 56px;
+          padding: 0 16px;
+          font-size: 18px;
+        }
+
+        main {
+          width: calc(100% - 24px);
+          margin: 20px auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar"><span class="menu-icon" aria-hidden="true"></span>Home</header>
+    <main>
+      <div class="section-title">Cameras</div>
+      <div id="card-root"></div>
+    </main>
+    <script type="module" src="/demo/demo.ts"></script>
+  </body>
+</html>

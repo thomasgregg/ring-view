@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Synthetic camera preview">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fb6c9"/>
+      <stop offset="1" stop-color="#d8d0bd"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6f8068"/>
+      <stop offset="1" stop-color="#445641"/>
+    </linearGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="14" stdDeviation="20" flood-opacity=".24"/>
+    </filter>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <rect y="570" width="1600" height="330" fill="url(#ground)"/>
+  <path d="M490 900 690 560h210l220 340z" fill="#c6c1b6"/>
+  <rect x="245" y="215" width="1110" height="470" rx="12" fill="#c8c0b1" filter="url(#soft)"/>
+  <rect x="650" y="285" width="300" height="400" fill="#35464d"/>
+  <rect x="686" y="325" width="228" height="188" rx="5" fill="#85aab5"/>
+  <path d="M800 325v188M686 419h228" stroke="#d7e2e2" stroke-width="12" opacity=".72"/>
+  <circle cx="894" cy="565" r="14" fill="#d8b64e"/>
+  <g fill="#344d34">
+    <circle cx="315" cy="600" r="120"/><circle cx="455" cy="635" r="95"/>
+    <circle cx="1230" cy="595" r="125"/><circle cx="1370" cy="640" r="100"/>
+  </g>
+  <g opacity=".16" stroke="#fff" stroke-width="2">
+    <path d="M0 140h1600M0 300h1600M0 460h1600M0 620h1600M0 780h1600"/>
+    <path d="M200 0v900M600 0v900M1000 0v900M1400 0v900"/>
+  </g>
+</svg>
