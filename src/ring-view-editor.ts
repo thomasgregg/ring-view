@@ -2,9 +2,10 @@ import { mdiAlertOutline } from "@mdi/js";
 import { LitElement, html, nothing, type TemplateResult } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import { customElement, property, state } from "lit/decorators.js";
-import { aspectRatioCss, badgeLabel, normalizeConfig } from "./config";
+import { aspectRatioCss, normalizeConfig } from "./config";
 import { ensureNativeCameraAvailable } from "./media/native-camera-adapter";
 import { posterUrl } from "./media/poster-provider";
+import { modeLabel, renderModeIcon } from "./mode-icon";
 import { editorStyles } from "./styles";
 import type {
   CameraMode,
@@ -125,7 +126,7 @@ const LABELS: Record<string, string> = {
   autoplay_recording: "Autoplay last recording",
   source: "Preview image",
   show_name: "Show camera name",
-  show_mode_badge: "Show status badge",
+  show_mode_badge: "Show view icon",
   name: "Camera name",
   aspect_ratio: "Aspect ratio",
   fit_mode: "Image fit",
@@ -280,9 +281,12 @@ export class RingViewEditor extends LitElement {
               : nothing}
             ${this.config!.preview.show_mode_badge
               ? html`
-                  <div class="preview-badge">
-                    <span class="preview-badge-dot" aria-hidden="true"></span>
-                    ${badgeLabel(mode)}
+                  <div
+                    class=${`preview-mode-indicator ${mode === "live" ? "live" : "recording"}`}
+                    title=${modeLabel(mode)}
+                    aria-hidden="true"
+                  >
+                    ${renderModeIcon(mode)}
                   </div>
                 `
               : nothing}

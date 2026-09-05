@@ -4,13 +4,13 @@ import { customElement, property, state } from "lit/decorators.js";
 import {
   aspectRatioNumber,
   aspectRatioCss,
-  badgeLabel,
   CARD_NAME,
   CARD_TAG,
   CARD_TYPE,
   normalizeConfig,
 } from "./config";
 import { posterUrl, sizedPosterUrl } from "./media/poster-provider";
+import { modeLabel, renderModeIcon } from "./mode-icon";
 import "./ring-view-dialog";
 import type { RingViewDialog } from "./ring-view-dialog";
 import { cardStyles } from "./styles";
@@ -170,7 +170,8 @@ export class RingView extends LitElement {
           style=${styleMap(style)}
           role="button"
           tabindex="0"
-          aria-label=${`Open ${name} viewer`}
+          aria-label=${`Open ${name} viewer — ${modeLabel(openingMode)}`}
+          title=${openingMode === "live" ? "Open live view" : "Open last recording"}
           @click=${this.openViewer}
           @keydown=${this.handleKeyDown}
         >
@@ -186,9 +187,11 @@ export class RingView extends LitElement {
           ${this.config.preview.show_name ? html`<div class="name">${name}</div>` : nothing}
           ${this.config.preview.show_mode_badge
             ? html`
-                <div class="badge">
-                  <span class="badge-dot" aria-hidden="true"></span>
-                  ${badgeLabel(openingMode)}
+                <div
+                  class=${`mode-indicator ${openingMode === "live" ? "live" : "recording"}`}
+                  aria-hidden="true"
+                >
+                  ${renderModeIcon(openingMode)}
                 </div>
               `
             : nothing}

@@ -98,7 +98,7 @@ describe("visual editor", () => {
     const layout = editor.shadowRoot?.querySelector(".editor-layout");
     expect(layout?.lastElementChild?.classList.contains("preview-pane")).toBe(true);
     expect(editor.shadowRoot?.querySelector(".preview-card img")).not.toBeNull();
-    expect(editor.shadowRoot?.querySelector(".preview-badge")).toBeNull();
+    expect(editor.shadowRoot?.querySelector(".preview-mode-indicator")).toBeNull();
 
     const previewForms = editor.shadowRoot?.querySelectorAll<HTMLElement>(
       'ha-form[data-target="preview"]',

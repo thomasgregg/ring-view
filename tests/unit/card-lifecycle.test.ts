@@ -48,6 +48,8 @@ describe("card stream lifecycle", () => {
   it("never mounts a camera stream for the dashboard preview", async () => {
     const card = await mount();
     expect(card.shadowRoot?.querySelector("ring-view-native-camera-adapter")).toBeNull();
+    expect(card.shadowRoot?.querySelector(".mode-indicator .mode-icon-recording")).not.toBeNull();
+    expect(card.shadowRoot?.querySelector(".mode-indicator")?.textContent?.trim()).toBe("");
     expect(TestCameraStream.active).toBe(0);
   });
 
@@ -247,6 +249,12 @@ describe("card stream lifecycle", () => {
     const dialog = card.shadowRoot?.querySelector<RingViewDialog>(
       "ring-view-dialog",
     );
+    expect(
+      dialog?.shadowRoot?.querySelector("#ring-view-tab-recording .mode-icon-recording"),
+    ).not.toBeNull();
+    expect(
+      dialog?.shadowRoot?.querySelector("#ring-view-tab-live .mode-icon-live"),
+    ).not.toBeNull();
     dialog?.shadowRoot?.querySelector<HTMLElement>("#ring-view-tab-live")?.click();
     await flush();
 

@@ -132,7 +132,3 @@ export function aspectRatioCss(
 ): string {
   return ratio === "auto" ? "16 / 9" : ratio.replace(":", " / ");
 }
-
-export function badgeLabel(mode: CameraMode): string {
-  return mode === "live" ? "Opens live" : "Recording";
-}

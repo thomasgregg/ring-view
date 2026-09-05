@@ -2,13 +2,17 @@
 
 A Home Assistant Lovelace card that keeps a recent Ring recording and a real Ring live camera one tap apart. The dashboard uses only a still preview. A live Ring session is created only after the viewer opens and **Live** is selected.
 
+![Ring View dashboard card](output/playwright/screenshots/ring-view-card.png)
+
 ![Ring View desktop viewer](output/playwright/screenshots/ring-view-desktop.png)
 
 ## Highlights
 
 - Native-feeling `picture-entity` dashboard preview
 - Native-sized still thumbnails for sharp previews without starting a live session
-- Compact, centered icon controls for **Recording** and **Live**
+- One consistent mode language across the preview and viewer: history for the
+  last recording and a red dot for **Live**
+- Compact, centered icon controls with tooltips and 44-pixel touch targets
 - One active native camera renderer at a time
 - Hard stream teardown on mode change, close, card removal, browser Back, and hidden tabs
 - Native Home Assistant WebRTC/HLS/MJPEG selection through `ha-camera-stream`
@@ -104,10 +108,11 @@ sized to the rendered card and the screen pixel density. It refreshes that still
 image every ten seconds only while the card and browser tab are visible, and
 updates the requested size after a meaningful resize. It never mounts
 `ha-camera-stream`, preconnects to the live entity, or starts a Ring live session
-on the dashboard. The badge describes what opening the card will do:
+on the dashboard. The optional icon at the top right describes what opening
+the card will do without covering the image with text:
 
-- **Recording** when the viewer opens on the latest recording
-- **Opens live** when the viewer opens on Live
+- A **history** icon when the viewer opens on the latest recording
+- A **red dot** when the viewer opens on Live
 
 ### Remembering the selected view
 

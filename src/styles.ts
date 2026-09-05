@@ -87,37 +87,37 @@ export const cardStyles = css`
     pointer-events: none;
   }
 
-  .badge {
+  .mode-indicator {
     position: absolute;
     inset-inline-end: 12px;
     top: 12px;
-    min-height: 28px;
     box-sizing: border-box;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    max-width: calc(100% - 24px);
-    padding: 5px 10px;
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
     border: 1px solid rgba(255, 255, 255, 0.22);
-    border-radius: 999px;
+    border-radius: 50%;
     color: #fff;
     background: rgba(20, 24, 28, 0.68);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 16px;
-    white-space: nowrap;
     pointer-events: none;
   }
 
-  .badge-dot {
-    width: 7px;
-    height: 7px;
-    flex: 0 0 auto;
-    border: 2px solid currentColor;
+  .mode-indicator .mode-icon-recording {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+  }
+
+  .mode-indicator .mode-icon-live {
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
+    background: var(--error-color, #db4437);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -281,13 +281,22 @@ export const dialogStyles = css`
   }
 
   .mode-button.live[aria-selected="true"] {
-    color: #ff8a80;
-    background: rgba(255, 138, 128, 0.14);
+    color: #fff;
+    background: rgba(219, 68, 55, 0.16);
+    background: color-mix(in srgb, var(--error-color, #db4437) 16%, transparent);
   }
 
   .mode-button svg {
     width: 20px;
     height: 20px;
+  }
+
+  .mode-button .mode-icon-live {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--error-color, #db4437);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
   }
 
   .media-frame {
@@ -628,38 +637,37 @@ export const editorStyles = css`
     pointer-events: none;
   }
 
-  .preview-badge {
+  .preview-mode-indicator {
     position: absolute;
     top: 10px;
     inset-inline-end: 10px;
-    min-height: 28px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    max-width: calc(100% - 20px);
-    padding: 5px 10px;
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
     box-sizing: border-box;
     border: 1px solid rgba(255, 255, 255, 0.22);
-    border-radius: 999px;
+    border-radius: 50%;
     color: #fff;
     background: rgba(14, 18, 22, 0.66);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.24);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    font-size: 12px;
-    font-weight: 650;
-    line-height: 16px;
-    white-space: nowrap;
     pointer-events: none;
   }
 
-  .preview-badge-dot {
-    width: 7px;
-    height: 7px;
-    flex: 0 0 auto;
-    border: 2px solid currentColor;
+  .preview-mode-indicator .mode-icon-recording {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+  }
+
+  .preview-mode-indicator .mode-icon-live {
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    box-sizing: border-box;
+    background: var(--error-color, #db4437);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
   }
 
   @container (max-width: 720px) {

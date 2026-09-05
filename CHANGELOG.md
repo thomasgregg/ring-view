@@ -4,6 +4,19 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.1.11] - 2026-09-05
+
+### Changed
+
+- Replace the dashboard preview's labeled mode pill with a compact icon-only
+  indicator.
+- Use one consistent mode language everywhere: a history icon for the last
+  recording and a Home Assistant-themed red dot for Live.
+- Keep the Live dot clean and solid, with only a subtle dark separation shadow
+  instead of a contrasting white keyline.
+- Rename the editor setting to **Show view icon** and include the selected mode
+  in the card's accessible label and browser tooltip.
+
 ## [0.1.10] - 2026-09-05
 
 ### Changed

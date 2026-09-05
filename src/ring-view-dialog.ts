@@ -1,9 +1,4 @@
-import {
-  mdiBroadcast,
-  mdiClose,
-  mdiHistory,
-  mdiPlay,
-} from "@mdi/js";
+import { mdiClose, mdiPlay } from "@mdi/js";
 import { LitElement, html, nothing, type PropertyValues, type TemplateResult } from "lit";
 import { classMap } from "lit/directives/class-map.js";
 import { keyed } from "lit/directives/keyed.js";
@@ -16,6 +11,7 @@ import type {
   NativeMediaCapabilities,
 } from "./media/native-camera-adapter";
 import { posterUrl } from "./media/poster-provider";
+import { renderModeIcon } from "./mode-icon";
 import { dialogStyles } from "./styles";
 import type {
   CameraMode,
@@ -165,7 +161,7 @@ export class RingViewDialog extends LitElement {
           @click=${() => this.selectMode("last_recording")}
           @keydown=${this.handleTabKeyDown}
         >
-          ${this.icon(mdiHistory)}
+          ${renderModeIcon("last_recording")}
         </button>
         <button
           id="ring-view-tab-live"
@@ -178,7 +174,7 @@ export class RingViewDialog extends LitElement {
           @click=${() => this.selectMode("live")}
           @keydown=${this.handleTabKeyDown}
         >
-          ${this.icon(mdiBroadcast)}
+          ${renderModeIcon("live")}
         </button>
       </div>
     `;
