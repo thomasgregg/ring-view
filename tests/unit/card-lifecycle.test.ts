@@ -268,6 +268,9 @@ describe("card stream lifecycle", () => {
     );
     expect(stream?.controls).toBe(true);
     expect(stream?.muted).toBe(true);
+    expect(
+      dialog?.shadowRoot?.querySelector(".live-surface-guard"),
+    ).not.toBeNull();
     expect(dialog?.shadowRoot?.querySelector(".audio-button")).toBeNull();
     expect(
       dialog?.shadowRoot?.querySelector('[aria-label="Enter fullscreen"]'),

@@ -4,6 +4,15 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.1.12] - 2026-09-05
+
+### Fixed
+
+- Let Home Assistant's WebRTC live video fill the entire Ring View media frame
+  instead of exposing a stale poster strip below it.
+- Keep the live image surface passive so incidental clicks do not pause the
+  stream, while preserving access to the native media control strip.
+
 ## [0.1.11] - 2026-09-05
 
 ### Changed

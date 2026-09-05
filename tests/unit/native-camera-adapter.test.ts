@@ -114,5 +114,6 @@ describe("native camera adapter", () => {
     expect(layoutStyle?.textContent).toContain(
       "object-fit: var(--ring-view-native-fit-mode, cover) !important",
     );
+    expect(layoutStyle?.textContent).toContain("--video-max-height: 100%");
   });
 });

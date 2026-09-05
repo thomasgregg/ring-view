@@ -112,6 +112,22 @@ test("renders native-style header controls without duplicate media actions", asy
   await expect(page.getByRole("dialog")).toHaveCSS("color", "rgb(242, 243, 244)");
 });
 
+test("keeps the live image passive while preserving the native control strip", async ({
+  page,
+}) => {
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  await page.getByRole("tab", { name: "Live" }).click();
+
+  const frame = page.locator(".media-frame");
+  const guard = page.locator(".live-surface-guard.with-controls");
+  await expect(guard).toBeVisible();
+
+  const frameBox = await frame.boundingBox();
+  const guardBox = await guard.boundingBox();
+  expect(guardBox?.y).toBe(frameBox?.y);
+  expect((frameBox?.height ?? 0) - (guardBox?.height ?? 0)).toBe(64);
+});
+
 test("shows a stable loading shell on a slow connection", async ({ page }) => {
   await page.goto("/demo/?delay=8000");
   await page.getByRole("button", { name: /Open Entrance viewer/ }).click();

@@ -245,6 +245,17 @@ export class RingViewDialog extends LitElement {
             `,
             )
           : nothing}
+        ${this.mode === "live" && canRender
+          ? html`
+              <div
+                class=${classMap({
+                  "live-surface-guard": true,
+                  "with-controls": this.config!.viewer.show_controls,
+                })}
+                aria-hidden="true"
+              ></div>
+            `
+          : nothing}
         ${this.renderStateLayer(unavailable, useRecordingVideo)}
       </div>
     `;

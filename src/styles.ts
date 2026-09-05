@@ -338,6 +338,17 @@ export const dialogStyles = css`
     opacity: 0.01;
   }
 
+  .live-surface-guard {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    cursor: default;
+  }
+
+  .live-surface-guard.with-controls {
+    inset-block-end: 64px;
+  }
+
   .state-layer {
     position: absolute;
     inset: 0;

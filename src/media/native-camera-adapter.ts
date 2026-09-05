@@ -169,6 +169,10 @@ export class RingViewNativeCameraAdapter extends LitElement {
         min-height: 0;
         object-fit: var(--ring-view-native-fit-mode, cover) !important;
       }
+
+      ha-web-rtc-player {
+        --video-max-height: 100%;
+      }
     `;
     root.append(style);
   }
