@@ -9,7 +9,32 @@
 
 Ring exposes the latest recording and the live stream as separate Home Assistant camera entities. Ring View brings them together in one focused dashboard card and one native-feeling viewer—without starting a live Ring session just to show a dashboard preview.
 
-![Ring View detail viewer showing a Ring camera recording](output/playwright/screenshots/ring-view-desktop.png)
+<p align="center">
+  <a href="docs/images/dashboard-card.png">
+    <img src="docs/images/dashboard-card.png" alt="Ring View dashboard card showing a still Ring camera preview" width="100%">
+  </a>
+  <br>
+  <sub>The dashboard card stays on a lightweight still preview.</sub>
+</p>
+
+<table>
+  <tr>
+    <td width="50%">
+      <a href="docs/images/recording-view.png">
+        <img src="docs/images/recording-view.png" alt="Ring View detail viewer showing the latest recording">
+      </a>
+    </td>
+    <td width="50%">
+      <a href="docs/images/live-view.png">
+        <img src="docs/images/live-view.png" alt="Ring View detail viewer showing the live camera">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Last recording</strong></td>
+    <td align="center"><strong>Live view</strong></td>
+  </tr>
+</table>
 
 ## Why Ring View?
 
@@ -25,8 +50,6 @@ Ring View fills that gap:
 - **A polished, consistent interface.** Recording and Live use the same compact icon language on the card and in the viewer.
 - **Built for dashboards.** Responsive layout, keyboard navigation, focus management, safe-area support, light and dark themes, and 44-pixel touch targets are included.
 - **Easy to configure.** The visual editor uses Home Assistant entity pickers, grouped settings, capability warnings, and automatic English or German text.
-
-![Ring View dashboard card](output/playwright/screenshots/ring-view-card.png)
 
 ### Ring View or a native card?
 
@@ -97,6 +120,8 @@ Select the card to open the viewer. The history icon opens the latest recording,
 ## Configuration reference
 
 Every Ring View setting is available in the visual **Config** editor. The only exceptions are `type`, which Home Assistant adds automatically, and `grid_options`, which Home Assistant manages in its standard **Layout** tab.
+
+[![Ring View visual configuration editor](docs/images/configuration-editor.png)](docs/images/configuration-editor.png)
 
 | Option | Default | Accepted values | Purpose |
 | --- | --- | --- | --- |

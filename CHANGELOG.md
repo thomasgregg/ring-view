@@ -4,6 +4,15 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.3.3] - 2026-09-06
+
+### Documentation
+
+- Replace the synthetic README images with carefully cropped, normalized
+  screenshots of the real dashboard card, recording view, and live view.
+- Group the product screenshots directly below the introduction and add the
+  visual editor screenshot to the configuration reference.
+
 ## [0.3.2] - 2026-09-06
 
 ### Documentation
