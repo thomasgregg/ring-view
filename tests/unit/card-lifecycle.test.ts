@@ -74,6 +74,7 @@ describe("card stream lifecycle", () => {
     const image = card.shadowRoot?.querySelector<HTMLImageElement>("img");
     expect(image?.src).toMatch(/^data:image\/svg\+xml/);
     expect(image?.src).not.toContain("image.jpg");
+    expect(card.shadowRoot?.querySelector(".mode-indicator")).toBeNull();
     expect(callWS).not.toHaveBeenCalled();
   });
 

@@ -10,6 +10,8 @@ All notable changes to this project are documented here.
 
 - Use the bundled synthetic entrance scene in Home Assistant's card picker so
   opening the catalog never displays or requests a user's camera image.
+- Remove the view-mode icon from the picker preview, where it is neither a
+  status nor an available action.
 - Keep configured dashboard cards on their selected real camera preview,
   including while editing a dashboard.
 

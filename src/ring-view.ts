@@ -203,7 +203,7 @@ export class RingView extends LitElement {
                 ${localize(this.hass, "card.preview_unavailable")}
               </div>`}
           ${this.config.show_name ? html`<div class="name">${name}</div>` : nothing}
-          ${this.config.show_mode_icon
+          ${this.config.show_mode_icon && !pickerPreview
             ? html`
                 <div
                   class=${`mode-indicator ${openingMode === "live" ? "live" : "recording"}`}

@@ -2309,7 +2309,7 @@ let k = class extends x {
                 ${o(this.hass, "card.preview_unavailable")}
               </div>`}
           ${this.config.show_name ? u`<div class="name">${i}</div>` : c}
-          ${this.config.show_mode_icon ? u`
+          ${this.config.show_mode_icon && !s ? u`
                 <div
                   class=${`mode-indicator ${r === "live" ? "live" : "recording"}`}
                   aria-hidden="true"

@@ -26,6 +26,7 @@ test("uses a privacy-safe synthetic image in the card picker", async ({ page }) 
   await expect(image).toBeVisible();
   await expect(image).toHaveAttribute("src", /^data:image\/svg\+xml/);
   await expect(image).not.toHaveAttribute("src", /camera-preview\.svg/);
+  await expect(page.locator("hui-card-picker ring-view .mode-indicator")).toHaveCount(0);
 });
 
 test("opens, switches recording → live → recording, and tears down", async ({ page }) => {
