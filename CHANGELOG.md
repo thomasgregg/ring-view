@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.3.7] - 2026-09-06
+
+### Documentation
+
+- Add camera-surveillance privacy and legal guidance, including a reference to
+  the European Data Protection Board's video-device guidelines.
+
 ## [0.3.6] - 2026-09-06
 
 ### Changed
