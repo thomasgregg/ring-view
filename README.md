@@ -9,8 +9,6 @@
 
 Ring exposes the latest recording and the live stream as separate Home Assistant camera entities. Ring View brings them together in one focused dashboard card and one native-feeling viewer—without starting a live Ring session just to show a dashboard preview.
 
-[![Open your Home Assistant instance and open this repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=thomasgregg&repository=ring-view&category=plugin)
-
 ![Ring View detail viewer showing a Ring camera recording](output/playwright/screenshots/ring-view-desktop.png)
 
 ## Why Ring View?
