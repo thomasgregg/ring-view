@@ -18,6 +18,14 @@ const entity = (id: string, supportedFeatures: number): HassEntity => ({
 });
 
 const hass: HomeAssistant = {
+  entities: {
+    "camera.recording": {
+      entity_id: "camera.recording",
+      platform: "ring",
+    },
+    "camera.live": { entity_id: "camera.live", platform: "ring" },
+    "camera.snapshot": { entity_id: "camera.snapshot", platform: "mqtt" },
+  },
   states: {
     "camera.recording": entity("camera.recording", 0),
     "camera.live": entity("camera.live", 2),
@@ -103,7 +111,29 @@ describe("visual editor", () => {
     expect(editor.shadowRoot?.querySelector("ha-alert")).not.toBeNull();
   });
 
-  it("uses one native form with three compact expandable groups and no duplicate preview", async () => {
+  it("warns when talkback is enabled for a non-Ring live camera", async () => {
+    const editor = document.createElement("ring-view-editor");
+    editor.hass = {
+      ...hass,
+      entities: {
+        ...hass.entities,
+        "camera.live": { entity_id: "camera.live", platform: "generic" },
+      },
+    };
+    editor.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      two_way_audio: true,
+    });
+    document.body.append(editor);
+    await editor.updateComplete;
+
+    expect(editor.shadowRoot?.textContent).toContain(
+      "Two-way audio requires the official Ring Live view camera",
+    );
+  });
+
+  it("groups related settings in four compact native expandable sections", async () => {
     const editor = document.createElement("ring-view-editor");
     editor.hass = hass;
     editor.setConfig({
@@ -119,10 +149,9 @@ describe("visual editor", () => {
     expect(editor.shadowRoot?.querySelector(".settings-group")).toBeNull();
 
     const schema = (forms?.[0] as HTMLElement & { schema?: ConfigFormSchema[] }).schema ?? [];
-    expect(schema.slice(0, 3).map((field) => field.name)).toEqual([
+    expect(schema.slice(0, 2).map((field) => field.name)).toEqual([
       "recording_entity",
       "live_entity",
-      "snapshot_entity",
     ]);
     expect(
       schema.filter((field) => field.type === "expandable").map((field) => ({
@@ -131,9 +160,75 @@ describe("visual editor", () => {
         icon: Boolean(field.iconPath),
       })),
     ).toEqual([
+      { name: "dashboard_preview", flatten: true, icon: true },
       { name: "viewer_behavior", flatten: true, icon: true },
       { name: "doorbell_features", flatten: true, icon: true },
       { name: "card_appearance", flatten: true, icon: true },
+    ]);
+  });
+
+  it("only reveals the snapshot settings required by the selected image source", async () => {
+    const editor = document.createElement("ring-view-editor");
+    editor.hass = hass;
+    editor.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+    });
+    document.body.append(editor);
+    await editor.updateComplete;
+
+    const form = editor.shadowRoot?.querySelector("ha-form") as
+      | (HTMLElement & { schema?: ConfigFormSchema[] })
+      | null;
+    const previewFields = () =>
+      form?.schema
+        ?.find((field) => field.name === "dashboard_preview")
+        ?.schema?.map((field) => ({
+          name: field.name,
+          required: field.required ?? false,
+        }));
+
+    expect(previewFields()).toEqual([
+      { name: "preview_source", required: true },
+    ]);
+
+    form?.dispatchEvent(
+      new CustomEvent("value-changed", {
+        detail: {
+          value: {
+            recording_entity: "camera.recording",
+            live_entity: "camera.live",
+            preview_source: "snapshot",
+          },
+        },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+    await editor.updateComplete;
+    expect(previewFields()).toEqual([
+      { name: "preview_source", required: true },
+      { name: "snapshot_entity", required: true },
+    ]);
+
+    form?.dispatchEvent(
+      new CustomEvent("value-changed", {
+        detail: {
+          value: {
+            recording_entity: "camera.recording",
+            live_entity: "camera.live",
+            preview_source: "newest",
+          },
+        },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+    await editor.updateComplete;
+    expect(previewFields()).toEqual([
+      { name: "preview_source", required: true },
+      { name: "snapshot_entity", required: true },
+      { name: "preview_fallback", required: true },
     ]);
   });
 
@@ -165,11 +260,14 @@ describe("visual editor", () => {
       "Anzeigeverhalten",
     );
     expect(form?.computeLabel?.({ name: "snapshot_entity" })).toBe(
-      "Kamera für Geräte-Schnappschuss (optional)",
+      "Kamera für Geräte-Schnappschuss",
     );
     expect(form?.computeLabel?.({ name: "name" })).toBe("Kameraname (optional)");
     expect(form?.computeLabel?.({ name: "show_name" })).toBe(
       "Kameranamen anzeigen",
+    );
+    expect(form?.computeLabel?.({ name: "dashboard_preview" })).toBe(
+      "Dashboard-Vorschau",
     );
     expect(form?.computeHelper?.({ name: "live_muted" })).toContain(
       "mit Ton zu starten",
@@ -215,11 +313,15 @@ describe("visual editor", () => {
     expect(cardAppearance?.schema?.map((field) => field.name)).toEqual([
       "name",
       "show_name",
-      "preview_source",
-      "preview_fallback",
       "",
     ]);
-    const previewSource = cardAppearance?.schema?.find(
+    const dashboardPreview = form?.schema?.find(
+      (field) => field.name === "dashboard_preview",
+    );
+    expect(dashboardPreview?.schema?.map((field) => field.name)).toEqual([
+      "preview_source",
+    ]);
+    const previewSource = dashboardPreview?.schema?.find(
       (field) => field.name === "preview_source",
     );
     expect(previewSource?.selector).toMatchObject({

@@ -24,8 +24,14 @@ export interface HassEntity {
   };
 }
 
+export interface HassEntityRegistryEntry {
+  entity_id: string;
+  platform?: string;
+}
+
 export interface HomeAssistant {
   states: Record<string, HassEntity>;
+  entities?: Record<string, HassEntityRegistryEntry>;
   connection?: {
     subscribeMessage<T>(
       callback: (message: T) => void,

@@ -18,9 +18,9 @@ npm run test:browser
 npm run build
 ```
 
-The unit suite covers configuration defaults and validation, snapshot timestamp parsing and freshest-preview fallbacks, native editor structure, entity capability states, doorbell alerts, timeout invalidation, no dashboard stream, single-renderer switching, close teardown, disconnect teardown, single-offer two-way audio, press-to-talk muting, and interrupted microphone permission.
+The unit suite covers configuration defaults and validation, snapshot timestamp parsing and freshest-preview fallbacks, native editor structure and progressive preview fields, entity and talkback capability states, unsupported-camera fallback, doorbell alerts, timeout invalidation, no dashboard stream, single-renderer switching, close teardown, disconnect teardown, single-offer two-way audio, press-to-talk muting, interrupted microphone permission, and insecure-connection guidance.
 
-The browser suite covers opening/closing, recording → live → recording, newest snapshot selection, keyboard operation, focus return, browser Back, entity unavailability while open, camera-frame visibility and size through phone orientation changes, hold-to-talk edge placement, native-style header controls, slow media readiness, and stream-count invariants.
+The browser suite covers opening/closing, recording → live → recording, newest snapshot selection, progressive dashboard-preview editor fields, unsupported live-camera fallback without talkback, keyboard operation, focus return, browser Back, entity unavailability while open, camera-frame visibility and size through phone orientation changes, hold-to-talk edge placement, portrait status-message clearance, native-style header controls, slow media readiness, and stream-count invariants.
 
 ## Real Home Assistant acceptance pass
 

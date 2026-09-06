@@ -80,6 +80,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
       font: inherit;
       font-size: 14px;
       font-weight: 600;
+      white-space: nowrap;
       cursor: pointer;
       pointer-events: auto;
       touch-action: none;
@@ -140,7 +141,12 @@ export class RingViewRingWebRtcPlayer extends LitElement {
       }
 
       .session-status {
-        bottom: calc(12px + env(safe-area-inset-bottom));
+        inset-inline: max(12px, env(safe-area-inset-left))
+          max(12px, env(safe-area-inset-right));
+        bottom: calc(max(8px, env(safe-area-inset-bottom)) + 54px);
+        max-width: none;
+        text-align: center;
+        white-space: normal;
       }
     }
 

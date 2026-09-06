@@ -12,6 +12,16 @@ export function supportsStream(entity?: HassEntity): boolean {
   return (features & CAMERA_STREAM_FEATURE) !== 0;
 }
 
+export function supportsRingTalkback(
+  hass: HomeAssistant,
+  entityId: string,
+): boolean {
+  return (
+    hass.entities?.[entityId]?.platform === "ring"
+    && supportsStream(hass.states[entityId])
+  );
+}
+
 export function recordingHasMedia(entity?: HassEntity): boolean {
   return Boolean(
     entity?.attributes.video_url || entity?.attributes.entity_picture,
@@ -19,7 +29,13 @@ export function recordingHasMedia(entity?: HassEntity): boolean {
 }
 
 export interface EntityWarning {
-  kind: "recording" | "live" | "snapshot" | "doorbell" | "compatibility";
+  kind:
+    | "recording"
+    | "live"
+    | "snapshot"
+    | "doorbell"
+    | "talkback"
+    | "compatibility";
   message: string;
 }
 
@@ -57,6 +73,14 @@ export function validateEntities(
     warnings.push({
       kind: "live",
       message: localize(hass, "warning.live_stream"),
+    });
+  } else if (
+    config.two_way_audio
+    && !supportsRingTalkback(hass, config.live_entity)
+  ) {
+    warnings.push({
+      kind: "talkback",
+      message: localize(hass, "warning.talkback_unsupported"),
     });
   }
 

@@ -113,6 +113,20 @@ recording.attributes.recorded_at = "2026-09-06T12:00:00Z";
 let hass: HomeAssistant = {
   language,
   locale: { language },
+  entities: {
+    [recording.entity_id]: {
+      entity_id: recording.entity_id,
+      platform: "ring",
+    },
+    [live.entity_id]: {
+      entity_id: live.entity_id,
+      platform: query.get("live_platform") || "ring",
+    },
+    [snapshot.entity_id]: {
+      entity_id: snapshot.entity_id,
+      platform: "mqtt",
+    },
+  },
   states: {
     [recording.entity_id]: recording,
     [live.entity_id]: live,

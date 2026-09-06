@@ -1,4 +1,9 @@
-import { mdiDoorbellVideo, mdiImageOutline, mdiPlayCircleOutline } from "@mdi/js";
+import {
+  mdiDoorbellVideo,
+  mdiImageOutline,
+  mdiPaletteOutline,
+  mdiPlayCircleOutline,
+} from "@mdi/js";
 import { LitElement, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { normalizeConfig } from "./config";
@@ -17,7 +22,74 @@ import type {
 } from "./types";
 import { validateEntities } from "./utilities/entity-validation";
 
-function configSchema(hass: HomeAssistant): ConfigFormSchema[] {
+function configSchema(
+  hass: HomeAssistant,
+  config: NormalizedConfig,
+): ConfigFormSchema[] {
+  const dashboardPreview: ConfigFormSchema[] = [
+    {
+      name: "preview_source",
+      required: true,
+      selector: {
+        select: {
+          mode: "dropdown",
+          options: [
+            {
+              value: "last_recording",
+              label: localize(hass, "editor.preview_recording"),
+            },
+            {
+              value: "live",
+              label: localize(hass, "editor.preview_live"),
+            },
+            {
+              value: "default",
+              label: localize(hass, "editor.preview_default"),
+            },
+            {
+              value: "snapshot",
+              label: localize(hass, "editor.preview_snapshot"),
+            },
+            {
+              value: "newest",
+              label: localize(hass, "editor.preview_newest"),
+            },
+          ],
+        },
+      },
+    },
+  ];
+
+  if (["snapshot", "newest"].includes(config.preview_source)) {
+    dashboardPreview.push({
+      name: "snapshot_entity",
+      required: true,
+      selector: { entity: { domain: "camera" } },
+    });
+  }
+
+  if (config.preview_source === "newest") {
+    dashboardPreview.push({
+      name: "preview_fallback",
+      required: true,
+      selector: {
+        select: {
+          mode: "dropdown",
+          options: [
+            {
+              value: "last_recording",
+              label: localize(hass, "editor.fallback_recording"),
+            },
+            {
+              value: "snapshot",
+              label: localize(hass, "editor.fallback_snapshot"),
+            },
+          ],
+        },
+      },
+    });
+  }
+
   return [
     {
       name: "recording_entity",
@@ -30,8 +102,11 @@ function configSchema(hass: HomeAssistant): ConfigFormSchema[] {
       selector: { entity: { domain: "camera" } },
     },
     {
-      name: "snapshot_entity",
-      selector: { entity: { domain: "camera" } },
+      name: "dashboard_preview",
+      type: "expandable",
+      flatten: true,
+      iconPath: mdiImageOutline,
+      schema: dashboardPreview,
     },
     {
       name: "viewer_behavior",
@@ -76,58 +151,10 @@ function configSchema(hass: HomeAssistant): ConfigFormSchema[] {
       name: "card_appearance",
       type: "expandable",
       flatten: true,
-      iconPath: mdiImageOutline,
+      iconPath: mdiPaletteOutline,
       schema: [
         { name: "name", selector: { text: {} } },
         { name: "show_name", selector: { boolean: {} } },
-        {
-          name: "preview_source",
-          selector: {
-            select: {
-              mode: "dropdown",
-              options: [
-                {
-                  value: "last_recording",
-                  label: localize(hass, "editor.preview_recording"),
-                },
-                {
-                  value: "live",
-                  label: localize(hass, "editor.preview_live"),
-                },
-                {
-                  value: "default",
-                  label: localize(hass, "editor.preview_default"),
-                },
-                {
-                  value: "snapshot",
-                  label: localize(hass, "editor.preview_snapshot"),
-                },
-                {
-                  value: "newest",
-                  label: localize(hass, "editor.preview_newest"),
-                },
-              ],
-            },
-          },
-        },
-        {
-          name: "preview_fallback",
-          selector: {
-            select: {
-              mode: "dropdown",
-              options: [
-                {
-                  value: "last_recording",
-                  label: localize(hass, "editor.fallback_recording"),
-                },
-                {
-                  value: "snapshot",
-                  label: localize(hass, "editor.fallback_snapshot"),
-                },
-              ],
-            },
-          },
-        },
         {
           name: "",
           type: "grid",
@@ -187,6 +214,7 @@ const LABELS: Record<string, TranslationKey> = {
   recording_entity: "editor.recording_entity",
   live_entity: "editor.live_entity",
   snapshot_entity: "editor.snapshot_entity",
+  dashboard_preview: "editor.dashboard_preview",
   viewer_behavior: "editor.viewer_behavior",
   default_mode: "editor.default_mode",
   remember_last_mode: "editor.remember_last_mode",
@@ -266,7 +294,7 @@ export class RingViewEditor extends LitElement {
       <ha-form
         .hass=${this.hass}
         .data=${this.config}
-        .schema=${configSchema(this.hass)}
+        .schema=${configSchema(this.hass, this.config)}
         .computeLabel=${this.computeLabel}
         .computeHelper=${this.computeHelper}
         @value-changed=${this.valueChanged}
@@ -278,7 +306,7 @@ export class RingViewEditor extends LitElement {
     const key = LABELS[schema.name];
     if (!key) return undefined;
     const label = localize(this.hass, key);
-    if (!["name", "snapshot_entity"].includes(schema.name)) return label;
+    if (schema.name !== "name") return label;
     const optional = localizeHaOrFallback(
       this.hass,
       "ui.panel.lovelace.editor.card.config.optional",

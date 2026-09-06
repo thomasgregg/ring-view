@@ -22,7 +22,11 @@ import type {
   HomeAssistant,
   NormalizedConfig,
 } from "./types";
-import { entityIsUnavailable, friendlyName } from "./utilities/entity-validation";
+import {
+  entityIsUnavailable,
+  friendlyName,
+  supportsRingTalkback,
+} from "./utilities/entity-validation";
 import { saveMode } from "./utilities/mode-storage";
 import { StreamLifecycle } from "./utilities/stream-lifecycle";
 
@@ -235,7 +239,10 @@ export class RingViewDialog extends LitElement {
       canRender && fallbackUrl && !this.recordingVideoFailed,
     );
     const useTalkbackPlayer = Boolean(
-      canRender && this.mode === "live" && this.config!.two_way_audio,
+      canRender
+      && this.mode === "live"
+      && this.config!.two_way_audio
+      && supportsRingTalkback(this.hass!, entityId),
     );
 
     return html`

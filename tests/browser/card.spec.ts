@@ -49,6 +49,97 @@ test("uses the newest device snapshot without adding a viewer mode", async ({ pa
   );
 });
 
+test("progressively reveals related dashboard preview settings", async ({ page }) => {
+  await expect(page.locator("ring-view")).toBeAttached();
+  const states = await page.evaluate(async () => {
+    type FormSchema = {
+      name: string;
+      required?: boolean;
+      schema?: FormSchema[];
+    };
+    type Editor = HTMLElement & {
+      hass: HomeAssistant;
+      setConfig: (config: Record<string, unknown>) => void;
+      updateComplete: Promise<unknown>;
+    };
+    const demoCard = document.querySelector("ring-view") as HTMLElement & {
+      hass: HomeAssistant;
+    };
+    const cardClass = customElements.get("ring-view") as CustomElementConstructor & {
+      getConfigElement: () => Promise<Editor>;
+    };
+    const editor = await cardClass.getConfigElement();
+    editor.hass = demoCard.hass;
+    editor.setConfig({
+      recording_entity: "camera.latest_recording",
+      live_entity: "camera.live_view",
+    });
+    document.body.replaceChildren(editor);
+    await editor.updateComplete;
+
+    const form = editor.shadowRoot?.querySelector("ha-form") as HTMLElement & {
+      schema: FormSchema[];
+    };
+    const visiblePreviewFields = () =>
+      form.schema
+        .find((field) => field.name === "dashboard_preview")
+        ?.schema?.map((field) => ({
+          name: field.name,
+          required: field.required ?? false,
+        }));
+    const result = { initial: visiblePreviewFields() } as Record<
+      string,
+      ReturnType<typeof visiblePreviewFields>
+    >;
+
+    for (const source of ["snapshot", "newest"]) {
+      form.dispatchEvent(
+        new CustomEvent("value-changed", {
+          detail: {
+            value: {
+              recording_entity: "camera.latest_recording",
+              live_entity: "camera.live_view",
+              preview_source: source,
+            },
+          },
+          bubbles: true,
+          composed: true,
+        }),
+      );
+      await editor.updateComplete;
+      result[source] = visiblePreviewFields();
+    }
+    return result;
+  });
+
+  expect(states).toEqual({
+    initial: [{ name: "preview_source", required: true }],
+    snapshot: [
+      { name: "preview_source", required: true },
+      { name: "snapshot_entity", required: true },
+    ],
+    newest: [
+      { name: "preview_source", required: true },
+      { name: "snapshot_entity", required: true },
+      { name: "preview_fallback", required: true },
+    ],
+  });
+});
+
+test("falls back to native live playback without talkback for a generic camera", async ({
+  page,
+}) => {
+  await page.goto(
+    "/demo/?mode=live&two_way_audio=1&live_platform=generic",
+  );
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+
+  await expect(page.locator("ring-view-native-camera-adapter")).toBeVisible();
+  await expect(page.locator("ring-view-ring-webrtc-player")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Hold to talk" })).toHaveCount(0);
+  await expect(page.getByRole("img", { name: "Synthetic demo camera media" })).toBeVisible();
+});
+
 test("opens, switches recording → live → recording, and tears down", async ({ page }) => {
   await expect(page.getByRole("button", { name: /Open Entrance viewer/ })).toBeVisible();
   await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
@@ -165,7 +256,12 @@ test("keeps hold to talk near the video edge on desktop and mobile", async ({ pa
       overflow: "hidden",
       background: "black",
     });
-    frame.append(document.createElement("ring-view-ring-webrtc-player"));
+    const player = document.createElement(
+      "ring-view-ring-webrtc-player",
+    ) as unknown as HTMLElement & { statusMessage: string };
+    player.statusMessage =
+      "Two-way audio needs an HTTPS Home Assistant connection. Video remains connected.";
+    frame.append(player);
     document.body.replaceChildren(frame);
   });
   const viewports = [
@@ -177,11 +273,26 @@ test("keeps hold to talk near the video edge on desktop and mobile", async ({ pa
     await page.setViewportSize(viewport);
     const frame = page.locator("#talkback-frame");
     const controls = page.locator("ring-view-ring-webrtc-player .talkback-controls");
+    const talkButton = page.locator("ring-view-ring-webrtc-player .talk-button");
+    const status = page.locator("ring-view-ring-webrtc-player .session-status");
     await expect(frame).toBeVisible();
     await expect(controls).toBeVisible();
+    await expect(status).toBeVisible();
     const frameBox = await frame.boundingBox();
     const controlsBox = await controls.boundingBox();
     expect((frameBox?.y ?? 0) + (frameBox?.height ?? 0) - ((controlsBox?.y ?? 0) + (controlsBox?.height ?? 0))).toBeLessThanOrEqual(24);
+
+    if (viewport.width <= 600) {
+      const buttonBox = await talkButton.boundingBox();
+      const statusBox = await status.boundingBox();
+      expect((statusBox?.y ?? 0) + (statusBox?.height ?? 0)).toBeLessThanOrEqual(
+        (buttonBox?.y ?? 0) - 6,
+      );
+      expect(statusBox?.x).toBeGreaterThanOrEqual(0);
+      expect((statusBox?.x ?? 0) + (statusBox?.width ?? 0)).toBeLessThanOrEqual(
+        viewport.width,
+      );
+    }
   }
 });
 

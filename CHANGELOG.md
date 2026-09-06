@@ -4,6 +4,41 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-09-07
+
+### Changed
+
+- Group dashboard image-source settings together in a dedicated visual-editor
+  section and reveal the snapshot camera and capture-time fallback only when
+  the selected source needs them.
+
+### Fixed
+
+- Show Hold to talk only for a streaming camera from Home Assistant's official
+  Ring integration. Unsupported live entities now retain native video and any
+  incoming-audio playback instead of mounting a nonfunctional talkback player.
+- Keep the HTTPS/talkback status message above the low Hold to talk control on
+  portrait phones, including when the message wraps to a second line.
+- Explain that two-way audio needs an HTTPS Home Assistant connection while
+  leaving video connected on an HTTP internal connection.
+
+### Documentation
+
+- Clarify that Companion apps using an HTTP internal URL on home Wi-Fi must use
+  an HTTPS internal URL or the HTTPS Home Assistant Cloud connection for
+  talkback.
+- Clarify that talkback requires the official Ring `live_view` entity;
+  Ring-MQTT can provide the optional snapshot but its RTSP camera path does not
+  carry Ring View's microphone audio back to the doorbell.
+
+### Tests
+
+- Add regression coverage for the insecure-connection explanation and for
+  keeping the portrait status message clear of the talkback control.
+- Add visual-editor coverage for the progressive dashboard-preview fields.
+- Add editor, unit, and desktop/mobile browser coverage for official-Ring
+  talkback capability detection and unsupported-camera fallback.
+
 ## [0.5.0] - 2026-09-06
 
 ### Added

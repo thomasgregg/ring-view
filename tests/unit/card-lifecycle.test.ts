@@ -17,6 +17,13 @@ const camera = (id: string, features: number): HassEntity => ({
 });
 
 const hass: HomeAssistant = {
+  entities: {
+    "camera.recording": {
+      entity_id: "camera.recording",
+      platform: "ring",
+    },
+    "camera.live": { entity_id: "camera.live", platform: "ring" },
+  },
   states: {
     "camera.recording": camera("camera.recording", 0),
     "camera.live": camera("camera.live", 2),
@@ -491,6 +498,39 @@ describe("card stream lifecycle", () => {
     expect(dialog?.shadowRoot?.querySelector(".audio-button")).toBeNull();
     expect(stream?.muted).toBe(false);
     expect(TestCameraStream.active).toBe(1);
+  });
+
+  it("uses native playback without a talk button for an unsupported live platform", async () => {
+    const card = document.createElement("ring-view");
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      two_way_audio: true,
+    });
+    card.hass = {
+      ...hass,
+      entities: {
+        ...hass.entities,
+        "camera.live": { entity_id: "camera.live", platform: "generic" },
+      },
+    };
+    document.body.append(card);
+    await card.updateComplete;
+    card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
+    await flush();
+    const dialog = card.shadowRoot?.querySelector<RingViewDialog>(
+      "ring-view-dialog",
+    );
+    dialog?.shadowRoot?.querySelector<HTMLElement>("#ring-view-tab-live")?.click();
+    await flush();
+
+    expect(
+      dialog?.shadowRoot?.querySelector("ring-view-ring-webrtc-player"),
+    ).toBeNull();
+    expect(
+      dialog?.shadowRoot?.querySelector("ring-view-native-camera-adapter"),
+    ).not.toBeNull();
+    expect(dialog?.shadowRoot?.textContent).not.toContain("Hold to talk");
   });
 
   it("leaves fullscreen and audio to the native media controls", async () => {

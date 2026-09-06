@@ -250,4 +250,23 @@ describe("Ring WebRTC player", () => {
       "Microphone permission was denied. Video remains connected.",
     );
   });
+
+  it("explains that an insecure Home Assistant connection blocks two-way audio", async () => {
+    const getUserMedia = vi.fn(async () => new MockMediaStream([]) as unknown as MediaStream);
+    const { player, peer } = await mount(getUserMedia);
+    Object.defineProperty(window, "isSecureContext", { configurable: true, value: false });
+
+    const button = player.shadowRoot?.querySelector<HTMLButtonElement>("button");
+    if (!button) throw new Error("Talk button was not rendered");
+    dispatchPointer(button, "pointerdown");
+    await flush();
+    await player.updateComplete;
+
+    expect(getUserMedia).not.toHaveBeenCalled();
+    expect(peer.replaceTrack).not.toHaveBeenCalled();
+    expect(peer.close).not.toHaveBeenCalled();
+    expect(player.shadowRoot?.textContent).toContain(
+      "Two-way audio needs an HTTPS Home Assistant connection. Video remains connected.",
+    );
+  });
 });

@@ -95,6 +95,11 @@ channel through the official `live_view` entity and Home Assistant camera
 WebSocket API. It does not require a custom integration or additional Ring
 credentials.
 
+For two-way audio, `live_entity` must be the official Ring `live_view` camera.
+A Ring-MQTT snapshot camera works well as the optional `snapshot_entity`, but a
+Ring-MQTT/Generic Camera RTSP live entity does not expose the microphone return
+path Ring View needs for talkback.
+
 ## Install with HACS
 
 [![Open your Home Assistant instance and open this repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=thomasgregg&repository=ring-view&category=plugin)
@@ -146,17 +151,17 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `type` | No — added automatically | Required | `custom:ring-view` | Identifies the custom card. Added automatically by the card picker. |
 | `recording_entity` | Yes — Config tab | Required | `camera.*` entity ID | Camera entity containing the latest recording. |
 | `live_entity` | Yes — Config tab | Required | `camera.*` entity ID | Camera entity that starts the Ring live view. |
-| `snapshot_entity` | Yes — Config tab | Not set | `camera.*` entity ID | Optional device snapshot camera, such as the snapshot entity created by Ring-MQTT. |
+| `snapshot_entity` | Yes — Dashboard preview | Not set | `camera.*` entity ID | Device snapshot camera, such as the snapshot entity created by Ring-MQTT. Shown when the selected image source needs it. |
 | `name` | Yes — Config tab | Entity name | Text | Optional label used instead of the recording entity's friendly name. |
 | `default_mode` | Yes — Config tab | `last_recording` | `last_recording`, `live` | View selected when the viewer opens. |
 | `remember_last_mode` | Yes — Config tab | `false` | `true`, `false` | Remembers the most recent view in the current browser and uses it instead of `default_mode`. |
 | `autoplay_recording` | Yes — Config tab | `true` | `true`, `false` | Starts the latest recording immediately; when disabled, the viewer waits for Play. |
 | `live_muted` | Yes — Config tab | `false` | `true`, `false` | Starts Live muted. Browser autoplay rules can still require muted playback. |
-| `two_way_audio` | Yes, Doorbell features | `false` | `true`, `false` | Uses one direct WebRTC session for live video, listening, and push-to-talk. |
+| `two_way_audio` | Yes, Doorbell features | `false` | `true`, `false` | Uses one direct WebRTC session for live video, listening, and push-to-talk when `live_entity` is an official Ring `live_view` camera. |
 | `doorbell_entity` | Yes, Doorbell features | Not set | `event.*` entity ID | Displays a temporary ring alert when the selected doorbell event reports `ring`. |
 | `show_name` | Yes — Config tab | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer. |
-| `preview_source` | Yes — Config tab | `last_recording` | `last_recording`, `live`, `default`, `snapshot`, `newest` | Chooses the entity used for the dashboard still. `default` follows the view that will open; `newest` compares the optional snapshot with the latest recording. |
-| `preview_fallback` | Yes — Config tab | `last_recording` | `last_recording`, `snapshot` | Chooses the still used by `newest` when capture times or update order cannot be compared. |
+| `preview_source` | Yes — Dashboard preview | `last_recording` | `last_recording`, `live`, `default`, `snapshot`, `newest` | Chooses the entity used for the dashboard still. `default` follows the view that will open; `newest` compares the optional snapshot with the latest recording. |
+| `preview_fallback` | Yes — Dashboard preview | `last_recording` | `last_recording`, `snapshot` | Chooses the still used by `newest` when capture times or update order cannot be compared. Only shown for `newest`. |
 | `aspect_ratio` | Yes — Config tab | `16:9` | `auto`, `16:9`, `4:3`, `1:1` | Sets the dashboard image shape. |
 | `fit_mode` | Yes — Config tab | `cover` | `cover`, `contain` | Crops the image to fill the card or fits the entire image inside it. |
 | `grid_options` | Yes — Layout tab | See below | Object | Standard Home Assistant Sections-layout sizing. Configure it in the Layout tab. |
@@ -209,8 +214,8 @@ Ring View 0.2 and newer use this flat configuration only. Earlier nested `previe
 
 ## Freshest snapshot preview
 
-Select an optional **Device snapshot camera** in the visual editor, then set
-**Card preview image** to **Newest snapshot or recording**. Ring View still
+Open **Dashboard preview**, set **Image source** to **Newest snapshot or
+recording**, and select the now-visible **Device snapshot camera**. Ring View still
 renders only one passive image on the dashboard, and tapping it opens the
 configured Recording or Live view—there is no third viewer tab.
 
@@ -220,7 +225,7 @@ timestamps when both camera entities provide them. The official Ring
 last-recording entity currently exposes `last_video_id` but no capture time, so
 Ring View also follows the order of snapshot timestamp and recording ID changes
 received after the card loads. On initial load, after a reload, or whenever the
-two sources remain incomparable, **Fallback when freshness is unknown** makes
+two sources remain incomparable, **If capture times cannot be compared** makes
 the result deterministic. General Home Assistant `last_updated` values are not
 treated as media capture times.
 
@@ -234,6 +239,15 @@ incoming audio connect first without opening the microphone. Pressing
 track into the existing session. Audio is sent only while the button remains
 pressed. If the permission prompt interrupts the first hold, release and hold
 again after granting access.
+
+This talkback path is specific to the official Ring `live_view` camera. The
+[Ring-MQTT video output](https://github.com/tsightler/ring-mqtt/wiki/Video-Streaming)
+can provide an RTSP live picture, but Ring View cannot send the browser
+microphone back through that camera entity. Ring-MQTT remains supported as the
+optional dashboard snapshot source alongside the official Ring live entity.
+If two-way audio is enabled with an unsupported live camera, the editor shows a
+warning and the viewer uses Home Assistant's normal player without displaying
+Hold to talk. Video and any incoming camera audio remain available.
 
 To show ring alerts inside the card, also select the Ring Ding event entity,
 for example `event.front_door_ding`. A fresh event displays **Someone is at the
@@ -250,10 +264,13 @@ the recording camera and does not start another Ring live session.
 
 [![Open your Home Assistant instance and import the Ring View doorbell notification blueprint.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https://github.com/thomasgregg/ring-view/blob/main/blueprints/automation/ring_view/doorbell_notification.yaml)
 
-Microphone permission requires HTTPS. Temporary WebRTC disconnections are left
-open for browser recovery, but Ring cloud outages, network loss, device session
-limits, browser suspension, and competing Ring clients can still interrupt a
-live view.
+Microphone permission requires HTTPS. In a Companion app that switches to an
+HTTP internal URL on home Wi-Fi, video still works but two-way audio is blocked
+by the browser. Use an HTTPS internal URL or the HTTPS Home Assistant Cloud
+connection for talkback. Temporary WebRTC disconnections are left open for
+browser recovery, but Ring cloud outages, network loss, device session limits,
+browser suspension, and competing Ring clients can still interrupt a live
+view.
 
 ## How preview and playback work
 

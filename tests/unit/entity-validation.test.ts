@@ -4,6 +4,7 @@ import type { HassEntity, HomeAssistant } from "../../src/types";
 import {
   entityIsUnavailable,
   recordingHasMedia,
+  supportsRingTalkback,
   supportsStream,
   validateEntities,
 } from "../../src/utilities/entity-validation";
@@ -19,6 +20,34 @@ describe("entity validation", () => {
     expect(supportsStream(entity("camera.live", { supported_features: 2 }))).toBe(true);
     expect(supportsStream(entity("camera.recording", { supported_features: 0 }))).toBe(false);
     expect(recordingHasMedia(entity("camera.recording", { video_url: "secret" }))).toBe(true);
+  });
+
+  it("accepts talkback only for a streaming camera from the official Ring platform", () => {
+    const states = {
+      "camera.live": entity("camera.live", { supported_features: 2 }),
+      "camera.recording": entity("camera.recording", { supported_features: 0 }),
+    };
+    const officialRing: HomeAssistant = {
+      states,
+      entities: {
+        "camera.live": { entity_id: "camera.live", platform: "ring" },
+      },
+      hassUrl: (path = "") => path,
+      callWS: async () => ({}) as never,
+    };
+    expect(supportsRingTalkback(officialRing, "camera.live")).toBe(true);
+    expect(supportsRingTalkback(officialRing, "camera.recording")).toBe(false);
+    expect(
+      supportsRingTalkback(
+        {
+          ...officialRing,
+          entities: {
+            "camera.live": { entity_id: "camera.live", platform: "generic" },
+          },
+        },
+        "camera.live",
+      ),
+    ).toBe(false);
   });
 
   it("detects missing and unavailable entities", () => {
@@ -126,5 +155,41 @@ describe("entity validation", () => {
       config,
     ).find((warning) => warning.kind === "snapshot");
     expect(snapshotWarning?.message).toContain("Select a device snapshot camera");
+  });
+
+  it("warns when two-way audio is enabled for a non-Ring live camera", () => {
+    const config = normalizeConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      two_way_audio: true,
+    });
+    const baseHass: HomeAssistant = {
+      states: {
+        "camera.recording": entity("camera.recording", {
+          entity_picture: "/recording.jpg",
+        }),
+        "camera.live": entity("camera.live", { supported_features: 2 }),
+      },
+      entities: {
+        "camera.live": { entity_id: "camera.live", platform: "generic" },
+      },
+      hassUrl: (path = "") => path,
+      callWS: async () => ({}) as never,
+    };
+    const warnings = validateEntities(baseHass, config);
+    expect(warnings.find((warning) => warning.kind === "talkback")?.message).toContain(
+      "requires the official Ring Live view camera",
+    );
+    expect(
+      validateEntities(
+        {
+          ...baseHass,
+          entities: {
+            "camera.live": { entity_id: "camera.live", platform: "ring" },
+          },
+        },
+        config,
+      ).map((warning) => warning.kind),
+    ).not.toContain("talkback");
   });
 });
