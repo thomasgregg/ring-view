@@ -10,31 +10,28 @@
 Ring exposes the latest recording and the live stream as separate Home Assistant camera entities. Ring View brings them together in one focused dashboard card and one native-feeling viewer—without starting a live Ring session just to show a dashboard preview.
 
 <p align="center">
-  <a href="docs/images/dashboard-card.png">
-    <img src="docs/images/dashboard-card.png" alt="Ring View dashboard card showing a still Ring camera preview" width="100%">
+  <a href="docs/images/ring-view-modes.png">
+    <img src="docs/images/ring-view-modes.png" alt="Ring View detail viewer showing the controls for switching between the latest recording and live view" width="100%">
   </a>
   <br>
-  <sub>The dashboard card stays on a lightweight still preview.</sub>
+  <sub>Switch between the latest recording and Live without leaving the viewer.</sub>
 </p>
 
-<table>
-  <tr>
-    <td width="50%">
-      <a href="docs/images/recording-view.png">
-        <img src="docs/images/recording-view.png" alt="Ring View detail viewer showing the latest recording">
-      </a>
-    </td>
-    <td width="50%">
-      <a href="docs/images/live-view.png">
-        <img src="docs/images/live-view.png" alt="Ring View detail viewer showing the live camera">
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Last recording</strong></td>
-    <td align="center"><strong>Live view</strong></td>
-  </tr>
-</table>
+## Contents
+
+- [Why Ring View?](#why-ring-view)
+  - [Ring View or a native card?](#ring-view-or-a-native-card)
+- [Requirements](#requirements)
+- [Install with HACS](#install-with-hacs)
+- [Quick start](#quick-start)
+- [Configuration reference](#configuration-reference)
+  - [Layout options](#layout-options)
+  - [Complete YAML example](#complete-yaml-example)
+- [How preview and playback work](#how-preview-and-playback-work)
+- [Themes, languages, and accessibility](#themes-languages-and-accessibility)
+- [Security and privacy](#security-and-privacy)
+- [Documentation](#documentation)
+- [License](#license)
 
 ## Why Ring View?
 
@@ -119,26 +116,26 @@ Select the card to open the viewer. The history icon opens the latest recording,
 
 ## Configuration reference
 
-Every Ring View setting is available in the visual **Config** editor. The only exceptions are `type`, which Home Assistant adds automatically, and `grid_options`, which Home Assistant manages in its standard **Layout** tab.
+Every Ring View setting is available through Home Assistant's visual card configuration. The **UI configuration** column below shows whether an option appears in Ring View's **Config** tab, Home Assistant's standard **Layout** tab, or is handled automatically.
 
 [![Ring View visual configuration editor](docs/images/configuration-editor.png)](docs/images/configuration-editor.png)
 
-| Option | Default | Accepted values | Purpose |
-| --- | --- | --- | --- |
-| `type` | Required | `custom:ring-view` | Identifies the custom card. Added automatically by the card picker. |
-| `recording_entity` | Required | `camera.*` entity ID | Camera entity containing the latest recording. |
-| `live_entity` | Required | `camera.*` entity ID | Camera entity that starts the Ring live view. |
-| `name` | Entity name | Text | Optional label used instead of the recording entity's friendly name. |
-| `default_mode` | `last_recording` | `last_recording`, `live` | View selected when the viewer opens. |
-| `remember_last_mode` | `false` | `true`, `false` | Remembers the most recent view in the current browser and uses it instead of `default_mode`. |
-| `autoplay_recording` | `true` | `true`, `false` | Starts the latest recording immediately; when disabled, the viewer waits for Play. |
-| `live_muted` | `false` | `true`, `false` | Starts Live muted. Browser autoplay rules can still require muted playback. |
-| `show_name` | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer. |
-| `preview_source` | `last_recording` | `last_recording`, `live`, `default` | Chooses the entity used for the dashboard still. `default` follows the view that will open. |
-| `show_mode_icon` | `true` | `true`, `false` | Shows the compact history or Live indicator on the dashboard card. |
-| `aspect_ratio` | `16:9` | `auto`, `16:9`, `4:3`, `1:1` | Sets the dashboard image shape. |
-| `fit_mode` | `cover` | `cover`, `contain` | Crops the image to fill the card or fits the entire image inside it. |
-| `grid_options` | See below | Object | Standard Home Assistant Sections-layout sizing. Configure it in the Layout tab. |
+| Option | UI configuration | Default | Accepted values | Purpose |
+| --- | --- | --- | --- | --- |
+| `type` | No — added automatically | Required | `custom:ring-view` | Identifies the custom card. Added automatically by the card picker. |
+| `recording_entity` | Yes — Config tab | Required | `camera.*` entity ID | Camera entity containing the latest recording. |
+| `live_entity` | Yes — Config tab | Required | `camera.*` entity ID | Camera entity that starts the Ring live view. |
+| `name` | Yes — Config tab | Entity name | Text | Optional label used instead of the recording entity's friendly name. |
+| `default_mode` | Yes — Config tab | `last_recording` | `last_recording`, `live` | View selected when the viewer opens. |
+| `remember_last_mode` | Yes — Config tab | `false` | `true`, `false` | Remembers the most recent view in the current browser and uses it instead of `default_mode`. |
+| `autoplay_recording` | Yes — Config tab | `true` | `true`, `false` | Starts the latest recording immediately; when disabled, the viewer waits for Play. |
+| `live_muted` | Yes — Config tab | `false` | `true`, `false` | Starts Live muted. Browser autoplay rules can still require muted playback. |
+| `show_name` | Yes — Config tab | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer. |
+| `preview_source` | Yes — Config tab | `last_recording` | `last_recording`, `live`, `default` | Chooses the entity used for the dashboard still. `default` follows the view that will open. |
+| `show_mode_icon` | Yes — Config tab | `true` | `true`, `false` | Shows the compact history or Live indicator on the dashboard card. |
+| `aspect_ratio` | Yes — Config tab | `16:9` | `auto`, `16:9`, `4:3`, `1:1` | Sets the dashboard image shape. |
+| `fit_mode` | Yes — Config tab | `cover` | `cover`, `contain` | Crops the image to fill the card or fits the entire image inside it. |
+| `grid_options` | Yes — Layout tab | See below | Object | Standard Home Assistant Sections-layout sizing. Configure it in the Layout tab. |
 
 ### Layout options
 

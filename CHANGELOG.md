@@ -14,6 +14,16 @@ All notable changes to this project are documented here.
   status nor an available action.
 - Keep configured dashboard cards on their selected real camera preview,
   including while editing a dashboard.
+- Remove the demo-only Live label so the synthetic preview matches the real
+  dashboard card more faithfully.
+
+### Documentation
+
+- Replace the private-camera screenshot gallery with one privacy-safe,
+  annotated synthetic viewer guide using precisely aligned callouts.
+- Add a contents list and identify which configuration options are available
+  in Ring View's Config tab, Home Assistant's Layout tab, or handled
+  automatically.
 
 ## [0.3.4] - 2026-09-06
 

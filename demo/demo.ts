@@ -45,13 +45,10 @@ class DemoCameraStream extends HTMLElement {
         :host { display:block; width:100%; height:100%; background:#000; }
         .frame { position:relative; width:100%; height:100%; overflow:hidden; background:#000; }
         .camera-image { width:100%; height:100%; background:url('/demo/camera-preview.svg') center/cover no-repeat; ${live ? "filter:saturate(1.08) brightness(.96);" : ""} }
-        .live { position:absolute; inset:14px auto auto 14px; display:flex; align-items:center; gap:7px; padding:6px 10px; border-radius:7px; color:#fff; background:rgba(0,0,0,.62); font:600 12px system-ui; }
-        .live::before { content:""; width:8px; height:8px; border-radius:50%; background:#ff453a; }
         .controls { position:absolute; inset:auto 0 0; height:46px; background:linear-gradient(transparent,rgba(0,0,0,.72)); }
       </style>
       <div class="frame">
         <div class="camera-image" role="img" aria-label="Synthetic demo camera media"></div>
-        ${live ? '<span class="live">LIVE</span>' : ""}
         <span class="controls"></span>
       </div>
     `;
