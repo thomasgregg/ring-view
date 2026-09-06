@@ -13,12 +13,20 @@ const DEFAULTS = {
   two_way_audio: false,
   show_name: false,
   preview_source: "last_recording",
+  preview_fallback: "last_recording",
   aspect_ratio: "16:9",
   fit_mode: "cover",
 } as const;
 
 const CAMERA_MODES = new Set(["last_recording", "live"]);
-const PREVIEW_SOURCES = new Set(["last_recording", "live", "default"]);
+const PREVIEW_SOURCES = new Set([
+  "last_recording",
+  "live",
+  "default",
+  "snapshot",
+  "newest",
+]);
+const PREVIEW_FALLBACKS = new Set(["last_recording", "snapshot"]);
 const ASPECT_RATIOS = new Set(["auto", "16:9", "4:3", "1:1"]);
 const FIT_MODES = new Set(["cover", "contain"]);
 
@@ -41,12 +49,21 @@ export function validateConfig(config: RingViewConfig): void {
   }
   assertCameraEntity(config.recording_entity, "config.recording_entity");
   assertCameraEntity(config.live_entity, "config.live_entity");
+  if (config.snapshot_entity !== undefined && config.snapshot_entity !== "") {
+    assertCameraEntity(config.snapshot_entity, "config.snapshot_entity");
+  }
 
   if (config.default_mode && !CAMERA_MODES.has(config.default_mode)) {
     throw new Error(localize(undefined, "config.default_mode"));
   }
   if (config.preview_source && !PREVIEW_SOURCES.has(config.preview_source)) {
     throw new Error(localize(undefined, "config.preview_source"));
+  }
+  if (
+    config.preview_fallback
+    && !PREVIEW_FALLBACKS.has(config.preview_fallback)
+  ) {
+    throw new Error(localize(undefined, "config.preview_fallback"));
   }
   if (config.aspect_ratio && !ASPECT_RATIOS.has(config.aspect_ratio)) {
     throw new Error(localize(undefined, "config.aspect_ratio"));
@@ -70,6 +87,7 @@ export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
     type: config.type ?? CARD_TYPE,
     recording_entity: config.recording_entity,
     live_entity: config.live_entity,
+    snapshot_entity: config.snapshot_entity || undefined,
     name: config.name,
     default_mode: config.default_mode ?? DEFAULTS.default_mode,
     remember_last_mode:
@@ -81,6 +99,7 @@ export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
     doorbell_entity: config.doorbell_entity || undefined,
     show_name: config.show_name ?? DEFAULTS.show_name,
     preview_source: config.preview_source ?? DEFAULTS.preview_source,
+    preview_fallback: config.preview_fallback ?? DEFAULTS.preview_fallback,
     aspect_ratio: config.aspect_ratio ?? DEFAULTS.aspect_ratio,
     fit_mode: config.fit_mode ?? DEFAULTS.fit_mode,
     grid_options: config.grid_options,

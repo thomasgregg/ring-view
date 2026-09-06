@@ -17,6 +17,7 @@ describe("configuration", () => {
       two_way_audio: false,
       show_name: false,
       preview_source: "last_recording",
+      preview_fallback: "last_recording",
       aspect_ratio: "16:9",
       fit_mode: "cover",
     });
@@ -47,6 +48,36 @@ describe("configuration", () => {
         doorbell_entity: "binary_sensor.doorbell",
       }),
     ).toThrow(/doorbell_entity/);
+    expect(() =>
+      validateConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        snapshot_entity: "sensor.snapshot",
+      }),
+    ).toThrow(/camera entity/);
+    expect(() =>
+      validateConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        preview_fallback: "live",
+      } as never),
+    ).toThrow(/preview_fallback/);
+  });
+
+  it("accepts the optional snapshot and freshest-preview settings", () => {
+    expect(
+      normalizeConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        snapshot_entity: "camera.snapshot",
+        preview_source: "newest",
+        preview_fallback: "snapshot",
+      }),
+    ).toMatchObject({
+      snapshot_entity: "camera.snapshot",
+      preview_source: "newest",
+      preview_fallback: "snapshot",
+    });
   });
 
   it("preserves explicit grid sizing", () => {

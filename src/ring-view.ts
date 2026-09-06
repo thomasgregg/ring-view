@@ -20,6 +20,11 @@ import { cardStyles } from "./styles";
 import type { GridOptions, HomeAssistant, NormalizedConfig, RingViewConfig } from "./types";
 import { entityIsUnavailable, friendlyName } from "./utilities/entity-validation";
 import { loadMode } from "./utilities/mode-storage";
+import {
+  captureTimestamp,
+  recordingMediaMarker,
+  selectPreviewEntityId,
+} from "./utilities/preview-selection";
 
 const PREVIEW_REFRESH_INTERVAL_MS = 10_000;
 const PREVIEW_FALLBACK_WIDTH = 640;
@@ -51,6 +56,10 @@ export class RingView extends LitElement {
   private previewResizeObserver?: ResizeObserver;
   private ringAlertTimer?: number;
   private lastRingAlertAt = 0;
+  private previewMarkersInitialized = false;
+  private recordingMarker?: string;
+  private snapshotTimestamp?: number;
+  private latestObservedPreviewSource?: "last_recording" | "snapshot";
 
   public static async getConfigElement(): Promise<HTMLElement> {
     await import("./ring-view-editor");
@@ -84,7 +93,17 @@ export class RingView extends LitElement {
   }
 
   public setConfig(config: RingViewConfig): void {
-    this.config = normalizeConfig(config);
+    const next = normalizeConfig(config);
+    if (
+      next.recording_entity !== this.config?.recording_entity
+      || next.snapshot_entity !== this.config?.snapshot_entity
+    ) {
+      this.previewMarkersInitialized = false;
+      this.recordingMarker = undefined;
+      this.snapshotTimestamp = undefined;
+      this.latestObservedPreviewSource = undefined;
+    }
+    this.config = next;
   }
 
   public getCardSize(): number {
@@ -128,6 +147,9 @@ export class RingView extends LitElement {
       previous.states[this.config.recording_entity] !==
         this.hass.states[this.config.recording_entity] ||
       previous.states[this.config.live_entity] !== this.hass.states[this.config.live_entity] ||
+      (this.config.snapshot_entity !== undefined &&
+        previous.states[this.config.snapshot_entity] !==
+          this.hass.states[this.config.snapshot_entity]) ||
       (this.config.doorbell_entity !== undefined &&
         previous.states[this.config.doorbell_entity] !==
           this.hass.states[this.config.doorbell_entity])
@@ -136,6 +158,7 @@ export class RingView extends LitElement {
 
   protected willUpdate(changed: PropertyValues<this>): void {
     if (!this.hass || !this.config) return;
+    this.observePreviewMedia();
     this.detectDoorbellEvent(changed.get("hass") as HomeAssistant | undefined);
     if (this.isInCardPicker()) return;
     const entityId = this.previewEntityId();
@@ -232,11 +255,43 @@ export class RingView extends LitElement {
   }
 
   private previewEntityId(): string {
-    const source = this.config!.preview_source;
-    const mode = source === "default" ? loadMode(this.config!) : source;
-    return mode === "live"
-      ? this.config!.live_entity
-      : this.config!.recording_entity;
+    return selectPreviewEntityId(
+      this.hass!,
+      this.config!,
+      loadMode(this.config!),
+      this.latestObservedPreviewSource,
+    );
+  }
+
+  private observePreviewMedia(): void {
+    const recordingMarker = recordingMediaMarker(
+      this.hass?.states[this.config!.recording_entity],
+    );
+    const snapshotTimestamp = captureTimestamp(
+      this.config!.snapshot_entity
+        ? this.hass?.states[this.config!.snapshot_entity]
+        : undefined,
+    );
+    if (!this.previewMarkersInitialized) {
+      this.previewMarkersInitialized = true;
+      this.recordingMarker = recordingMarker;
+      this.snapshotTimestamp = snapshotTimestamp;
+      return;
+    }
+
+    const recordingChanged =
+      recordingMarker !== undefined && recordingMarker !== this.recordingMarker;
+    const snapshotChanged =
+      snapshotTimestamp !== undefined && snapshotTimestamp !== this.snapshotTimestamp;
+    if (recordingChanged !== snapshotChanged) {
+      this.latestObservedPreviewSource = recordingChanged
+        ? "last_recording"
+        : "snapshot";
+    } else if (recordingChanged) {
+      this.latestObservedPreviewSource = undefined;
+    }
+    this.recordingMarker = recordingMarker;
+    this.snapshotTimestamp = snapshotTimestamp;
   }
 
   private openViewer = (): void => {

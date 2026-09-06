@@ -21,6 +21,7 @@ const hass: HomeAssistant = {
   states: {
     "camera.recording": entity("camera.recording", 0),
     "camera.live": entity("camera.live", 2),
+    "camera.snapshot": entity("camera.snapshot", 0),
   },
   hassUrl: (path = "") => path,
   callWS: async () => ({}) as never,
@@ -73,6 +74,7 @@ describe("visual editor", () => {
       live_muted: false,
       two_way_audio: false,
       preview_source: "last_recording",
+      preview_fallback: "last_recording",
       aspect_ratio: "16:9",
       fit_mode: "cover",
     });
@@ -117,9 +119,10 @@ describe("visual editor", () => {
     expect(editor.shadowRoot?.querySelector(".settings-group")).toBeNull();
 
     const schema = (forms?.[0] as HTMLElement & { schema?: ConfigFormSchema[] }).schema ?? [];
-    expect(schema.slice(0, 2).map((field) => field.name)).toEqual([
+    expect(schema.slice(0, 3).map((field) => field.name)).toEqual([
       "recording_entity",
       "live_entity",
+      "snapshot_entity",
     ]);
     expect(
       schema.filter((field) => field.type === "expandable").map((field) => ({
@@ -160,6 +163,9 @@ describe("visual editor", () => {
     );
     expect(form?.computeLabel?.({ name: "viewer_behavior" })).toBe(
       "Anzeigeverhalten",
+    );
+    expect(form?.computeLabel?.({ name: "snapshot_entity" })).toBe(
+      "Kamera für Geräte-Schnappschuss (optional)",
     );
     expect(form?.computeLabel?.({ name: "name" })).toBe("Kameraname (optional)");
     expect(form?.computeLabel?.({ name: "show_name" })).toBe(
@@ -210,6 +216,7 @@ describe("visual editor", () => {
       "name",
       "show_name",
       "preview_source",
+      "preview_fallback",
       "",
     ]);
     const previewSource = cardAppearance?.schema?.find(
@@ -221,6 +228,11 @@ describe("visual editor", () => {
           { value: "last_recording", label: "Standbild der letzten Aufnahme" },
           { value: "live", label: "Standbild der Live-Kamera" },
           { value: "default", label: "Der Startansicht folgen" },
+          { value: "snapshot", label: "Geräte-Schnappschuss" },
+          {
+            value: "newest",
+            label: "Neuester Schnappschuss oder Aufnahme",
+          },
         ],
       },
     });

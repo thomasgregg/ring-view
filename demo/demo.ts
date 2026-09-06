@@ -98,6 +98,17 @@ const live: HassEntity = {
     supported_features: 2,
   },
 };
+const snapshot: HassEntity = {
+  entity_id: "camera.device_snapshot",
+  state: "idle",
+  attributes: {
+    friendly_name: "Device snapshot",
+    entity_picture: "/demo/camera-preview.svg?source=snapshot",
+    supported_features: 0,
+    timestamp: Date.parse("2026-09-06T12:01:00Z") / 1_000,
+  },
+};
+recording.attributes.recorded_at = "2026-09-06T12:00:00Z";
 
 let hass: HomeAssistant = {
   language,
@@ -105,6 +116,7 @@ let hass: HomeAssistant = {
   states: {
     [recording.entity_id]: recording,
     [live.entity_id]: live,
+    [snapshot.entity_id]: snapshot,
   },
   hassUrl: (path = "") => path,
   callWS: async () => ({}) as never,
@@ -114,19 +126,25 @@ let hass: HomeAssistant = {
 const card = document.createElement("ring-view");
 const requestedPreview = query.get("preview");
 const previewSource: PreviewSource =
-  requestedPreview === "live" || requestedPreview === "default"
+  requestedPreview === "live"
+  || requestedPreview === "default"
+  || requestedPreview === "snapshot"
+  || requestedPreview === "newest"
     ? requestedPreview
     : "last_recording";
 card.setConfig({
   type: "custom:ring-view",
   recording_entity: recording.entity_id,
   live_entity: live.entity_id,
+  snapshot_entity: snapshot.entity_id,
   name: "Entrance",
   default_mode: query.get("mode") === "live" ? "live" : "last_recording",
   remember_last_mode: query.get("remember") === "1",
   autoplay_recording: query.get("autoplay") !== "0",
   show_name: query.get("name") === "1",
   preview_source: previewSource,
+  preview_fallback: query.get("fallback") === "snapshot" ? "snapshot" : "last_recording",
+  two_way_audio: query.get("two_way_audio") === "1",
 });
 card.hass = hass;
 document.querySelector("#card-root")!.append(card);

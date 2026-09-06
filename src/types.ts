@@ -1,5 +1,11 @@
 export type CameraMode = "last_recording" | "live";
-export type PreviewSource = "last_recording" | "live" | "default";
+export type PreviewSource =
+  | "last_recording"
+  | "live"
+  | "default"
+  | "snapshot"
+  | "newest";
+export type PreviewFallback = "last_recording" | "snapshot";
 export type AspectRatio = "auto" | "16:9" | "4:3" | "1:1";
 export type FitMode = "cover" | "contain";
 
@@ -48,6 +54,7 @@ export interface RingViewConfig {
   type?: string;
   recording_entity: string;
   live_entity: string;
+  snapshot_entity?: string;
   name?: string;
   default_mode?: CameraMode;
   remember_last_mode?: boolean;
@@ -57,16 +64,21 @@ export interface RingViewConfig {
   doorbell_entity?: string;
   show_name?: boolean;
   preview_source?: PreviewSource;
+  preview_fallback?: PreviewFallback;
   aspect_ratio?: AspectRatio;
   fit_mode?: FitMode;
   grid_options?: GridOptions;
 }
 
 export interface NormalizedConfig extends Required<
-  Omit<RingViewConfig, "name" | "grid_options" | "doorbell_entity">
+  Omit<
+    RingViewConfig,
+    "name" | "grid_options" | "doorbell_entity" | "snapshot_entity"
+  >
 > {
   name?: string;
   doorbell_entity?: string;
+  snapshot_entity?: string;
   grid_options?: GridOptions;
 }
 

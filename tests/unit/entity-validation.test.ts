@@ -66,4 +66,65 @@ describe("entity validation", () => {
       "Die Live-Kamera meldet keine Unterstützung für Kamera-Streaming.",
     );
   });
+
+  it("validates an optional snapshot entity without treating idle as stale", () => {
+    const config = normalizeConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      snapshot_entity: "camera.snapshot",
+      preview_source: "newest",
+    });
+    const baseStates = {
+      "camera.recording": entity("camera.recording", { entity_picture: "/recording.jpg" }),
+      "camera.live": entity("camera.live", { supported_features: 2 }),
+    };
+    const available: HomeAssistant = {
+      states: {
+        ...baseStates,
+        "camera.snapshot": entity("camera.snapshot", {
+          entity_picture: "/snapshot.jpg",
+          timestamp: 1_780_000_000,
+        }),
+      },
+      hassUrl: (path = "") => path,
+      callWS: async () => ({}) as never,
+    };
+    expect(validateEntities(available, config).map((warning) => warning.kind)).not.toContain(
+      "snapshot",
+    );
+
+    const unavailable = {
+      ...available,
+      states: {
+        ...available.states,
+        "camera.snapshot": {
+          ...available.states["camera.snapshot"]!,
+          state: "unavailable",
+        },
+      },
+    };
+    expect(validateEntities(unavailable, config).map((warning) => warning.kind)).toContain(
+      "snapshot",
+    );
+  });
+
+  it("warns when a snapshot-based preview has no snapshot entity", () => {
+    const config = normalizeConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      preview_source: "snapshot",
+    });
+    const snapshotWarning = validateEntities(
+      {
+        states: {
+          "camera.recording": entity("camera.recording", { entity_picture: "/recording.jpg" }),
+          "camera.live": entity("camera.live", { supported_features: 2 }),
+        },
+        hassUrl: (path = "") => path,
+        callWS: async () => ({}) as never,
+      },
+      config,
+    ).find((warning) => warning.kind === "snapshot");
+    expect(snapshotWarning?.message).toContain("Select a device snapshot camera");
+  });
 });

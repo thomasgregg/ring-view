@@ -53,6 +53,118 @@ describe("card stream lifecycle", () => {
     expect(TestCameraStream.active).toBe(0);
   });
 
+  it("shows the freshest configured still without adding a third viewer tab", async () => {
+    const snapshot = {
+      ...camera("camera.snapshot", 0),
+      attributes: {
+        ...camera("camera.snapshot", 0).attributes,
+        entity_picture: "/snapshot.jpg",
+        timestamp: Date.parse("2026-09-06T12:01:00Z") / 1_000,
+      },
+    };
+    const recording = {
+      ...hass.states["camera.recording"]!,
+      attributes: {
+        ...hass.states["camera.recording"]!.attributes,
+        recorded_at: "2026-09-06T12:00:00Z",
+      },
+    };
+    const card = document.createElement("ring-view");
+    card.setConfig({
+      recording_entity: recording.entity_id,
+      live_entity: "camera.live",
+      snapshot_entity: snapshot.entity_id,
+      preview_source: "newest",
+    });
+    card.hass = {
+      ...hass,
+      states: { ...hass.states, [recording.entity_id]: recording, [snapshot.entity_id]: snapshot },
+    };
+    document.body.append(card);
+    await card.updateComplete;
+
+    expect(card.shadowRoot?.querySelector<HTMLImageElement>("img")?.getAttribute("src")).toBe(
+      "/snapshot.jpg",
+    );
+    expect(card.shadowRoot?.querySelector("ring-view-native-camera-adapter")).toBeNull();
+    card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
+    await flush();
+    const dialog = card.shadowRoot?.querySelector<RingViewDialog>("ring-view-dialog");
+    expect(dialog?.shadowRoot?.querySelectorAll('[role="tab"]')).toHaveLength(2);
+    expect(
+      dialog?.shadowRoot
+        ?.querySelector("#ring-view-tab-recording")
+        ?.getAttribute("aria-selected"),
+    ).toBe("true");
+  });
+
+  it("follows snapshot timestamp and recording ID changes received after load", async () => {
+    const recording = {
+      ...camera("camera.recording", 0),
+      attributes: {
+        ...camera("camera.recording", 0).attributes,
+        entity_picture: "/recording.jpg",
+        last_video_id: "recording-1",
+      },
+    };
+    const snapshot = {
+      ...camera("camera.snapshot", 0),
+      attributes: {
+        ...camera("camera.snapshot", 0).attributes,
+        entity_picture: "/snapshot.jpg",
+        timestamp: 1_780_000_000,
+      },
+    };
+    const card = document.createElement("ring-view");
+    card.setConfig({
+      recording_entity: recording.entity_id,
+      live_entity: "camera.live",
+      snapshot_entity: snapshot.entity_id,
+      preview_source: "newest",
+      preview_fallback: "last_recording",
+    });
+    const initialHass = {
+      ...hass,
+      states: { ...hass.states, [recording.entity_id]: recording, [snapshot.entity_id]: snapshot },
+    };
+    card.hass = initialHass;
+    document.body.append(card);
+    await card.updateComplete;
+    expect(card.shadowRoot?.querySelector<HTMLImageElement>("img")?.getAttribute("src")).toBe(
+      "/recording.jpg",
+    );
+
+    const newerSnapshot = {
+      ...snapshot,
+      attributes: { ...snapshot.attributes, timestamp: 1_780_000_060 },
+    };
+    card.hass = {
+      ...initialHass,
+      states: { ...initialHass.states, [snapshot.entity_id]: newerSnapshot },
+    };
+    await card.updateComplete;
+    expect(card.shadowRoot?.querySelector<HTMLImageElement>("img")?.getAttribute("src")).toBe(
+      "/snapshot.jpg",
+    );
+
+    const newerRecording = {
+      ...recording,
+      attributes: { ...recording.attributes, last_video_id: "recording-2" },
+    };
+    card.hass = {
+      ...initialHass,
+      states: {
+        ...initialHass.states,
+        [recording.entity_id]: newerRecording,
+        [snapshot.entity_id]: newerSnapshot,
+      },
+    };
+    await card.updateComplete;
+    expect(card.shadowRoot?.querySelector<HTMLImageElement>("img")?.getAttribute("src")).toBe(
+      "/recording.jpg",
+    );
+  });
+
   it("uses the synthetic scene in the card picker without requesting a camera", async () => {
     const callWS = vi.fn(async (_message: Record<string, unknown>) => ({
       path: "/api/camera_proxy/camera.recording?authSig=temporary",

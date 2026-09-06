@@ -27,6 +27,7 @@ Ring exposes the latest recording and the live stream as separate Home Assistant
 - [Configuration reference](#configuration-reference)
   - [Layout options](#layout-options)
   - [Complete YAML example](#complete-yaml-example)
+- [Freshest snapshot preview](#freshest-snapshot-preview)
 - [Two-way audio and doorbell notifications](#two-way-audio-and-doorbell-notifications)
 - [How preview and playback work](#how-preview-and-playback-work)
 - [Themes, languages, and accessibility](#themes-languages-and-accessibility)
@@ -43,6 +44,8 @@ Ring View fills that gap:
 
 - **One card, both Ring views.** Move between the latest recording and Live without leaving the viewer.
 - **A quiet dashboard.** The card always displays a still image; it never mounts a live player in the dashboard.
+- **Optional freshest still.** A Ring-MQTT snapshot camera can compete with the
+  latest recording for the dashboard preview without adding another viewer mode.
 - **Live only when requested.** A live session begins only after the viewer opens and Live is selected.
 - **Native media rendering.** Home Assistant still chooses WebRTC, HLS, or MJPEG and provides the media controls.
 - **Optional two-way audio.** One Ring WebRTC session carries live video,
@@ -143,6 +146,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `type` | No — added automatically | Required | `custom:ring-view` | Identifies the custom card. Added automatically by the card picker. |
 | `recording_entity` | Yes — Config tab | Required | `camera.*` entity ID | Camera entity containing the latest recording. |
 | `live_entity` | Yes — Config tab | Required | `camera.*` entity ID | Camera entity that starts the Ring live view. |
+| `snapshot_entity` | Yes — Config tab | Not set | `camera.*` entity ID | Optional device snapshot camera, such as the snapshot entity created by Ring-MQTT. |
 | `name` | Yes — Config tab | Entity name | Text | Optional label used instead of the recording entity's friendly name. |
 | `default_mode` | Yes — Config tab | `last_recording` | `last_recording`, `live` | View selected when the viewer opens. |
 | `remember_last_mode` | Yes — Config tab | `false` | `true`, `false` | Remembers the most recent view in the current browser and uses it instead of `default_mode`. |
@@ -151,7 +155,8 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `two_way_audio` | Yes, Doorbell features | `false` | `true`, `false` | Uses one direct WebRTC session for live video, listening, and push-to-talk. |
 | `doorbell_entity` | Yes, Doorbell features | Not set | `event.*` entity ID | Displays a temporary ring alert when the selected doorbell event reports `ring`. |
 | `show_name` | Yes — Config tab | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer. |
-| `preview_source` | Yes — Config tab | `last_recording` | `last_recording`, `live`, `default` | Chooses the entity used for the dashboard still. `default` follows the view that will open. |
+| `preview_source` | Yes — Config tab | `last_recording` | `last_recording`, `live`, `default`, `snapshot`, `newest` | Chooses the entity used for the dashboard still. `default` follows the view that will open; `newest` compares the optional snapshot with the latest recording. |
+| `preview_fallback` | Yes — Config tab | `last_recording` | `last_recording`, `snapshot` | Chooses the still used by `newest` when capture times or update order cannot be compared. |
 | `aspect_ratio` | Yes — Config tab | `16:9` | `auto`, `16:9`, `4:3`, `1:1` | Sets the dashboard image shape. |
 | `fit_mode` | Yes — Config tab | `cover` | `cover`, `contain` | Crops the image to fill the card or fits the entire image inside it. |
 | `grid_options` | Yes — Layout tab | See below | Object | Standard Home Assistant Sections-layout sizing. Configure it in the Layout tab. |
@@ -176,6 +181,7 @@ type: custom:ring-view
 
 recording_entity: camera.front_door_last_recording
 live_entity: camera.front_door_live_view
+snapshot_entity: camera.front_door_snapshot
 name: Entrance
 
 default_mode: last_recording
@@ -187,7 +193,8 @@ two_way_audio: true
 doorbell_entity: event.front_door_ding
 
 show_name: true
-preview_source: last_recording
+preview_source: newest
+preview_fallback: last_recording
 aspect_ratio: "16:9"
 fit_mode: cover
 
@@ -199,6 +206,23 @@ grid_options:
 ```
 
 Ring View 0.2 and newer use this flat configuration only. Earlier nested `preview`, `appearance`, `viewer`, and `performance` structures are not supported.
+
+## Freshest snapshot preview
+
+Select an optional **Device snapshot camera** in the visual editor, then set
+**Card preview image** to **Newest snapshot or recording**. Ring View still
+renders only one passive image on the dashboard, and tapping it opens the
+configured Recording or Live view—there is no third viewer tab.
+
+Ring-MQTT publishes a Unix-seconds `timestamp` attribute whenever it
+successfully retrieves a new snapshot. Ring View compares explicit capture
+timestamps when both camera entities provide them. The official Ring
+last-recording entity currently exposes `last_video_id` but no capture time, so
+Ring View also follows the order of snapshot timestamp and recording ID changes
+received after the card loads. On initial load, after a reload, or whenever the
+two sources remain incomparable, **Fallback when freshness is unknown** makes
+the result deterministic. General Home Assistant `last_updated` values are not
+treated as media capture times.
 
 ## Two-way audio and doorbell notifications
 

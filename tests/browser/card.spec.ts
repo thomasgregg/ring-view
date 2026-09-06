@@ -29,6 +29,26 @@ test("uses a privacy-safe synthetic image in the card picker", async ({ page }) 
   await expect(page.locator("hui-card-picker ring-view .mode-indicator")).toHaveCount(0);
 });
 
+test("uses the newest device snapshot without adding a viewer mode", async ({ page }) => {
+  await page.goto("/demo/?preview=newest");
+  const preview = page.locator("ring-view img");
+  await expect(preview).toHaveAttribute("src", /source=snapshot/);
+  await page.evaluate(() =>
+    window.demoSetEntityState("camera.device_snapshot", "unavailable"),
+  );
+  await expect(preview).not.toHaveAttribute("src", /source=snapshot/);
+  await page.evaluate(() =>
+    window.demoSetEntityState("camera.device_snapshot", "idle"),
+  );
+  await expect(preview).toHaveAttribute("src", /source=snapshot/);
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  await expect(page.getByRole("tab")).toHaveCount(2);
+  await expect(page.getByRole("tab", { name: "Last recording" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+});
+
 test("opens, switches recording → live → recording, and tears down", async ({ page }) => {
   await expect(page.getByRole("button", { name: /Open Entrance viewer/ })).toBeVisible();
   await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
@@ -91,7 +111,7 @@ test("shows an immediate unavailable state if the active entity changes", async 
   await expect.poll(() => page.evaluate(() => window.demoActiveStreams)).toBe(0);
 });
 
-test("keeps controls usable after phone orientation change", async ({ page }) => {
+test("keeps the camera and controls visible after orientation changes", async ({ page }) => {
   const viewports = [
     { width: 320, height: 568 },
     { width: 390, height: 844 },
@@ -107,8 +127,13 @@ test("keeps controls usable after phone orientation change", async ({ page }) =>
     await page.setViewportSize(viewport);
     const liveTab = page.getByRole("tab", { name: "Live" });
     const closeButton = page.getByRole("button", { name: "Close camera viewer" });
+    const dialog = page.getByRole("dialog");
+    const mediaFrame = page.locator(".media-frame");
+    const cameraRenderer = page.locator("ring-view-native-camera-adapter");
     await expect(liveTab).toBeVisible();
     await expect(closeButton).toBeVisible();
+    await expect(mediaFrame).toBeVisible();
+    await expect(cameraRenderer).toBeVisible();
     expect((await liveTab.boundingBox())?.height).toBeGreaterThanOrEqual(44);
     expect((await closeButton.boundingBox())?.height).toBeGreaterThanOrEqual(44);
     const liveBox = await liveTab.boundingBox();
@@ -117,6 +142,46 @@ test("keeps controls usable after phone orientation change", async ({ page }) =>
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
       viewport.width,
     );
+    const mediaBox = await mediaFrame.boundingBox();
+    expect(mediaBox?.width).toBeGreaterThan(viewport.width * 0.55);
+    expect(mediaBox?.height).toBeGreaterThan(150);
+
+    if (viewport.width > viewport.height && viewport.height <= 500) {
+      const dialogBox = await dialog.boundingBox();
+      expect(dialogBox?.width).toBeGreaterThanOrEqual(viewport.width - 2);
+      expect(dialogBox?.height).toBeGreaterThanOrEqual(viewport.height - 2);
+      expect(mediaBox?.height).toBeGreaterThanOrEqual(viewport.height - 2);
+    }
+  }
+});
+
+test("keeps hold to talk near the video edge on desktop and mobile", async ({ page }) => {
+  await page.evaluate(() => {
+    const frame = document.createElement("div");
+    frame.id = "talkback-frame";
+    Object.assign(frame.style, {
+      position: "fixed",
+      inset: "0",
+      overflow: "hidden",
+      background: "black",
+    });
+    frame.append(document.createElement("ring-view-ring-webrtc-player"));
+    document.body.replaceChildren(frame);
+  });
+  const viewports = [
+    { width: 390, height: 844 },
+    { width: 844, height: 390 },
+    { width: 1280, height: 800 },
+  ];
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
+    const frame = page.locator("#talkback-frame");
+    const controls = page.locator("ring-view-ring-webrtc-player .talkback-controls");
+    await expect(frame).toBeVisible();
+    await expect(controls).toBeVisible();
+    const frameBox = await frame.boundingBox();
+    const controlsBox = await controls.boundingBox();
+    expect((frameBox?.y ?? 0) + (frameBox?.height ?? 0) - ((controlsBox?.y ?? 0) + (controlsBox?.height ?? 0))).toBeLessThanOrEqual(24);
   }
 });
 

@@ -18,9 +18,9 @@ npm run test:browser
 npm run build
 ```
 
-The unit suite covers configuration defaults and validation, native editor structure, entity capability states, doorbell alerts, timeout invalidation, no dashboard stream, single-renderer switching, close teardown, disconnect teardown, single-offer two-way audio, press-to-talk muting, and interrupted microphone permission.
+The unit suite covers configuration defaults and validation, snapshot timestamp parsing and freshest-preview fallbacks, native editor structure, entity capability states, doorbell alerts, timeout invalidation, no dashboard stream, single-renderer switching, close teardown, disconnect teardown, single-offer two-way audio, press-to-talk muting, and interrupted microphone permission.
 
-The browser suite covers opening/closing, recording → live → recording, keyboard operation, focus return, browser Back, entity unavailability while open, phone orientation changes, native-style header controls, slow media readiness, and stream-count invariants.
+The browser suite covers opening/closing, recording → live → recording, newest snapshot selection, keyboard operation, focus return, browser Back, entity unavailability while open, camera-frame visibility and size through phone orientation changes, hold-to-talk edge placement, native-style header controls, slow media readiness, and stream-count invariants.
 
 ## Real Home Assistant acceptance pass
 
@@ -48,6 +48,7 @@ Verify each item on current stable Home Assistant and, where practical, the prev
 11. Holding **Hold to talk** requests permission when needed, sends audio only while held, and does not interrupt or replace the video session.
 12. Releasing, cancelling the press, switching apps, or hiding the page immediately mutes the microphone.
 13. A configured doorbell event shows the in-card alert without opening a new live session.
+14. A configured Ring-MQTT snapshot uses its `timestamp`, falls back when unavailable, and never adds a third viewer tab.
 
 ## Visual matrix
 

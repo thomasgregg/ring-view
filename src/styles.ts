@@ -509,9 +509,28 @@ export const dialogStyles = css`
   }
 
   @media (max-height: 500px) and (orientation: landscape) {
+    .dialog {
+      inset: 0;
+      width: 100vw;
+      height: 100dvh;
+      max-height: none;
+      border: 0;
+      border-radius: 0;
+      transform: none;
+    }
+
+    .header {
+      min-height: calc(64px + env(safe-area-inset-top));
+      padding: calc(10px + env(safe-area-inset-top))
+        calc(10px + env(safe-area-inset-right)) 14px
+        calc(16px + env(safe-area-inset-left));
+    }
+
     .body {
       position: relative;
       flex: 1 1 auto;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
     }
 
@@ -524,6 +543,9 @@ export const dialogStyles = css`
       transform: none;
     }
 
+    .mode-switch {
+      top: calc(10px + env(safe-area-inset-top));
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {

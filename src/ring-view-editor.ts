@@ -30,6 +30,10 @@ function configSchema(hass: HomeAssistant): ConfigFormSchema[] {
       selector: { entity: { domain: "camera" } },
     },
     {
+      name: "snapshot_entity",
+      selector: { entity: { domain: "camera" } },
+    },
+    {
       name: "viewer_behavior",
       type: "expandable",
       flatten: true,
@@ -94,6 +98,32 @@ function configSchema(hass: HomeAssistant): ConfigFormSchema[] {
                   value: "default",
                   label: localize(hass, "editor.preview_default"),
                 },
+                {
+                  value: "snapshot",
+                  label: localize(hass, "editor.preview_snapshot"),
+                },
+                {
+                  value: "newest",
+                  label: localize(hass, "editor.preview_newest"),
+                },
+              ],
+            },
+          },
+        },
+        {
+          name: "preview_fallback",
+          selector: {
+            select: {
+              mode: "dropdown",
+              options: [
+                {
+                  value: "last_recording",
+                  label: localize(hass, "editor.fallback_recording"),
+                },
+                {
+                  value: "snapshot",
+                  label: localize(hass, "editor.fallback_snapshot"),
+                },
               ],
             },
           },
@@ -156,6 +186,7 @@ function configSchema(hass: HomeAssistant): ConfigFormSchema[] {
 const LABELS: Record<string, TranslationKey> = {
   recording_entity: "editor.recording_entity",
   live_entity: "editor.live_entity",
+  snapshot_entity: "editor.snapshot_entity",
   viewer_behavior: "editor.viewer_behavior",
   default_mode: "editor.default_mode",
   remember_last_mode: "editor.remember_last_mode",
@@ -168,6 +199,7 @@ const LABELS: Record<string, TranslationKey> = {
   name: "editor.name",
   show_name: "editor.show_name",
   preview_source: "editor.preview_source",
+  preview_fallback: "editor.preview_fallback",
   aspect_ratio: "editor.aspect_ratio",
   fit_mode: "editor.fit_mode",
 };
@@ -181,6 +213,8 @@ const HELPERS: Record<string, TranslationKey> = {
   doorbell_entity: "editor.helper_doorbell_entity",
   show_name: "editor.helper_show_name",
   preview_source: "editor.helper_preview_source",
+  snapshot_entity: "editor.helper_snapshot_entity",
+  preview_fallback: "editor.helper_preview_fallback",
 };
 
 @customElement("ring-view-editor")
@@ -244,7 +278,7 @@ export class RingViewEditor extends LitElement {
     const key = LABELS[schema.name];
     if (!key) return undefined;
     const label = localize(this.hass, key);
-    if (schema.name !== "name") return label;
+    if (!["name", "snapshot_entity"].includes(schema.name)) return label;
     const optional = localizeHaOrFallback(
       this.hass,
       "ui.panel.lovelace.editor.card.config.optional",

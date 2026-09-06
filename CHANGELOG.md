@@ -4,6 +4,34 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-09-06
+
+### Added
+
+- Add an optional device snapshot camera for Ring-MQTT and other integrations.
+- Add dashboard preview choices for the device snapshot and the newest snapshot
+  or recording, with a configurable fallback when capture times cannot be
+  compared.
+- Read Ring-MQTT's explicit snapshot `timestamp`, recognize other explicit
+  capture-time attributes, and follow snapshot timestamp or recording ID
+  changes received while the dashboard is open. The viewer remains limited to
+  the existing Recording and Live modes.
+
+### Fixed
+
+- Keep the camera viewer at full viewport height on short landscape phones so
+  the media no longer collapses to a thin line.
+- Move Hold to talk closer to the video edge on desktop and mobile, without
+  applying portrait phone safe-area padding to a centered media frame.
+
+### Tests
+
+- Make the orientation regression test assert that the camera renderer and a
+  meaningfully sized media frame remain visible, in addition to checking the
+  controls.
+- Add timestamp parsing, fallback, availability, source-switching, two-mode
+  viewer, and talkback-position coverage.
+
 ## [0.4.5] - 2026-09-06
 
 ### Fixed

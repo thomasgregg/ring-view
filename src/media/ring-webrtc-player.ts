@@ -59,7 +59,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     .talkback-controls {
       position: absolute;
       z-index: 4;
-      inset: auto 16px 32px;
+      inset: auto 16px 10px;
       display: flex;
       justify-content: center;
       pointer-events: none;
@@ -136,11 +136,17 @@ export class RingViewRingWebRtcPlayer extends LitElement {
       .talkback-controls {
         inset-inline: max(12px, env(safe-area-inset-right))
           max(12px, env(safe-area-inset-left));
-        bottom: calc(32px + env(safe-area-inset-bottom));
+        bottom: 8px;
       }
 
       .session-status {
         bottom: calc(12px + env(safe-area-inset-bottom));
+      }
+    }
+
+    @media (max-height: 500px) and (orientation: landscape) {
+      .talkback-controls {
+        bottom: max(8px, env(safe-area-inset-bottom));
       }
     }
 

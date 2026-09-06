@@ -19,7 +19,7 @@ export function recordingHasMedia(entity?: HassEntity): boolean {
 }
 
 export interface EntityWarning {
-  kind: "recording" | "live" | "doorbell" | "compatibility";
+  kind: "recording" | "live" | "snapshot" | "doorbell" | "compatibility";
   message: string;
 }
 
@@ -57,6 +57,26 @@ export function validateEntities(
     warnings.push({
       kind: "live",
       message: localize(hass, "warning.live_stream"),
+    });
+  }
+
+  if (
+    config.snapshot_entity
+    && ["snapshot", "newest"].includes(config.preview_source)
+  ) {
+    const snapshot = hass.states[config.snapshot_entity];
+    if (entityIsUnavailable(snapshot)) {
+      warnings.push({
+        kind: "snapshot",
+        message: localize(hass, "warning.unavailable", {
+          name: friendlyName(snapshot, config.snapshot_entity),
+        }),
+      });
+    }
+  } else if (["snapshot", "newest"].includes(config.preview_source)) {
+    warnings.push({
+      kind: "snapshot",
+      message: localize(hass, "warning.snapshot_required"),
     });
   }
 
