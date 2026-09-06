@@ -1,6 +1,6 @@
 {
   "name": "ring-view",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "A polished Home Assistant view for a Ring recording and live camera pair.",
   "type": "module",
   "main": "dist/ring-view.js",

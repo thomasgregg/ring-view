@@ -4,6 +4,15 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-09-06
+
+### Documentation
+
+- Remove the built-in outer gutter from the visual configuration screenshot so
+  it uses the same full content width as the surrounding configuration text.
+- Give the lead viewer screenshot consistent rounded corners, a subtle neutral
+  shadow, and true transparency without the previous colored edge fringe.
+
 ## [0.4.1] - 2026-09-06
 
 ### Documentation
