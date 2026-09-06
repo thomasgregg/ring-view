@@ -1493,7 +1493,7 @@ y.styles = j`
     .talkback-controls {
       position: absolute;
       z-index: 4;
-      inset: auto 16px 58px;
+      inset: auto 16px 32px;
       display: flex;
       justify-content: center;
       pointer-events: none;
@@ -1570,7 +1570,7 @@ y.styles = j`
       .talkback-controls {
         inset-inline: max(12px, env(safe-area-inset-right))
           max(12px, env(safe-area-inset-left));
-        bottom: calc(58px + env(safe-area-inset-bottom));
+        bottom: calc(32px + env(safe-area-inset-bottom));
       }
 
       .session-status {

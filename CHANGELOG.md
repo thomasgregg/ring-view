@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.4.3] - 2026-09-06
+
+### Changed
+
+- Lower the hold-to-talk control toward the otherwise unused center of the
+  native media bar while preserving mobile safe-area clearance.
+
 ## [0.4.2] - 2026-09-06
 
 ### Documentation
