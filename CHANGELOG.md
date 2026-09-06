@@ -4,6 +4,17 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-09-06
+
+### Documentation
+
+- Update the lead viewer image with the released hold-to-talk control and a
+  matching set of mode and audio callouts.
+- Restore the visual configuration screenshot with the current grouped editor,
+  two-way audio switch, doorbell event picker, and dashboard preview.
+- Tighten the opening description to focus on the unified Ring camera
+  experience.
+
 ## [0.4.0] - 2026-09-06
 
 ### Added

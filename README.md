@@ -7,14 +7,14 @@
 
 ## One clean Ring camera experience for Home Assistant
 
-Ring exposes the latest recording and the live stream as separate Home Assistant camera entities. Ring View brings them together in one focused dashboard card and one native-feeling viewer—without starting a live Ring session just to show a dashboard preview.
+Ring exposes the latest recording and the live stream as separate Home Assistant camera entities. Ring View brings them together in one focused dashboard card and one native-feeling viewer.
 
 <p align="center">
   <a href="docs/images/ring-view-modes.png">
-    <img src="docs/images/ring-view-modes.png" alt="Ring View detail viewer showing the controls for switching between the latest recording and live view" width="100%">
+    <img src="docs/images/ring-view-modes.png" alt="Ring View viewer showing the latest recording, live view, and Hold to talk controls" width="100%">
   </a>
   <br>
-  <sub>Switch between the latest recording and Live without leaving the viewer.</sub>
+  <sub>Switch between the latest recording and Live, then listen and use push-to-talk in the same session.</sub>
 </p>
 
 ## Contents
@@ -129,6 +129,14 @@ Select the card to open the viewer. The history icon opens the latest recording,
 ## Configuration reference
 
 Every Ring View setting is available through Home Assistant's visual card configuration. The **UI configuration** column below shows whether an option appears in Ring View's **Config** tab, Home Assistant's standard **Layout** tab, or is handled automatically.
+
+<p align="center">
+  <a href="docs/images/configuration-editor.png">
+    <img src="docs/images/configuration-editor.png" alt="Ring View visual configuration editor with camera, two-way audio, and doorbell event settings" width="100%">
+  </a>
+  <br>
+  <sub>Configure the cameras, viewer behavior, two-way audio, doorbell alerts, and appearance without writing YAML.</sub>
+</p>
 
 | Option | UI configuration | Default | Accepted values | Purpose |
 | --- | --- | --- | --- | --- |
