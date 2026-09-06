@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.3.6] - 2026-09-06
+
 ### Changed
 
 - Remove the redundant view-mode icon from configured dashboard cards and
