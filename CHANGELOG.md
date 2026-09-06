@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.4.5] - 2026-09-06
+
+### Fixed
+
+- Make the MIT license badge and its link render reliably in the HACS
+  repository preview by serving both from absolute repository URLs.
+
 ## [0.4.4] - 2026-09-06
 
 ### Fixed
