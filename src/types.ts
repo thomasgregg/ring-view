@@ -20,6 +20,12 @@ export interface HassEntity {
 
 export interface HomeAssistant {
   states: Record<string, HassEntity>;
+  connection?: {
+    subscribeMessage<T>(
+      callback: (message: T) => void,
+      message: Record<string, unknown>,
+    ): Promise<() => void>;
+  };
   language?: string;
   locale?: { language: string };
   themes?: unknown;
@@ -47,6 +53,8 @@ export interface RingViewConfig {
   remember_last_mode?: boolean;
   autoplay_recording?: boolean;
   live_muted?: boolean;
+  two_way_audio?: boolean;
+  doorbell_entity?: string;
   show_name?: boolean;
   preview_source?: PreviewSource;
   aspect_ratio?: AspectRatio;
@@ -55,9 +63,10 @@ export interface RingViewConfig {
 }
 
 export interface NormalizedConfig extends Required<
-  Omit<RingViewConfig, "name" | "grid_options">
+  Omit<RingViewConfig, "name" | "grid_options" | "doorbell_entity">
 > {
   name?: string;
+  doorbell_entity?: string;
   grid_options?: GridOptions;
 }
 

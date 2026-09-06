@@ -4,6 +4,44 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-06
+
+### Added
+
+- Add optional two-way audio that keeps live video, incoming audio, and
+  push-to-talk on one WebRTC session through Home Assistant's official Ring
+  live-view entity.
+- Insert microphone audio into the existing connection only after explicit
+  permission, without sending a second offer or restarting video.
+- Add an optional doorbell event entity that displays an incoming-ring alert
+  without starting or replacing the camera stream.
+- Add a native Home Assistant notification blueprint for immediate doorbell
+  alerts, one-tap Ring View access, duplicate suppression, and a recording
+  preview update when Ring finishes processing the new clip.
+
+### Safety
+
+- Keep video connected if microphone permission or track insertion fails.
+- Stop microphone transmission on pointer cancellation, focus loss, or when the
+  page becomes hidden.
+- Let temporary WebRTC disconnections recover without deliberately replacing
+  the session.
+
+### Changed
+
+- Replace the separate microphone activation step with one hold-to-talk
+  control that requests permission on the first hold.
+- Hide the persistent connected status pill so it does not cover the camera
+  timestamp; retain status messages for connection progress and problems.
+- Promote two-way audio and doorbell awareness from the beta card namespace to
+  the standard `custom:ring-view` card and visual editor.
+
+### Documentation
+
+- Document the stable Doorbell features editor group, hold-to-talk behavior,
+  complete YAML options, and one-click notification blueprint import.
+- Remove the outdated visual-editor screenshot that predated the new group.
+
 ## [0.3.7] - 2026-09-06
 
 ### Documentation

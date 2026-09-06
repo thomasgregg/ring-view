@@ -10,6 +10,7 @@ const DEFAULTS = {
   remember_last_mode: false,
   autoplay_recording: true,
   live_muted: false,
+  two_way_audio: false,
   show_name: false,
   preview_source: "last_recording",
   aspect_ratio: "16:9",
@@ -53,6 +54,14 @@ export function validateConfig(config: RingViewConfig): void {
   if (config.fit_mode && !FIT_MODES.has(config.fit_mode)) {
     throw new Error(localize(undefined, "config.fit_mode"));
   }
+  if (
+    config.doorbell_entity !== undefined
+    && config.doorbell_entity !== ""
+    && (typeof config.doorbell_entity !== "string"
+      || !config.doorbell_entity.startsWith("event."))
+  ) {
+    throw new Error(localize(undefined, "config.doorbell_entity"));
+  }
 }
 
 export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
@@ -68,6 +77,8 @@ export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
     autoplay_recording:
       config.autoplay_recording ?? DEFAULTS.autoplay_recording,
     live_muted: config.live_muted ?? DEFAULTS.live_muted,
+    two_way_audio: config.two_way_audio ?? DEFAULTS.two_way_audio,
+    doorbell_entity: config.doorbell_entity || undefined,
     show_name: config.show_name ?? DEFAULTS.show_name,
     preview_source: config.preview_source ?? DEFAULTS.preview_source,
     aspect_ratio: config.aspect_ratio ?? DEFAULTS.aspect_ratio,

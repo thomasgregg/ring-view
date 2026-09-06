@@ -96,6 +96,46 @@ describe("card stream lifecycle", () => {
     expect(dialog?.shadowRoot?.querySelector("h2")?.textContent).toBe("Entrance");
   });
 
+  it("shows a fresh doorbell event without starting a stream and opens Live on tap", async () => {
+    const doorbell: HassEntity = {
+      entity_id: "event.front_door_ding",
+      state: "2026-09-06T12:00:00Z",
+      attributes: { event_type: "ring", event_types: ["ring"] },
+    };
+    const card = document.createElement("ring-view");
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      doorbell_entity: doorbell.entity_id,
+    });
+    card.hass = { ...hass, states: { ...hass.states, [doorbell.entity_id]: doorbell } };
+    document.body.append(card);
+    await card.updateComplete;
+    expect(card.shadowRoot?.querySelector(".ring-alert")).toBeNull();
+    expect(TestCameraStream.active).toBe(0);
+
+    card.hass = {
+      ...hass,
+      states: {
+        ...hass.states,
+        [doorbell.entity_id]: { ...doorbell, state: "2026-09-06T12:01:00Z" },
+      },
+    };
+    await card.updateComplete;
+    expect(card.shadowRoot?.querySelector(".ring-alert")?.textContent).toContain(
+      "Someone is at the door",
+    );
+    expect(TestCameraStream.active).toBe(0);
+
+    card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
+    await flush();
+    const dialog = card.shadowRoot?.querySelector<RingViewDialog>("ring-view-dialog");
+    expect(
+      dialog?.shadowRoot?.querySelector("#ring-view-tab-live")?.getAttribute("aria-selected"),
+    ).toBe("true");
+    expect(TestCameraStream.active).toBe(1);
+  });
+
   it("keeps the card and viewer name hidden while preserving a dialog label", async () => {
     const card = await mount();
     expect(card.shadowRoot?.querySelector(".name")).toBeNull();

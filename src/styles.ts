@@ -88,6 +88,34 @@ export const cardStyles = css`
     pointer-events: none;
   }
 
+  .ring-alert {
+    position: absolute;
+    inset: auto 12px 12px;
+    display: flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 7px 13px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: 999px;
+    color: #fff;
+    background: rgba(198, 40, 40, 0.9);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 18px;
+    pointer-events: none;
+  }
+
+  .ring-alert svg {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+    fill: currentColor;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .preview:active::after {
       display: none;
@@ -285,6 +313,7 @@ export const dialogStyles = css`
 
   .poster,
   ring-view-native-camera-adapter,
+  ring-view-ring-webrtc-player,
   .video-fallback {
     position: absolute;
     inset: 0;
@@ -303,8 +332,47 @@ export const dialogStyles = css`
     background: transparent;
   }
 
-  ring-view-native-camera-adapter.pending {
+  ring-view-native-camera-adapter.pending,
+  ring-view-ring-webrtc-player.pending {
     opacity: 0.01;
+  }
+
+  .dialog-ring-alert {
+    position: absolute;
+    z-index: 6;
+    inset: 68px auto auto 50%;
+    display: inline-flex;
+    min-height: 42px;
+    max-width: calc(100% - 32px);
+    align-items: center;
+    gap: 8px;
+    padding: 8px 13px;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: 999px;
+    color: #fff;
+    background: rgba(198, 40, 40, 0.92);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.38);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 18px;
+    transform: translateX(-50%);
+    cursor: pointer;
+  }
+
+  .dialog-ring-alert:disabled {
+    opacity: 1;
+    cursor: default;
+  }
+
+  .dialog-ring-alert svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .ring-action {
+    padding-inline-start: 4px;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 12px;
   }
 
   .state-layer {

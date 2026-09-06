@@ -1,3 +1,4 @@
+import { mdiBellRingOutline } from "@mdi/js";
 import { LitElement, html, nothing, type PropertyValues } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import { customElement, property, state } from "lit/decorators.js";
@@ -37,6 +38,7 @@ export class RingView extends LitElement {
   @state() private config?: NormalizedConfig;
   @state() private previewFailed = false;
   @state() private lastPoster?: string;
+  @state() private ringAlertVisible = false;
   private lastFallbackPoster?: string;
   private activePreviewEntityId?: string;
   private lastPreviewSize?: { width: number; height: number };
@@ -47,6 +49,8 @@ export class RingView extends LitElement {
   private previewResizeFrame?: number;
   private previewIntersectionObserver?: IntersectionObserver;
   private previewResizeObserver?: ResizeObserver;
+  private ringAlertTimer?: number;
+  private lastRingAlertAt = 0;
 
   public static async getConfigElement(): Promise<HTMLElement> {
     await import("./ring-view-editor");
@@ -107,6 +111,7 @@ export class RingView extends LitElement {
   public disconnectedCallback(): void {
     this.renderRoot.querySelector<RingViewDialog>("ring-view-dialog")?.close();
     this.teardownPreviewLifecycle();
+    if (this.ringAlertTimer !== undefined) window.clearTimeout(this.ringAlertTimer);
     super.disconnectedCallback();
   }
 
@@ -122,12 +127,16 @@ export class RingView extends LitElement {
       previous.locale?.language !== this.hass.locale?.language ||
       previous.states[this.config.recording_entity] !==
         this.hass.states[this.config.recording_entity] ||
-      previous.states[this.config.live_entity] !== this.hass.states[this.config.live_entity]
+      previous.states[this.config.live_entity] !== this.hass.states[this.config.live_entity] ||
+      (this.config.doorbell_entity !== undefined &&
+        previous.states[this.config.doorbell_entity] !==
+          this.hass.states[this.config.doorbell_entity])
     );
   }
 
-  protected willUpdate(): void {
+  protected willUpdate(changed: PropertyValues<this>): void {
     if (!this.hass || !this.config) return;
+    this.detectDoorbellEvent(changed.get("hass") as HomeAssistant | undefined);
     if (this.isInCardPicker()) return;
     const entityId = this.previewEntityId();
     const fallbackPoster = posterUrl(this.hass, this.hass.states[entityId], entityId);
@@ -165,7 +174,7 @@ export class RingView extends LitElement {
         this.hass.states[this.config.recording_entity],
         localize(this.hass, "common.camera"),
       );
-    const openingMode = loadMode(this.config);
+    const openingMode = this.ringAlertVisible ? "live" : loadMode(this.config);
     const pickerPreview = this.isInCardPicker();
     const unavailable = pickerPreview ? false : entityIsUnavailable(previewEntity);
     const style = {
@@ -203,11 +212,20 @@ export class RingView extends LitElement {
                 ${localize(this.hass, "card.preview_unavailable")}
               </div>`}
           ${this.config.show_name ? html`<div class="name">${name}</div>` : nothing}
+          ${this.ringAlertVisible
+            ? html`<div class="ring-alert" role="status">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d=${mdiBellRingOutline}></path>
+                </svg>
+                <span>${localize(this.hass, "ring.alert")}</span>
+              </div>`
+            : nothing}
         </div>
       </ha-card>
       <ring-view-dialog
         .hass=${this.hass}
         .config=${this.config}
+        .ringing=${this.ringAlertVisible}
         @viewer-closed=${this.handleViewerClosed}
       ></ring-view-dialog>
     `;
@@ -225,8 +243,31 @@ export class RingView extends LitElement {
     const trigger = this.renderRoot.querySelector<HTMLElement>(".preview") ?? undefined;
     this.renderRoot
       .querySelector<RingViewDialog>("ring-view-dialog")
-      ?.show(loadMode(this.config!), trigger);
+      ?.show(this.ringAlertVisible ? "live" : loadMode(this.config!), trigger);
   };
+
+  private detectDoorbellEvent(previous?: HomeAssistant): void {
+    const entityId = this.config?.doorbell_entity;
+    if (!entityId || !previous || !this.hass) return;
+    const before = previous.states[entityId];
+    const after = this.hass.states[entityId];
+    if (!after || before?.state === after.state || ["unknown", "unavailable"].includes(after.state)) {
+      return;
+    }
+    if (after.attributes.event_type !== undefined && after.attributes.event_type !== "ring") {
+      return;
+    }
+
+    const now = Date.now();
+    if (now - this.lastRingAlertAt < 5_000) return;
+    this.lastRingAlertAt = now;
+    this.ringAlertVisible = true;
+    if (this.ringAlertTimer !== undefined) window.clearTimeout(this.ringAlertTimer);
+    this.ringAlertTimer = window.setTimeout(() => {
+      this.ringAlertVisible = false;
+      this.ringAlertTimer = undefined;
+    }, 12_000);
+  }
 
   private handleKeyDown = (event: KeyboardEvent): void => {
     if (event.key !== "Enter" && event.key !== " ") return;

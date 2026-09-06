@@ -1,4 +1,4 @@
-import { mdiImageOutline, mdiPlayCircleOutline } from "@mdi/js";
+import { mdiDoorbellVideo, mdiImageOutline, mdiPlayCircleOutline } from "@mdi/js";
 import { LitElement, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { normalizeConfig } from "./config";
@@ -53,6 +53,19 @@ function configSchema(hass: HomeAssistant): ConfigFormSchema[] {
         { name: "remember_last_mode", selector: { boolean: {} } },
         { name: "autoplay_recording", selector: { boolean: {} } },
         { name: "live_muted", selector: { boolean: {} } },
+      ],
+    },
+    {
+      name: "doorbell_features",
+      type: "expandable",
+      flatten: true,
+      iconPath: mdiDoorbellVideo,
+      schema: [
+        { name: "two_way_audio", selector: { boolean: {} } },
+        {
+          name: "doorbell_entity",
+          selector: { entity: { domain: "event", device_class: "doorbell" } },
+        },
       ],
     },
     {
@@ -148,6 +161,9 @@ const LABELS: Record<string, TranslationKey> = {
   remember_last_mode: "editor.remember_last_mode",
   autoplay_recording: "editor.autoplay_recording",
   live_muted: "editor.live_muted",
+  doorbell_features: "editor.doorbell_features",
+  two_way_audio: "editor.two_way_audio",
+  doorbell_entity: "editor.doorbell_entity",
   card_appearance: "editor.card_appearance",
   name: "editor.name",
   show_name: "editor.show_name",
@@ -161,6 +177,8 @@ const HELPERS: Record<string, TranslationKey> = {
   remember_last_mode: "editor.helper_remember_last_mode",
   autoplay_recording: "editor.helper_autoplay_recording",
   live_muted: "editor.helper_live_muted",
+  two_way_audio: "editor.helper_two_way_audio",
+  doorbell_entity: "editor.helper_doorbell_entity",
   show_name: "editor.helper_show_name",
   preview_source: "editor.helper_preview_source",
 };

@@ -1,4 +1,4 @@
-import { mdiClose, mdiPlay } from "@mdi/js";
+import { mdiBellRingOutline, mdiClose, mdiPlay } from "@mdi/js";
 import { LitElement, html, nothing, type PropertyValues, type TemplateResult } from "lit";
 import { classMap } from "lit/directives/class-map.js";
 import { keyed } from "lit/directives/keyed.js";
@@ -7,10 +7,12 @@ import { customElement, property, state } from "lit/decorators.js";
 import { aspectRatioNumber } from "./config";
 import { localize, localizeHaOrFallback } from "./localize";
 import "./media/native-camera-adapter";
+import "./media/ring-webrtc-player";
 import type {
   NativeAdapterFailure,
   NativeMediaCapabilities,
 } from "./media/native-camera-adapter";
+import type { RingViewRingWebRtcPlayer } from "./media/ring-webrtc-player";
 import { posterUrl } from "./media/poster-provider";
 import { renderModeIcon } from "./mode-icon";
 import { dialogStyles } from "./styles";
@@ -34,6 +36,7 @@ export class RingViewDialog extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
   @property({ attribute: false }) public config?: NormalizedConfig;
   @property({ type: Boolean, reflect: true }) public open = false;
+  @property({ type: Boolean }) public ringing = false;
 
   @state() private mode: CameraMode = "last_recording";
   @state() private mediaStatus: MediaStatus = "idle";
@@ -127,6 +130,7 @@ export class RingViewDialog extends LitElement {
       >
         <div class="body">
           ${this.renderMedia()}
+          ${this.renderRingAlert()}
           <header class="header">
             ${showTitle
               ? html`<h2 id="ring-view-dialog-title">${title}</h2>`
@@ -195,6 +199,24 @@ export class RingViewDialog extends LitElement {
     `;
   }
 
+  private renderRingAlert(): TemplateResult | typeof nothing {
+    if (!this.ringing) return nothing;
+    return html`
+      <button
+        class="dialog-ring-alert"
+        type="button"
+        ?disabled=${this.mode === "live"}
+        @click=${() => this.selectMode("live")}
+      >
+        ${this.icon(mdiBellRingOutline)}
+        <span>${localize(this.hass, "ring.alert")}</span>
+        ${this.mode === "live"
+          ? nothing
+          : html`<span class="ring-action">${localize(this.hass, "ring.open_live")}</span>`}
+      </button>
+    `;
+  }
+
   private renderMedia(): TemplateResult {
     const entity = this.activeEntity();
     const entityId = this.activeEntityId();
@@ -211,6 +233,9 @@ export class RingViewDialog extends LitElement {
         : undefined;
     const useRecordingVideo = Boolean(
       canRender && fallbackUrl && !this.recordingVideoFailed,
+    );
+    const useTalkbackPlayer = Boolean(
+      canRender && this.mode === "live" && this.config!.two_way_audio,
     );
 
     return html`
@@ -229,19 +254,34 @@ export class RingViewDialog extends LitElement {
           ? keyed(
               `${entityId}:${this.session}`,
               html`
-                <ring-view-native-camera-adapter
-                  class=${this.mediaStatus === "pending" ? "pending" : ""}
-                  .stateObj=${entity}
-                  .controls=${true}
-                  .muted=${this.mode === "live" ? this.liveMuted : this.recordingMuted}
-                  .allowExoPlayer=${true}
-                  .aspectRatio=${ratio}
-                  .fitMode=${this.config!.fit_mode}
-                  .passiveSurface=${this.mode === "live"}
-                  @native-media-ready=${this.handleMediaReady}
-                  @native-media-error=${this.handleMediaError}
-                  @native-media-capabilities=${this.handleMediaCapabilities}
-                ></ring-view-native-camera-adapter>
+                ${useTalkbackPlayer
+                  ? html`
+                      <ring-view-ring-webrtc-player
+                        class=${this.mediaStatus === "pending" ? "pending" : ""}
+                        .hass=${this.hass}
+                        .entityId=${entityId}
+                        .muted=${this.liveMuted}
+                        .fitMode=${this.config!.fit_mode}
+                        @ring-webrtc-ready=${this.handleMediaReady}
+                        @ring-webrtc-error=${this.handleRingWebRtcError}
+                        @ring-webrtc-capabilities=${this.handleMediaCapabilities}
+                      ></ring-view-ring-webrtc-player>
+                    `
+                  : html`
+                      <ring-view-native-camera-adapter
+                        class=${this.mediaStatus === "pending" ? "pending" : ""}
+                        .stateObj=${entity}
+                        .controls=${true}
+                        .muted=${this.mode === "live" ? this.liveMuted : this.recordingMuted}
+                        .allowExoPlayer=${true}
+                        .aspectRatio=${ratio}
+                        .fitMode=${this.config!.fit_mode}
+                        .passiveSurface=${this.mode === "live"}
+                        @native-media-ready=${this.handleMediaReady}
+                        @native-media-error=${this.handleMediaError}
+                        @native-media-capabilities=${this.handleMediaCapabilities}
+                      ></ring-view-native-camera-adapter>
+                    `}
               `,
             )
           : nothing}
@@ -560,6 +600,11 @@ export class RingViewDialog extends LitElement {
     this.failMedia(false);
   };
 
+  private handleRingWebRtcError = (): void => {
+    if (this.mode !== "live" || !this.config?.two_way_audio) return;
+    this.failMedia(true);
+  };
+
   private failMedia(allowAutomaticRetry: boolean): void {
     if (allowAutomaticRetry && this.mode === "live" && this.retryCount < 1) {
       this.retryCount += 1;
@@ -706,6 +751,14 @@ export class RingViewDialog extends LitElement {
 
   private handleVisibilityChange = (): void => {
     if (!this.open) return;
+    if (this.mode === "live" && this.config?.two_way_audio) {
+      if (document.hidden) {
+        this.renderRoot
+          .querySelector<RingViewRingWebRtcPlayer>("ring-view-ring-webrtc-player")
+          ?.stopTalking();
+      }
+      return;
+    }
     if (document.hidden) {
       this.lifecycle.dispose();
       this.session = this.lifecycle.current();

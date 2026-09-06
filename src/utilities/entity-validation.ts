@@ -19,7 +19,7 @@ export function recordingHasMedia(entity?: HassEntity): boolean {
 }
 
 export interface EntityWarning {
-  kind: "recording" | "live" | "compatibility";
+  kind: "recording" | "live" | "doorbell" | "compatibility";
   message: string;
 }
 
@@ -58,6 +58,26 @@ export function validateEntities(
       kind: "live",
       message: localize(hass, "warning.live_stream"),
     });
+  }
+
+  if (config.doorbell_entity) {
+    const doorbell = hass.states[config.doorbell_entity];
+    if (entityIsUnavailable(doorbell)) {
+      warnings.push({
+        kind: "doorbell",
+        message: localize(hass, "warning.unavailable", {
+          name: friendlyName(doorbell, config.doorbell_entity),
+        }),
+      });
+    } else if (
+      Array.isArray(doorbell?.attributes.event_types)
+      && !doorbell.attributes.event_types.includes("ring")
+    ) {
+      warnings.push({
+        kind: "doorbell",
+        message: localize(hass, "warning.doorbell_event"),
+      });
+    }
   }
 
   if (!customElements.get("ha-camera-stream")) {

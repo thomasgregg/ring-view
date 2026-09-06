@@ -1,0 +1,89 @@
+blueprint:
+  name: Ring View doorbell notification
+  description: >-
+    Sends an immediate Home Assistant Companion notification when a doorbell
+    event is received. Tapping opens the configured Ring View dashboard. When
+    Ring finishes processing a new recording, the same notification is updated
+    with a camera preview. The recording camera path does not start another
+    Ring live-view session.
+  domain: automation
+  homeassistant:
+    min_version: 2026.7.0
+  input:
+    doorbell_event:
+      name: Doorbell event
+      description: Select the Ring Ding event entity.
+      selector:
+        entity:
+          filter:
+            - domain: event
+              device_class: doorbell
+    recording_camera:
+      name: Last recording camera
+      description: Select the Ring last-recording camera entity.
+      selector:
+        entity:
+          filter:
+            - domain: camera
+    notification_device:
+      name: Phone or tablet
+      description: Select a device running the Home Assistant Companion app.
+      selector:
+        device:
+          filter:
+            - integration: mobile_app
+    dashboard_path:
+      name: Ring View dashboard path
+      description: Relative Home Assistant path opened when the notification is tapped.
+      default: /ring-camera-test/ring-view
+      selector:
+        text: {}
+
+triggers:
+  - trigger: event.received
+    target:
+      entity_id: !input doorbell_event
+    options:
+      event_type:
+        - ring
+
+variables:
+  recording_camera_id: !input recording_camera
+  dashboard_path_value: !input dashboard_path
+
+actions:
+  - alias: Notify immediately
+    device_id: !input notification_device
+    domain: mobile_app
+    type: notify
+    title: Someone is at the door
+    message: Tap to open Ring View
+    data:
+      tag: ring-view-doorbell
+      group: ring-view
+      url: "{{ dashboard_path_value }}"
+      clickAction: "{{ dashboard_path_value }}"
+  - alias: Wait for the new Ring recording
+    wait_for_trigger:
+      - trigger: state
+        entity_id: !input recording_camera
+        attribute: last_video_id
+    timeout: "00:02:00"
+    continue_on_timeout: false
+  - alias: Add the visitor preview to the existing notification
+    device_id: !input notification_device
+    domain: mobile_app
+    type: notify
+    title: Someone is at the door
+    message: Tap to open Ring View
+    data:
+      tag: ring-view-doorbell
+      group: ring-view
+      url: "{{ dashboard_path_value }}"
+      clickAction: "{{ dashboard_path_value }}"
+      entity_id: "{{ recording_camera_id }}"
+      image: >-
+        /api/camera_proxy/{{ recording_camera_id }}?v={{
+        state_attr(recording_camera_id, 'last_video_id') }}
+
+mode: restart

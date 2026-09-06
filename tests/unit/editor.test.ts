@@ -71,6 +71,7 @@ describe("visual editor", () => {
       remember_last_mode: false,
       autoplay_recording: true,
       live_muted: false,
+      two_way_audio: false,
       preview_source: "last_recording",
       aspect_ratio: "16:9",
       fit_mode: "cover",
@@ -100,7 +101,7 @@ describe("visual editor", () => {
     expect(editor.shadowRoot?.querySelector("ha-alert")).not.toBeNull();
   });
 
-  it("uses one native form with two compact expandable groups and no duplicate preview", async () => {
+  it("uses one native form with three compact expandable groups and no duplicate preview", async () => {
     const editor = document.createElement("ring-view-editor");
     editor.hass = hass;
     editor.setConfig({
@@ -128,6 +129,7 @@ describe("visual editor", () => {
       })),
     ).toEqual([
       { name: "viewer_behavior", flatten: true, icon: true },
+      { name: "doorbell_features", flatten: true, icon: true },
       { name: "card_appearance", flatten: true, icon: true },
     ]);
   });
@@ -178,6 +180,19 @@ describe("visual editor", () => {
       "remember_last_mode",
       "autoplay_recording",
       "live_muted",
+    ]);
+    const doorbellFeatures = form?.schema?.find(
+      (field) => field.name === "doorbell_features",
+    );
+    expect(form?.computeLabel?.({ name: "doorbell_features" })).toBe(
+      "Türklingelfunktionen",
+    );
+    expect(form?.computeLabel?.({ name: "two_way_audio" })).toBe(
+      "Zwei-Wege-Audio aktivieren",
+    );
+    expect(doorbellFeatures?.schema?.map((field) => field.name)).toEqual([
+      "two_way_audio",
+      "doorbell_entity",
     ]);
     expect(defaultMode?.selector).toMatchObject({
       select: {

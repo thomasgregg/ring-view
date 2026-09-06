@@ -6,6 +6,8 @@ name: Entrance
 
 default_mode: last_recording
 live_muted: true
+two_way_audio: true
+doorbell_entity: event.front_door_ding
 show_name: false
 aspect_ratio: "16:9"
 fit_mode: cover

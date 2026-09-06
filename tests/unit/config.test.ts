@@ -14,6 +14,7 @@ describe("configuration", () => {
       remember_last_mode: false,
       autoplay_recording: true,
       live_muted: false,
+      two_way_audio: false,
       show_name: false,
       preview_source: "last_recording",
       aspect_ratio: "16:9",
@@ -39,6 +40,13 @@ describe("configuration", () => {
         preview_source: "moving_picture",
       } as never),
     ).toThrow(/preview_source/);
+    expect(() =>
+      validateConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        doorbell_entity: "binary_sensor.doorbell",
+      }),
+    ).toThrow(/doorbell_entity/);
   });
 
   it("preserves explicit grid sizing", () => {

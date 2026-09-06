@@ -27,6 +27,7 @@ Ring exposes the latest recording and the live stream as separate Home Assistant
 - [Configuration reference](#configuration-reference)
   - [Layout options](#layout-options)
   - [Complete YAML example](#complete-yaml-example)
+- [Two-way audio and doorbell notifications](#two-way-audio-and-doorbell-notifications)
 - [How preview and playback work](#how-preview-and-playback-work)
 - [Themes, languages, and accessibility](#themes-languages-and-accessibility)
 - [Security and privacy](#security-and-privacy)
@@ -44,6 +45,10 @@ Ring View fills that gap:
 - **A quiet dashboard.** The card always displays a still image; it never mounts a live player in the dashboard.
 - **Live only when requested.** A live session begins only after the viewer opens and Live is selected.
 - **Native media rendering.** Home Assistant still chooses WebRTC, HLS, or MJPEG and provides the media controls.
+- **Optional two-way audio.** One Ring WebRTC session carries live video,
+  incoming audio, and push-to-talk without reconnecting when the microphone is enabled.
+- **Doorbell awareness.** A native Ring event entity can show an incoming-ring
+  banner without automatically starting or replacing the camera stream.
 - **Intentional stream lifecycle.** Only one camera renderer is active, and it is torn down when the mode changes, the viewer closes, the card is removed, the browser goes Back, or the tab is hidden.
 - **A polished, consistent interface.** Recording and Live use the same compact icon language on the card and in the viewer.
 - **Built for dashboards.** Responsive layout, keyboard navigation, focus management, safe-area support, light and dark themes, and 44-pixel touch targets are included.
@@ -59,6 +64,8 @@ Ring View fills that gap:
 | Keep the dashboard on a still image | Always | Configurable for one camera |
 | Remember the last selected view | Optional | Not built in |
 | Choose a preview independently of the opening view | Yes | Not built in |
+| Listen and use push-to-talk | Optional, in the same live session | Not exposed for Ring |
+| React to a Ring doorbell event | In-card alert and notification blueprint | Requires a separate automation |
 | Explicitly tear down the inactive renderer | Yes | Not applicable to a two-entity viewer |
 
 Use a native card for a simple single-camera tile. Use Ring View when you want the recording/live pair to feel like one camera experience.
@@ -79,7 +86,11 @@ camera.front_door_last_recording
 camera.front_door_live_view
 ```
 
-Ring View cannot add capabilities that the integration does not expose. In particular, two-way audio is not currently available through the Home Assistant Ring integration.
+Home Assistant's standard Ring camera UI does not currently expose two-way
+audio. Ring View negotiates the required send-and-receive audio
+channel through the official `live_view` entity and Home Assistant camera
+WebSocket API. It does not require a custom integration or additional Ring
+credentials.
 
 ## Install with HACS
 
@@ -119,8 +130,6 @@ Select the card to open the viewer. The history icon opens the latest recording,
 
 Every Ring View setting is available through Home Assistant's visual card configuration. The **UI configuration** column below shows whether an option appears in Ring View's **Config** tab, Home Assistant's standard **Layout** tab, or is handled automatically.
 
-[![Ring View visual configuration editor](docs/images/configuration-editor.png)](docs/images/configuration-editor.png)
-
 | Option | UI configuration | Default | Accepted values | Purpose |
 | --- | --- | --- | --- | --- |
 | `type` | No — added automatically | Required | `custom:ring-view` | Identifies the custom card. Added automatically by the card picker. |
@@ -131,6 +140,8 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `remember_last_mode` | Yes — Config tab | `false` | `true`, `false` | Remembers the most recent view in the current browser and uses it instead of `default_mode`. |
 | `autoplay_recording` | Yes — Config tab | `true` | `true`, `false` | Starts the latest recording immediately; when disabled, the viewer waits for Play. |
 | `live_muted` | Yes — Config tab | `false` | `true`, `false` | Starts Live muted. Browser autoplay rules can still require muted playback. |
+| `two_way_audio` | Yes, Doorbell features | `false` | `true`, `false` | Uses one direct WebRTC session for live video, listening, and push-to-talk. |
+| `doorbell_entity` | Yes, Doorbell features | Not set | `event.*` entity ID | Displays a temporary ring alert when the selected doorbell event reports `ring`. |
 | `show_name` | Yes — Config tab | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer. |
 | `preview_source` | Yes — Config tab | `last_recording` | `last_recording`, `live`, `default` | Chooses the entity used for the dashboard still. `default` follows the view that will open. |
 | `aspect_ratio` | Yes — Config tab | `16:9` | `auto`, `16:9`, `4:3`, `1:1` | Sets the dashboard image shape. |
@@ -164,6 +175,9 @@ remember_last_mode: false
 autoplay_recording: true
 live_muted: false
 
+two_way_audio: true
+doorbell_entity: event.front_door_ding
+
 show_name: true
 preview_source: last_recording
 aspect_ratio: "16:9"
@@ -178,11 +192,42 @@ grid_options:
 
 Ring View 0.2 and newer use this flat configuration only. Earlier nested `preview`, `appearance`, `viewer`, and `performance` structures are not supported.
 
+## Two-way audio and doorbell notifications
+
+Version `0.4.0` adds an optional direct WebRTC player for Ring live view.
+Open **Doorbell features** in the visual editor and select
+**Enable two-way audio**. Live video and
+incoming audio connect first without opening the microphone. Pressing
+**Hold to talk** requests microphone permission when needed and inserts the
+track into the existing session. Audio is sent only while the button remains
+pressed. If the permission prompt interrupts the first hold, release and hold
+again after granting access.
+
+To show ring alerts inside the card, also select the Ring Ding event entity,
+for example `event.front_door_ding`. A fresh event displays **Someone is at the
+door** for twelve seconds. Selecting the card during that alert opens Live.
+An already active Live session is left untouched.
+
+A dashboard card cannot deliver reliable background phone notifications while
+the dashboard is closed. The included
+[`Ring View doorbell notification`](blueprints/automation/ring_view/doorbell_notification.yaml)
+blueprint handles that through Home Assistant. It sends an immediate alert,
+opens the configured Ring View dashboard when tapped, and replaces the alert
+with a preview when the new Ring recording becomes available. The preview uses
+the recording camera and does not start another Ring live session.
+
+[![Open your Home Assistant instance and import the Ring View doorbell notification blueprint.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https://github.com/thomasgregg/ring-view/blob/main/blueprints/automation/ring_view/doorbell_notification.yaml)
+
+Microphone permission requires HTTPS. Temporary WebRTC disconnections are left
+open for browser recovery, but Ring cloud outages, network loss, device session
+limits, browser suspension, and competing Ring clients can still interrupt a
+live view.
+
 ## How preview and playback work
 
 The dashboard requests an authenticated still through Home Assistant's camera proxy. It sizes the request to the rendered card and screen pixel density, refreshes it every ten seconds only while visible, and reacts to meaningful layout changes. It does not mount `ha-camera-stream` or preconnect a live renderer.
 
-Inside the viewer, Ring View delegates camera rendering to Home Assistant so the platform can select the appropriate WebRTC, HLS, or MJPEG path. A recording starts automatically unless `autoplay_recording` is disabled. Live starts only when selected. If audible autoplay is rejected by the browser, Ring View retries muted.
+Inside the viewer, Ring View delegates camera rendering to Home Assistant so the platform can select the appropriate WebRTC, HLS, or MJPEG path. A recording starts automatically unless `autoplay_recording` is disabled. Live starts only when selected. If audible autoplay is rejected by the browser, Ring View retries muted. When two-way audio is enabled, Ring View uses its single-session WebRTC player for Live instead.
 
 Unavailable or missing entities are reported immediately. A live connection times out after 20 seconds and retries once. If Home Assistant's camera renderer is unavailable, recording playback can fall back to the current ephemeral `video_url`; Live offers Home Assistant's standard camera dialog instead.
 
@@ -197,6 +242,8 @@ The card supports keyboard activation, Escape to close, focus trapping and resto
 - Ring View communicates only with Home Assistant-provided entities, endpoints, and frontend components.
 - It includes no Ring authentication, direct Ring requests, external scripts, remote fonts, telemetry, or analytics.
 - Camera tokens, authenticated URLs, and `video_url` values are never copied into configuration, browser storage, or logs.
+- Microphone access is requested only after the user presses **Hold to talk**.
+  The track remains muted whenever the button is not actively held.
 - The optional remembered view stores only the selected mode for that entity pair in the local browser.
 
 ## A note on privacy & legality

@@ -13,7 +13,7 @@ The implementation currently expects `ha-camera-stream` to expose these properti
 - `aspectRatio`
 - `fitMode`
 
-These assumptions live only in `src/media/native-camera-adapter.ts`. The adapter checks for the custom element, asks `loadCardHelpers().importMoreInfoControl("camera")` to load it when needed, waits for definition, and reports a compatibility failure instead of leaving a spinner indefinitely.
+These assumptions live only in `src/media/native-camera-adapter.ts`. The adapter checks for the custom element, asks `loadCardHelpers().importMoreInfoControl("camera")` to load it when needed, waits for definition, and reports a compatibility failure instead of leaving a spinner indefinitely. When two-way audio is enabled, Live instead uses Ring View's single-session WebRTC player so a microphone track can be added without reconnecting the video.
 
 ## Why use an internal component?
 
