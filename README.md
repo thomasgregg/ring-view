@@ -10,8 +10,8 @@
 Ring exposes the latest recording and the live stream as separate Home Assistant camera entities. Ring View brings them together in one focused dashboard card and one native-feeling viewer.
 
 <p align="center">
-  <a href="docs/images/ring-view-modes-rounded.png">
-    <img src="docs/images/ring-view-modes-rounded.png" alt="Ring View viewer showing the latest recording, live view, and Hold to talk controls" width="100%">
+  <a href="https://github.com/thomasgregg/ring-view/blob/main/docs/images/ring-view-modes-rounded.png">
+    <img src="https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/ring-view-modes-rounded.png" alt="Ring View viewer showing the latest recording, live view, and Hold to talk controls" width="100%">
   </a>
   <br>
   <sub>Switch between the latest recording and Live, then listen and use push-to-talk in the same session.</sub>
@@ -131,8 +131,8 @@ Select the card to open the viewer. The history icon opens the latest recording,
 Every Ring View setting is available through Home Assistant's visual card configuration. The **UI configuration** column below shows whether an option appears in Ring View's **Config** tab, Home Assistant's standard **Layout** tab, or is handled automatically.
 
 <p align="center">
-  <a href="docs/images/configuration-editor-wide.png">
-    <img src="docs/images/configuration-editor-wide.png" alt="Ring View visual configuration editor with camera, two-way audio, and doorbell event settings" width="100%">
+  <a href="https://github.com/thomasgregg/ring-view/blob/main/docs/images/configuration-editor-wide.png">
+    <img src="https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/configuration-editor-wide.png" alt="Ring View visual configuration editor with camera, two-way audio, and doorbell event settings" width="100%">
   </a>
   <br>
   <sub>Configure the cameras, viewer behavior, two-way audio, doorbell alerts, and appearance without writing YAML.</sub>

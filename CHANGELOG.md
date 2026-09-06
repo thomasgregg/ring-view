@@ -4,6 +4,18 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.4.4] - 2026-09-06
+
+### Fixed
+
+- Make the documentation images render in the HACS repository preview by using
+  absolute GitHub image URLs.
+
+### Changed
+
+- Build every GitHub release description from its matching changelog section
+  so the release explains what changed instead of only linking to a comparison.
+
 ## [0.4.3] - 2026-09-06
 
 ### Changed

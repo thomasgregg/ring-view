@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -20,8 +22,10 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run build
+      - name: Prepare release notes
+        run: node scripts/release-notes.mjs "$GITHUB_REF_NAME" > release-notes.md
       - name: Publish bundle
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: dist/ring-view.js
-          generate_release_notes: true
+          body_path: release-notes.md
