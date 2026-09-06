@@ -30,6 +30,7 @@ Ring exposes the latest recording and the live stream as separate Home Assistant
 - [How preview and playback work](#how-preview-and-playback-work)
 - [Themes, languages, and accessibility](#themes-languages-and-accessibility)
 - [Security and privacy](#security-and-privacy)
+- [A note on privacy & legality](#a-note-on-privacy--legality)
 - [Documentation](#documentation)
 - [License](#license)
 
@@ -197,6 +198,10 @@ The card supports keyboard activation, Escape to close, focus trapping and resto
 - It includes no Ring authentication, direct Ring requests, external scripts, remote fonts, telemetry, or analytics.
 - Camera tokens, authenticated URLs, and `video_url` values are never copied into configuration, browser storage, or logs.
 - The optional remembered view stores only the selected mode for that entity pair in the local browser.
+
+## A note on privacy & legality
+
+Camera surveillance is regulated differently around the world. In many countries (including Germany and much of the EU), **recording public streets, sidewalks, or your neighbor's property may be restricted or unlawful**—home-camera use that extends even partially into a public space or neighboring property can fall outside the GDPR's household exemption. Before positioning a camera, check your local laws, use privacy zones or masking where your camera or platform supports them, and be transparent with visitors where required. Ring View only displays what the Ring integration makes available through Home Assistant—the legal responsibility for how your camera is positioned and what it records remains with you. See the [European Data Protection Board's video-device guidelines](https://www.edpb.europa.eu/documents/guideline/guidelines-32019-on-processing-of-personal-data-through-video-devices_en) for further guidance.
 
 ## Documentation
 
