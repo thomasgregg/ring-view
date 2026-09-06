@@ -4,6 +4,15 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-09-06
+
+### Documentation
+
+- Remove captured dashboard pixels from outside every screenshot's rounded
+  corners so the gallery sits cleanly on light and dark README backgrounds.
+- Trim stray edge pixels from the configuration screenshot and preserve its
+  dialog shape with a transparent, consistently rounded frame.
+
 ## [0.3.3] - 2026-09-06
 
 ### Documentation
