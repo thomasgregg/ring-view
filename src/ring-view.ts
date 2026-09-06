@@ -1,6 +1,7 @@
 import { LitElement, html, nothing, type PropertyValues } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import { customElement, property, state } from "lit/decorators.js";
+import pickerPreviewSvg from "../demo/camera-preview.svg?raw";
 import {
   aspectRatioNumber,
   aspectRatioCss,
@@ -23,6 +24,9 @@ const PREVIEW_REFRESH_INTERVAL_MS = 10_000;
 const PREVIEW_FALLBACK_WIDTH = 640;
 const PREVIEW_FALLBACK_RATIO = 16 / 9;
 const PREVIEW_RESIZE_THRESHOLD_PX = 16;
+const PICKER_PREVIEW_URL = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
+  pickerPreviewSvg,
+)}`;
 
 @customElement(CARD_TAG)
 export class RingView extends LitElement {
@@ -96,7 +100,7 @@ export class RingView extends LitElement {
   public connectedCallback(): void {
     super.connectedCallback();
     void this.updateComplete.then(() => {
-      if (this.isConnected) this.setupPreviewLifecycle();
+      if (this.isConnected && !this.isInCardPicker()) this.setupPreviewLifecycle();
     });
   }
 
@@ -124,6 +128,7 @@ export class RingView extends LitElement {
 
   protected willUpdate(): void {
     if (!this.hass || !this.config) return;
+    if (this.isInCardPicker()) return;
     const entityId = this.previewEntityId();
     const fallbackPoster = posterUrl(this.hass, this.hass.states[entityId], entityId);
     if (
@@ -141,7 +146,11 @@ export class RingView extends LitElement {
 
   protected updated(changed: PropertyValues<this>): void {
     const configChanged = (changed as unknown as Map<PropertyKey, unknown>).has("config");
-    if ((changed.has("hass") || configChanged) && this.previewVisible) {
+    if (
+      !this.isInCardPicker() &&
+      (changed.has("hass") || configChanged) &&
+      this.previewVisible
+    ) {
       void this.refreshPreview(true);
     }
   }
@@ -157,7 +166,8 @@ export class RingView extends LitElement {
         localize(this.hass, "common.camera"),
       );
     const openingMode = loadMode(this.config);
-    const unavailable = entityIsUnavailable(previewEntity);
+    const pickerPreview = this.isInCardPicker();
+    const unavailable = pickerPreview ? false : entityIsUnavailable(previewEntity);
     const style = {
       "--ring-view-aspect-ratio": aspectRatioCss(this.config.aspect_ratio),
       "--ring-view-fit-mode": this.config.fit_mode,
@@ -184,7 +194,7 @@ export class RingView extends LitElement {
           ${!unavailable && !this.previewFailed
             ? html`
                 <img
-                  src=${this.lastPoster ?? ""}
+                  src=${pickerPreview ? PICKER_PREVIEW_URL : (this.lastPoster ?? "")}
                   alt=${localize(this.hass, "card.preview_alt", { name })}
                   @error=${this.handlePreviewError}
                 />
@@ -243,6 +253,7 @@ export class RingView extends LitElement {
   };
 
   private setupPreviewLifecycle(): void {
+    if (this.isInCardPicker()) return;
     if (this.previewIntersectionObserver || this.previewResizeObserver) return;
     const preview = this.renderRoot.querySelector<HTMLElement>(".preview");
     if (!preview) return;
@@ -295,6 +306,7 @@ export class RingView extends LitElement {
   };
 
   private updatePreviewVisibility(): void {
+    if (this.isInCardPicker()) return;
     const visible = this.previewIntersecting && document.visibilityState !== "hidden";
     if (visible === this.previewVisible) return;
     this.previewVisible = visible;
@@ -316,7 +328,7 @@ export class RingView extends LitElement {
   }
 
   private async refreshPreview(force: boolean): Promise<void> {
-    if (!this.previewVisible || !this.hass || !this.config) return;
+    if (this.isInCardPicker() || !this.previewVisible || !this.hass || !this.config) return;
     const preview = this.renderRoot.querySelector<HTMLElement>(".preview");
     if (!preview) return;
 
@@ -358,6 +370,21 @@ export class RingView extends LitElement {
       // Keep the entity_picture/camera-proxy fallback already on screen. Some
       // older Home Assistant releases may not expose auth/sign_path here.
     }
+  }
+
+  /**
+   * Home Assistant mounts picker previews inside `hui-card-picker`. Keep that
+   * catalog surface representative without exposing a user's camera image.
+   * The standard `preview` property is also used while editing dashboards, so
+   * the ancestor check intentionally distinguishes the picker from edit mode.
+   */
+  private isInCardPicker(): boolean {
+    let node: Node | null = this.parentNode ?? this.getRootNode();
+    while (node) {
+      if (node instanceof Element && node.localName === "hui-card-picker") return true;
+      node = node instanceof ShadowRoot ? node.host : node.parentNode;
+    }
+    return false;
   }
 }
 

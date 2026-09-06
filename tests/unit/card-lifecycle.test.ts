@@ -54,6 +54,29 @@ describe("card stream lifecycle", () => {
     expect(TestCameraStream.active).toBe(0);
   });
 
+  it("uses the synthetic scene in the card picker without requesting a camera", async () => {
+    const callWS = vi.fn(async (_message: Record<string, unknown>) => ({
+      path: "/api/camera_proxy/camera.recording?authSig=temporary",
+    }));
+    const picker = document.createElement("hui-card-picker");
+    const card = document.createElement("ring-view");
+    card.setConfig({ recording_entity: "camera.recording", live_entity: "camera.live" });
+    card.hass = {
+      ...hass,
+      callWS: <T>(message: Record<string, unknown>) =>
+        callWS(message) as unknown as Promise<T>,
+    };
+    picker.append(card);
+    document.body.append(picker);
+    await card.updateComplete;
+    await Promise.resolve();
+
+    const image = card.shadowRoot?.querySelector<HTMLImageElement>("img");
+    expect(image?.src).toMatch(/^data:image\/svg\+xml/);
+    expect(image?.src).not.toContain("image.jpg");
+    expect(callWS).not.toHaveBeenCalled();
+  });
+
   it("uses one name setting for a top-left card label and the viewer title", async () => {
     const card = document.createElement("ring-view");
     card.setConfig({

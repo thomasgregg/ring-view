@@ -1,7 +1,31 @@
 import { expect, test } from "@playwright/test";
+import type { HomeAssistant } from "../../src/types";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/demo/");
+});
+
+test("uses a privacy-safe synthetic image in the card picker", async ({ page }) => {
+  await expect(page.locator("ring-view")).toBeAttached();
+  await page.evaluate(() => {
+    const demoCard = document.querySelector("ring-view") as HTMLElement & {
+      hass: unknown;
+    };
+    const picker = document.createElement("hui-card-picker");
+    const card = document.createElement("ring-view");
+    card.setConfig({
+      recording_entity: "camera.latest_recording",
+      live_entity: "camera.live_view",
+    });
+    card.hass = demoCard.hass as HomeAssistant;
+    picker.append(card);
+    demoCard.replaceWith(picker);
+  });
+
+  const image = page.locator("hui-card-picker ring-view img");
+  await expect(image).toBeVisible();
+  await expect(image).toHaveAttribute("src", /^data:image\/svg\+xml/);
+  await expect(image).not.toHaveAttribute("src", /camera-preview\.svg/);
 });
 
 test("opens, switches recording → live → recording, and tears down", async ({ page }) => {

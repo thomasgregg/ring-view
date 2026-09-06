@@ -4,6 +4,15 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.3.5] - 2026-09-06
+
+### Changed
+
+- Use the bundled synthetic entrance scene in Home Assistant's card picker so
+  opening the catalog never displays or requests a user's camera image.
+- Keep configured dashboard cards on their selected real camera preview,
+  including while editing a dashboard.
+
 ## [0.3.4] - 2026-09-06
 
 ### Documentation
