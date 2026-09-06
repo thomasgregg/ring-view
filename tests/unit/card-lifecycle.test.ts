@@ -49,8 +49,7 @@ describe("card stream lifecycle", () => {
   it("never mounts a camera stream for the dashboard preview", async () => {
     const card = await mount();
     expect(card.shadowRoot?.querySelector("ring-view-native-camera-adapter")).toBeNull();
-    expect(card.shadowRoot?.querySelector(".mode-indicator .mode-icon-recording")).not.toBeNull();
-    expect(card.shadowRoot?.querySelector(".mode-indicator")?.textContent?.trim()).toBe("");
+    expect(card.shadowRoot?.querySelector(".mode-indicator")).toBeNull();
     expect(TestCameraStream.active).toBe(0);
   });
 
@@ -131,13 +130,12 @@ describe("card stream lifecycle", () => {
     expect(TestCameraStream.active).toBe(1);
   });
 
-  it("can remember the selected view and hide the card view icon", async () => {
+  it("can remember the selected view", async () => {
     const card = document.createElement("ring-view");
     card.setConfig({
       recording_entity: "camera.recording",
       live_entity: "camera.live",
       remember_last_mode: true,
-      show_mode_icon: false,
     });
     card.hass = hass;
     document.body.append(card);

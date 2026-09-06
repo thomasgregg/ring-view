@@ -4,6 +4,17 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+### Changed
+
+- Remove the redundant view-mode icon from configured dashboard cards and
+  remove its visual-editor option; mode switching remains in the detail viewer.
+
+### Documentation
+
+- Use the approved annotated real-camera viewer image in the README.
+- Replace the configuration reference image with a clean, transparent rounded
+  crop and a current dashboard preview without the removed mode icon.
+
 ## [0.3.5] - 2026-09-06
 
 ### Changed

@@ -132,7 +132,6 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `live_muted` | Yes — Config tab | `false` | `true`, `false` | Starts Live muted. Browser autoplay rules can still require muted playback. |
 | `show_name` | Yes — Config tab | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer. |
 | `preview_source` | Yes — Config tab | `last_recording` | `last_recording`, `live`, `default` | Chooses the entity used for the dashboard still. `default` follows the view that will open. |
-| `show_mode_icon` | Yes — Config tab | `true` | `true`, `false` | Shows the compact history or Live indicator on the dashboard card. |
 | `aspect_ratio` | Yes — Config tab | `16:9` | `auto`, `16:9`, `4:3`, `1:1` | Sets the dashboard image shape. |
 | `fit_mode` | Yes — Config tab | `cover` | `cover`, `contain` | Crops the image to fill the card or fits the entire image inside it. |
 | `grid_options` | Yes — Layout tab | See below | Object | Standard Home Assistant Sections-layout sizing. Configure it in the Layout tab. |
@@ -166,7 +165,6 @@ live_muted: false
 
 show_name: true
 preview_source: last_recording
-show_mode_icon: true
 aspect_ratio: "16:9"
 fit_mode: cover
 

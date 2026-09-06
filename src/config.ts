@@ -12,7 +12,6 @@ const DEFAULTS = {
   live_muted: false,
   show_name: false,
   preview_source: "last_recording",
-  show_mode_icon: true,
   aspect_ratio: "16:9",
   fit_mode: "cover",
 } as const;
@@ -71,7 +70,6 @@ export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
     live_muted: config.live_muted ?? DEFAULTS.live_muted,
     show_name: config.show_name ?? DEFAULTS.show_name,
     preview_source: config.preview_source ?? DEFAULTS.preview_source,
-    show_mode_icon: config.show_mode_icon ?? DEFAULTS.show_mode_icon,
     aspect_ratio: config.aspect_ratio ?? DEFAULTS.aspect_ratio,
     fit_mode: config.fit_mode ?? DEFAULTS.fit_mode,
     grid_options: config.grid_options,

@@ -34,6 +34,7 @@ describe("visual editor", () => {
       recording_entity: "camera.recording",
       live_entity: "camera.live",
       preview: { source: "live" },
+      show_mode_icon: true,
     } as never);
     const listener = vi.fn();
     editor.addEventListener("config-changed", listener);
@@ -71,11 +72,11 @@ describe("visual editor", () => {
       autoplay_recording: true,
       live_muted: false,
       preview_source: "last_recording",
-      show_mode_icon: true,
       aspect_ratio: "16:9",
       fit_mode: "cover",
     });
     expect(event.detail.config).not.toHaveProperty("preview");
+    expect(event.detail.config).not.toHaveProperty("show_mode_icon");
   });
 
   it("shows a capability warning for a non-streaming live entity", async () => {
@@ -194,7 +195,6 @@ describe("visual editor", () => {
       "name",
       "show_name",
       "preview_source",
-      "show_mode_icon",
       "",
     ]);
     const previewSource = cardAppearance?.schema?.find(

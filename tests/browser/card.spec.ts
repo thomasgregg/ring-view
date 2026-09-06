@@ -123,9 +123,7 @@ test("keeps controls usable after phone orientation change", async ({ page }) =>
 test("renders native-style header controls without duplicate media actions", async ({ page }) => {
   await page.goto("/demo/?theme=dark");
   const previewIndicator = page.locator("ring-view .mode-indicator");
-  await expect(previewIndicator).toBeVisible();
-  await expect(previewIndicator).toHaveText("");
-  await expect(previewIndicator.locator(".mode-icon-recording")).toBeVisible();
+  await expect(previewIndicator).toHaveCount(0);
   await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
   await expect(page.getByRole("button", { name: "Close camera viewer" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Enter fullscreen" })).toHaveCount(0);
@@ -162,8 +160,7 @@ test("hides the camera name from both views when disabled", async ({ page }) => 
 });
 
 test("supports restored playback and card appearance choices", async ({ page }) => {
-  await page.goto("/demo/?autoplay=0&icon=0&remember=1");
-  await expect(page.locator("ring-view .mode-indicator")).toHaveCount(0);
+  await page.goto("/demo/?autoplay=0&remember=1");
   await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
   await expect(page.getByRole("button", { name: "Play last recording" })).toBeVisible();
   await expect

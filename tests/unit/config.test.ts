@@ -16,7 +16,6 @@ describe("configuration", () => {
       live_muted: false,
       show_name: false,
       preview_source: "last_recording",
-      show_mode_icon: true,
       aspect_ratio: "16:9",
       fit_mode: "cover",
     });
@@ -58,10 +57,12 @@ describe("configuration", () => {
       preview: { source: "live", show_name: true },
       viewer: { live_muted: true },
       performance: { debug: true },
+      show_mode_icon: true,
     } as never);
     expect(config).not.toHaveProperty("preview");
     expect(config).not.toHaveProperty("viewer");
     expect(config).not.toHaveProperty("performance");
+    expect(config).not.toHaveProperty("show_mode_icon");
     expect(config.show_name).toBe(false);
     expect(config.live_muted).toBe(false);
   });

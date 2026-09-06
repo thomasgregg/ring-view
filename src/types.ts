@@ -49,7 +49,6 @@ export interface RingViewConfig {
   live_muted?: boolean;
   show_name?: boolean;
   preview_source?: PreviewSource;
-  show_mode_icon?: boolean;
   aspect_ratio?: AspectRatio;
   fit_mode?: FitMode;
   grid_options?: GridOptions;

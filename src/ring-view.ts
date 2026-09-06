@@ -12,7 +12,7 @@ import {
 } from "./config";
 import { localize } from "./localize";
 import { posterUrl, sizedPosterUrl } from "./media/poster-provider";
-import { modeLabel, renderModeIcon } from "./mode-icon";
+import { modeLabel } from "./mode-icon";
 import "./ring-view-dialog";
 import type { RingViewDialog } from "./ring-view-dialog";
 import { cardStyles } from "./styles";
@@ -203,16 +203,6 @@ export class RingView extends LitElement {
                 ${localize(this.hass, "card.preview_unavailable")}
               </div>`}
           ${this.config.show_name ? html`<div class="name">${name}</div>` : nothing}
-          ${this.config.show_mode_icon && !pickerPreview
-            ? html`
-                <div
-                  class=${`mode-indicator ${openingMode === "live" ? "live" : "recording"}`}
-                  aria-hidden="true"
-                >
-                  ${renderModeIcon(openingMode)}
-                </div>
-              `
-            : nothing}
         </div>
       </ha-card>
       <ring-view-dialog

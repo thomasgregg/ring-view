@@ -127,7 +127,6 @@ card.setConfig({
   autoplay_recording: query.get("autoplay") !== "0",
   show_name: query.get("name") === "1",
   preview_source: previewSource,
-  show_mode_icon: query.get("icon") !== "0",
 });
 card.hass = hass;
 document.querySelector("#card-root")!.append(card);

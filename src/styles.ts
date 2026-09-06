@@ -88,39 +88,6 @@ export const cardStyles = css`
     pointer-events: none;
   }
 
-  .mode-indicator {
-    position: absolute;
-    inset-inline-end: 12px;
-    top: 12px;
-    box-sizing: border-box;
-    display: grid;
-    width: 32px;
-    height: 32px;
-    place-items: center;
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    border-radius: 50%;
-    color: #fff;
-    background: rgba(20, 24, 28, 0.68);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    pointer-events: none;
-  }
-
-  .mode-indicator .mode-icon-recording {
-    width: 18px;
-    height: 18px;
-    fill: currentColor;
-  }
-
-  .mode-indicator .mode-icon-live {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--error-color, #db4437);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .preview:active::after {
       display: none;

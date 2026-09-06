@@ -85,7 +85,6 @@ function configSchema(hass: HomeAssistant): ConfigFormSchema[] {
             },
           },
         },
-        { name: "show_mode_icon", selector: { boolean: {} } },
         {
           name: "",
           type: "grid",
@@ -153,7 +152,6 @@ const LABELS: Record<string, TranslationKey> = {
   name: "editor.name",
   show_name: "editor.show_name",
   preview_source: "editor.preview_source",
-  show_mode_icon: "editor.show_mode_icon",
   aspect_ratio: "editor.aspect_ratio",
   fit_mode: "editor.fit_mode",
 };
@@ -165,7 +163,6 @@ const HELPERS: Record<string, TranslationKey> = {
   live_muted: "editor.helper_live_muted",
   show_name: "editor.helper_show_name",
   preview_source: "editor.helper_preview_source",
-  show_mode_icon: "editor.helper_show_mode_icon",
 };
 
 @customElement("ring-view-editor")
