@@ -1,4 +1,11 @@
-# Test plan
+# Development and testing
+
+Node.js 20 or newer is required. Install the project dependencies with
+`npm install`.
+
+The production artifact is `dist/ring-view.js`. The browser suite uses a local
+demo harness and mocked camera elements, so it verifies interface behavior and
+renderer teardown without opening real Ring sessions.
 
 ## Automated checks
 

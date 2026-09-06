@@ -1,72 +1,141 @@
 # Ring View
 
-A Home Assistant Lovelace card that keeps a recent Ring recording and a real Ring live camera one tap apart. The dashboard uses only a still preview. A live Ring session is created only after the viewer opens and **Live** is selected.
+[![Latest release](https://img.shields.io/github/v/release/thomasgregg/ring-view?display_name=tag&sort=semver)](https://github.com/thomasgregg/ring-view/releases/latest)
+[![Validate](https://github.com/thomasgregg/ring-view/actions/workflows/validate.yml/badge.svg)](https://github.com/thomasgregg/ring-view/actions/workflows/validate.yml)
+[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://www.hacs.xyz/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+## One clean Ring camera experience for Home Assistant
+
+Ring exposes the latest recording and the live stream as separate Home Assistant camera entities. Ring View brings them together in one focused dashboard card and one native-feeling viewer—without starting a live Ring session just to show a dashboard preview.
+
+[![Open your Home Assistant instance and open this repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=thomasgregg&repository=ring-view&category=plugin)
+
+![Ring View detail viewer showing a Ring camera recording](output/playwright/screenshots/ring-view-desktop.png)
+
+## Why Ring View?
+
+The official [Ring integration](https://www.home-assistant.io/integrations/ring/) deliberately models `last_recording` and `live_view` as different camera entities. Home Assistant's native [picture entity card](https://www.home-assistant.io/dashboards/picture-entity/) is excellent when one camera entity is all you need. A Ring doorbell commonly needs two cards, custom actions, or repeated navigation to move between its recording and live view.
+
+Ring View fills that gap:
+
+- **One card, both Ring views.** Move between the latest recording and Live without leaving the viewer.
+- **A quiet dashboard.** The card always displays a still image; it never mounts a live player in the dashboard.
+- **Live only when requested.** A live session begins only after the viewer opens and Live is selected.
+- **Native media rendering.** Home Assistant still chooses WebRTC, HLS, or MJPEG and provides the media controls.
+- **Intentional stream lifecycle.** Only one camera renderer is active, and it is torn down when the mode changes, the viewer closes, the card is removed, the browser goes Back, or the tab is hidden.
+- **A polished, consistent interface.** Recording and Live use the same compact icon language on the card and in the viewer.
+- **Built for dashboards.** Responsive layout, keyboard navigation, focus management, safe-area support, light and dark themes, and 44-pixel touch targets are included.
+- **Easy to configure.** The visual editor uses Home Assistant entity pickers, grouped settings, capability warnings, and automatic English or German text.
 
 ![Ring View dashboard card](output/playwright/screenshots/ring-view-card.png)
 
-![Ring View desktop viewer](output/playwright/screenshots/ring-view-desktop.png)
+### Ring View or a native card?
 
-## Highlights
+| Capability | Ring View | Native picture entity card |
+| --- | --- | --- |
+| Show one camera entity | Yes | Yes |
+| Combine Ring recording and live entities | One card and viewer | Normally separate cards or actions |
+| Switch views without closing the viewer | Yes | Not built in |
+| Keep the dashboard on a still image | Always | Configurable for one camera |
+| Remember the last selected view | Optional | Not built in |
+| Choose a preview independently of the opening view | Yes | Not built in |
+| Explicitly tear down the inactive renderer | Yes | Not applicable to a two-entity viewer |
 
-- Native-feeling `picture-entity` dashboard preview
-- Native-sized still thumbnails for sharp previews without starting a live session
-- One consistent mode language across the preview and viewer: history for the
-  last recording and a red dot for **Live**
-- Compact, centered icon controls with tooltips and 44-pixel touch targets
-- One active native camera renderer at a time
-- Hard stream teardown on mode change, close, card removal, browser Back, and hidden tabs
-- Native Home Assistant WebRTC/HLS/MJPEG selection through `ha-camera-stream`
-- Fullscreen, keyboard navigation, focus trapping, safe-area handling, and screen-reader status messages
-- Home Assistant-native card editor with camera-only entity pickers, compact expandable sections, and capability warnings
-- English and German UI that automatically follows the active Home Assistant language
-- No Ring credentials, direct Ring requests, analytics, Browser Mod, or persisted camera URLs
+Use a native card for a simple single-camera tile. Use Ring View when you want the recording/live pair to feel like one camera experience.
 
-## Requirements and compatibility
+## Requirements
 
-- Home Assistant 2026.7 or newer
-- A recording camera entity and a separate live camera entity
-- Current Chrome, Edge, Firefox, or Safari, including Home Assistant Companion app webviews
+- Home Assistant **2026.7 or newer**
+- [HACS](https://www.hacs.xyz/) for the recommended installation
+- The official Home Assistant [Ring integration](https://www.home-assistant.io/integrations/ring/)
+- A Ring `last_recording` camera entity and a separate `live_view` camera entity
+- A Ring Protect plan for recording access
+- A current Chrome, Edge, Firefox, Safari, or Home Assistant Companion app webview
 
-The primary tested entity shape is:
+The Ring integration disables the last-recording entity by default, so enable it in the device's entity list before configuring the card. Entity IDs depend on the device name and may resemble:
 
 ```text
-camera.front_door
+camera.front_door_last_recording
 camera.front_door_live_view
 ```
 
-The card uses Home Assistant’s internal `ha-camera-stream` component because native WebRTC/HLS selection and Ring’s MJPEG recording fallback are core product requirements. Home Assistant does not promise this internal element as a stable public API. All access is isolated in [`src/media/native-camera-adapter.ts`](src/media/native-camera-adapter.ts), feature-detected, lazy-loaded, and protected by fallbacks. See [COMPATIBILITY.md](COMPATIBILITY.md) for the support policy.
+Ring View cannot add capabilities that the integration does not expose. In particular, two-way audio is not currently available through the Home Assistant Ring integration.
 
-## Installation with HACS
+## Install with HACS
 
-1. In HACS, open **Frontend**.
-2. Use the menu to choose **Custom repositories**.
-3. Add this repository URL and select **Dashboard** as the category.
-4. Install **Ring View**.
-5. Refresh Home Assistant. A hard refresh may be required after an upgrade.
+[![Open your Home Assistant instance and open this repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=thomasgregg&repository=ring-view&category=plugin)
 
-HACS should register `/hacsfiles/ring-view/ring-view.js` as a JavaScript module automatically.
+1. Select the button above and add **Ring View** to HACS.
+2. Download the latest release.
+3. Refresh Home Assistant. After an upgrade, a hard browser refresh may be required.
+4. Edit a dashboard, select **Add card**, and choose **Ring View**.
+5. Select the recording and live camera entities.
 
-## Manual installation
+HACS registers `/hacsfiles/ring-view/ring-view.js` as a JavaScript module automatically.
 
-1. Download `ring-view.js` from the latest release.
+<details>
+<summary>Manual installation</summary>
+
+1. Download `ring-view.js` from the [latest release](https://github.com/thomasgregg/ring-view/releases/latest).
 2. Copy it to `<config>/www/ring-view.js`.
 3. Add `/local/ring-view.js` as a **JavaScript module** under **Settings → Dashboards → Resources**.
 4. Refresh the browser.
 
-## Minimal configuration
+</details>
+
+## Quick start
+
+The visual editor is the recommended way to configure Ring View. The equivalent minimal YAML is:
 
 ```yaml
 type: custom:ring-view
-recording_entity: camera.front_door
+recording_entity: camera.front_door_last_recording
 live_entity: camera.front_door_live_view
 ```
 
-## Full example
+Select the card to open the viewer. The history icon opens the latest recording, and the red dot selects Live. Playback, volume, seeking, and fullscreen remain in Home Assistant's native media bar.
+
+## Configuration reference
+
+Every Ring View setting is available in the visual **Config** editor. The only exceptions are `type`, which Home Assistant adds automatically, and `grid_options`, which Home Assistant manages in its standard **Layout** tab.
+
+| Option | Default | Accepted values | Purpose |
+| --- | --- | --- | --- |
+| `type` | Required | `custom:ring-view` | Identifies the custom card. Added automatically by the card picker. |
+| `recording_entity` | Required | `camera.*` entity ID | Camera entity containing the latest recording. |
+| `live_entity` | Required | `camera.*` entity ID | Camera entity that starts the Ring live view. |
+| `name` | Entity name | Text | Optional label used instead of the recording entity's friendly name. |
+| `default_mode` | `last_recording` | `last_recording`, `live` | View selected when the viewer opens. |
+| `remember_last_mode` | `false` | `true`, `false` | Remembers the most recent view in the current browser and uses it instead of `default_mode`. |
+| `autoplay_recording` | `true` | `true`, `false` | Starts the latest recording immediately; when disabled, the viewer waits for Play. |
+| `live_muted` | `false` | `true`, `false` | Starts Live muted. Browser autoplay rules can still require muted playback. |
+| `show_name` | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer. |
+| `preview_source` | `last_recording` | `last_recording`, `live`, `default` | Chooses the entity used for the dashboard still. `default` follows the view that will open. |
+| `show_mode_icon` | `true` | `true`, `false` | Shows the compact history or Live indicator on the dashboard card. |
+| `aspect_ratio` | `16:9` | `auto`, `16:9`, `4:3`, `1:1` | Sets the dashboard image shape. |
+| `fit_mode` | `cover` | `cover`, `contain` | Crops the image to fill the card or fits the entire image inside it. |
+| `grid_options` | See below | Object | Standard Home Assistant Sections-layout sizing. Configure it in the Layout tab. |
+
+### Layout options
+
+These are standard Home Assistant card layout fields rather than Ring View behavior:
+
+| Field | Card default | Purpose |
+| --- | --- | --- |
+| `columns` | `12` | Preferred number of grid columns, or `full`. |
+| `rows` | `3` | Preferred number of grid rows. |
+| `min_columns` | `6` | Minimum supported width in grid columns. |
+| `min_rows` | `2` | Minimum supported height in grid rows. |
+| `max_columns` | Not set | Optional maximum width. |
+| `max_rows` | Not set | Optional maximum height. |
+
+### Complete YAML example
 
 ```yaml
 type: custom:ring-view
 
-recording_entity: camera.front_door
+recording_entity: camera.front_door_last_recording
 live_entity: camera.front_door_live_view
 name: Entrance
 
@@ -74,7 +143,8 @@ default_mode: last_recording
 remember_last_mode: false
 autoplay_recording: true
 live_muted: false
-show_name: false
+
+show_name: true
 preview_source: last_recording
 show_mode_icon: true
 aspect_ratio: "16:9"
@@ -83,70 +153,39 @@ fit_mode: cover
 grid_options:
   columns: 12
   rows: 3
+  min_columns: 6
+  min_rows: 2
 ```
 
-All options shown above match the built-in defaults except `name` and `grid_options`, which are optional. The graphical editor keeps the two camera sources visible and places viewer behavior and card appearance in compact, native expandable sections. Home Assistant supplies the live preview on the right, so the editor does not render a second copy.
+Ring View 0.2 and newer use this flat configuration only. Earlier nested `preview`, `appearance`, `viewer`, and `performance` structures are not supported.
 
-Version 0.2 and later use this flat configuration only. The older nested `preview`, `appearance`, `viewer`, and `performance` options are intentionally not supported.
+## How preview and playback work
 
-## Languages
+The dashboard requests an authenticated still through Home Assistant's camera proxy. It sizes the request to the rendered card and screen pixel density, refreshes it every ten seconds only while visible, and reacts to meaningful layout changes. It does not mount `ha-camera-stream` or preconnect a live renderer.
 
-Ring View automatically follows the active Home Assistant language. English and
-German are included across the editor, card tooltips, viewer states, warnings,
-and accessibility announcements. Regional German locales such as `de-DE`,
-`de-AT`, and `de-CH` use German; other languages fall back to English. No card
-configuration is needed.
+Inside the viewer, Ring View delegates camera rendering to Home Assistant so the platform can select the appropriate WebRTC, HLS, or MJPEG path. A recording starts automatically unless `autoplay_recording` is disabled. Live starts only when selected. If audible autoplay is rejected by the browser, Ring View retries muted.
 
-### Preview semantics
+Unavailable or missing entities are reported immediately. A live connection times out after 20 seconds and retries once. If Home Assistant's camera renderer is unavailable, recording playback can fall back to the current ephemeral `video_url`; Live offers Home Assistant's standard camera dialog instead.
 
-Like Home Assistant's native picture card, the dashboard asks Home Assistant's
-authenticated camera proxy for a still, sized to the rendered card and the
-screen pixel density. `preview_source` can use the last-recording camera, the
-live camera, or follow the view that will open. The still refreshes every ten
-seconds only while the card and browser tab are visible and is resized after a
-meaningful layout change. The dashboard never mounts `ha-camera-stream` or
-preconnects a live renderer. The optional icon at the top right describes what
-opening the card will do without covering the image with text:
+## Themes, languages, and accessibility
 
-- A **history** icon when the viewer opens on the latest recording
-- A **red dot** when the viewer opens on Live
+Ring View uses Home Assistant theme variables instead of fixed light or dark surfaces, so it follows the active dashboard theme. English and German are included throughout the editor, tooltips, viewer states, warnings, and accessibility announcements. Regional variants such as `de-DE`, `de-AT`, and `de-CH` use German; unsupported languages fall back to English.
 
-## Failure behavior
-
-- Missing or unavailable entities are reported immediately.
-- Live connection attempts time out after 20 seconds and retry once.
-- If Home Assistant’s internal camera component cannot load, a recording may fall back to an ephemeral native `<video>` using the current `video_url`. That URL is never copied into configuration, storage, or logs.
-- Live mode offers the normal Home Assistant camera dialog if native rendering is incompatible.
-
-## Development
-
-Node.js 20 or newer is required.
-
-```bash
-npm install
-npm run check
-npm test
-npm run test:browser
-npm run build
-```
-
-The production artifact is `dist/ring-view.js`. The browser suite uses the local demo harness and mocked camera elements; it verifies UI behavior and renderer teardown without opening Ring sessions.
-
-Real Home Assistant/Ring verification is intentionally manual because it requires an authenticated Home Assistant installation and actual camera entities. Follow [TESTING.md](TESTING.md) before a release.
+The card supports keyboard activation, Escape to close, focus trapping and restoration, screen-reader status messages, visible focus treatment, responsive phone and tablet layouts, and device safe areas.
 
 ## Security and privacy
 
-- The card communicates only with Home Assistant-provided entities and frontend components.
-- It contains no Ring authentication, external scripts, remote fonts, telemetry, or analytics.
-- Camera tokens, authenticated URLs, and `video_url` values are never logged or persisted.
-- Recording and live playback start with audio after the user opens or selects
-  them, matching Home Assistant's native camera viewer. Audio and fullscreen
-  remain in the native media control bar. If a browser rejects audible
-  autoplay, the card retries muted.
+- Ring View communicates only with Home Assistant-provided entities, endpoints, and frontend components.
+- It includes no Ring authentication, direct Ring requests, external scripts, remote fonts, telemetry, or analytics.
+- Camera tokens, authenticated URLs, and `video_url` values are never copied into configuration, browser storage, or logs.
+- The optional remembered view stores only the selected mode for that entity pair in the local browser.
 
-## Rollback
+## Documentation
 
-See [ROLLBACK.md](ROLLBACK.md). In short: restore the previous HACS version, refresh the resource cache, and keep the existing native cards available until the custom card has passed real-device verification. This project never modifies or replaces dashboard cards automatically.
+- [Compatibility and support policy](COMPATIBILITY.md)
+- [Development, testing, and release acceptance](TESTING.md)
+- [Release recovery](ROLLBACK.md)
+- [Changelog](CHANGELOG.md)
 
 ## License
 

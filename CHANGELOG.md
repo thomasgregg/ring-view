@@ -4,6 +4,19 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-09-06
+
+### Documentation
+
+- Rebuild the README around Ring View's unified two-entity workflow and the
+  problems it solves beyond a single native camera card.
+- Add the official one-click HACS repository button and a concise installation
+  path.
+- Document every flat Ring View option, accepted value, default, and standard
+  Home Assistant grid field.
+- Move development details into the dedicated testing guide and keep release
+  recovery in its own document.
+
 ## [0.3.0] - 2026-09-06
 
 ### Added
