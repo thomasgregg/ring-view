@@ -190,11 +190,13 @@ export class RingViewRingWebRtcPlayer extends LitElement {
   public connectedCallback(): void {
     super.connectedCallback();
     window.addEventListener("blur", this.handleWindowBlur);
+    window.addEventListener("pagehide", this.handlePageHide);
     document.addEventListener("visibilitychange", this.handleVisibilityChange);
   }
 
   public disconnectedCallback(): void {
     window.removeEventListener("blur", this.handleWindowBlur);
+    window.removeEventListener("pagehide", this.handlePageHide);
     document.removeEventListener("visibilitychange", this.handleVisibilityChange);
     this.clearStatusMessageTimeout();
     this.connectionToken += 1;
@@ -506,6 +508,12 @@ export class RingViewRingWebRtcPlayer extends LitElement {
   }
 
   private handleWindowBlur = (): void => this.cancelActivePress();
+
+  private handlePageHide = (): void => {
+    this.clearStatusMessageTimeout();
+    this.connectionToken += 1;
+    void this.disposeSession();
+  };
 
   private handleVisibilityChange = (): void => {
     if (document.hidden) this.cancelActivePress();

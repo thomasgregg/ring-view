@@ -54,6 +54,7 @@ describe("card stream lifecycle", () => {
   afterEach(() => {
     document.body.replaceChildren();
     vi.useRealTimers();
+    vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
 
@@ -438,8 +439,10 @@ describe("card stream lifecycle", () => {
 
     document.body.replaceChildren();
     history.replaceState(null, "", history.state.refreshUrl);
+    vi.useFakeTimers();
     const restoredCard = await mount();
-    await flush();
+    await vi.advanceTimersByTimeAsync(0);
+    await restoredCard.updateComplete;
 
     const restoredDialog = getDialog();
     expect(restoredCard.shadowRoot?.querySelector("ring-view-dialog")).toBeNull();
@@ -449,12 +452,48 @@ describe("card stream lifecycle", () => {
         ?.querySelector("#ring-view-tab-live")
         ?.getAttribute("aria-selected"),
     ).toBe("true");
+    expect(restoredDialog?.shadowRoot?.textContent).toContain(
+      "Reconnecting live view…",
+    );
+    expect(TestCameraStream.active).toBe(0);
+
+    await vi.advanceTimersByTimeAsync(2_000);
+    await restoredDialog?.updateComplete;
     expect(TestCameraStream.active).toBe(1);
 
+    vi.useRealTimers();
     restoredDialog?.close();
     await flush();
     expect(location.search).not.toContain("ring-view-");
     expect(TestCameraStream.active).toBe(0);
+  });
+
+  it("replaces a failed talkback session with one reconnecting surface", async () => {
+    vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => undefined);
+    vi.spyOn(HTMLMediaElement.prototype, "load").mockImplementation(() => undefined);
+    const card = document.createElement("ring-view");
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      two_way_audio: true,
+    });
+    card.hass = hass;
+    document.body.append(card);
+    await card.updateComplete;
+    card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
+    await flush();
+    const dialog = getDialog();
+    dialog?.shadowRoot?.querySelector<HTMLElement>("#ring-view-tab-live")?.click();
+    await flush();
+
+    expect(dialog?.shadowRoot?.textContent).toContain("Reconnecting live view…");
+    expect(dialog?.shadowRoot?.textContent).not.toContain(
+      "Connecting video and incoming audio.",
+    );
+    expect(dialog?.shadowRoot?.querySelector("ring-view-ring-webrtc-player")).toBeNull();
+    expect(
+      dialog?.shadowRoot?.querySelector('button[aria-label="Hold to talk"]'),
+    ).toBeNull();
   });
 
   it("does not restore a viewer into a card for another camera pair", async () => {

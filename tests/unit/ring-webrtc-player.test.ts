@@ -229,6 +229,16 @@ describe("Ring WebRTC player", () => {
     expect(microphone.enabled).toBe(false);
   });
 
+  it("closes the peer connection as soon as the page is discarded", async () => {
+    const { player, peer } = await mount(async () => new MockMediaStream([]) as unknown as MediaStream);
+
+    window.dispatchEvent(new Event("pagehide"));
+    await flush();
+
+    expect(player.isConnected).toBe(true);
+    expect(peer.close).toHaveBeenCalledTimes(1);
+  });
+
   it("does not transmit after a permission prompt interrupts the original hold", async () => {
     const microphone = new MockTrack("audio");
     const localStream = new MockMediaStream([microphone]);

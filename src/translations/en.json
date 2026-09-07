@@ -100,7 +100,7 @@
   "viewer.trying_ha": "Trying Home Assistant camera playback.",
   "viewer.recording_audio_blocked": "The browser blocked recording audio. Retrying muted.",
   "viewer.live_audio_muted": "Live audio was muted so playback can start.",
-  "viewer.retrying_live": "Retrying Ring live view.",
+  "viewer.retrying_live": "Reconnecting live view…",
   "talkback.connecting": "Connecting video and incoming audio.",
   "talkback.requesting_microphone": "Requesting microphone",
   "talkback.hold_to_talk": "Hold to talk",

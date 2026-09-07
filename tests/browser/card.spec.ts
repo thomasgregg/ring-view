@@ -292,6 +292,8 @@ test("restores the open camera viewer after a Companion-style frontend reload", 
   await page.reload();
 
   await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.locator(".state-title", { hasText: "Reconnecting live view…" })).toBeVisible();
+  await expect(page.locator("ring-view-ring-webrtc-player")).toHaveCount(0);
   await expect(page.getByRole("tab", { name: "Live" })).toHaveAttribute(
     "aria-selected",
     "true",
@@ -311,6 +313,31 @@ test("restores the open camera viewer after a Companion-style frontend reload", 
   await expect(page.getByRole("dialog")).toBeHidden();
   await expect(page).not.toHaveURL(/ring-view-/);
   await expect(page.locator("ring-view-ring-webrtc-player")).toHaveCount(0);
+});
+
+test("does not overlap a failed live session with reconnecting controls", async ({
+  page,
+}) => {
+  await page.goto("/demo/?two_way_audio=1");
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  await page.getByRole("tab", { name: "Live" }).click();
+  const player = page.locator("ring-view-ring-webrtc-player");
+  await expect(player).toBeVisible();
+
+  await player.evaluate((element) => {
+    element.dispatchEvent(
+      new CustomEvent("ring-webrtc-error", {
+        detail: { message: "Previous session is still closing" },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  });
+
+  await expect(page.locator(".state-title", { hasText: "Reconnecting live view…" })).toBeVisible();
+  await expect(page.getByText("Connecting video and incoming audio.")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Hold to talk" })).toHaveCount(0);
+  await expect(player).toHaveCount(0);
 });
 
 test("keeps hold to talk near the video edge on desktop and mobile", async ({ page }) => {

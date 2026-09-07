@@ -43,8 +43,16 @@ import {
 } from "./utilities/dialog-url";
 import { StreamLifecycle } from "./utilities/stream-lifecycle";
 
-type MediaStatus = "idle" | "pending" | "ready" | "error" | "compatibility";
+type MediaStatus =
+  | "idle"
+  | "pending"
+  | "retrying"
+  | "ready"
+  | "error"
+  | "compatibility";
 const LIVE_TIMEOUT_SECONDS = 20;
+const RESTORED_LIVE_START_DELAY_MS = 2_000;
+const LIVE_RETRY_DELAY_MS = 2_500;
 
 @customElement(RING_VIEW_DIALOG_TAG)
 export class RingViewDialog extends LitElement {
@@ -102,7 +110,14 @@ export class RingViewDialog extends LitElement {
     this.open = true;
     this.syncUrl();
     this.attachGlobalListeners();
-    this.startMedia();
+    if (params.restored && this.mode === "live") {
+      // Ring can keep the discarded Web View's live session reserved briefly.
+      // Native dialogs reconstruct their media after the new frontend is ready;
+      // give the old peer/WebSocket session the same opportunity to close.
+      this.scheduleLiveReconnect(RESTORED_LIVE_START_DELAY_MS);
+    } else {
+      this.startMedia();
+    }
     void this.updateComplete.then(() => this.focusInitialControl());
   }
 
@@ -262,8 +277,10 @@ export class RingViewDialog extends LitElement {
       this.mode === "last_recording" && typeof entity?.attributes.video_url === "string"
         ? entity.attributes.video_url
         : undefined;
+    const renderActiveMedia =
+      canRender && (this.mediaStatus === "pending" || this.mediaStatus === "ready");
     const useRecordingVideo = Boolean(
-      canRender && fallbackUrl && !this.recordingVideoFailed,
+      renderActiveMedia && fallbackUrl && !this.recordingVideoFailed,
     );
     const useTalkbackPlayer = Boolean(
       canRender
@@ -284,7 +301,7 @@ export class RingViewDialog extends LitElement {
         }
       >
         <img class="poster" src=${poster} alt="" aria-hidden="true" />
-        ${canRender && !useRecordingVideo && this.mediaStatus !== "compatibility"
+        ${renderActiveMedia && !useRecordingVideo
           ? keyed(
               `${entityId}:${this.session}`,
               html`
@@ -395,13 +412,15 @@ export class RingViewDialog extends LitElement {
       `;
     }
 
-    if (this.mediaStatus === "pending") {
+    if (this.mediaStatus === "pending" || this.mediaStatus === "retrying") {
       return html`
         <div class="state-layer" role="status">
           <div class="state-card">
             <div class="spinner" aria-hidden="true"></div>
             <div class="state-title">
-              ${this.mode === "live"
+              ${this.mediaStatus === "retrying"
+                ? localize(this.hass, "viewer.retrying_live")
+                : this.mode === "live"
                 ? localize(this.hass, "viewer.connecting_live")
                 : localize(this.hass, "viewer.loading_recording")}
             </div>
@@ -643,8 +662,7 @@ export class RingViewDialog extends LitElement {
   private failMedia(allowAutomaticRetry: boolean): void {
     if (allowAutomaticRetry && this.mode === "live" && this.retryCount < 1) {
       this.retryCount += 1;
-      this.statusAnnouncement = localize(this.hass, "viewer.retrying_live");
-      this.startMedia();
+      this.scheduleLiveReconnect(LIVE_RETRY_DELAY_MS);
       return;
     }
     this.lifecycle.dispose();
@@ -654,6 +672,14 @@ export class RingViewDialog extends LitElement {
       this.mode === "live"
         ? localize(this.hass, "viewer.live_failed")
         : localize(this.hass, "viewer.recording_unavailable");
+  }
+
+  private scheduleLiveReconnect(delay: number): void {
+    this.lifecycle.dispose();
+    this.session = this.lifecycle.current();
+    this.mediaStatus = "retrying";
+    this.statusAnnouncement = localize(this.hass, "viewer.retrying_live");
+    this.lifecycle.scheduleTimeout(() => this.startMedia(), delay);
   }
 
   private retry = (): void => {

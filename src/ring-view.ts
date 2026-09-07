@@ -330,6 +330,7 @@ export class RingView extends LitElement {
         config: this.config,
         mode: restore.mode,
         opener: trigger,
+        restored: true,
         ringingUntil:
           restore.ringingUntil !== undefined && restore.ringingUntil > Date.now()
             ? restore.ringingUntil

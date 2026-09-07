@@ -14,6 +14,7 @@ export interface RingViewDialogParams {
   opener?: HTMLElement;
   ringingUntil?: number;
   returnUrl?: string;
+  restored?: boolean;
 }
 
 interface ShowDialogDetail {

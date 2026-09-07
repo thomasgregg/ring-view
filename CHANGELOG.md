@@ -4,6 +4,16 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.5.5] - 2026-09-07
+
+### Fixed
+
+- Let a discarded Companion Web View release its Ring live session before the
+  restored viewer reconnects, then retry once with a short backoff if Ring is
+  still finishing the previous session.
+- Keep reconnecting, failure, and talkback status surfaces mutually exclusive
+  so an error never overlaps a stale Connecting message or disabled talk button.
+
 ## [0.5.4] - 2026-09-07
 
 ### Fixed
