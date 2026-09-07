@@ -248,7 +248,7 @@ describe("Ring WebRTC player", () => {
     expect(peer.close).not.toHaveBeenCalled();
     expect(subscribeMessage).toHaveBeenCalledTimes(1);
     expect(player.shadowRoot?.textContent).toContain(
-      "Microphone permission was denied. Video remains connected.",
+      "Microphone permission denied.",
     );
   });
 

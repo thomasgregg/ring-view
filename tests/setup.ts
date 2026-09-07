@@ -1,4 +1,6 @@
 import { beforeEach } from "vitest";
+import { installDemoDialogManager } from "../demo/dialog-manager";
+import type { HomeAssistant } from "../src/types";
 
 const storage = (() => {
   const values = new Map<string, string>();
@@ -56,6 +58,20 @@ if (!customElements.get("ha-camera-stream")) {
 Object.defineProperty(window, "loadCardHelpers", {
   configurable: true,
   value: async () => ({ importMoreInfoControl: async () => undefined }),
+});
+
+installDemoDialogManager((event) => {
+  const card = event
+    .composedPath()
+    .find(
+      (node): node is HTMLElement & { hass?: HomeAssistant } =>
+        node instanceof HTMLElement && node.localName === "ring-view",
+    );
+  return card?.hass ?? {
+    states: {},
+    hassUrl: (path = "") => path,
+    callWS: async () => ({}) as never,
+  };
 });
 
 beforeEach(() => {

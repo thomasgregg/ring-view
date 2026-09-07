@@ -11,11 +11,13 @@ import {
   CARD_TYPE,
   normalizeConfig,
 } from "./config";
+import {
+  RING_ALERT_DURATION_MS,
+  showRingViewDialog,
+} from "./dialog-controller";
 import { localize } from "./localize";
 import { posterUrl, sizedPosterUrl } from "./media/poster-provider";
 import { modeLabel } from "./mode-icon";
-import "./ring-view-dialog";
-import type { RingViewDialog } from "./ring-view-dialog";
 import { cardStyles } from "./styles";
 import type { GridOptions, HomeAssistant, NormalizedConfig, RingViewConfig } from "./types";
 import { entityIsUnavailable, friendlyName } from "./utilities/entity-validation";
@@ -128,7 +130,6 @@ export class RingView extends LitElement {
   }
 
   public disconnectedCallback(): void {
-    this.renderRoot.querySelector<RingViewDialog>("ring-view-dialog")?.close();
     this.teardownPreviewLifecycle();
     if (this.ringAlertTimer !== undefined) window.clearTimeout(this.ringAlertTimer);
     super.disconnectedCallback();
@@ -245,12 +246,6 @@ export class RingView extends LitElement {
             : nothing}
         </div>
       </ha-card>
-      <ring-view-dialog
-        .hass=${this.hass}
-        .config=${this.config}
-        .ringing=${this.ringAlertVisible}
-        @viewer-closed=${this.handleViewerClosed}
-      ></ring-view-dialog>
     `;
   }
 
@@ -296,9 +291,14 @@ export class RingView extends LitElement {
 
   private openViewer = (): void => {
     const trigger = this.renderRoot.querySelector<HTMLElement>(".preview") ?? undefined;
-    this.renderRoot
-      .querySelector<RingViewDialog>("ring-view-dialog")
-      ?.show(this.ringAlertVisible ? "live" : loadMode(this.config!), trigger);
+    showRingViewDialog(trigger ?? this, {
+      config: this.config!,
+      mode: this.ringAlertVisible ? "live" : loadMode(this.config!),
+      opener: trigger,
+      ringingUntil: this.ringAlertVisible
+        ? this.lastRingAlertAt + RING_ALERT_DURATION_MS
+        : undefined,
+    });
   };
 
   private detectDoorbellEvent(previous?: HomeAssistant): void {
@@ -321,7 +321,7 @@ export class RingView extends LitElement {
     this.ringAlertTimer = window.setTimeout(() => {
       this.ringAlertVisible = false;
       this.ringAlertTimer = undefined;
-    }, 12_000);
+    }, RING_ALERT_DURATION_MS);
   }
 
   private handleKeyDown = (event: KeyboardEvent): void => {
@@ -332,10 +332,6 @@ export class RingView extends LitElement {
 
   private handlePreviewError = (): void => {
     this.previewFailed = true;
-  };
-
-  private handleViewerClosed = (): void => {
-    this.requestUpdate();
   };
 
   private setupPreviewLifecycle(): void {

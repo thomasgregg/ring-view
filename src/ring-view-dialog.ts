@@ -5,6 +5,11 @@ import { keyed } from "lit/directives/keyed.js";
 import { styleMap } from "lit/directives/style-map.js";
 import { customElement, property, state } from "lit/decorators.js";
 import { aspectRatioNumber } from "./config";
+import {
+  RING_ALERT_DURATION_MS,
+  RING_VIEW_DIALOG_TAG,
+  type RingViewDialogParams,
+} from "./dialog-controller";
 import { localize, localizeHaOrFallback } from "./localize";
 import "./media/native-camera-adapter";
 import "./media/ring-webrtc-player";
@@ -33,15 +38,15 @@ import { StreamLifecycle } from "./utilities/stream-lifecycle";
 type MediaStatus = "idle" | "pending" | "ready" | "error" | "compatibility";
 const LIVE_TIMEOUT_SECONDS = 20;
 
-@customElement("ring-view-dialog")
+@customElement(RING_VIEW_DIALOG_TAG)
 export class RingViewDialog extends LitElement {
   public static styles = dialogStyles;
 
   @property({ attribute: false }) public hass?: HomeAssistant;
   @property({ attribute: false }) public config?: NormalizedConfig;
   @property({ type: Boolean, reflect: true }) public open = false;
-  @property({ type: Boolean }) public ringing = false;
 
+  @state() private ringing = false;
   @state() private mode: CameraMode = "last_recording";
   @state() private mediaStatus: MediaStatus = "idle";
   @state() private session = 0;
@@ -55,19 +60,21 @@ export class RingViewDialog extends LitElement {
   @state() private statusAnnouncement = "";
 
   private lifecycle = new StreamLifecycle();
-  private historyMarker = `ring-view-${Math.random().toString(36).slice(2)}`;
-  private ownsHistoryEntry = false;
   private opener?: HTMLElement;
+  private ringAlertTimer?: number;
+  private lastDoorbellState?: string;
   private audioFallbackAttempted = false;
   private recordingPlaybackPending = false;
   private recordingPlaybackStarted = false;
 
-  public show(mode: CameraMode, opener?: HTMLElement): void {
-    if (!this.config || !this.hass || this.open) return;
-    this.opener = opener;
-    this.mode = mode;
+  public showDialog(params: RingViewDialogParams): void {
+    if (!this.hass) return;
+    if (this.open) this.finishClose(false, false);
+    this.config = params.config;
+    this.opener = params.opener;
+    this.mode = params.mode;
     this.liveMuted = this.config.live_muted;
-    this.recordingStarted = mode === "live" || this.config.autoplay_recording;
+    this.recordingStarted = this.mode === "live" || this.config.autoplay_recording;
     this.retryCount = 0;
     this.audioFallbackAttempted = false;
     this.recordingPlaybackPending = false;
@@ -76,29 +83,37 @@ export class RingViewDialog extends LitElement {
     this.liveHasAudio = undefined;
     this.recordingVideoFailed = false;
     this.suspended = false;
+    this.statusAnnouncement = "";
+    this.lastDoorbellState = this.config.doorbell_entity
+      ? this.hass.states[this.config.doorbell_entity]?.state
+      : undefined;
+    this.setRingingUntil(params.ringingUntil);
     this.open = true;
-    this.pushHistoryEntry();
     this.attachGlobalListeners();
     this.startMedia();
     void this.updateComplete.then(() => this.focusInitialControl());
   }
 
-  public close(): void {
-    if (!this.open) return;
-    if (this.ownsHistoryEntry && history.state?.ringView === this.historyMarker) {
-      this.ownsHistoryEntry = false;
-      history.back();
-    }
+  public closeDialog(): boolean {
     this.finishClose();
+    return true;
+  }
+
+  public close(): void {
+    this.closeDialog();
   }
 
   public disconnectedCallback(): void {
-    this.finishClose(false);
+    this.finishClose(false, false);
     super.disconnectedCallback();
   }
 
   protected willUpdate(changed: PropertyValues<this>): void {
-    if (!this.open || !changed.has("hass") || !this.config) return;
+    if (!this.open || !this.config) return;
+    if (changed.has("hass")) {
+      this.detectDoorbellEvent(changed.get("hass") as HomeAssistant | undefined);
+    }
+    if (!changed.has("hass")) return;
     const entity = this.activeEntity();
     if (entityIsUnavailable(entity) && this.mediaStatus !== "error") {
       this.lifecycle.dispose();
@@ -678,6 +693,13 @@ export class RingViewDialog extends LitElement {
   };
 
   private handleKeyDown = (event: KeyboardEvent): void => {
+    if (event.key === "Escape") {
+      if (document.fullscreenElement) return;
+      event.preventDefault();
+      event.stopPropagation();
+      this.close();
+      return;
+    }
     if (event.key !== "Tab") return;
     const focusable = this.focusableElements();
     if (focusable.length === 0) return;
@@ -717,44 +739,13 @@ export class RingViewDialog extends LitElement {
     this.renderRoot.querySelector<HTMLElement>(".close")?.focus();
   }
 
-  private pushHistoryEntry(): void {
-    try {
-      const base = history.state && typeof history.state === "object" ? history.state : {};
-      history.pushState(
-        { ...base, ringView: this.historyMarker },
-        "",
-        location.href,
-      );
-      this.ownsHistoryEntry = true;
-    } catch {
-      this.ownsHistoryEntry = false;
-    }
-  }
-
   private attachGlobalListeners(): void {
-    window.addEventListener("popstate", this.handlePopState);
-    document.addEventListener("keydown", this.handleDocumentKeyDown, true);
     document.addEventListener("visibilitychange", this.handleVisibilityChange);
   }
 
   private detachGlobalListeners(): void {
-    window.removeEventListener("popstate", this.handlePopState);
-    document.removeEventListener("keydown", this.handleDocumentKeyDown, true);
     document.removeEventListener("visibilitychange", this.handleVisibilityChange);
   }
-
-  private handlePopState = (): void => {
-    this.ownsHistoryEntry = false;
-    if (this.open) this.finishClose();
-  };
-
-  private handleDocumentKeyDown = (event: KeyboardEvent): void => {
-    if (event.key !== "Escape") return;
-    if (document.fullscreenElement) return;
-    event.preventDefault();
-    event.stopPropagation();
-    this.close();
-  };
 
   private handleVisibilityChange = (): void => {
     if (!this.open) return;
@@ -777,8 +768,45 @@ export class RingViewDialog extends LitElement {
     }
   };
 
-  private finishClose(restoreFocus = true): void {
-    if (!this.open && !this.isConnected) return;
+  private detectDoorbellEvent(previous?: HomeAssistant): void {
+    const entityId = this.config?.doorbell_entity;
+    if (!entityId || !this.hass) return;
+    const after = this.hass.states[entityId];
+    const beforeState = previous?.states[entityId]?.state ?? this.lastDoorbellState;
+    this.lastDoorbellState = after?.state;
+    if (
+      !after
+      || beforeState === undefined
+      || beforeState === after.state
+      || ["unknown", "unavailable"].includes(after.state)
+      || (after.attributes.event_type !== undefined
+        && after.attributes.event_type !== "ring")
+    ) {
+      return;
+    }
+    this.setRingingUntil(Date.now() + RING_ALERT_DURATION_MS);
+  }
+
+  private setRingingUntil(until?: number): void {
+    if (this.ringAlertTimer !== undefined) {
+      window.clearTimeout(this.ringAlertTimer);
+      this.ringAlertTimer = undefined;
+    }
+    const remaining = until === undefined ? 0 : until - Date.now();
+    this.ringing = remaining > 0;
+    if (!this.ringing) return;
+    this.ringAlertTimer = window.setTimeout(() => {
+      this.ringing = false;
+      this.ringAlertTimer = undefined;
+    }, remaining);
+  }
+
+  private finishClose(restoreFocus = true, notifyManager = true): void {
+    if (!this.open) return;
+    const opener = this.opener;
+    this.renderRoot
+      .querySelector<RingViewRingWebRtcPlayer>("ring-view-ring-webrtc-player")
+      ?.stopTalking();
     this.lifecycle.dispose();
     this.session = this.lifecycle.current();
     this.mediaStatus = "idle";
@@ -790,12 +818,25 @@ export class RingViewDialog extends LitElement {
     this.recordingMuted = false;
     this.liveHasAudio = undefined;
     this.recordingVideoFailed = false;
+    this.statusAnnouncement = "";
+    this.setRingingUntil();
+    this.lastDoorbellState = undefined;
     this.detachGlobalListeners();
     if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
     this.dispatchEvent(
       new CustomEvent("viewer-closed", { bubbles: true, composed: true }),
     );
-    if (restoreFocus) this.opener?.focus();
+    if (notifyManager) {
+      this.dispatchEvent(
+        new CustomEvent("dialog-closed", {
+          detail: { dialog: RING_VIEW_DIALOG_TAG },
+          bubbles: true,
+          composed: true,
+        }),
+      );
+    }
+    this.config = undefined;
+    if (restoreFocus && opener?.isConnected) opener.focus();
     this.opener = undefined;
   }
 

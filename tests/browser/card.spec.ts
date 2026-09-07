@@ -246,6 +246,38 @@ test("keeps the camera and controls visible after orientation changes", async ({
   }
 });
 
+test("keeps the global viewer open when a responsive layout removes the card", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  await page.getByRole("tab", { name: "Live" }).click();
+  await expect(page.locator("body > ring-view-dialog")).toBeVisible();
+  await expect(page.locator("ring-view ring-view-dialog")).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => window.demoActiveStreams)).toBe(1);
+
+  await page.evaluate(() => document.querySelector("ring-view")?.remove());
+  await page.setViewportSize({ width: 844, height: 390 });
+
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.getByRole("tab", { name: "Live" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await expect(page.locator("ring-view-native-camera-adapter")).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.demoActiveStreams)).toBe(1);
+
+  await page.evaluate(() =>
+    window.demoSetEntityState("camera.live_view", "unavailable"),
+  );
+  await expect(
+    page.getByRole("status").getByText("Camera entity is unavailable."),
+  ).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.demoActiveStreams)).toBe(0);
+  await page.getByRole("button", { name: "Close camera viewer" }).click();
+  await expect(page.getByRole("dialog")).toBeHidden();
+});
+
 test("keeps hold to talk near the video edge on desktop and mobile", async ({ page }) => {
   await page.evaluate(() => {
     const frame = document.createElement("div");

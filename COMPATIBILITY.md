@@ -4,6 +4,11 @@
 
 The release target is Home Assistant 2026.9 and the previous two monthly releases where practical. Version 0.1.0 declares Home Assistant 2026.7.0 as its minimum.
 
+The viewer uses Home Assistant's application-level `show-dialog` contract for
+dialog placement, browser Back behavior, and independence from responsive card
+relayouts. The dialog itself remains part of Ring View and continues to own its
+camera and talkback lifecycle.
+
 The implementation currently expects `ha-camera-stream` to expose these properties:
 
 - `stateObj`

@@ -3,6 +3,8 @@ import type {
   HomeAssistant,
   PreviewSource,
 } from "../src/types";
+import "../src/media/ring-webrtc-player";
+import { installDemoDialogManager } from "./dialog-manager";
 
 class HaCard extends HTMLElement {}
 
@@ -136,6 +138,7 @@ let hass: HomeAssistant = {
   callWS: async () => ({}) as never,
   formatEntityName: (entity, override) => override || entity.attributes.friendly_name || entity.entity_id,
 };
+const dialogManager = installDemoDialogManager(() => hass);
 
 const card = document.createElement("ring-view");
 const requestedPreview = query.get("preview");
@@ -171,6 +174,7 @@ window.demoSetEntityState = (entityId: string, state: string) => {
     states: { ...hass.states, [entityId]: { ...current, state } },
   };
   card.hass = hass;
+  dialogManager.updateHass(hass);
 };
 
 declare global {

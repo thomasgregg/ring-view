@@ -4,6 +4,32 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-09-07
+
+### Changed
+
+- Open the camera viewer through Home Assistant's application-level dialog
+  manager so responsive dashboard relayouts and card remounts do not interrupt
+  an active recording, live view, or talkback session.
+- Delegate browser-history ownership to Home Assistant while retaining Ring
+  View's focus handling, Escape behavior, visibility safety, and deterministic
+  media cleanup.
+
+### Fixed
+
+- Keep the viewer open when a phone or tablet rotates between portrait and
+  landscape in a responsive Sections dashboard.
+- Continue updating unavailable-camera errors and doorbell alerts after the
+  originating dashboard card has been moved or recreated.
+- Keep all microphone errors brief by removing the redundant video-connection
+  sentence.
+
+### Tests
+
+- Add unit and desktop/mobile browser regression coverage for globally owned
+  dialogs, card removal during an active stream, orientation changes, current
+  error messages, and final stream cleanup.
+
 ## [0.5.2] - 2026-09-07
 
 ### Fixed

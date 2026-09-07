@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import "../../src/index";
 import type { HomeAssistant, HassEntity } from "../../src/types";
 import type { RingView } from "../../src/ring-view";
-import type { RingViewDialog } from "../../src/ring-view-dialog";
+import { RingViewDialog } from "../../src/ring-view-dialog";
 import type { RingViewNativeCameraAdapter } from "../../src/media/native-camera-adapter";
 import { TestCameraStream } from "../setup";
 
@@ -44,6 +44,10 @@ async function mount(): Promise<RingView> {
 async function flush(): Promise<void> {
   await new Promise<void>((resolve) => setTimeout(resolve, 0));
   await new Promise<void>((resolve) => setTimeout(resolve, 0));
+}
+
+function getDialog(): RingViewDialog | null {
+  return document.body.querySelector<RingViewDialog>("ring-view-dialog");
 }
 
 describe("card stream lifecycle", () => {
@@ -96,7 +100,7 @@ describe("card stream lifecycle", () => {
     expect(card.shadowRoot?.querySelector("ring-view-native-camera-adapter")).toBeNull();
     card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
     await flush();
-    const dialog = card.shadowRoot?.querySelector<RingViewDialog>("ring-view-dialog");
+    const dialog = getDialog();
     expect(dialog?.shadowRoot?.querySelectorAll('[role="tab"]')).toHaveLength(2);
     expect(
       dialog?.shadowRoot
@@ -211,7 +215,7 @@ describe("card stream lifecycle", () => {
     expect(card.shadowRoot?.querySelector(".name")?.textContent).toBe("Entrance");
     card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
     await flush();
-    const dialog = card.shadowRoot?.querySelector<RingViewDialog>("ring-view-dialog");
+    const dialog = getDialog();
     expect(dialog?.shadowRoot?.querySelector("h2")?.textContent).toBe("Entrance");
   });
 
@@ -248,7 +252,7 @@ describe("card stream lifecycle", () => {
 
     card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
     await flush();
-    const dialog = card.shadowRoot?.querySelector<RingViewDialog>("ring-view-dialog");
+    const dialog = getDialog();
     expect(
       dialog?.shadowRoot?.querySelector("#ring-view-tab-live")?.getAttribute("aria-selected"),
     ).toBe("true");
@@ -260,7 +264,7 @@ describe("card stream lifecycle", () => {
     expect(card.shadowRoot?.querySelector(".name")).toBeNull();
     card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
     await flush();
-    const dialog = card.shadowRoot?.querySelector<RingViewDialog>("ring-view-dialog");
+    const dialog = getDialog();
     const section = dialog?.shadowRoot?.querySelector<HTMLElement>(".dialog");
     expect(dialog?.shadowRoot?.querySelector("h2")).toBeNull();
     expect(section?.getAttribute("aria-label")).toBe("Camera view");
@@ -280,7 +284,7 @@ describe("card stream lifecycle", () => {
     card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
     await flush();
 
-    const dialog = card.shadowRoot?.querySelector<RingViewDialog>("ring-view-dialog");
+    const dialog = getDialog();
     const play = dialog?.shadowRoot?.querySelector<HTMLElement>(".play-recording");
     expect(play?.textContent).toContain("Play last recording");
     expect(TestCameraStream.active).toBe(0);
@@ -303,7 +307,7 @@ describe("card stream lifecycle", () => {
 
     card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
     await flush();
-    let dialog = card.shadowRoot?.querySelector<RingViewDialog>("ring-view-dialog");
+    let dialog = getDialog();
     dialog?.shadowRoot?.querySelector<HTMLElement>("#ring-view-tab-live")?.click();
     await flush();
     dialog?.close();
@@ -311,7 +315,7 @@ describe("card stream lifecycle", () => {
 
     card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
     await flush();
-    dialog = card.shadowRoot?.querySelector<RingViewDialog>("ring-view-dialog");
+    dialog = getDialog();
     expect(
       dialog?.shadowRoot
         ?.querySelector("#ring-view-tab-live")
@@ -389,9 +393,7 @@ describe("card stream lifecycle", () => {
     await flush();
     expect(TestCameraStream.active).toBe(1);
 
-    const dialog = card.shadowRoot?.querySelector<RingViewDialog>(
-      "ring-view-dialog",
-    );
+    const dialog = getDialog();
     dialog?.shadowRoot?.querySelector<HTMLElement>("#ring-view-tab-live")?.click();
     await flush();
     expect(TestCameraStream.active).toBe(1);
@@ -405,14 +407,120 @@ describe("card stream lifecycle", () => {
     expect(TestCameraStream.active).toBe(0);
   });
 
-  it("removes the renderer when the card disconnects", async () => {
+  it("keeps the global viewer and renderer when the card disconnects", async () => {
     const card = await mount();
     card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
     await flush();
     expect(TestCameraStream.active).toBe(1);
+    const dialog = getDialog();
+    expect(card.shadowRoot?.querySelector("ring-view-dialog")).toBeNull();
+    expect(dialog?.parentElement).toBe(document.body);
     card.remove();
     await flush();
+    expect(dialog?.open).toBe(true);
+    expect(dialog?.shadowRoot?.querySelector('[role="dialog"]')).not.toBeNull();
+    expect(TestCameraStream.active).toBe(1);
+    dialog?.close();
+    await flush();
     expect(TestCameraStream.active).toBe(0);
+  });
+
+  it("reuses the managed dialog safely when another card opens it", async () => {
+    const first = await mount();
+    first.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
+    await flush();
+    const dialog = getDialog();
+    expect(TestCameraStream.active).toBe(1);
+
+    const secondRecording = camera("camera.garden_recording", 0);
+    const secondLive = camera("camera.garden_live", 2);
+    const second = document.createElement("ring-view");
+    second.setConfig({
+      recording_entity: secondRecording.entity_id,
+      live_entity: secondLive.entity_id,
+      name: "Garden",
+      show_name: true,
+      default_mode: "live",
+    });
+    second.hass = {
+      ...hass,
+      entities: {
+        ...hass.entities,
+        [secondRecording.entity_id]: {
+          entity_id: secondRecording.entity_id,
+          platform: "ring",
+        },
+        [secondLive.entity_id]: {
+          entity_id: secondLive.entity_id,
+          platform: "ring",
+        },
+      },
+      states: {
+        ...hass.states,
+        [secondRecording.entity_id]: secondRecording,
+        [secondLive.entity_id]: secondLive,
+      },
+    };
+    document.body.append(second);
+    await second.updateComplete;
+    second.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
+    await flush();
+
+    expect(getDialog()).toBe(dialog);
+    expect(dialog?.shadowRoot?.querySelector("h2")?.textContent).toBe("Garden");
+    expect(
+      dialog?.shadowRoot?.querySelector("#ring-view-tab-live")?.getAttribute("aria-selected"),
+    ).toBe("true");
+    expect(TestCameraStream.active).toBe(1);
+    dialog?.close();
+    await flush();
+    expect(TestCameraStream.active).toBe(0);
+  });
+
+  it("keeps global errors and doorbell alerts current after the opener is removed", async () => {
+    const doorbell: HassEntity = {
+      entity_id: "event.front_door_ding",
+      state: "2026-09-07T08:00:00Z",
+      attributes: { event_type: "ring" },
+    };
+    const card = document.createElement("ring-view");
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      doorbell_entity: doorbell.entity_id,
+      default_mode: "live",
+    });
+    card.hass = {
+      ...hass,
+      states: { ...hass.states, [doorbell.entity_id]: doorbell },
+    };
+    document.body.append(card);
+    await card.updateComplete;
+    card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
+    await flush();
+
+    const dialog = getDialog();
+    expect(TestCameraStream.active).toBe(1);
+    card.remove();
+    dialog!.hass = {
+      ...hass,
+      states: {
+        ...hass.states,
+        "camera.live": { ...hass.states["camera.live"]!, state: "unavailable" },
+        [doorbell.entity_id]: {
+          ...doorbell,
+          state: "2026-09-07T08:01:00Z",
+        },
+      },
+    };
+    await dialog!.updateComplete;
+    await flush();
+
+    expect(dialog?.open).toBe(true);
+    expect(dialog?.shadowRoot?.textContent).toContain("Camera entity is unavailable.");
+    expect(dialog?.shadowRoot?.querySelector(".dialog-ring-alert")).not.toBeNull();
+    expect(TestCameraStream.active).toBe(0);
+    dialog?.close();
   });
 
   it("starts the temporary recording with audio and falls back muted if blocked", async () => {
@@ -439,9 +547,7 @@ describe("card stream lifecycle", () => {
     card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
     await flush();
 
-    const dialog = card.shadowRoot?.querySelector<RingViewDialog>(
-      "ring-view-dialog",
-    );
+    const dialog = getDialog();
     const video = dialog?.shadowRoot?.querySelector<HTMLVideoElement>("video");
     expect(video?.src).toBe("https://example.test/latest-recording.mp4");
     expect(video?.muted).toBe(false);
@@ -472,9 +578,7 @@ describe("card stream lifecycle", () => {
     const card = await mount();
     card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
     await flush();
-    const dialog = card.shadowRoot?.querySelector<RingViewDialog>(
-      "ring-view-dialog",
-    );
+    const dialog = getDialog();
     dialog?.shadowRoot?.querySelector<HTMLElement>("#ring-view-tab-live")?.click();
     await flush();
     const stream = dialog?.shadowRoot
@@ -518,9 +622,7 @@ describe("card stream lifecycle", () => {
     await card.updateComplete;
     card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
     await flush();
-    const dialog = card.shadowRoot?.querySelector<RingViewDialog>(
-      "ring-view-dialog",
-    );
+    const dialog = getDialog();
     dialog?.shadowRoot?.querySelector<HTMLElement>("#ring-view-tab-live")?.click();
     await flush();
 
@@ -545,9 +647,7 @@ describe("card stream lifecycle", () => {
     await card.updateComplete;
     card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
     await flush();
-    const dialog = card.shadowRoot?.querySelector<RingViewDialog>(
-      "ring-view-dialog",
-    );
+    const dialog = getDialog();
     expect(
       dialog?.shadowRoot?.querySelector("#ring-view-tab-recording .mode-icon-recording"),
     ).not.toBeNull();
