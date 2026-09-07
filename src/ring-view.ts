@@ -129,6 +129,7 @@ export class RingView extends LitElement {
 
   public connectedCallback(): void {
     super.connectedCallback();
+    this.updateRingAlert();
     void this.updateComplete.then(() => {
       if (this.isConnected && !this.isInCardPicker()) this.setupPreviewLifecycle();
     });
@@ -136,7 +137,7 @@ export class RingView extends LitElement {
 
   public disconnectedCallback(): void {
     this.teardownPreviewLifecycle();
-    if (this.ringAlertTimer !== undefined) window.clearTimeout(this.ringAlertTimer);
+    this.clearRingAlertTimer();
     if (this.restoreViewerTimer !== undefined) {
       window.clearTimeout(this.restoreViewerTimer);
       this.restoreViewerTimer = undefined;
@@ -302,6 +303,9 @@ export class RingView extends LitElement {
   }
 
   private openViewer = (): void => {
+    // Timers may be throttled while the app is hidden; never open Live for an
+    // expired ring just because its timeout has not run yet.
+    this.updateRingAlert();
     const trigger = this.renderRoot.querySelector<HTMLElement>(".preview") ?? undefined;
     showRingViewDialog(trigger ?? this, {
       config: this.config!,
@@ -354,12 +358,24 @@ export class RingView extends LitElement {
     const now = Date.now();
     if (now - this.lastRingAlertAt < 5_000) return;
     this.lastRingAlertAt = now;
-    this.ringAlertVisible = true;
-    if (this.ringAlertTimer !== undefined) window.clearTimeout(this.ringAlertTimer);
-    this.ringAlertTimer = window.setTimeout(() => {
-      this.ringAlertVisible = false;
-      this.ringAlertTimer = undefined;
-    }, RING_ALERT_DURATION_MS);
+    this.updateRingAlert();
+  }
+
+  private updateRingAlert(): void {
+    this.clearRingAlertTimer();
+    const remaining = this.lastRingAlertAt + RING_ALERT_DURATION_MS - Date.now();
+    this.ringAlertVisible = this.lastRingAlertAt > 0 && remaining > 0;
+    if (this.ringAlertVisible && this.isConnected) {
+      // Preserve the original expiry across detach/reinsert, without starting
+      // a new twelve-second alert on each responsive layout change.
+      this.ringAlertTimer = window.setTimeout(() => this.updateRingAlert(), remaining);
+    }
+  }
+
+  private clearRingAlertTimer(): void {
+    if (this.ringAlertTimer === undefined) return;
+    window.clearTimeout(this.ringAlertTimer);
+    this.ringAlertTimer = undefined;
   }
 
   private handleKeyDown = (event: KeyboardEvent): void => {

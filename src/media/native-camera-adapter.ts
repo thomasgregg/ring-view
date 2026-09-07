@@ -2,7 +2,7 @@ import { LitElement, css, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { HassEntity } from "../types";
 
-export type NativeAdapterFailure = "component-unavailable" | "media-error";
+export type NativeAdapterFailure = "component-unavailable";
 export interface NativeMediaCapabilities {
   hasAudio?: boolean;
   hasVideo?: boolean;

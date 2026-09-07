@@ -84,9 +84,9 @@ export class RingViewDialog extends LitElement {
   private ringAlertTimer?: number;
   private ringingUntil?: number;
   private lastDoorbellState?: string;
-  private audioFallbackAttempted = false;
-  private recordingPlaybackPending = false;
-  private recordingPlaybackStarted = false;
+  // Playback belongs to an element, not the dialog: every replacement video
+  // needs its own attempt, while repeated canplay events must not replay it.
+  private readonly recordingPlayback = new WeakSet<HTMLVideoElement>();
   private automaticLiveRetry = true;
   private automaticLiveRecovery?: "waiting" | "attempting";
   private recoveryConnection?: HomeAssistant["connection"];
@@ -114,15 +114,9 @@ export class RingViewDialog extends LitElement {
       ? true
       : this.config.live_muted;
     this.recordingStarted = this.mode === "live" || this.config.autoplay_recording;
-    this.retryCount = 0;
-    this.audioFallbackAttempted = false;
-    this.recordingPlaybackPending = false;
-    this.recordingPlaybackStarted = false;
+    this.resetMediaAttempt();
     this.automaticLiveRetry = !params.restored;
     this.pageUnloading = false;
-    this.recordingMuted = false;
-    this.liveHasAudio = undefined;
-    this.recordingVideoFailed = false;
     this.suspended = false;
     this.statusAnnouncement = "";
     this.lastDoorbellState = this.config.doorbell_entity
@@ -557,13 +551,7 @@ export class RingViewDialog extends LitElement {
     saveMode(this.config, mode);
     this.liveMuted = this.config.live_muted;
     this.recordingStarted = mode === "live" || this.config.autoplay_recording;
-    this.retryCount = 0;
-    this.audioFallbackAttempted = false;
-    this.recordingPlaybackPending = false;
-    this.recordingPlaybackStarted = false;
-    this.recordingMuted = false;
-    this.liveHasAudio = undefined;
-    this.recordingVideoFailed = false;
+    this.resetMediaAttempt();
     this.statusAnnouncement = localize(
       this.hass,
       mode === "live"
@@ -591,9 +579,16 @@ export class RingViewDialog extends LitElement {
     this.mediaStatus = "pending";
     this.session = this.lifecycle.next();
     this.lifecycle.scheduleTimeout(
-      () => this.failMedia(true),
+      () => this.failMedia(),
       LIVE_TIMEOUT_SECONDS * 1_000,
     );
+  }
+
+  private resetMediaAttempt(): void {
+    this.retryCount = 0;
+    this.recordingMuted = false;
+    this.liveHasAudio = undefined;
+    this.recordingVideoFailed = false;
   }
 
   private acceptsMediaEvent(event?: Event): boolean {
@@ -645,10 +640,8 @@ export class RingViewDialog extends LitElement {
     return localize(this.hass, "viewer.live_detecting_audio");
   }
 
-  private handleRecordingVideoError = (): void => {
-    if (this.mode !== "last_recording") return;
-    this.recordingPlaybackPending = false;
-    this.recordingPlaybackStarted = false;
+  private handleRecordingVideoError = (event?: Event): void => {
+    if (this.mode !== "last_recording" || !this.acceptsMediaEvent(event)) return;
     // The Ring URL is temporary and can expire between state refreshes. Fall
     // back to Home Assistant's authenticated MJPEG renderer for this attempt.
     this.recordingVideoFailed = true;
@@ -657,76 +650,67 @@ export class RingViewDialog extends LitElement {
   };
 
   private handleRecordingCanPlay = (event: Event): void => {
+    const video = event.currentTarget;
+    const session = this.session;
     if (
-      this.mode !== "last_recording" ||
-      this.recordingPlaybackPending ||
-      this.recordingPlaybackStarted ||
-      !(event.currentTarget instanceof HTMLVideoElement)
+      !(video instanceof HTMLVideoElement)
+      || this.recordingPlayback.has(video)
+      || !this.isCurrentRecording(video, session)
     ) {
       return;
     }
 
-    const video = event.currentTarget;
-    this.recordingPlaybackPending = true;
-    void video.play().then(() => {
-      this.recordingPlaybackPending = false;
-      this.recordingPlaybackStarted = true;
-      this.handleMediaReady();
-    }).catch(() => {
-      if (!this.open || this.mode !== "last_recording" || !video.isConnected) {
-        this.recordingPlaybackPending = false;
-        return;
-      }
-      if (!this.recordingMuted) {
-        // Some browsers reject audible autoplay even after the viewer was
-        // opened by a user gesture. Keep the same recording and retry muted;
-        // the native media controls can then be used to enable sound.
-        this.recordingMuted = true;
-        video.muted = true;
-        this.statusAnnouncement = localize(
-          this.hass,
-          "viewer.recording_audio_blocked",
-        );
-        void video.play().then(() => {
-          this.recordingPlaybackPending = false;
-          this.recordingPlaybackStarted = true;
-          this.handleMediaReady();
-        }).catch(() => {
-          this.recordingPlaybackPending = false;
-          this.handleRecordingVideoError();
-        });
-        return;
-      }
-      this.recordingPlaybackPending = false;
-      this.handleRecordingVideoError();
-    });
+    this.recordingPlayback.add(video);
+    void this.playRecording(video, session);
   };
 
+  private isCurrentRecording(video: HTMLVideoElement, session: number): boolean {
+    return this.acceptsMediaEvent()
+      && this.mode === "last_recording"
+      && session === this.lifecycle.current()
+      && video.isConnected
+      && video === this.renderRoot.querySelector(".video-fallback");
+  }
+
+  private async playRecording(video: HTMLVideoElement, session: number): Promise<void> {
+    try {
+      await video.play();
+    } catch {
+      if (!this.isCurrentRecording(video, session)) return;
+      if (this.recordingMuted) {
+        this.handleRecordingVideoError();
+        return;
+      }
+      // Keep the same recording and retry audible-autoplay rejection muted.
+      // Native controls can enable sound afterward.
+      this.recordingMuted = true;
+      video.muted = true;
+      this.statusAnnouncement = localize(this.hass, "viewer.recording_audio_blocked");
+      try {
+        await video.play();
+      } catch {
+        if (this.isCurrentRecording(video, session)) this.handleRecordingVideoError();
+        return;
+      }
+    }
+    // A resolved/rejected promise from a removed player must never update a
+    // reopened dialog or cancel the timeout belonging to a newer Live session.
+    if (this.isCurrentRecording(video, session)) this.handleMediaReady();
+  }
+
   private handleMediaError = (event: CustomEvent<NativeAdapterFailure>): void => {
-    if (!this.acceptsMediaEvent(event)) return;
-    if (event.detail === "component-unavailable") {
-      this.clearAutomaticLiveRecovery();
-      this.lifecycle.clearTimeout();
-      this.mediaStatus = "compatibility";
-      this.statusAnnouncement = localize(
-        this.hass,
-        "viewer.native_unavailable_title",
-      );
-      return;
-    }
-    if (this.mode === "live" && !this.liveMuted && !this.audioFallbackAttempted) {
-      this.audioFallbackAttempted = true;
-      this.liveMuted = true;
-      this.statusAnnouncement = localize(this.hass, "viewer.live_audio_muted");
-      this.startMedia();
-      return;
-    }
-    this.failMedia(false);
+    if (!this.acceptsMediaEvent(event) || event.detail !== "component-unavailable") return;
+    // Native candidate/autoplay fallback is owned by HA. This adapter only
+    // reports component availability; stalled playback uses our session timer.
+    this.clearAutomaticLiveRecovery();
+    this.lifecycle.clearTimeout();
+    this.mediaStatus = "compatibility";
+    this.statusAnnouncement = localize(this.hass, "viewer.native_unavailable_title");
   };
 
   private handleRingWebRtcError = (event: Event): void => {
     if (!this.acceptsMediaEvent(event) || this.mode !== "live" || !this.config?.two_way_audio) return;
-    this.failMedia(true);
+    this.failMedia();
   };
 
   private handleLiveResumeRequired = (event: Event): void => {
@@ -790,9 +774,7 @@ export class RingViewDialog extends LitElement {
   private resumeLive = (): void => {
     if (!this.open || this.mode !== "live" || this.mediaStatus !== "awaiting-resume") return;
     this.clearAutomaticLiveRecovery();
-    this.retryCount = 0;
-    this.audioFallbackAttempted = false;
-    this.liveHasAudio = undefined;
+    this.resetMediaAttempt();
     this.startMedia();
     void this.updateComplete.then(() => this.focusInitialControl());
   };
@@ -806,7 +788,7 @@ export class RingViewDialog extends LitElement {
     this.statusAnnouncement = localize(this.hass, "viewer.resume_live");
   };
 
-  private failMedia(allowAutomaticRetry: boolean): void {
+  private failMedia(): void {
     if (this.automaticLiveRecovery === "attempting") {
       // Keep v0.5.8's proven manual path if this one attempt cannot recover.
       // Autoplay rejection uses playback-blocked instead and retains the peer.
@@ -814,8 +796,7 @@ export class RingViewDialog extends LitElement {
       return;
     }
     if (
-      allowAutomaticRetry
-      && this.automaticLiveRetry
+      this.automaticLiveRetry
       && this.mode === "live"
       && this.retryCount < 1
     ) {
@@ -842,13 +823,7 @@ export class RingViewDialog extends LitElement {
 
   private retry = (): void => {
     this.clearAutomaticLiveRecovery();
-    this.retryCount = 0;
-    this.audioFallbackAttempted = false;
-    this.recordingPlaybackPending = false;
-    this.recordingPlaybackStarted = false;
-    this.recordingMuted = false;
-    this.liveHasAudio = undefined;
-    this.recordingVideoFailed = false;
+    this.resetMediaAttempt();
     this.startMedia();
   };
 
@@ -1066,13 +1041,9 @@ export class RingViewDialog extends LitElement {
     this.open = false;
     unregisterActiveRingViewDialog(this);
     this.suspended = false;
-    this.recordingPlaybackPending = false;
-    this.recordingPlaybackStarted = false;
+    this.resetMediaAttempt();
     this.automaticLiveRetry = true;
     this.recordingStarted = true;
-    this.recordingMuted = false;
-    this.liveHasAudio = undefined;
-    this.recordingVideoFailed = false;
     this.statusAnnouncement = "";
     this.setRingingUntil();
     this.lastDoorbellState = undefined;

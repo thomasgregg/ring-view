@@ -23,7 +23,9 @@ type Subscription = {
 customElements.define("ha-card", class extends HTMLElement {});
 const sessions = new Map<string, Session>();
 const subscriptions = new Set<Subscription>();
-const disconnectedListeners = new Set<() => void>();
+const connectionListeners = new Map<string, Array<() => void>>();
+let stallNextCleanup = false;
+let finishPendingCleanup: (() => void) | undefined;
 const audioContext = new AudioContext();
 let nextSession = 0;
 let reconnectSubscriptions: Subscription[] = [];
@@ -35,6 +37,8 @@ const state = {
   candidateMessages: 0,
   getUserMediaCalls: 0,
   blockedPlayCalls: 0,
+  disconnectNotifications: 0,
+  cleanupPending: false,
   initialUserActivation: navigator.userActivation.hasBeenActive,
   failNextOffer: new URLSearchParams(location.search).has("fail_first_offer"),
   blockPlayback: new URLSearchParams(location.search).has("block_playback"),
@@ -164,8 +168,20 @@ async function signal(subscription: Subscription): Promise<void> {
 
 const connection = {
   connected: true,
-  addEventListener: (_event: "disconnected", listener: () => void) => disconnectedListeners.add(listener),
-  removeEventListener: (_event: "disconnected", listener: () => void) => disconnectedListeners.delete(listener),
+  addEventListener(event: "disconnected" | "ready", listener: () => void) {
+    const listeners = connectionListeners.get(event) ?? [];
+    listeners.push(listener);
+    connectionListeners.set(event, listeners);
+  },
+  removeEventListener(event: "disconnected" | "ready", listener: () => void) {
+    const listeners = connectionListeners.get(event);
+    const index = listeners?.indexOf(listener) ?? -1;
+    if (index !== -1) listeners!.splice(index, 1);
+  },
+  fireEvent(event: "disconnected" | "ready") {
+    // Match HA's live-array iteration, including its mutation semantics.
+    (connectionListeners.get(event) ?? []).forEach((listener) => listener());
+  },
   async subscribeMessage<T>(
     callback: (message: T) => void,
     message: Record<string, unknown>,
@@ -187,6 +203,13 @@ const connection = {
     return () => {
       subscriptions.delete(subscription);
       closeSession(subscription.sessionId);
+      if (stallNextCleanup) {
+        stallNextCleanup = false;
+        state.cleanupPending = true;
+        return new Promise<void>((resolve) => {
+          finishPendingCleanup = () => { state.cleanupPending = false; resolve(); };
+        });
+      }
     };
   },
 };
@@ -252,10 +275,14 @@ const recovery = {
     connection.connected = false;
     reconnectSubscriptions = [...subscriptions];
     for (const sessionId of sessions.keys()) closeSession(sessionId);
-    for (const listener of [...disconnectedListeners]) listener();
+    const observer = () => { state.disconnectNotifications += 1; };
+    connection.addEventListener("disconnected", observer);
+    connection.fireEvent("disconnected");
+    connection.removeEventListener("disconnected", observer);
   },
   async reconnect() {
     connection.connected = true;
+    connection.fireEvent("ready");
     // HA normally replays subscriptions with the original offer and callback.
     for (const subscription of reconnectSubscriptions) {
       if (subscription.options?.resubscribe === false) continue;
@@ -266,6 +293,16 @@ const recovery = {
     hass = { ...hass };
     card.hass = hass;
     manager.updateHass(hass);
+  },
+  failWithStalledCleanup() {
+    const subscription = [...subscriptions].at(-1);
+    if (!subscription) throw new Error("No active session to fail");
+    stallNextCleanup = true;
+    subscription.callback({ type: "error", message: "Simulated connection failure" });
+  },
+  finishCleanup() {
+    finishPendingCleanup?.();
+    finishPendingCleanup = undefined;
   },
   recreateCard() {
     const replacement = createCard();

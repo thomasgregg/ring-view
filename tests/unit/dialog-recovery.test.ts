@@ -55,12 +55,11 @@ describe("automatic restored live recovery", () => {
     expect(dialog.shadowRoot?.querySelector(".state-layer")).toBeNull();
   });
 
-  it.each(["error", "timeout"])("falls back to manual Resume after one automatic %s", async (failure) => {
+  it("falls back to manual Resume after one automatic native playback timeout", async () => {
     const { dialog, adapter, resume, events } = await restore();
     const oldPlayer = adapter();
     expect(oldPlayer).not.toBeNull();
-    if (failure === "error") oldPlayer?.dispatchEvent(new CustomEvent("native-media-error", { detail: "media-error" }));
-    else await vi.advanceTimersByTimeAsync(20_000);
+    await vi.advanceTimersByTimeAsync(20_000);
     await vi.advanceTimersByTimeAsync(0);
     expect(adapter()).toBeNull();
     expect(resume()).not.toBeNull();
@@ -80,10 +79,19 @@ describe("automatic restored live recovery", () => {
     await vi.advanceTimersByTimeAsync(0);
     expect(TestCameraStream.active).toBe(1);
     // A failed manual attempt is still an honest error with explicit Retry.
-    adapter()?.dispatchEvent(new CustomEvent("native-media-error", { detail: "media-error" }));
     await vi.advanceTimersByTimeAsync(120_000);
     expect(dialog.shadowRoot?.querySelector('[role="alert"]')).not.toBeNull();
     expect(adapter()).toBeNull();
+  });
+
+  it("reports a missing native component without inventing an audio fallback", async () => {
+    const { dialog, adapter, resume } = await restore();
+    adapter()?.dispatchEvent(new CustomEvent("native-media-error", { detail: "component-unavailable" }));
+    await vi.advanceTimersByTimeAsync(120_000);
+    expect(adapter()).toBeNull();
+    expect(resume()).toBeNull();
+    expect(dialog.shadowRoot?.querySelector(".state-title")?.textContent).toContain("Native camera playback is unavailable.");
+    expect(TestCameraStream.active).toBe(0);
   });
 
   it.each(["hidden", "offline"])("waits while %s before consuming its one attempt", async (reason) => {

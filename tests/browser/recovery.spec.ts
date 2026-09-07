@@ -148,6 +148,7 @@ test("does not replay a stale offer on websocket reconnect and releases active t
   await page.keyboard.down("Space");
   await expect.poll(() => page.evaluate(() => window.recovery.microphone?.enabled)).toBe(true);
   await page.evaluate(() => window.recovery.disconnect());
+  expect(await page.evaluate(() => window.recovery.state.disconnectNotifications)).toBe(1);
   await page.keyboard.up("Space");
   await expect(page.getByRole("button", { name: "Resume live view" })).toBeVisible();
   expect(await page.evaluate(() => window.recovery.microphone)).toEqual({ enabled: false, readyState: "ended" });
@@ -184,4 +185,39 @@ test("keeps a connected stream when autoplay is blocked and plays the same peer 
   await expectMovingVideo(page);
   expect(await page.evaluate(() => window.recovery.state.offers)).toBe(1);
   expect(await page.evaluate(() => window.recovery.state.closed)).toBe(0);
+});
+
+test("offers Retry during stalled cleanup and keeps the replacement stream healthy", async ({ page }) => {
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  await expectMovingVideo(page);
+  await page.reload();
+  await expectMovingVideo(page);
+  const talk = page.getByRole("button", { name: "Hold to talk" });
+  await talk.focus();
+  await page.keyboard.down("Space");
+  await expect.poll(() => page.evaluate(() => window.recovery.microphone?.enabled)).toBe(true);
+
+  await page.evaluate(() => window.recovery.failWithStalledCleanup());
+  await page.keyboard.up("Space");
+  await expect(page.getByRole("button", { name: "Retry", exact: true })).toBeVisible();
+  expect(await page.evaluate(() => window.recovery.microphone)).toEqual({ enabled: false, readyState: "ended" });
+  expect(await page.evaluate(() => window.recovery.state.cleanupPending)).toBe(true);
+  await expect(talk).toHaveCount(0);
+  await page.getByRole("button", { name: "Retry", exact: true }).click();
+  await expectMovingVideo(page);
+  const replacement = await page.locator("ring-view-ring-webrtc-player").elementHandle();
+  expect(await page.evaluate(() => window.recovery.state.offers)).toBe(2);
+  expect(await page.evaluate(() => window.recovery.state.getUserMediaCalls)).toBe(1);
+
+  await page.evaluate(() => window.recovery.finishCleanup());
+  await expectMovingVideo(page);
+  expect(await replacement!.evaluate((element) => element.isConnected)).toBe(true);
+  expect(await page.evaluate(() => window.recovery.state.cleanupPending)).toBe(false);
+  expect(await page.evaluate(() => window.recovery.state.offers)).toBe(2);
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  await talk.focus();
+  await page.keyboard.down("Space");
+  await expect.poll(() => page.evaluate(() => window.recovery.microphone?.enabled)).toBe(true);
+  await page.keyboard.up("Space");
+  await expect.poll(() => page.evaluate(() => window.recovery.microphone?.enabled)).toBe(false);
 });

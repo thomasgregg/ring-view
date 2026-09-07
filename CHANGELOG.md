@@ -4,6 +4,35 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.5.10] - 2026-09-07
+
+### Fixed
+
+- Recognize replacement recording players after returning from the background;
+  ignore late playback promises from closed viewers or previous media sessions.
+- Release local media immediately and show Live recovery controls even when the
+  backend subscription or unsubscribe acknowledgment is still pending.
+- Defer WebSocket listener removal until after Home Assistant finishes dispatch,
+  without delaying microphone shutdown or skipping another disconnect listener.
+- Preserve doorbell alerts' original expiry across card detach/reinsert, and
+  avoid opening Live for an expired alert when browser timers were throttled.
+
+### Changed
+
+- Scope recording playback attempts to their video element, consolidate repeated
+  attempt resets, and remove the unused initial-mode helper, redundant talk-button
+  disabled condition, and unreachable native-audio fallback state/translations.
+- Keep native candidate fallback in Home Assistant's camera renderer; retain
+  Ring View's actual recording/WebRTC muted-playback fallbacks and bounded recovery.
+
+### Tests
+
+- Reproduce lifecycle failures before fixing them, including delayed recording
+  success/rejection, repeated backgrounding, stalled subscription cleanup, and
+  doorbell expiry before and after reinsertion.
+- Match HA's live-array event dispatch in the browser fixture, and verify Retry,
+  advancing video frames, and fresh talk presses while old cleanup is pending.
+
 ## [0.5.9] - 2026-09-07
 
 ### Changed

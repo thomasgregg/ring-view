@@ -135,7 +135,11 @@ describe("Ring WebRTC player", () => {
     }
   });
 
-  async function mount(getUserMedia: () => Promise<MediaStream>, playing = true): Promise<{
+  async function mount(
+    getUserMedia: () => Promise<MediaStream>,
+    playing = true,
+    connectionOverrides: Partial<NonNullable<HomeAssistant["connection"]>> = {},
+  ): Promise<{
     player: RingViewRingWebRtcPlayer;
     peer: MockPeerConnection;
     subscribeMessage: ReturnType<typeof vi.fn>;
@@ -149,7 +153,7 @@ describe("Ring WebRTC player", () => {
       states: {},
       hassUrl: (path = "") => path,
       callWS: async () => ({ configuration: {} }) as never,
-      connection: { subscribeMessage },
+      connection: { subscribeMessage, ...connectionOverrides },
     };
     const player = document.createElement("ring-view-ring-webrtc-player");
     player.hass = hass;
@@ -331,6 +335,103 @@ describe("Ring WebRTC player", () => {
     expect(peer.close).toHaveBeenCalledTimes(1);
     expect(newSubscribe).not.toHaveBeenCalled();
     expect(subscribeMessage).toHaveBeenCalledTimes(1);
+  });
+
+  it("releases talkback immediately without skipping HA's next disconnect listener", async () => {
+    // HA dispatches a live array with forEach; DOM EventTarget and Set mocks
+    // hide the skipped-listener bug caused by splicing this array mid-dispatch.
+    const listeners: Array<() => void> = [];
+    const microphone = new MockTrack("audio");
+    const { player, peer } = await mount(
+      async () => new MockMediaStream([microphone]) as unknown as MediaStream,
+      true,
+      {
+        addEventListener: (_event, callback) => listeners.push(callback),
+        removeEventListener: (_event, callback) => {
+          const index = listeners.indexOf(callback);
+          if (index !== -1) listeners.splice(index, 1);
+        },
+      },
+    );
+    dispatchPointer(player.shadowRoot!.querySelector(".talk-button")!, "pointerdown");
+    await flush();
+    expect(microphone.enabled).toBe(true);
+    const nextConsumer = vi.fn();
+    listeners.push(nextConsumer);
+    listeners.forEach((callback) => callback());
+    expect(microphone.enabled).toBe(false);
+    expect(microphone.stop).toHaveBeenCalledTimes(1);
+    expect(peer.close).toHaveBeenCalledTimes(1);
+    expect(nextConsumer).toHaveBeenCalledTimes(1);
+    await flush();
+    expect(listeners).toEqual([nextConsumer]);
+  });
+
+  it.each(["subscription", "unsubscribe"] as const)("reports peer failure without waiting for a stalled %s", async (stage) => {
+    let finishCleanup!: () => void;
+    const cleanup = new Promise<void>((resolve) => { finishCleanup = resolve; });
+    const unsubscribe = vi.fn(() => stage === "unsubscribe" ? cleanup : Promise.resolve());
+    const { player, peer } = await mount(
+      async () => new MockMediaStream([]) as unknown as MediaStream,
+      true,
+      { subscribeMessage: () => stage === "subscription" ? cleanup.then(() => unsubscribe) : Promise.resolve(unsubscribe) },
+    );
+    const failed = vi.fn();
+    player.addEventListener("ring-webrtc-error", failed);
+    peer.connectionState = "failed";
+    peer.onconnectionstatechange?.(new Event("connectionstatechange"));
+    expect(peer.close).toHaveBeenCalledTimes(1);
+    await flush();
+    expect(failed).toHaveBeenCalledTimes(1);
+    player.remove();
+    finishCleanup();
+    await flush();
+    expect(unsubscribe).toHaveBeenCalledTimes(1);
+    expect(failed).toHaveBeenCalledTimes(1);
+  });
+
+  it("recovers the dialog without waiting for the failed session's cleanup acknowledgment", async () => {
+    vi.useFakeTimers();
+    let finishCleanup!: () => void;
+    const cleanup = new Promise<void>((resolve) => { finishCleanup = resolve; });
+    const unsubscribe = vi.fn(() => cleanup);
+    const dialog = document.createElement("ring-view-dialog");
+    dialog.hass = {
+      states: { "camera.live": { entity_id: "camera.live", state: "idle", attributes: { supported_features: 2 } } },
+      entities: { "camera.live": { entity_id: "camera.live", platform: "ring" } },
+      hassUrl: (path = "") => path,
+      callWS: async () => ({ configuration: {} }) as never,
+      connection: { subscribeMessage: async () => unsubscribe },
+    };
+    document.body.append(dialog);
+    dialog.showDialog({
+      config: normalizeConfig({ live_entity: "camera.live", recording_entity: "camera.recording", two_way_audio: true }),
+      mode: "live", restored: true,
+    });
+    await vi.advanceTimersByTimeAsync(0);
+    const peer = MockPeerConnection.instances[0]!;
+    const player = dialog.shadowRoot!.querySelector("ring-view-ring-webrtc-player")!;
+    peer.connectionState = "connected";
+    peer.onconnectionstatechange?.(new Event("connectionstatechange"));
+    player.shadowRoot!.querySelector("video")!.dispatchEvent(new Event("playing"));
+    await vi.advanceTimersByTimeAsync(0);
+    expect(dialog.shadowRoot!.querySelector(".state-layer")).toBeNull();
+    peer.connectionState = "failed";
+    peer.onconnectionstatechange?.(new Event("connectionstatechange"));
+    await vi.advanceTimersByTimeAsync(120_000);
+    expect(peer.close).toHaveBeenCalledTimes(1);
+    expect(dialog.shadowRoot!.querySelector('[role="alert"]')).not.toBeNull();
+    dialog.shadowRoot!.querySelector<HTMLButtonElement>(".state-actions .primary")!.click();
+    await vi.advanceTimersByTimeAsync(0);
+    const replacement = dialog.shadowRoot!.querySelector("ring-view-ring-webrtc-player")!;
+    expect(replacement).not.toBe(player);
+    replacement.shadowRoot!.querySelector("video")!.dispatchEvent(new Event("playing"));
+    await vi.advanceTimersByTimeAsync(0);
+    finishCleanup();
+    await vi.advanceTimersByTimeAsync(120_000);
+    expect(dialog.shadowRoot!.querySelector("ring-view-ring-webrtc-player")).toBe(replacement);
+    expect(dialog.shadowRoot!.querySelector(".state-layer")).toBeNull();
+    expect(MockPeerConnection.instances).toHaveLength(2);
   });
 
   it("requests the microphone on hold without another offer and stops on release", async () => {

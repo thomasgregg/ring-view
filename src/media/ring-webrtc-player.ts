@@ -101,11 +101,6 @@ export class RingViewRingWebRtcPlayer extends LitElement {
       outline-offset: 3px;
     }
 
-    button:disabled {
-      cursor: wait;
-      opacity: 0.7;
-    }
-
     button.talk-button.active {
       border-color: var(--error-color, #db4437);
       background: var(--error-color, #db4437);
@@ -293,7 +288,6 @@ export class RingViewRingWebRtcPlayer extends LitElement {
           type="button"
           aria-label=${buttonLabel}
           aria-pressed=${String(talking)}
-          ?disabled=${!connected}
           @contextmenu=${(event: Event) => event.preventDefault()}
           @pointerdown=${this.handleTalkPointerDown}
           @pointerup=${this.handleTalkPointerEnd}
@@ -405,7 +399,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
       await this.unsubscribePromise;
     } catch (error) {
       if (token === this.connectionToken) {
-        await this.fail(error instanceof Error ? error.message : String(error));
+        this.fail(error instanceof Error ? error.message : String(error));
       }
     }
   }
@@ -591,11 +585,11 @@ export class RingViewRingWebRtcPlayer extends LitElement {
           this.pendingRemoteCandidates.push(candidate);
         }
       } else if (message.type === "error") {
-        await this.fail(message.message || message.code || localize(this.hass, "viewer.live_failed"));
+        this.fail(message.message || message.code || localize(this.hass, "viewer.live_failed"));
       }
     } catch (error) {
       if (token === this.connectionToken) {
-        await this.fail(error instanceof Error ? error.message : String(error));
+        this.fail(error instanceof Error ? error.message : String(error));
       }
     }
   }
@@ -611,7 +605,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
       await this.sendCandidate(data, token);
     } catch (error) {
       if (token === this.connectionToken) {
-        await this.fail(error instanceof Error ? error.message : String(error));
+        this.fail(error instanceof Error ? error.message : String(error));
       }
     }
   }
@@ -690,7 +684,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
       }));
       return;
     }
-    void this.fail(localize(this.hass, "viewer.live_failed"));
+    this.fail(localize(this.hass, "viewer.live_failed"));
   }
 
   private resumePlayback = (): void => {
@@ -729,13 +723,15 @@ export class RingViewRingWebRtcPlayer extends LitElement {
       this.cancelActivePress();
       this.showStatusMessage(localize(this.hass, "talkback.temporarily_disconnected"));
     } else if (this.connectionState === "failed") {
-      void this.fail(localize(this.hass, "viewer.live_failed"));
+      this.fail(localize(this.hass, "viewer.live_failed"));
     }
   }
 
-  private async fail(message: string): Promise<void> {
+  private fail(message: string): void {
     const token = ++this.connectionToken;
-    await this.disposeSession();
+    // Local media is released synchronously. Backend acknowledgment must not
+    // delay the error/Retry UI, especially after an already-playing peer fails.
+    void this.disposeSession();
     if (token !== this.connectionToken || !this.isConnected) return;
     this.connectionState = "failed";
     this.showStatusMessage(message);
@@ -780,8 +776,14 @@ export class RingViewRingWebRtcPlayer extends LitElement {
 
   private async disposeSession(): Promise<void> {
     this.cancelActivePress();
-    this.signalingConnection?.removeEventListener?.("disconnected", this.requestLiveResume);
+    const connection = this.signalingConnection;
     this.signalingConnection = undefined;
+    // HA iterates a live array of listeners. Splicing it during disconnected
+    // dispatch skips the next consumer. Only unregistering is deferred; the
+    // microphone, peer and stale-callback tokens are released immediately.
+    if (connection) queueMicrotask(() => {
+      connection.removeEventListener?.("disconnected", this.requestLiveResume);
+    });
     this.microphoneRequest = undefined;
     this.playbackRequestPending = false;
     this.readyDispatched = false;

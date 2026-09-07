@@ -559,6 +559,37 @@ describe("card stream lifecycle", () => {
     expect(getDialog()?.shadowRoot?.querySelector(".dialog-ring-alert")).not.toBeNull();
   });
 
+  it.each([2_000, 20_000])("preserves the original doorbell alert expiry after %i ms detached", async (detachedFor) => {
+    vi.useFakeTimers();
+    const doorbell: HassEntity = {
+      entity_id: "event.doorbell", state: "2026-09-07T12:00:00Z", attributes: { event_type: "ring" },
+    };
+    const card = document.createElement("ring-view");
+    card.setConfig({ recording_entity: "camera.recording", live_entity: "camera.live", doorbell_entity: doorbell.entity_id });
+    card.hass = { ...hass, states: { ...hass.states, [doorbell.entity_id]: doorbell } };
+    document.body.append(card);
+    await vi.advanceTimersByTimeAsync(0);
+    card.hass = {
+      ...card.hass, states: { ...card.hass.states, [doorbell.entity_id]: { ...doorbell, state: "2026-09-07T12:00:30Z" } },
+    };
+    await vi.advanceTimersByTimeAsync(0);
+    expect(card.shadowRoot!.querySelector(".ring-alert")).not.toBeNull();
+    await vi.advanceTimersByTimeAsync(1_000);
+    card.remove();
+    await vi.advanceTimersByTimeAsync(detachedFor);
+    document.body.append(card);
+    await vi.advanceTimersByTimeAsync(0);
+    if (detachedFor < 11_000) {
+      expect(card.shadowRoot!.querySelector(".ring-alert")).not.toBeNull();
+      await vi.advanceTimersByTimeAsync(11_000 - detachedFor);
+    }
+    expect(card.shadowRoot!.querySelector(".ring-alert")).toBeNull();
+    // An expired ring must not force Live when the configured default is Recording.
+    card.shadowRoot!.querySelector<HTMLElement>(".preview")!.click();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(getDialog()?.shadowRoot?.querySelector("#ring-view-tab-recording")?.getAttribute("aria-selected")).toBe("true");
+  });
+
   it("reuses the managed dialog safely when another card opens it", async () => {
     const first = await mount();
     first.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();

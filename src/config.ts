@@ -1,5 +1,5 @@
 import { localize, type TranslationKey } from "./localize";
-import type { CameraMode, NormalizedConfig, RingViewConfig } from "./types";
+import type { NormalizedConfig, RingViewConfig } from "./types";
 
 export const CARD_TYPE = "custom:ring-view";
 export const CARD_TAG = "ring-view";
@@ -104,10 +104,6 @@ export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
     fit_mode: config.fit_mode ?? DEFAULTS.fit_mode,
     grid_options: config.grid_options,
   };
-}
-
-export function initialMode(config: NormalizedConfig): CameraMode {
-  return config.default_mode;
 }
 
 export function aspectRatioNumber(

@@ -100,7 +100,6 @@
   "viewer.live_detecting_audio": "Live-Ansicht verbunden. Audiostatus wird noch ermittelt.",
   "viewer.trying_ha": "Wiedergabe über die Home-Assistant-Kamera wird versucht.",
   "viewer.recording_audio_blocked": "Der Browser hat das Audio der Aufnahme blockiert. Erneuter Versuch ohne Ton.",
-  "viewer.live_audio_muted": "Live-Audio wurde stummgeschaltet, damit die Wiedergabe starten kann.",
   "viewer.retrying_live": "Live-Ansicht wird erneut verbunden…",
   "talkback.connecting": "Video und eingehendes Audio werden verbunden.",
   "talkback.requesting_microphone": "Mikrofon wird angefordert",

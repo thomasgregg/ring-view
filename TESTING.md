@@ -32,6 +32,16 @@ The unit suite covers configuration defaults and validation, snapshot timestamp 
 
 The browser suite covers opening/closing, recording → live → recording, newest snapshot selection, progressive dashboard-preview editor fields, unsupported live-camera fallback without talkback, keyboard operation, focus return, browser Back, entity unavailability while open, camera-frame visibility and size through phone orientation changes, hold-to-talk edge placement, portrait status-message clearance, native-style header controls, slow media readiness, and stream-count invariants.
 
+The lifecycle regressions additionally cover repeated recording background/resume,
+late playback promises after switching or reopening, stalled subscription and
+unsubscribe acknowledgments, and doorbell alert expiry across card reinsertion.
+Connection-event mocks use HA's live-array iteration rather than DOM EventTarget
+semantics where listener removal matters. Browser recovery checks verify Retry,
+advancing frames, and fresh talkback while an old cleanup acknowledgment remains
+pending, and confirm that completing the old cleanup cannot disturb the new peer.
+Native playback failures are exercised through the real adapter contract and
+timeouts, not a synthetic native media-error event that production never emits.
+
 ## Real Home Assistant acceptance pass
 
 Add the custom card alongside—not in place of—the existing native `picture-entity` card and live tile:
@@ -64,6 +74,11 @@ Verify each item on current stable Home Assistant and, where practical, the prev
 17. If the browser blocks playback, the centered **Play** button remains available without a connection-error timeout. Tapping it resumes the existing session.
 18. Losing the Home Assistant connection or reloading while talking immediately releases the microphone. After resuming, speech is sent only after a fresh talk press.
 19. Automatic recovery waits while the page is hidden or Home Assistant is offline; closing or switching mode cancels it. Check both a full frontend reload and a persisted page-cache return. The automated tests simulate page-cache events; actual Companion behavior still needs device validation.
+20. Start a recording, switch to another app, and return twice. The replacement
+    recording remains playable beyond 20 seconds without a false unavailable error.
+21. Trigger a doorbell alert and move the dashboard card while it is visible.
+    The alert still expires twelve seconds after the ring, not twelve seconds
+    after the move. Returning after expiry must not force the next opening to Live.
 
 ## Visual matrix
 
