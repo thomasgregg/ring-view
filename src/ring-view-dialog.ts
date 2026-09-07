@@ -132,6 +132,8 @@ export class RingViewDialog extends LitElement {
       mode: this.mode, status: this.mediaStatus,
       hasRecordingUrl: Boolean(this.hass?.states[this.config!.recording_entity]?.attributes.video_url),
       recordingFailed: this.recordingVideoFailed,
+      recordingUrl: this.hass?.states[this.config!.recording_entity]?.attributes.video_url,
+      recordingId: this.hass?.states[this.config!.recording_entity]?.attributes.last_video_id,
     }));
     registerActiveRingViewDialog(this);
     this.syncUrl();

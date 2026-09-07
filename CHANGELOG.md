@@ -4,6 +4,18 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.5.11-diagnostic.2] - 2026-09-07
+
+Diagnostic-only prerelease. **Not a playback fix**; stable remains v0.5.10.
+
+- Capture first-open media events when HA calls `showDialog` before connecting the dialog.
+- Add anonymous SHA-256 fingerprints for the selected/assigned recording source and the current HA recording, plus signed-link age/nominal expiry at observation time.
+- Keep raw links, IDs, credentials and footage out of reports. Collection remains opt-in, memory-only and time/size bounded; late fingerprint work cannot enter a stopped or restarted test.
+- Preserve viewer styles, native controls, autoplay and fallback decisions, and backend integration behavior.
+- Add first-open, source-change, privacy, expiry and asynchronous-cleanup regression tests. See [diagnostic interpretation](docs/playback-diagnostic.md).
+
+Rollback: redownload v0.5.11-diagnostic.1 in HACS (or v0.5.10 to remove diagnostics).
+
 ## [0.5.11-diagnostic.1] - 2026-09-07
 
 Temporary diagnostic prerelease for the iPhone recording-controls investigation.

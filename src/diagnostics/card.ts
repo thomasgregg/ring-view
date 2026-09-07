@@ -43,6 +43,7 @@ export class RingViewDiagnostics extends LitElement {
       <p>Start the test, open the camera, select Last recording and tap the picture.
         Then close the viewer and copy the report here. Do not rotate or reload during this test.</p>
       <p>No recording links, camera names, credentials, images or audio are collected.
+        Anonymous source fingerprints and link timing help match the failure.
         The report stays in this page until you copy it.</p>
       <div class="actions">
         <button @click=${this.start}>${diagnosticsActive() ? "Restart test" : "Start test"}</button>
