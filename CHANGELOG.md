@@ -4,6 +4,24 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.5.7] - 2026-09-07
+
+### Fixed
+
+- Preserve the application-owned camera dialog and its exact media player when
+  a responsive Home Assistant layout recreates a matching Ring View card.
+- Adopt the replacement card as the dialog's focus target without dispatching
+  another `show-dialog` request or restarting video, incoming audio, or
+  talkback.
+- Keep a restored viewer in one centered reconnecting state while a discarded
+  Companion Web View's Ring session closes, then retry with bounded backoff
+  without overlapping stale error or talkback controls.
+
+### Tests
+
+- Add deterministic desktop and iPhone/WebKit regressions for card recreation,
+  Ring teardown races, and portrait-to-landscape frontend reload recovery.
+
 ## [0.5.6] - 2026-09-07
 
 ### Fixed

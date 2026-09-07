@@ -278,6 +278,103 @@ test("keeps the global viewer open when a responsive layout removes the card", a
   await expect(page.getByRole("dialog")).toBeHidden();
 });
 
+test("does not restart the open viewer when a responsive layout recreates the card", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  await page.getByRole("tab", { name: "Live" }).click();
+  await expect.poll(() => page.evaluate(() => window.demoActiveStreams)).toBe(1);
+
+  await page.evaluate(() => {
+    const current = document.querySelector("ring-view") as HTMLElement & {
+      hass: HomeAssistant;
+    };
+    const replacement = document.createElement("ring-view");
+    replacement.setConfig({
+      type: "custom:ring-view",
+      recording_entity: "camera.latest_recording",
+      live_entity: "camera.live_view",
+    });
+    replacement.hass = current.hass;
+    current.replaceWith(replacement);
+  });
+
+  // Home Assistant may recreate a card while reflowing the dashboard, but the
+  // application-owned dialog and its media session must remain untouched.
+  await page.waitForTimeout(100);
+  expect(await page.evaluate(() => window.demoActiveStreams)).toBe(1);
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.locator(".state-title", { hasText: "Reconnecting live view…" })).toHaveCount(0);
+  await page.getByRole("button", { name: "Close camera viewer" }).click();
+  await expect.poll(() => page.evaluate(() => window.demoActiveStreams)).toBe(0);
+});
+
+test("does not overlap the previous Ring session when the card is recreated", async ({
+  page,
+}) => {
+  await page.goto("/demo/?mode=live&two_way_audio=1&ring_teardown_race=1");
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  await expect.poll(() => page.evaluate(() => window.demoRingSubscriptions)).toBe(1);
+  const player = page.locator("ring-view-ring-webrtc-player");
+  const originalPlayer = await player.elementHandle();
+  await expect(page.getByRole("button", { name: "Hold to talk" })).toBeVisible();
+
+  await page.evaluate(() => {
+    const current = document.querySelector("ring-view") as HTMLElement & {
+      hass: HomeAssistant;
+    };
+    const replacement = document.createElement("ring-view");
+    replacement.setConfig({
+      type: "custom:ring-view",
+      recording_entity: "camera.latest_recording",
+      live_entity: "camera.live_view",
+      default_mode: "live",
+      two_way_audio: true,
+    });
+    replacement.hass = current.hass;
+    current.replaceWith(replacement);
+  });
+
+  // The replacement card must adopt the existing application-owned viewer;
+  // opening it again creates a second Ring signaling subscription while the
+  // first is still closing and eventually produces the reported error screen.
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.waitForTimeout(6_000);
+  await expect(page.getByText("Live view could not be started.")).toHaveCount(0);
+  expect(await originalPlayer?.evaluate((element) => element.isConnected)).toBe(true);
+  await expect(player).toHaveCount(1);
+  await expect(page.getByRole("button", { name: "Hold to talk" })).toBeVisible();
+  expect(await page.evaluate(() => window.demoRingSubscriptions)).toBe(1);
+});
+
+test("recovers after a previous Ring session is still closing on frontend reload", async ({
+  page,
+}) => {
+  await page.goto("/demo/?mode=live&two_way_audio=1&ring_teardown_race=reload");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  await expect.poll(() => page.evaluate(() => window.demoRingSubscriptions)).toBe(1);
+  await expect(page).toHaveURL(/ring-view-mode=live/);
+
+  // A Companion frontend reload destroys the old document before restoring the
+  // URL-owned dialog. The Ring backend can still be closing that document's
+  // signaling session when the restored viewer requests another one.
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.reload();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.waitForTimeout(6_000);
+  await expect(page.getByText("Live view could not be started.")).toHaveCount(0);
+  await expect(page.locator(".state-title", { hasText: "Reconnecting live view…" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Hold to talk" })).toHaveCount(0);
+  expect(await page.evaluate(() => window.demoRingSubscriptions)).toBe(1);
+  await expect(page.locator("ring-view-ring-webrtc-player")).toBeVisible({
+    timeout: 12_000,
+  });
+  await expect(page.getByText("Live view could not be started.")).toHaveCount(0);
+  expect(await page.evaluate(() => window.demoRingSubscriptions)).toBe(1);
+});
+
 test("restores the open camera viewer after a Companion-style frontend reload", async ({
   page,
 }) => {

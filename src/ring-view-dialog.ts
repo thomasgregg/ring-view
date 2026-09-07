@@ -8,7 +8,9 @@ import { aspectRatioNumber } from "./config";
 import {
   RING_ALERT_DURATION_MS,
   RING_VIEW_DIALOG_TAG,
+  registerActiveRingViewDialog,
   type RingViewDialogParams,
+  unregisterActiveRingViewDialog,
 } from "./dialog-controller";
 import { localize, localizeHaOrFallback } from "./localize";
 import "./media/native-camera-adapter";
@@ -53,6 +55,7 @@ type MediaStatus =
 const LIVE_TIMEOUT_SECONDS = 20;
 const RESTORED_LIVE_START_DELAY_MS = 2_000;
 const LIVE_RETRY_DELAY_MS = 2_500;
+const RESTORED_LIVE_RETRY_DELAYS_MS = [12_000, 24_000] as const;
 
 @customElement(RING_VIEW_DIALOG_TAG)
 export class RingViewDialog extends LitElement {
@@ -84,9 +87,17 @@ export class RingViewDialog extends LitElement {
   private audioFallbackAttempted = false;
   private recordingPlaybackPending = false;
   private recordingPlaybackStarted = false;
+  private restoringLiveSession = false;
 
   public showDialog(params: RingViewDialogParams): void {
     if (!this.hass) return;
+    // Defend against matching cards that dispatch restore requests before the
+    // first asynchronous Home Assistant show-dialog request finishes.
+    if (params.restored && this.isOpenFor(params)) {
+      this.adoptRestoredDialog(params);
+      this.syncUrl();
+      return;
+    }
     if (this.open) this.finishClose(false, false);
     this.config = params.config;
     this.opener = params.opener;
@@ -104,6 +115,7 @@ export class RingViewDialog extends LitElement {
     this.audioFallbackAttempted = false;
     this.recordingPlaybackPending = false;
     this.recordingPlaybackStarted = false;
+    this.restoringLiveSession = params.restored === true && this.mode === "live";
     this.recordingMuted = false;
     this.liveHasAudio = undefined;
     this.recordingVideoFailed = false;
@@ -114,6 +126,7 @@ export class RingViewDialog extends LitElement {
       : undefined;
     this.setRingingUntil(params.ringingUntil);
     this.open = true;
+    registerActiveRingViewDialog(this);
     this.syncUrl();
     this.attachGlobalListeners();
     if (params.restored && this.mode === "live") {
@@ -125,6 +138,27 @@ export class RingViewDialog extends LitElement {
       this.startMedia();
     }
     void this.updateComplete.then(() => this.focusInitialControl());
+  }
+
+  public isOpenFor(params: RingViewDialogParams): boolean {
+    return Boolean(
+      this.open
+      && this.config
+      && this.config.live_entity === params.config.live_entity
+      && this.config.recording_entity === params.config.recording_entity
+      && this.mode === params.mode,
+    );
+  }
+
+  public adoptRestoredDialog(params: RingViewDialogParams): void {
+    if (params.opener) this.opener = params.opener;
+    if (
+      params.ringingUntil !== undefined
+      && params.ringingUntil > Date.now()
+      && (this.ringingUntil === undefined || params.ringingUntil > this.ringingUntil)
+    ) {
+      this.setRingingUntil(params.ringingUntil);
+    }
   }
 
   public closeDialog(): boolean {
@@ -499,6 +533,7 @@ export class RingViewDialog extends LitElement {
   private selectMode(mode: CameraMode): void {
     if (!this.config || mode === this.mode) return;
     this.lifecycle.dispose();
+    this.restoringLiveSession = false;
     this.mode = mode;
     saveMode(this.config, mode);
     this.liveMuted = this.config.live_muted;
@@ -544,6 +579,7 @@ export class RingViewDialog extends LitElement {
 
   private handleMediaReady = (): void => {
     this.lifecycle.clearTimeout();
+    this.restoringLiveSession = false;
     this.mediaStatus = "ready";
     this.statusAnnouncement =
       this.mode === "live"
@@ -666,11 +702,21 @@ export class RingViewDialog extends LitElement {
   };
 
   private failMedia(allowAutomaticRetry: boolean): void {
-    if (allowAutomaticRetry && this.mode === "live" && this.retryCount < 1) {
+    const retryDelay = this.restoringLiveSession
+      ? RESTORED_LIVE_RETRY_DELAYS_MS[this.retryCount]
+      : this.retryCount < 1
+        ? LIVE_RETRY_DELAY_MS
+        : undefined;
+    if (
+      allowAutomaticRetry
+      && this.mode === "live"
+      && retryDelay !== undefined
+    ) {
       this.retryCount += 1;
-      this.scheduleLiveReconnect(LIVE_RETRY_DELAY_MS);
+      this.scheduleLiveReconnect(retryDelay);
       return;
     }
+    this.restoringLiveSession = false;
     this.lifecycle.dispose();
     this.session = this.lifecycle.current();
     this.mediaStatus = "error";
@@ -690,6 +736,7 @@ export class RingViewDialog extends LitElement {
 
   private retry = (): void => {
     this.retryCount = 0;
+    this.restoringLiveSession = false;
     this.audioFallbackAttempted = false;
     this.recordingPlaybackPending = false;
     this.recordingPlaybackStarted = false;
@@ -877,9 +924,11 @@ export class RingViewDialog extends LitElement {
     this.session = this.lifecycle.current();
     this.mediaStatus = "idle";
     this.open = false;
+    unregisterActiveRingViewDialog(this);
     this.suspended = false;
     this.recordingPlaybackPending = false;
     this.recordingPlaybackStarted = false;
+    this.restoringLiveSession = false;
     this.recordingStarted = true;
     this.recordingMuted = false;
     this.liveHasAudio = undefined;

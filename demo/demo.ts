@@ -76,6 +76,10 @@ if (!customElements.get("ha-camera-stream")) {
 
 const query = new URLSearchParams(location.search);
 const language = query.get("lang") || "en";
+const ringTeardownRaceMode = query.get("ring_teardown_race");
+const emulateRingTeardownRace =
+  ringTeardownRaceMode === "1" || ringTeardownRaceMode === "reload";
+const ringReloadReservationKey = "demo-ring-reload-reserved-until";
 document.documentElement.lang = language;
 
 await import("../src/index");
@@ -112,6 +116,9 @@ const snapshot: HassEntity = {
 };
 recording.attributes.recorded_at = "2026-09-06T12:00:00Z";
 
+let ringSubscriptions = 0;
+let ringSessionSequence = 0;
+
 let hass: HomeAssistant = {
   language,
   locale: { language },
@@ -137,10 +144,53 @@ let hass: HomeAssistant = {
   hassUrl: (path = "") => path,
   callWS: async () => ({}) as never,
   connection: {
-    subscribeMessage: async () => () => undefined,
+    subscribeMessage: async <T>(callback: (message: T) => void) => {
+      if (!emulateRingTeardownRace) return () => undefined;
+
+      const reloadReservationActive =
+        ringTeardownRaceMode === "reload"
+        && Number(sessionStorage.getItem(ringReloadReservationKey) ?? 0) > Date.now();
+      ringSubscriptions += 1;
+      window.demoRingSubscriptions = ringSubscriptions;
+      const sessionId = `demo-ring-session-${++ringSessionSequence}`;
+      queueMicrotask(() => callback({ type: "session", session_id: sessionId } as T));
+      if (ringSubscriptions > 1 || reloadReservationActive) {
+        queueMicrotask(() => callback({
+          type: "error",
+          code: "session_in_use",
+          message: "The previous Ring live session is still closing.",
+        } as T));
+      }
+
+      return () => {
+        // Ring's signaling websocket can outlive the frontend subscription
+        // while its close handshake finishes. Keep it reserved long enough to
+        // expose an incorrect second dialog open deterministically.
+        if (ringTeardownRaceMode === "reload") {
+          sessionStorage.setItem(
+            ringReloadReservationKey,
+            String(Date.now() + 10_000),
+          );
+        }
+        window.setTimeout(() => {
+          ringSubscriptions = Math.max(0, ringSubscriptions - 1);
+          window.demoRingSubscriptions = ringSubscriptions;
+        }, 10_000);
+      };
+    },
   },
   formatEntityName: (entity, override) => override || entity.attributes.friendly_name || entity.entity_id,
 };
+
+if (ringTeardownRaceMode === "reload") {
+  window.addEventListener("pagehide", () => {
+    if (ringSubscriptions === 0) return;
+    sessionStorage.setItem(
+      ringReloadReservationKey,
+      String(Date.now() + 10_000),
+    );
+  });
+}
 const dialogManager = installDemoDialogManager(() => hass);
 
 const card = document.createElement("ring-view");
@@ -184,6 +234,7 @@ declare global {
   interface Window {
     demoActiveStreams?: number;
     demoPeakStreams?: number;
+    demoRingSubscriptions?: number;
     demoSetEntityState: (entityId: string, state: string) => void;
   }
 }
