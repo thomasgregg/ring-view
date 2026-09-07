@@ -210,6 +210,25 @@ describe("Ring WebRTC player", () => {
     expect(player.shadowRoot?.textContent).toContain("Hold to talk");
   });
 
+  it("releases the microphone and peer connection when the frontend is rebuilt", async () => {
+    const microphone = new MockTrack("audio");
+    const localStream = new MockMediaStream([microphone]);
+    const { player, peer } = await mount(
+      async () => localStream as unknown as MediaStream,
+    );
+    const button = player.shadowRoot?.querySelector<HTMLButtonElement>("button");
+    if (!button) throw new Error("Talk button was not rendered");
+    dispatchPointer(button, "pointerdown");
+    await flush();
+
+    player.remove();
+    await flush();
+
+    expect(peer.close).toHaveBeenCalledTimes(1);
+    expect(microphone.stop).toHaveBeenCalledTimes(1);
+    expect(microphone.enabled).toBe(false);
+  });
+
   it("does not transmit after a permission prompt interrupts the original hold", async () => {
     const microphone = new MockTrack("audio");
     const localStream = new MockMediaStream([microphone]);

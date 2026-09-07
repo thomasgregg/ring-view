@@ -4,6 +4,27 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.5.4] - 2026-09-07
+
+### Fixed
+
+- Restore an open viewer after the iOS Companion app rebuilds its Web View
+  during rotation, following Home Assistant's native camera More info pattern.
+- Restore the matching camera pair, selected Recording or Live mode, and any
+  still-active doorbell notice without reopening a different Ring View card.
+- Stop an active talk press, microphone track, and peer connection before the
+  old frontend is discarded, then recreate the talkback controls with the new
+  live session.
+- Remove the recoverable viewer URL state on Close, browser Back, and normal
+  navigation so a dismissed camera does not reopen.
+
+### Tests
+
+- Add full frontend-reload regression coverage at iPhone portrait and landscape
+  sizes, including the Hold to talk control and URL cleanup.
+- Add unit coverage for camera matching, mode and doorbell restoration,
+  unavailable-camera errors, and microphone/peer cleanup.
+
 ## [0.5.3] - 2026-09-07
 
 ### Changed

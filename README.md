@@ -54,9 +54,11 @@ Ring View fills that gap:
   banner without automatically starting or replacing the camera stream.
 - **Intentional stream lifecycle.** Only one camera renderer is active. Home
   Assistant owns the viewer above the responsive dashboard, so moving or
-  recreating the card does not interrupt it; the renderer is torn down when the
-  mode changes, the viewer closes, or the browser goes Back. Hidden tabs suspend
-  native playback and immediately stop active talkback.
+  recreating the card does not interrupt it. If the iOS Companion app rebuilds
+  its Web View during rotation, the viewer restores the matching camera and
+  reconnects just like Home Assistant's native camera dialog. The renderer is
+  torn down when the mode changes, the viewer closes, or the browser goes Back.
+  Hidden tabs suspend native playback and immediately stop active talkback.
 - **A polished, consistent interface.** Recording and Live use the same compact icon language on the card and in the viewer.
 - **Built for dashboards.** Responsive layout, keyboard navigation, focus management, safe-area support, light and dark themes, and 44-pixel touch targets are included.
 - **Easy to configure.** The visual editor uses Home Assistant entity pickers, grouped settings, capability warnings, and automatic English or German text.

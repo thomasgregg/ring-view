@@ -23,6 +23,10 @@ import type { GridOptions, HomeAssistant, NormalizedConfig, RingViewConfig } fro
 import { entityIsUnavailable, friendlyName } from "./utilities/entity-validation";
 import { loadMode } from "./utilities/mode-storage";
 import {
+  decodeRingViewUrl,
+  ringViewUrlMatchesConfig,
+} from "./utilities/dialog-url";
+import {
   captureTimestamp,
   recordingMediaMarker,
   selectPreviewEntityId,
@@ -57,6 +61,7 @@ export class RingView extends LitElement {
   private previewIntersectionObserver?: IntersectionObserver;
   private previewResizeObserver?: ResizeObserver;
   private ringAlertTimer?: number;
+  private restoreViewerTimer?: number;
   private lastRingAlertAt = 0;
   private previewMarkersInitialized = false;
   private recordingMarker?: string;
@@ -132,6 +137,10 @@ export class RingView extends LitElement {
   public disconnectedCallback(): void {
     this.teardownPreviewLifecycle();
     if (this.ringAlertTimer !== undefined) window.clearTimeout(this.ringAlertTimer);
+    if (this.restoreViewerTimer !== undefined) {
+      window.clearTimeout(this.restoreViewerTimer);
+      this.restoreViewerTimer = undefined;
+    }
     super.disconnectedCallback();
   }
 
@@ -185,6 +194,9 @@ export class RingView extends LitElement {
       this.previewVisible
     ) {
       void this.refreshPreview(true);
+    }
+    if (!this.isInCardPicker() && this.hass && this.config) {
+      this.scheduleViewerRestore();
     }
   }
 
@@ -300,6 +312,31 @@ export class RingView extends LitElement {
         : undefined,
     });
   };
+
+  private scheduleViewerRestore(): void {
+    if (this.restoreViewerTimer !== undefined || !this.config) return;
+    const state = decodeRingViewUrl();
+    if (!ringViewUrlMatchesConfig(state, this.config)) return;
+
+    // Let Home Assistant finish cleaning the stale in-memory dialog state
+    // from the previous document before asking its manager to reopen it.
+    this.restoreViewerTimer = window.setTimeout(() => {
+      this.restoreViewerTimer = undefined;
+      if (!this.isConnected || !this.hass || !this.config) return;
+      const restore = decodeRingViewUrl();
+      if (!ringViewUrlMatchesConfig(restore, this.config)) return;
+      const trigger = this.renderRoot.querySelector<HTMLElement>(".preview") ?? undefined;
+      showRingViewDialog(trigger ?? this, {
+        config: this.config,
+        mode: restore.mode,
+        opener: trigger,
+        ringingUntil:
+          restore.ringingUntil !== undefined && restore.ringingUntil > Date.now()
+            ? restore.ringingUntil
+            : undefined,
+      });
+    }, 0);
+  }
 
   private detectDoorbellEvent(previous?: HomeAssistant): void {
     const entityId = this.config?.doorbell_entity;

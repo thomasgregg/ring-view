@@ -29,6 +29,17 @@ export function installDemoDialogManager(
     const detail = event.detail;
     if (!detail?.dialogTag || !detail.dialogImport) return;
     const hass = getHass(rawEvent);
+    if (detail.addHistory !== false) {
+      if (history.state?.dialog) {
+        history.replaceState({ dialog: detail.dialogTag }, "");
+      } else {
+        const base = history.state && typeof history.state === "object"
+          ? history.state
+          : {};
+        history.replaceState({ ...base, opensDialog: true }, "");
+        history.pushState({ dialog: detail.dialogTag }, "");
+      }
+    }
     await detail.dialogImport();
     await customElements.whenDefined(detail.dialogTag);
     let dialog = dialogs.get(detail.dialogTag);
@@ -42,11 +53,6 @@ export function installDemoDialogManager(
     dialog.showDialog(detail.dialogParams);
     if (shouldAppend) document.body.append(dialog);
     activeTag = detail.dialogTag;
-    if (detail.addHistory !== false) {
-      const base = history.state && typeof history.state === "object" ? history.state : {};
-      history.replaceState({ ...base, opensDialog: true }, "");
-      history.pushState({ dialog: detail.dialogTag }, "");
-    }
   };
 
   const dialogClosed = (rawEvent: Event): void => {
@@ -67,6 +73,18 @@ export function installDemoDialogManager(
   document.addEventListener("show-dialog", (event) => void showDialog(event));
   document.addEventListener("dialog-closed", dialogClosed);
   window.addEventListener("popstate", popState);
+
+  // Mirror Home Assistant's startup cleanup for a document that reloads while
+  // a managed dialog is open. A dialog may provide a recoverable URL that the
+  // newly loaded card can use to reconstruct itself.
+  if (history.state?.dialog) {
+    const refreshUrl = history.state.refreshUrl;
+    if (typeof refreshUrl === "string") {
+      history.replaceState(null, "", refreshUrl);
+    } else {
+      history.back();
+    }
+  }
 
   return {
     updateHass(hass): void {

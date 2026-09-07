@@ -136,6 +136,9 @@ let hass: HomeAssistant = {
   },
   hassUrl: (path = "") => path,
   callWS: async () => ({}) as never,
+  connection: {
+    subscribeMessage: async () => () => undefined,
+  },
   formatEntityName: (entity, override) => override || entity.attributes.friendly_name || entity.entity_id,
 };
 const dialogManager = installDemoDialogManager(() => hass);

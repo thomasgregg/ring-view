@@ -425,6 +425,101 @@ describe("card stream lifecycle", () => {
     expect(TestCameraStream.active).toBe(0);
   });
 
+  it("restores the matching viewer after Home Assistant rebuilds the frontend", async () => {
+    const card = await mount();
+    card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
+    await flush();
+    getDialog()?.shadowRoot?.querySelector<HTMLElement>("#ring-view-tab-live")?.click();
+    await flush();
+
+    expect(location.search).toContain("ring-view-live-entity=camera.live");
+    expect(location.search).toContain("ring-view-mode=live");
+    expect(history.state.refreshUrl).toContain("ring-view-mode=live");
+
+    document.body.replaceChildren();
+    history.replaceState(null, "", history.state.refreshUrl);
+    const restoredCard = await mount();
+    await flush();
+
+    const restoredDialog = getDialog();
+    expect(restoredCard.shadowRoot?.querySelector("ring-view-dialog")).toBeNull();
+    expect(restoredDialog?.open).toBe(true);
+    expect(
+      restoredDialog?.shadowRoot
+        ?.querySelector("#ring-view-tab-live")
+        ?.getAttribute("aria-selected"),
+    ).toBe("true");
+    expect(TestCameraStream.active).toBe(1);
+
+    restoredDialog?.close();
+    await flush();
+    expect(location.search).not.toContain("ring-view-");
+    expect(TestCameraStream.active).toBe(0);
+  });
+
+  it("does not restore a viewer into a card for another camera pair", async () => {
+    history.replaceState(
+      null,
+      "",
+      "/?ring-view-live-entity=camera.entrance_live"
+        + "&ring-view-recording-entity=camera.entrance_recording"
+        + "&ring-view-mode=live",
+    );
+    const card = await mount();
+    await flush();
+
+    expect(card.shadowRoot?.querySelector("ring-view-dialog")).toBeNull();
+    expect(getDialog()?.open).not.toBe(true);
+    expect(TestCameraStream.active).toBe(0);
+  });
+
+  it("restores the viewer with the normal unavailable-camera state", async () => {
+    history.replaceState(
+      null,
+      "",
+      "/?ring-view-live-entity=camera.live"
+        + "&ring-view-recording-entity=camera.recording"
+        + "&ring-view-mode=live",
+    );
+    const card = document.createElement("ring-view");
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+    });
+    card.hass = {
+      ...hass,
+      states: {
+        ...hass.states,
+        "camera.live": { ...hass.states["camera.live"]!, state: "unavailable" },
+      },
+    };
+    document.body.append(card);
+    await card.updateComplete;
+    await flush();
+
+    const dialog = getDialog();
+    expect(dialog?.open).toBe(true);
+    expect(dialog?.shadowRoot?.textContent).toContain("Camera entity is unavailable.");
+    expect(dialog?.shadowRoot?.querySelector("ring-view-native-camera-adapter")).toBeNull();
+    expect(TestCameraStream.active).toBe(0);
+  });
+
+  it("keeps a still-active doorbell notice when restoring the viewer", async () => {
+    const ringingUntil = Date.now() + 10_000;
+    history.replaceState(
+      null,
+      "",
+      "/?ring-view-live-entity=camera.live"
+        + "&ring-view-recording-entity=camera.recording"
+        + "&ring-view-mode=live"
+        + `&ring-view-ringing-until=${ringingUntil}`,
+    );
+    await mount();
+    await flush();
+
+    expect(getDialog()?.shadowRoot?.querySelector(".dialog-ring-alert")).not.toBeNull();
+  });
+
   it("reuses the managed dialog safely when another card opens it", async () => {
     const first = await mount();
     first.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();

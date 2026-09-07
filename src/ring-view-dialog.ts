@@ -33,6 +33,14 @@ import {
   supportsRingTalkback,
 } from "./utilities/entity-validation";
 import { saveMode } from "./utilities/mode-storage";
+import {
+  createRingViewUrl,
+  currentUrl,
+  decodeRingViewUrl,
+  removeRingViewUrl,
+  replaceCurrentUrl,
+  ringViewUrlMatchesConfig,
+} from "./utilities/dialog-url";
 import { StreamLifecycle } from "./utilities/stream-lifecycle";
 
 type MediaStatus = "idle" | "pending" | "ready" | "error" | "compatibility";
@@ -61,7 +69,9 @@ export class RingViewDialog extends LitElement {
 
   private lifecycle = new StreamLifecycle();
   private opener?: HTMLElement;
+  private returnUrl?: string;
   private ringAlertTimer?: number;
+  private ringingUntil?: number;
   private lastDoorbellState?: string;
   private audioFallbackAttempted = false;
   private recordingPlaybackPending = false;
@@ -72,6 +82,7 @@ export class RingViewDialog extends LitElement {
     if (this.open) this.finishClose(false, false);
     this.config = params.config;
     this.opener = params.opener;
+    this.returnUrl = params.returnUrl ?? removeRingViewUrl(currentUrl());
     this.mode = params.mode;
     this.liveMuted = this.config.live_muted;
     this.recordingStarted = this.mode === "live" || this.config.autoplay_recording;
@@ -89,6 +100,7 @@ export class RingViewDialog extends LitElement {
       : undefined;
     this.setRingingUntil(params.ringingUntil);
     this.open = true;
+    this.syncUrl();
     this.attachGlobalListeners();
     this.startMedia();
     void this.updateComplete.then(() => this.focusInitialControl());
@@ -479,6 +491,7 @@ export class RingViewDialog extends LitElement {
         ? "viewer.mode_selected_live"
         : "viewer.mode_selected_recording",
     );
+    this.syncUrl();
     this.startMedia();
   }
 
@@ -793,17 +806,38 @@ export class RingViewDialog extends LitElement {
       this.ringAlertTimer = undefined;
     }
     const remaining = until === undefined ? 0 : until - Date.now();
+    this.ringingUntil = remaining > 0 ? until : undefined;
     this.ringing = remaining > 0;
-    if (!this.ringing) return;
+    if (!this.ringing) {
+      this.syncUrl();
+      return;
+    }
     this.ringAlertTimer = window.setTimeout(() => {
       this.ringing = false;
+      this.ringingUntil = undefined;
       this.ringAlertTimer = undefined;
+      this.syncUrl();
     }, remaining);
+  }
+
+  private syncUrl(): void {
+    if (!this.open || !this.config || !this.returnUrl) return;
+    const viewerUrl = createRingViewUrl(this.returnUrl, {
+      liveEntity: this.config.live_entity,
+      recordingEntity: this.config.recording_entity,
+      mode: this.mode,
+      ringingUntil: this.ringingUntil,
+    });
+    // `refreshUrl` is the same Home Assistant history convention used to
+    // recover a useful URL when a dialog-owning document is rebuilt.
+    replaceCurrentUrl(viewerUrl, viewerUrl);
   }
 
   private finishClose(restoreFocus = true, notifyManager = true): void {
     if (!this.open) return;
     const opener = this.opener;
+    const returnUrl = this.returnUrl;
+    const config = this.config;
     this.renderRoot
       .querySelector<RingViewRingWebRtcPlayer>("ring-view-ring-webrtc-player")
       ?.stopTalking();
@@ -823,6 +857,14 @@ export class RingViewDialog extends LitElement {
     this.lastDoorbellState = undefined;
     this.detachGlobalListeners();
     if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
+    if (
+      notifyManager
+      && returnUrl
+      && config
+      && ringViewUrlMatchesConfig(decodeRingViewUrl(), config)
+    ) {
+      replaceCurrentUrl(returnUrl, null);
+    }
     this.dispatchEvent(
       new CustomEvent("viewer-closed", { bubbles: true, composed: true }),
     );
@@ -836,6 +878,7 @@ export class RingViewDialog extends LitElement {
       );
     }
     this.config = undefined;
+    this.returnUrl = undefined;
     if (restoreFocus && opener?.isConnected) opener.focus();
     this.opener = undefined;
   }

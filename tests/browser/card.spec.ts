@@ -278,6 +278,41 @@ test("keeps the global viewer open when a responsive layout removes the card", a
   await expect(page.getByRole("dialog")).toBeHidden();
 });
 
+test("restores the open camera viewer after a Companion-style frontend reload", async ({
+  page,
+}) => {
+  await page.goto("/demo/?two_way_audio=1");
+  await page.setViewportSize({ width: 430, height: 932 });
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  await page.getByRole("tab", { name: "Live" }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Hold to talk" })).toBeVisible();
+  await expect(page).toHaveURL(/ring-view-mode=live/);
+
+  await page.reload();
+
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.getByRole("tab", { name: "Live" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await expect(page.getByRole("button", { name: "Close camera viewer" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Hold to talk" })).toBeVisible();
+  await expect(page.locator("ring-view-ring-webrtc-player")).toBeVisible();
+
+  await page.setViewportSize({ width: 932, height: 430 });
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.getByRole("tab", { name: "Live" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+
+  await page.getByRole("button", { name: "Close camera viewer" }).click();
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await expect(page).not.toHaveURL(/ring-view-/);
+  await expect(page.locator("ring-view-ring-webrtc-player")).toHaveCount(0);
+});
+
 test("keeps hold to talk near the video edge on desktop and mobile", async ({ page }) => {
   await page.evaluate(() => {
     const frame = document.createElement("div");

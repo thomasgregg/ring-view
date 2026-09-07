@@ -9,6 +9,14 @@ dialog placement, browser Back behavior, and independence from responsive card
 relayouts. The dialog itself remains part of Ring View and continues to own its
 camera and talkback lifecycle.
 
+Like Home Assistant's native camera More info dialog, Ring View places the
+active camera identity and view mode in the current URL while the viewer is
+open. Home Assistant's `refreshUrl` history convention lets a matching card
+reconstruct the dialog if an iOS Companion Web View rebuild occurs during
+rotation. Closing the viewer removes those parameters. Camera credentials,
+media URLs, and microphone state are never stored there; media and talkback are
+negotiated again after restoration.
+
 The implementation currently expects `ha-camera-stream` to expose these properties:
 
 - `stateObj`
