@@ -1,6 +1,7 @@
 import { LitElement, css, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { HassEntity } from "../types";
+import { recordDiagnostic } from "../diagnostics/recorder";
 
 export type NativeAdapterFailure = "component-unavailable";
 export interface NativeMediaCapabilities {
@@ -204,6 +205,12 @@ export class RingViewNativeCameraAdapter extends LitElement {
     if (!this.passiveSurface || event.detail === 0 || !this.eventHost) return;
     const rect = this.eventHost.getBoundingClientRect();
     const controlStripHeight = this.controls ? 64 : 0;
+    recordDiagnostic("native-click-guard", {
+      blocked: event.clientY < rect.bottom - controlStripHeight,
+      xPercent: rect.width ? (event.clientX - rect.left) / rect.width * 100 : 0,
+      yPercent: rect.height ? (event.clientY - rect.top) / rect.height * 100 : 0,
+      trusted: event.isTrusted,
+    });
     if (event.clientY >= rect.bottom - controlStripHeight) return;
     event.preventDefault();
     event.stopImmediatePropagation();

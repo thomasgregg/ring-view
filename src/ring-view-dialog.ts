@@ -44,6 +44,7 @@ import {
   ringViewUrlMatchesConfig,
 } from "./utilities/dialog-url";
 import { StreamLifecycle } from "./utilities/stream-lifecycle";
+import { recordDiagnostic, safePlaybackError, videoDiagnostic, watchDiagnosticViewer } from "./diagnostics/recorder";
 
 type MediaStatus =
   | "idle"
@@ -91,6 +92,7 @@ export class RingViewDialog extends LitElement {
   private automaticLiveRecovery?: "waiting" | "attempting";
   private recoveryConnection?: HomeAssistant["connection"];
   private pageUnloading = false;
+  private stopDiagnosticViewer?: () => void;
 
   public showDialog(params: RingViewDialogParams): void {
     if (!this.hass) return;
@@ -124,6 +126,13 @@ export class RingViewDialog extends LitElement {
       : undefined;
     this.setRingingUntil(params.ringingUntil);
     this.open = true;
+    this.stopDiagnosticViewer?.();
+    recordDiagnostic("viewer-open", { mode: this.mode, restored: Boolean(params.restored) });
+    this.stopDiagnosticViewer = watchDiagnosticViewer(this, () => ({
+      mode: this.mode, status: this.mediaStatus,
+      hasRecordingUrl: Boolean(this.hass?.states[this.config!.recording_entity]?.attributes.video_url),
+      recordingFailed: this.recordingVideoFailed,
+    }));
     registerActiveRingViewDialog(this);
     this.syncUrl();
     this.attachGlobalListeners();
@@ -642,6 +651,10 @@ export class RingViewDialog extends LitElement {
 
   private handleRecordingVideoError = (event?: Event): void => {
     if (this.mode !== "last_recording" || !this.acceptsMediaEvent(event)) return;
+    recordDiagnostic("recording-fallback", {
+      reason: event ? "media-element-error" : "play-rejected",
+      ...(event?.currentTarget instanceof HTMLVideoElement ? videoDiagnostic(event.currentTarget) : {}),
+    });
     // The Ring URL is temporary and can expire between state refreshes. Fall
     // back to Home Assistant's authenticated MJPEG renderer for this attempt.
     this.recordingVideoFailed = true;
@@ -673,9 +686,11 @@ export class RingViewDialog extends LitElement {
   }
 
   private async playRecording(video: HTMLVideoElement, session: number): Promise<void> {
+    recordDiagnostic("play-attempt", { attempt: 1, userActive: navigator.userActivation?.isActive, ...videoDiagnostic(video) });
     try {
       await video.play();
-    } catch {
+    } catch (error) {
+      recordDiagnostic("play-rejected", { attempt: 1, errorName: safePlaybackError(error), currentAttempt: this.isCurrentRecording(video, session), ...videoDiagnostic(video) });
       if (!this.isCurrentRecording(video, session)) return;
       if (this.recordingMuted) {
         this.handleRecordingVideoError();
@@ -687,14 +702,17 @@ export class RingViewDialog extends LitElement {
       video.muted = true;
       this.statusAnnouncement = localize(this.hass, "viewer.recording_audio_blocked");
       try {
+        recordDiagnostic("play-attempt", { attempt: 2, userActive: navigator.userActivation?.isActive, ...videoDiagnostic(video) });
         await video.play();
-      } catch {
+      } catch (error) {
+        recordDiagnostic("play-rejected", { attempt: 2, errorName: safePlaybackError(error), currentAttempt: this.isCurrentRecording(video, session), ...videoDiagnostic(video) });
         if (this.isCurrentRecording(video, session)) this.handleRecordingVideoError();
         return;
       }
     }
     // A resolved/rejected promise from a removed player must never update a
     // reopened dialog or cancel the timeout belonging to a newer Live session.
+    recordDiagnostic("play-resolved", { currentAttempt: this.isCurrentRecording(video, session), ...videoDiagnostic(video) });
     if (this.isCurrentRecording(video, session)) this.handleMediaReady();
   }
 
@@ -1028,6 +1046,9 @@ export class RingViewDialog extends LitElement {
 
   private finishClose(restoreFocus = true, notifyManager = true): void {
     if (!this.open) return;
+    this.stopDiagnosticViewer?.();
+    this.stopDiagnosticViewer = undefined;
+    recordDiagnostic("viewer-close", { mode: this.mode });
     this.clearAutomaticLiveRecovery();
     const opener = this.opener;
     const returnUrl = this.returnUrl;

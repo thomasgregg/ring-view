@@ -4,6 +4,19 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.5.11-diagnostic.1] - 2026-09-07
+
+Temporary diagnostic prerelease for the iPhone recording-controls investigation.
+This is **not a playback fix**. The stable release remains v0.5.10.
+
+- Keep existing viewer layout, buttons, autoplay attempts and fallback behavior unchanged.
+- Add an opt-in `custom:ring-view-diagnostics` panel outside the viewer. Start a test, reproduce the issue, close the viewer, then copy the report.
+- Observe playback refusal names, media error codes, player/control state and the existing Live click guard without collecting recording URLs, entity identifiers, credentials or media content.
+- Keep reports in memory only, stop after two minutes, and provide manual copy if clipboard access is blocked. Reloading the page clears the report; do not rotate during this first test.
+- Add nine unit tests covering privacy, opt-in collection, unchanged playback behavior, observer cleanup and clipboard fallback.
+
+To roll back, redownload v0.5.10 in HACS and remove the temporary diagnostic view.
+
 ## [0.5.10] - 2026-09-07
 
 ### Fixed
