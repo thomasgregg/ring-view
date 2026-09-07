@@ -1,6 +1,7 @@
-import { mdiMicrophone, mdiMicrophoneOff } from "@mdi/js";
+import { mdiMicrophone, mdiMicrophoneOff, mdiPlay } from "@mdi/js";
 import { LitElement, css, html, nothing, type PropertyValues } from "lit";
 import { classMap } from "lit/directives/class-map.js";
+import { ifDefined } from "lit/directives/if-defined.js";
 import { customElement, property, state } from "lit/decorators.js";
 import { localize } from "../localize";
 import type { FitMode, HomeAssistant } from "../types";
@@ -137,6 +138,20 @@ export class RingViewRingWebRtcPlayer extends LitElement {
       pointer-events: none;
     }
 
+    .playback-resume {
+      position: absolute;
+      z-index: 4;
+      top: 50%;
+      left: 50%;
+      max-width: calc(100% - 32px);
+      transform: translate(-50%, -50%);
+      white-space: normal;
+      border-radius: 10px;
+      border-color: var(--primary-color, #03a9f4);
+      background: var(--primary-color, #03a9f4);
+      touch-action: manipulation;
+    }
+
     @media (max-width: 600px) {
       .talkback-controls {
         inset-inline: max(12px, env(safe-area-inset-right))
@@ -162,11 +177,14 @@ export class RingViewRingWebRtcPlayer extends LitElement {
   @property({ attribute: false }) public entityId = "";
   @property({ type: Boolean }) public muted = false;
   @property({ attribute: false }) public fitMode: FitMode = "cover";
+  @property({ attribute: false }) public poster?: string;
 
   @state() private microphoneState: MicrophoneState = "not-requested";
   @state() private connectionState: RTCPeerConnectionState | "starting" = "starting";
   @state() private statusMessage = "";
   @state() private actualMuted = false;
+  @state() private playbackBlocked = false;
+  @state() private readyDispatched = false;
 
   private connectionToken = 0;
   private startAttempted = false;
@@ -178,9 +196,10 @@ export class RingViewRingWebRtcPlayer extends LitElement {
   private sessionId?: string;
   private pendingLocalCandidates: RTCIceCandidateInit[] = [];
   private pendingRemoteCandidates: RTCIceCandidateInit[] = [];
-  private unsubscribePromise?: Promise<() => void>;
+  private unsubscribePromise?: Promise<() => void | Promise<void>>;
+  private signalingConnection?: HomeAssistant["connection"];
   private microphoneRequest?: Promise<boolean>;
-  private readyDispatched = false;
+  private playbackRequestPending = false;
   private startQueued = false;
   private activePointerId?: number;
   private keyboardPressed = false;
@@ -214,6 +233,11 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     if (changed.has("muted")) {
       const video = this.renderRoot.querySelector<HTMLVideoElement>("video");
       if (video) video.muted = this.actualMuted;
+    }
+
+    if (this.signalingConnection && this.hass?.connection !== this.signalingConnection) {
+      this.requestLiveResume();
+      return;
     }
 
     const entityChanged = changed.has("entityId") && this.startedEntityId !== this.entityId;
@@ -253,10 +277,17 @@ export class RingViewRingWebRtcPlayer extends LitElement {
         autoplay
         playsinline
         controls
+        poster=${ifDefined(this.poster)}
         .muted=${this.actualMuted}
         @playing=${this.handlePlaying}
       ></video>
-      <div class="talkback-controls">
+      ${this.playbackBlocked ? html`
+        <button class="playback-resume" type="button" tabindex="0" @click=${this.resumePlayback}>
+          ${this.icon(mdiPlay)}
+          <span>${localize(this.hass, "viewer.resume_live")}</span>
+        </button>
+      ` : nothing}
+      ${connected && this.readyDispatched && !this.playbackBlocked ? html`<div class="talkback-controls">
         <button
           class=${classMap({ "talk-button": true, active: talking })}
           type="button"
@@ -274,8 +305,8 @@ export class RingViewRingWebRtcPlayer extends LitElement {
           ${this.icon(talking ? mdiMicrophone : mdiMicrophoneOff)}
           <span>${buttonLabel}</span>
         </button>
-      </div>
-      ${this.statusMessage
+      </div>` : nothing}
+      ${this.statusMessage && !this.playbackBlocked
         ? html`<div class="session-status" role="status" aria-live="polite">
             ${this.statusMessage}
           </div>`
@@ -293,8 +324,9 @@ export class RingViewRingWebRtcPlayer extends LitElement {
   };
 
   private async restartSession(): Promise<void> {
-    this.connectionToken += 1;
+    const token = ++this.connectionToken;
     await this.disposeSession();
+    if (token !== this.connectionToken || !this.isConnected) return;
     this.startAttempted = false;
     await this.startSession();
   }
@@ -309,10 +341,18 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     this.startAttempted = true;
     this.startedEntityId = this.entityId;
     const token = ++this.connectionToken;
+    const connection = this.hass.connection;
+    if (connection.connected === false) {
+      this.requestLiveResume();
+      return;
+    }
+    this.signalingConnection = connection;
+    connection.addEventListener?.("disconnected", this.requestLiveResume);
     this.connectionState = "starting";
     this.microphoneState = "not-requested";
     this.showStatusMessage(localize(this.hass, "talkback.connecting"));
     this.readyDispatched = false;
+    this.playbackBlocked = false;
     this.pendingLocalCandidates = [];
     this.pendingRemoteCandidates = [];
     this.sessionId = undefined;
@@ -346,12 +386,19 @@ export class RingViewRingWebRtcPlayer extends LitElement {
       if (token !== this.connectionToken || !peerConnection.localDescription?.sdp) return;
 
       this.unsubscribePromise = Promise.resolve(
-        this.hass.connection.subscribeMessage<SignalMessage>(
+        connection.subscribeMessage<SignalMessage>(
           (message) => void this.handleSignalMessage(message, token),
           {
             type: "camera/webrtc/offer",
             entity_id: this.entityId,
             offer: peerConnection.localDescription.sdp,
+          },
+          {
+            // A camera offer belongs to this peer only. HA's ordinary event
+            // subscriptions auto-resubscribe, but replaying this offer would
+            // give a previously negotiated peer a different Ring session.
+            resubscribe: false,
+            preCheck: () => token === this.connectionToken && this.isConnected,
           },
         ),
       );
@@ -511,8 +558,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
 
   private handlePageHide = (): void => {
     this.clearStatusMessageTimeout();
-    this.connectionToken += 1;
-    void this.disposeSession();
+    this.requestLiveResume();
   };
 
   private handleVisibilityChange = (): void => {
@@ -523,6 +569,10 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     if (token !== this.connectionToken || !this.peerConnection) return;
     try {
       if (message.type === "session") {
+        if (this.sessionId && this.sessionId !== message.session_id) {
+          this.requestLiveResume();
+          return;
+        }
         this.sessionId = message.session_id;
         await this.flushLocalCandidates(token);
       } else if (message.type === "answer") {
@@ -622,16 +672,48 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     this.showStatusMessage(localize(this.hass, "talkback.playback_muted"));
     queueMicrotask(() => {
       if (token !== this.connectionToken || !video.isConnected) return;
-      void video.play().catch(() => {
+      void video.play().catch((error: unknown) => {
         if (token === this.connectionToken) {
-          void this.fail(localize(this.hass, "viewer.live_failed"));
+          this.handlePlaybackRejection(error);
         }
       });
     });
   }
 
+  private handlePlaybackRejection(error: unknown): void {
+    if (error instanceof DOMException && ["NotAllowedError", "AbortError"].includes(error.name)) {
+      this.cancelActivePress();
+      this.playbackBlocked = true;
+      this.showStatusMessage("");
+      this.dispatchEvent(new CustomEvent("ring-webrtc-playback-blocked", {
+        bubbles: true, composed: true,
+      }));
+      return;
+    }
+    void this.fail(localize(this.hass, "viewer.live_failed"));
+  }
+
+  private resumePlayback = (): void => {
+    const video = this.renderRoot.querySelector<HTMLVideoElement>("video");
+    if (!video || this.playbackRequestPending) return;
+    const token = this.connectionToken;
+    this.playbackRequestPending = true;
+    // Call play directly in the tap handler, while iOS user activation exists.
+    void video.play().catch((error: unknown) => {
+      if (token === this.connectionToken) this.handlePlaybackRejection(error);
+    }).finally(() => {
+      if (token === this.connectionToken) this.playbackRequestPending = false;
+    });
+  };
+
   private handlePlaying = (): void => {
-    if (this.readyDispatched) return;
+    if (!this.peerConnection || !this.isConnected) return;
+    const wasBlocked = this.playbackBlocked;
+    if (this.shadowRoot?.activeElement?.classList.contains("playback-resume")) {
+      this.renderRoot.querySelector<HTMLVideoElement>("video")?.focus();
+    }
+    this.playbackBlocked = false;
+    if (this.readyDispatched && !wasBlocked) return;
     this.readyDispatched = true;
     this.dispatchEvent(
       new CustomEvent("ring-webrtc-ready", { bubbles: true, composed: true }),
@@ -652,12 +734,23 @@ export class RingViewRingWebRtcPlayer extends LitElement {
   }
 
   private async fail(message: string): Promise<void> {
-    this.connectionToken += 1;
+    const token = ++this.connectionToken;
     await this.disposeSession();
+    if (token !== this.connectionToken || !this.isConnected) return;
     this.connectionState = "failed";
     this.showStatusMessage(message);
     this.dispatchFailure(message);
   }
+
+  private requestLiveResume = (): void => {
+    this.connectionToken += 1;
+    // Release microphone/peer synchronously, even if WebSocket unsubscribe is
+    // still pending. Old asynchronous callbacks are invalidated by the token.
+    void this.disposeSession();
+    this.dispatchEvent(new CustomEvent("ring-webrtc-resume", {
+      bubbles: true, composed: true,
+    }));
+  };
 
   private showStatusMessage(message: string): void {
     this.clearStatusMessageTimeout();
@@ -687,7 +780,12 @@ export class RingViewRingWebRtcPlayer extends LitElement {
 
   private async disposeSession(): Promise<void> {
     this.cancelActivePress();
+    this.signalingConnection?.removeEventListener?.("disconnected", this.requestLiveResume);
+    this.signalingConnection = undefined;
     this.microphoneRequest = undefined;
+    this.playbackRequestPending = false;
+    this.readyDispatched = false;
+    this.playbackBlocked = false;
     const unsubscribePromise = this.unsubscribePromise;
     this.unsubscribePromise = undefined;
 
@@ -718,7 +816,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     if (unsubscribePromise) {
       try {
         const unsubscribe = await unsubscribePromise;
-        unsubscribe();
+        await unsubscribe();
       } catch {
         // The WebSocket subscription either failed or was already closed.
       }

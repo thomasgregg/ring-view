@@ -4,6 +4,28 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.5.8] - 2026-09-07
+
+### Fixed
+
+- Restore Live after a frontend reload with a centered Resume live view button
+  over the camera still, without an automatic connection or retry loop.
+- Start one fresh Ring session on Resume and keep autoplay rejection separate
+  from connection failure: a connected stream can wait for Play without timing out.
+- Stop replaying stale WebRTC offers when Home Assistant reconnects, release
+  microphone access immediately, and require a new talk press after resuming.
+- Show talkback only after playback is ready and keep the Play control reachable
+  by keyboard without overlapping loading or error messages.
+
+### Tests
+
+- Reproduce double autoplay rejection, stale session replacement, and reload
+  recovery failures before changing the player.
+- Add a local camera fixture using real WebRTC peers and advancing video frames
+  for browser tests of both orientations, reconnection, and microphone cleanup.
+  Home Assistant signaling and the microphone source are simulated; these tests
+  do not replace validation with Ring hardware in the iOS Companion app.
+
 ## [0.5.7] - 2026-09-07
 
 ### Fixed

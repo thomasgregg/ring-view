@@ -81,6 +81,7 @@
   "viewer.connecting_live": "Connecting to Ring live view…",
   "viewer.loading_recording": "Loading last recording…",
   "viewer.play_recording": "Play last recording",
+  "viewer.resume_live": "Resume live view",
   "viewer.native_unavailable_title": "Native camera playback is unavailable.",
   "viewer.native_unavailable_detail": "This Home Assistant version did not provide the expected camera component.",
   "viewer.open_ha_camera": "Open Home Assistant camera",

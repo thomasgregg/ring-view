@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import "../../src/media/ring-webrtc-player";
 import type { HomeAssistant } from "../../src/types";
 import type { RingViewRingWebRtcPlayer } from "../../src/media/ring-webrtc-player";
+import "../../src/ring-view-dialog";
+import { normalizeConfig } from "../../src/config";
 
 class MockTrack extends EventTarget {
   public enabled = true;
@@ -133,7 +135,7 @@ describe("Ring WebRTC player", () => {
     }
   });
 
-  async function mount(getUserMedia: () => Promise<MediaStream>): Promise<{
+  async function mount(getUserMedia: () => Promise<MediaStream>, playing = true): Promise<{
     player: RingViewRingWebRtcPlayer;
     peer: MockPeerConnection;
     subscribeMessage: ReturnType<typeof vi.fn>;
@@ -159,6 +161,7 @@ describe("Ring WebRTC player", () => {
     if (!peer) throw new Error("Peer connection was not created");
     peer.connectionState = "connected";
     peer.onconnectionstatechange?.(new Event("connectionstatechange"));
+    if (playing) player.shadowRoot?.querySelector("video")?.dispatchEvent(new Event("playing"));
     await player.updateComplete;
     return { player, peer, subscribeMessage };
   }
@@ -206,6 +209,134 @@ describe("Ring WebRTC player", () => {
     expect(player.shadowRoot?.textContent).toContain(
       "The browser started live view muted.",
     );
+  });
+
+  it("keeps connected media available for a user tap when both autoplay attempts are blocked", async () => {
+    const play = vi.mocked(HTMLMediaElement.prototype.play);
+    play.mockRejectedValue(new DOMException("Gesture required", "NotAllowedError"));
+    const { player, peer, subscribeMessage } = await mount(
+      async () => new MockMediaStream([]) as unknown as MediaStream, false,
+    );
+    const failed = vi.fn();
+    const blocked = vi.fn();
+    player.addEventListener("ring-webrtc-error", failed);
+    player.addEventListener("ring-webrtc-playback-blocked", blocked);
+    peer.ontrack?.({ track: new MockTrack("video") } as unknown as RTCTrackEvent);
+    await flush();
+
+    expect(play).toHaveBeenCalledTimes(2);
+    expect(peer.close).not.toHaveBeenCalled();
+    expect(failed).not.toHaveBeenCalled();
+    expect(blocked).toHaveBeenCalledTimes(1);
+    expect(player.shadowRoot?.querySelector(".talk-button")).toBeNull();
+    const resume = player.shadowRoot?.querySelector<HTMLButtonElement>(".playback-resume");
+    expect(resume?.textContent).toContain("Resume live view");
+
+    play.mockResolvedValue(undefined);
+    resume?.click();
+    await flush();
+    expect(play).toHaveBeenCalledTimes(3);
+    const video = player.shadowRoot?.querySelector("video");
+    video?.dispatchEvent(new Event("playing"));
+    await player.updateComplete;
+    expect(player.shadowRoot?.querySelector(".playback-resume")).toBeNull();
+    expect(player.shadowRoot?.querySelector(".talk-button")).not.toBeNull();
+    expect(subscribeMessage).toHaveBeenCalledTimes(1);
+    expect(peer.close).not.toHaveBeenCalled();
+  });
+
+  it("never replays an old camera offer after a Home Assistant socket reconnect", async () => {
+    const { player, peer, subscribeMessage } = await mount(
+      async () => new MockMediaStream([]) as unknown as MediaStream,
+    );
+    const options = subscribeMessage.mock.calls[0]?.[2];
+    expect(options).toMatchObject({ resubscribe: false });
+    expect(await options.preCheck()).toBe(true);
+    player.remove();
+    await flush();
+    expect(await options.preCheck()).toBe(false);
+    expect(peer.close).toHaveBeenCalledTimes(1);
+  });
+
+  it("rejects a replacement session ID instead of applying its answer to the old peer", async () => {
+    const { player, peer, subscribeMessage } = await mount(
+      async () => new MockMediaStream([]) as unknown as MediaStream,
+    );
+    const resume = vi.fn();
+    player.addEventListener("ring-webrtc-resume", resume);
+    const signal = subscribeMessage.mock.calls[0]?.[0];
+    signal({ type: "session", session_id: "original" });
+    signal({ type: "answer", answer: "first answer" });
+    await flush();
+    signal({ type: "session", session_id: "replacement" });
+    signal({ type: "answer", answer: "second answer" });
+    await flush();
+    expect(peer.setRemoteDescription).toHaveBeenCalledTimes(1);
+    expect(peer.close).toHaveBeenCalledTimes(1);
+    expect(resume).toHaveBeenCalledTimes(1);
+  });
+
+  it("waits indefinitely for Resume or blocked playback without a failure timer or extra offer", async () => {
+    vi.useFakeTimers();
+    const subscribeMessage = vi.fn(async () => vi.fn());
+    const dialog = document.createElement("ring-view-dialog");
+    dialog.hass = {
+      states: { "camera.live": { entity_id: "camera.live", state: "idle", attributes: { supported_features: 2 } } },
+      entities: { "camera.live": { entity_id: "camera.live", platform: "ring" } },
+      hassUrl: (path = "") => path,
+      callWS: async () => ({ configuration: {} }) as never,
+      connection: { subscribeMessage },
+    };
+    document.body.append(dialog);
+    dialog.showDialog({
+      config: normalizeConfig({ live_entity: "camera.live", recording_entity: "camera.recording", two_way_audio: true }),
+      mode: "live", restored: true,
+    });
+    await dialog.updateComplete;
+    await vi.advanceTimersByTimeAsync(120_000);
+    expect(subscribeMessage).not.toHaveBeenCalled();
+    expect(MockPeerConnection.instances).toHaveLength(0);
+
+    const resume = dialog.shadowRoot?.querySelector<HTMLButtonElement>(".resume-live");
+    resume?.click();
+    resume?.click();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(subscribeMessage).toHaveBeenCalledTimes(1);
+    expect(MockPeerConnection.instances).toHaveLength(1);
+    const peer = MockPeerConnection.instances[0]!;
+    const player = dialog.shadowRoot?.querySelector("ring-view-ring-webrtc-player");
+    vi.mocked(HTMLMediaElement.prototype.play).mockRejectedValue(new DOMException("Gesture required", "NotAllowedError"));
+    peer.ontrack?.({ track: new MockTrack("video") } as unknown as RTCTrackEvent);
+    await vi.advanceTimersByTimeAsync(0);
+    await vi.advanceTimersByTimeAsync(120_000);
+    expect(dialog.shadowRoot?.querySelector(".state-layer")).toBeNull();
+    expect(player?.shadowRoot?.querySelector(".playback-resume")).not.toBeNull();
+    expect(dialog.shadowRoot?.querySelector("ring-view-ring-webrtc-player")).toBe(player);
+    expect(subscribeMessage).toHaveBeenCalledTimes(1);
+    expect(peer.close).not.toHaveBeenCalled();
+    dialog.close();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(peer.close).toHaveBeenCalledTimes(1);
+    // Even a queued readiness event from the discarded player cannot revive it.
+    player?.dispatchEvent(new CustomEvent("ring-webrtc-ready"));
+    await vi.advanceTimersByTimeAsync(120_000);
+    expect(dialog.open).toBe(false);
+    expect(subscribeMessage).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns to Resume when Home Assistant replaces the connection object", async () => {
+    const { player, peer, subscribeMessage } = await mount(
+      async () => new MockMediaStream([]) as unknown as MediaStream,
+    );
+    const resume = vi.fn();
+    player.addEventListener("ring-webrtc-resume", resume);
+    const newSubscribe = vi.fn(async () => vi.fn());
+    player.hass = { ...player.hass!, connection: { subscribeMessage: newSubscribe } };
+    await flush();
+    expect(resume).toHaveBeenCalledTimes(1);
+    expect(peer.close).toHaveBeenCalledTimes(1);
+    expect(newSubscribe).not.toHaveBeenCalled();
+    expect(subscribeMessage).toHaveBeenCalledTimes(1);
   });
 
   it("requests the microphone on hold without another offer and stops on release", async () => {

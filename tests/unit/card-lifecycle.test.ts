@@ -452,12 +452,14 @@ describe("card stream lifecycle", () => {
         ?.querySelector("#ring-view-tab-live")
         ?.getAttribute("aria-selected"),
     ).toBe("true");
-    expect(restoredDialog?.shadowRoot?.textContent).toContain(
-      "Reconnecting live view…",
-    );
+    expect(restoredDialog?.shadowRoot?.textContent).toContain("Resume live view");
     expect(TestCameraStream.active).toBe(0);
 
-    await vi.advanceTimersByTimeAsync(2_000);
+    // Waiting through the entire former retry window must not start a session.
+    await vi.advanceTimersByTimeAsync(120_000);
+    await restoredDialog?.updateComplete;
+    expect(TestCameraStream.active).toBe(0);
+    restoredDialog?.shadowRoot?.querySelector<HTMLElement>(".resume-live")?.click();
     await restoredDialog?.updateComplete;
     expect(TestCameraStream.active).toBe(1);
 

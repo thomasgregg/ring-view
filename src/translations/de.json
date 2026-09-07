@@ -81,6 +81,7 @@
   "viewer.connecting_live": "Ring-Live-Ansicht wird verbunden…",
   "viewer.loading_recording": "Letzte Aufnahme wird geladen…",
   "viewer.play_recording": "Letzte Aufnahme abspielen",
+  "viewer.resume_live": "Live-Ansicht fortsetzen",
   "viewer.native_unavailable_title": "Native Kamerawiedergabe ist nicht verfügbar.",
   "viewer.native_unavailable_detail": "Diese Home-Assistant-Version stellt die erwartete Kamerakomponente nicht bereit.",
   "viewer.open_ha_camera": "Home-Assistant-Kamera öffnen",

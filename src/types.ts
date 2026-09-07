@@ -33,10 +33,14 @@ export interface HomeAssistant {
   states: Record<string, HassEntity>;
   entities?: Record<string, HassEntityRegistryEntry>;
   connection?: {
+    readonly connected?: boolean;
+    addEventListener?(event: "disconnected", callback: () => void): void;
+    removeEventListener?(event: "disconnected", callback: () => void): void;
     subscribeMessage<T>(
       callback: (message: T) => void,
       message: Record<string, unknown>,
-    ): Promise<() => void>;
+      options?: { resubscribe?: boolean; preCheck?: () => boolean },
+    ): Promise<() => void | Promise<void>>;
   };
   language?: string;
   locale?: { language: string };

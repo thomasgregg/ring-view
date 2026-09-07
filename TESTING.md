@@ -4,8 +4,11 @@ Node.js 20 or newer is required. Install the project dependencies with
 `npm install`.
 
 The production artifact is `dist/ring-view.js`. The browser suite uses a local
-demo harness and mocked camera elements, so it verifies interface behavior and
-renderer teardown without opening real Ring sessions.
+demo harness with mocked camera elements for interface behavior and renderer
+teardown. The recovery fixture also connects real browser WebRTC peers and checks
+advancing video frames in Chromium and WebKit. Home Assistant signaling and the
+microphone source are simulated; no Ring session or physical microphone is used.
+These checks do not replace Companion app testing against a real Ring camera.
 
 ## Automated checks
 
@@ -49,6 +52,10 @@ Verify each item on current stable Home Assistant and, where practical, the prev
 12. Releasing, cancelling the press, switching apps, or hiding the page immediately mutes the microphone.
 13. A configured doorbell event shows the in-card alert without opening a new live session.
 14. A configured Ring-MQTT snapshot uses its `timestamp`, falls back when unavailable, and never adds a third viewer tab.
+15. Rotating without a frontend reload preserves the current player and moving video.
+16. If the Companion app reloads during rotation (the HA logo appears), the restored viewer shows a centered **Resume live view** button without connecting automatically. Tapping it starts one fresh session; confirm visible motion, incoming audio, and a new talk press.
+17. If the browser blocks playback, the centered **Play** button remains available without a connection-error timeout. Tapping it resumes the existing session.
+18. Losing the Home Assistant connection or reloading while talking immediately releases the microphone. After resuming, speech is sent only after a fresh talk press.
 
 ## Visual matrix
 
