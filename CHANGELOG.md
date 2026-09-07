@@ -4,6 +4,25 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.5.9] - 2026-09-07
+
+### Changed
+
+- Try one muted automatic Live recovery after a frontend reload, once the page
+  is visible and Home Assistant's signaling connection is ready. Keep Resume
+  available if the attempt fails or times out, without automatic retry loops.
+- Preserve the connected player and its centered Resume control when iOS blocks
+  autoplay. Resuming playback does not create another camera session.
+- Cancel pending recovery on Close, mode changes, unavailable cameras, or page
+  exit. A persisted page-cache return can recover without restoring a talk press.
+
+### Tests
+
+- Reproduce the missing automatic recovery before implementing it, then verify
+  moving, muted video after reload in both orientations without any new gesture.
+- Cover blocked autoplay, failed automatic connections, manual fallback, hidden
+  or offline startup, stale events, listener cleanup, and microphone safety.
+
 ## [0.5.8] - 2026-09-07
 
 ### Fixed

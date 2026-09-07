@@ -348,7 +348,7 @@ test("does not overlap the previous Ring session when the card is recreated", as
   expect(await page.evaluate(() => window.demoRingSubscriptions)).toBe(1);
 });
 
-test("waits for Resume while a discarded Ring session is still closing", async ({
+test("falls back to Resume if a discarded Ring session prevents automatic recovery", async ({
   page,
 }) => {
   await page.goto("/demo/?mode=live&two_way_audio=1&ring_teardown_race=reload");
@@ -367,7 +367,7 @@ test("waits for Resume while a discarded Ring session is still closing", async (
   await expect(page.getByText("Live view could not be started.")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Resume live view" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Hold to talk" })).toHaveCount(0);
-  expect(await page.evaluate(() => window.demoRingSubscriptions ?? 0)).toBe(0);
+  expect(await page.evaluate(() => window.demoRingSubscriptions ?? 0)).toBe(1);
   await expect(page.locator("ring-view-ring-webrtc-player")).toHaveCount(0);
   await page.getByRole("button", { name: "Resume live view" }).click();
   // This synthetic backend still owns the previous stream. The explicit
@@ -376,7 +376,7 @@ test("waits for Resume while a discarded Ring session is still closing", async (
   await page.waitForTimeout(3_000);
   await expect(page.getByText("Reconnecting live view…", { exact: true })).toHaveCount(0);
   await expect(page.locator("ring-view-ring-webrtc-player")).toHaveCount(0);
-  expect(await page.evaluate(() => window.demoRingSubscriptions)).toBe(1);
+  expect(await page.evaluate(() => window.demoRingSubscriptions)).toBe(2);
 });
 
 test("restores the open camera viewer after a Companion-style frontend reload", async ({
@@ -393,15 +393,13 @@ test("restores the open camera viewer after a Companion-style frontend reload", 
   await page.reload();
 
   await expect(page.getByRole("dialog")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Resume live view" })).toBeVisible();
-  await expect(page.locator("ring-view-ring-webrtc-player")).toHaveCount(0);
+  await expect(page.locator("ring-view-ring-webrtc-player")).toHaveCount(1);
   await expect(page.getByRole("tab", { name: "Live" })).toHaveAttribute(
     "aria-selected",
     "true",
   );
   await expect(page.getByRole("button", { name: "Close camera viewer" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Hold to talk" })).toHaveCount(0);
-  await page.getByRole("button", { name: "Resume live view" }).click();
   await expect(page.locator("ring-view-ring-webrtc-player")).toBeVisible();
   await expect
     .poll(() =>

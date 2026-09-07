@@ -34,8 +34,8 @@ export interface HomeAssistant {
   entities?: Record<string, HassEntityRegistryEntry>;
   connection?: {
     readonly connected?: boolean;
-    addEventListener?(event: "disconnected", callback: () => void): void;
-    removeEventListener?(event: "disconnected", callback: () => void): void;
+    addEventListener?(event: "disconnected" | "ready", callback: () => void): void;
+    removeEventListener?(event: "disconnected" | "ready", callback: () => void): void;
     subscribeMessage<T>(
       callback: (message: T) => void,
       message: Record<string, unknown>,

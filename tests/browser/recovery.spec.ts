@@ -45,7 +45,7 @@ test("preserves a playing WebRTC peer when a responsive layout recreates its car
   expect(await page.evaluate(() => window.recovery.state.closed)).toBe(0);
 });
 
-test("restores each orientation with Resume and starts fresh moving video only on tap", async ({ page }, testInfo) => {
+test("automatically restores moving muted video in both orientations without a tap", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
   await expectMovingVideo(page);
@@ -55,18 +55,10 @@ test("restores each orientation with Resume and starts fresh moving video only o
     await page.reload();
     await expect(page.getByRole("dialog")).toBeVisible();
     await expect(page.getByRole("tab", { name: "Live" })).toHaveAttribute("aria-selected", "true");
-    const resume = page.getByRole("button", { name: "Resume live view" });
-    await expect(resume).toBeVisible();
-    await expect(page.locator("ring-view-ring-webrtc-player")).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Hold to talk" })).toHaveCount(0);
-    expect(await page.evaluate(() => window.recovery.state.offers)).toBe(0);
-    const box = await resume.boundingBox();
-    expect(Math.abs(box!.x + box!.width / 2 - viewport.width / 2)).toBeLessThan(2);
-    expect(Math.abs(box!.y + box!.height / 2 - viewport.height / 2)).toBeLessThan(2);
-    await page.screenshot({ path: testInfo.outputPath(`resume-${viewport.width}.png`) });
-
-    await resume.click();
     await expectMovingVideo(page);
+    expect(await page.locator(videoSelector).evaluate((element: HTMLVideoElement) => element.muted)).toBe(true);
+    expect(await page.evaluate(() => window.recovery.state.getUserMediaCalls)).toBe(0);
+    await expect(page.getByRole("button", { name: "Resume live view" })).toHaveCount(0);
     expect(await page.evaluate(() => window.recovery.state.offers)).toBe(1);
     expect(await page.evaluate(() => window.recovery.state.active)).toBe(1);
     await expect(page.getByText("Live view could not be started.")).toHaveCount(0);
@@ -78,6 +70,74 @@ test("restores each orientation with Resume and starts fresh moving video only o
   await page.reload();
   await expect(page.getByRole("button", { name: /Open Entrance viewer/ })).toBeVisible();
   await expect(page.getByRole("dialog")).toHaveCount(0);
+});
+
+test("automatically resumes after a page-cache return without restoring a talk press", async ({ page }) => {
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  await expectMovingVideo(page);
+  await page.getByRole("button", { name: "Hold to talk" }).focus();
+  await page.keyboard.down("Space");
+  await expect.poll(() => page.evaluate(() => window.recovery.microphone?.enabled)).toBe(true);
+  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent("pagehide", { persisted: true })));
+  await expect(page.getByRole("button", { name: "Resume live view" })).toBeVisible();
+  expect(await page.evaluate(() => window.recovery.microphone)).toEqual({ enabled: false, readyState: "ended" });
+  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true })));
+  await expectMovingVideo(page);
+  expect(await page.evaluate(() => window.recovery.state.getUserMediaCalls)).toBe(1);
+  expect(await page.evaluate(() => window.recovery.state.offers)).toBe(2);
+  await page.keyboard.up("Space");
+  await page.getByRole("button", { name: "Hold to talk" }).focus();
+  await page.keyboard.down("Space");
+  await expect.poll(() => page.evaluate(() => window.recovery.microphone?.enabled)).toBe(true);
+  await page.keyboard.up("Space");
+  await expect.poll(() => page.evaluate(() => window.recovery.microphone?.enabled)).toBe(false);
+});
+
+test("falls back to one centered Resume when automatic recovery is blocked by iOS", async ({ page }, testInfo) => {
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  await expectMovingVideo(page);
+  for (const viewport of [{ width: 844, height: 390 }, { width: 390, height: 844 }]) {
+    await page.setViewportSize(viewport);
+    await page.evaluate(() => {
+      const url = new URL(location.href);
+      url.searchParams.set("block_playback", "1");
+      history.replaceState(history.state, "", url);
+    });
+    await page.reload();
+    const resume = page.getByRole("button", { name: "Resume live view" });
+    await expect(resume).toBeVisible();
+    expect(await page.evaluate(() => window.recovery.state.offers)).toBe(1);
+    expect(await page.evaluate(() => window.recovery.state.closed)).toBe(0);
+    await expect(page.getByRole("button", { name: "Hold to talk" })).toHaveCount(0);
+    await expect(page.locator("ring-view-dialog .state-layer")).toHaveCount(0);
+    const box = await resume.boundingBox();
+    expect(Math.abs(box!.x + box!.width / 2 - viewport.width / 2)).toBeLessThan(2);
+    expect(Math.abs(box!.y + box!.height / 2 - viewport.height / 2)).toBeLessThan(2);
+    await page.screenshot({ path: testInfo.outputPath(`resume-${viewport.width}.png`) });
+    await resume.click();
+    await expectMovingVideo(page);
+    expect(await page.evaluate(() => window.recovery.state.offers)).toBe(1);
+    expect(await page.evaluate(() => window.recovery.state.closed)).toBe(0);
+  }
+});
+
+test("lets a manual Resume recover after the automatic connection fails", async ({ page }) => {
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  await expectMovingVideo(page);
+  await page.evaluate(() => {
+    const url = new URL(location.href);
+    url.searchParams.set("fail_first_offer", "1");
+    history.replaceState(history.state, "", url);
+  });
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Resume live view" })).toBeVisible();
+  expect(await page.evaluate(() => window.recovery.state.offers)).toBe(1);
+  await expect(page.locator("ring-view-ring-webrtc-player")).toHaveCount(0);
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  await page.getByRole("button", { name: "Resume live view" }).click();
+  await expectMovingVideo(page);
+  expect(await page.evaluate(() => window.recovery.state.offers)).toBe(2);
+  expect(await page.evaluate(() => window.recovery.state.active)).toBe(1);
 });
 
 test("does not replay a stale offer on websocket reconnect and releases active talkback", async ({ page }) => {

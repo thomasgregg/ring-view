@@ -276,7 +276,7 @@ describe("Ring WebRTC player", () => {
     expect(resume).toHaveBeenCalledTimes(1);
   });
 
-  it("waits indefinitely for Resume or blocked playback without a failure timer or extra offer", async () => {
+  it("keeps blocked automatic playback indefinitely without a failure timer or extra offer", async () => {
     vi.useFakeTimers();
     const subscribeMessage = vi.fn(async () => vi.fn());
     const dialog = document.createElement("ring-view-dialog");
@@ -293,18 +293,12 @@ describe("Ring WebRTC player", () => {
       mode: "live", restored: true,
     });
     await dialog.updateComplete;
-    await vi.advanceTimersByTimeAsync(120_000);
-    expect(subscribeMessage).not.toHaveBeenCalled();
-    expect(MockPeerConnection.instances).toHaveLength(0);
-
-    const resume = dialog.shadowRoot?.querySelector<HTMLButtonElement>(".resume-live");
-    resume?.click();
-    resume?.click();
     await vi.advanceTimersByTimeAsync(0);
     expect(subscribeMessage).toHaveBeenCalledTimes(1);
     expect(MockPeerConnection.instances).toHaveLength(1);
     const peer = MockPeerConnection.instances[0]!;
     const player = dialog.shadowRoot?.querySelector("ring-view-ring-webrtc-player");
+    expect(player?.muted).toBe(true);
     vi.mocked(HTMLMediaElement.prototype.play).mockRejectedValue(new DOMException("Gesture required", "NotAllowedError"));
     peer.ontrack?.({ track: new MockTrack("video") } as unknown as RTCTrackEvent);
     await vi.advanceTimersByTimeAsync(0);

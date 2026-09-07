@@ -88,6 +88,9 @@ export class RingViewDialog extends LitElement {
   private recordingPlaybackPending = false;
   private recordingPlaybackStarted = false;
   private automaticLiveRetry = true;
+  private automaticLiveRecovery?: "waiting" | "attempting";
+  private recoveryConnection?: HomeAssistant["connection"];
+  private pageUnloading = false;
 
   public showDialog(params: RingViewDialogParams): void {
     if (!this.hass) return;
@@ -116,6 +119,7 @@ export class RingViewDialog extends LitElement {
     this.recordingPlaybackPending = false;
     this.recordingPlaybackStarted = false;
     this.automaticLiveRetry = !params.restored;
+    this.pageUnloading = false;
     this.recordingMuted = false;
     this.liveHasAudio = undefined;
     this.recordingVideoFailed = false;
@@ -130,10 +134,7 @@ export class RingViewDialog extends LitElement {
     this.syncUrl();
     this.attachGlobalListeners();
     if (params.restored && this.mode === "live") {
-      // Restore the viewer, but wait for an explicit playback gesture in the
-      // replacement Web View. There is no camera subscription or retry timer
-      // while the user is looking at the still image.
-      this.waitForLiveResume();
+      this.prepareAutomaticLiveResume();
     } else {
       this.startMedia();
     }
@@ -183,11 +184,13 @@ export class RingViewDialog extends LitElement {
     if (!changed.has("hass")) return;
     const entity = this.activeEntity();
     if (entityIsUnavailable(entity) && this.mediaStatus !== "error") {
+      this.clearAutomaticLiveRecovery();
       this.lifecycle.dispose();
       this.session = this.lifecycle.current();
       this.mediaStatus = "error";
       this.statusAnnouncement = localize(this.hass, "viewer.entity_unavailable");
     }
+    this.tryAutomaticLiveResume();
   }
 
   protected render() {
@@ -547,6 +550,7 @@ export class RingViewDialog extends LitElement {
 
   private selectMode(mode: CameraMode): void {
     if (!this.config || mode === this.mode) return;
+    this.clearAutomaticLiveRecovery();
     this.lifecycle.dispose();
     this.automaticLiveRetry = true;
     this.mode = mode;
@@ -600,6 +604,7 @@ export class RingViewDialog extends LitElement {
 
   private handleMediaReady = (event?: Event): void => {
     if (!this.acceptsMediaEvent(event)) return;
+    this.clearAutomaticLiveRecovery();
     this.lifecycle.clearTimeout();
     this.mediaStatus = "ready";
     this.statusAnnouncement =
@@ -700,6 +705,7 @@ export class RingViewDialog extends LitElement {
   private handleMediaError = (event: CustomEvent<NativeAdapterFailure>): void => {
     if (!this.acceptsMediaEvent(event)) return;
     if (event.detail === "component-unavailable") {
+      this.clearAutomaticLiveRecovery();
       this.lifecycle.clearTimeout();
       this.mediaStatus = "compatibility";
       this.statusAnnouncement = localize(
@@ -729,6 +735,7 @@ export class RingViewDialog extends LitElement {
   };
 
   private waitForLiveResume(): void {
+    this.clearAutomaticLiveRecovery();
     this.lifecycle.dispose();
     this.session = this.lifecycle.current();
     this.automaticLiveRetry = false;
@@ -736,8 +743,53 @@ export class RingViewDialog extends LitElement {
     this.statusAnnouncement = localize(this.hass, "viewer.resume_live");
   }
 
+  private prepareAutomaticLiveResume(): void {
+    this.waitForLiveResume();
+    this.automaticLiveRecovery = "waiting";
+    this.tryAutomaticLiveResume();
+  }
+
+  private tryAutomaticLiveResume = (): void => {
+    if (
+      this.automaticLiveRecovery !== "waiting"
+      || !this.open || !this.isConnected || this.mode !== "live"
+      || this.mediaStatus !== "awaiting-resume" || this.pageUnloading
+    ) return;
+    const connection = this.hass?.connection;
+    if (this.recoveryConnection !== connection) {
+      this.recoveryConnection?.removeEventListener?.("ready", this.handleRecoveryConnectionReady);
+      this.recoveryConnection = connection;
+      connection?.addEventListener?.("ready", this.handleRecoveryConnectionReady);
+    }
+    if (
+      document.hidden || connection?.connected === false
+      || (this.config?.two_way_audio && !connection)
+      || entityIsUnavailable(this.activeEntity())
+    ) return;
+    this.clearAutomaticLiveRecovery();
+    // Consume the single attempt before mounting any renderer. Readiness,
+    // visibility and repeated HA updates cannot create another session.
+    this.automaticLiveRecovery = "attempting";
+    this.liveMuted = true;
+    this.statusAnnouncement = localize(this.hass, "viewer.connecting_live");
+    this.startMedia();
+  };
+
+  private handleRecoveryConnectionReady = (): void => {
+    // HA iterates its live listener array. Unregistering in that callback can
+    // skip another consumer; defer consumption and cleanup until dispatch ends.
+    queueMicrotask(this.tryAutomaticLiveResume);
+  };
+
+  private clearAutomaticLiveRecovery(): void {
+    this.automaticLiveRecovery = undefined;
+    this.recoveryConnection?.removeEventListener?.("ready", this.handleRecoveryConnectionReady);
+    this.recoveryConnection = undefined;
+  }
+
   private resumeLive = (): void => {
     if (!this.open || this.mode !== "live" || this.mediaStatus !== "awaiting-resume") return;
+    this.clearAutomaticLiveRecovery();
     this.retryCount = 0;
     this.audioFallbackAttempted = false;
     this.liveHasAudio = undefined;
@@ -755,6 +807,12 @@ export class RingViewDialog extends LitElement {
   };
 
   private failMedia(allowAutomaticRetry: boolean): void {
+    if (this.automaticLiveRecovery === "attempting") {
+      // Keep v0.5.8's proven manual path if this one attempt cannot recover.
+      // Autoplay rejection uses playback-blocked instead and retains the peer.
+      this.waitForLiveResume();
+      return;
+    }
     if (
       allowAutomaticRetry
       && this.automaticLiveRetry
@@ -783,6 +841,7 @@ export class RingViewDialog extends LitElement {
   }
 
   private retry = (): void => {
+    this.clearAutomaticLiveRecovery();
     this.retryCount = 0;
     this.audioFallbackAttempted = false;
     this.recordingPlaybackPending = false;
@@ -885,14 +944,41 @@ export class RingViewDialog extends LitElement {
 
   private attachGlobalListeners(): void {
     document.addEventListener("visibilitychange", this.handleVisibilityChange);
+    window.addEventListener("pagehide", this.handlePageHide);
+    window.addEventListener("pageshow", this.handlePageShow);
   }
 
   private detachGlobalListeners(): void {
     document.removeEventListener("visibilitychange", this.handleVisibilityChange);
+    window.removeEventListener("pagehide", this.handlePageHide);
+    window.removeEventListener("pageshow", this.handlePageShow);
   }
+
+  private handlePageHide = (): void => {
+    this.pageUnloading = true;
+    if (!this.open || this.mode !== "live") return;
+    this.renderRoot.querySelector<RingViewRingWebRtcPlayer>("ring-view-ring-webrtc-player")?.stopTalking();
+    this.waitForLiveResume();
+  };
+
+  private handlePageShow = (event: PageTransitionEvent): void => {
+    const returning = this.pageUnloading;
+    this.pageUnloading = false;
+    if (returning && event.persisted && this.open && this.mode === "live") {
+      this.prepareAutomaticLiveResume();
+    }
+  };
 
   private handleVisibilityChange = (): void => {
     if (!this.open) return;
+    if (this.automaticLiveRecovery === "waiting") {
+      this.tryAutomaticLiveResume();
+      return;
+    }
+    if (document.hidden && this.automaticLiveRecovery === "attempting") {
+      this.waitForLiveResume();
+      return;
+    }
     if (this.mediaStatus === "awaiting-resume") return;
     if (this.mode === "live" && this.config?.two_way_audio) {
       if (document.hidden) {
@@ -967,6 +1053,7 @@ export class RingViewDialog extends LitElement {
 
   private finishClose(restoreFocus = true, notifyManager = true): void {
     if (!this.open) return;
+    this.clearAutomaticLiveRecovery();
     const opener = this.opener;
     const returnUrl = this.returnUrl;
     const config = this.config;

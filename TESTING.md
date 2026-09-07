@@ -10,6 +10,13 @@ advancing video frames in Chromium and WebKit. Home Assistant signaling and the
 microphone source are simulated; no Ring session or physical microphone is used.
 These checks do not replace Companion app testing against a real Ring camera.
 
+The gesture-free recovery test uses fresh browser contexts, disables trace DOM
+snapshots, and waits for the fixture to report six decoded video frames before
+inspecting the page. This is intentional: Playwright's page evaluation (including
+trace snapshots) can grant simulated user activation. The attached proof records
+no activation at startup, playback, or after the moving frames; other recovery
+tests retain normal failure traces.
+
 ## Automated checks
 
 Run before every release:
@@ -53,9 +60,10 @@ Verify each item on current stable Home Assistant and, where practical, the prev
 13. A configured doorbell event shows the in-card alert without opening a new live session.
 14. A configured Ring-MQTT snapshot uses its `timestamp`, falls back when unavailable, and never adds a third viewer tab.
 15. Rotating without a frontend reload preserves the current player and moving video.
-16. If the Companion app reloads during rotation (the HA logo appears), the restored viewer shows a centered **Resume live view** button without connecting automatically. Tapping it starts one fresh session; confirm visible motion, incoming audio, and a new talk press.
+16. If the Companion app reloads during rotation (the HA logo appears), the restored viewer attempts automatic muted playback once. Confirm visible motion without a tap, then enable incoming audio and try a new talk press. If the automatic connection fails, a centered **Resume live view** button offers one manual attempt without a retry loop.
 17. If the browser blocks playback, the centered **Play** button remains available without a connection-error timeout. Tapping it resumes the existing session.
 18. Losing the Home Assistant connection or reloading while talking immediately releases the microphone. After resuming, speech is sent only after a fresh talk press.
+19. Automatic recovery waits while the page is hidden or Home Assistant is offline; closing or switching mode cancels it. Check both a full frontend reload and a persisted page-cache return. The automated tests simulate page-cache events; actual Companion behavior still needs device validation.
 
 ## Visual matrix
 

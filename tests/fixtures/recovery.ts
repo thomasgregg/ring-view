@@ -35,7 +35,8 @@ const state = {
   candidateMessages: 0,
   getUserMediaCalls: 0,
   blockedPlayCalls: 0,
-  failNextOffer: false,
+  initialUserActivation: navigator.userActivation.hasBeenActive,
+  failNextOffer: new URLSearchParams(location.search).has("fail_first_offer"),
   blockPlayback: new URLSearchParams(location.search).has("block_playback"),
   errors: [] as string[],
 };
@@ -64,6 +65,7 @@ Object.defineProperty(Object.getPrototypeOf(navigator.mediaDevices), "getUserMed
 // Deterministically exercise WKWebView's gesture-required outcome while still
 // decoding actual frames through a real peer connection.
 const originalPlay = HTMLMediaElement.prototype.play;
+let autoplayProbeStarted = false;
 HTMLMediaElement.prototype.play = function () {
   if (state.blockPlayback) {
     state.blockedPlayCalls += 1;
@@ -71,7 +73,29 @@ HTMLMediaElement.prototype.play = function () {
     this.pause();
     return Promise.reject(new DOMException("Gesture required", "NotAllowedError"));
   }
-  return originalPlay.call(this);
+  const activationAtPlay = navigator.userActivation.hasBeenActive;
+  const result = originalPlay.call(this);
+  if (new URLSearchParams(location.search).has("autoplay_probe") && !autoplayProbeStarted && this instanceof HTMLVideoElement) {
+    autoplayProbeStarted = true;
+    const video = this;
+    // Report from the page itself before Playwright inspects anything: its
+    // evaluate/locator helpers can otherwise grant a simulated user gesture.
+    void result.then(() => {
+      let frames = 0;
+      const firstTime = video.currentTime;
+      const sample = () => {
+        if (++frames < 6) { video.requestVideoFrameCallback(sample); return; }
+        console.info(`RING_VIEW_AUTOPLAY_PROOF ${JSON.stringify({
+          initialUserActivation: state.initialUserActivation,
+          activationAtPlay, activationAfterFrames: navigator.userActivation.hasBeenActive,
+          muted: video.muted, frames, elapsed: video.currentTime - firstTime,
+          offers: state.offers, getUserMediaCalls: state.getUserMediaCalls,
+        })}`);
+      };
+      video.requestVideoFrameCallback(sample);
+    }).catch(() => undefined);
+  }
+  return result;
 };
 document.addEventListener("click", (event) => {
   void audioContext.resume();
