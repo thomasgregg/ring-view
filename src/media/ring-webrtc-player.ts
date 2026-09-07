@@ -605,8 +605,13 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     }
 
     const video = this.renderRoot.querySelector<HTMLVideoElement>("video");
-    if (!video || video.srcObject === this.remoteStream) return;
-    video.srcObject = this.remoteStream;
+    if (!video) return;
+    if (video.srcObject !== this.remoteStream) video.srcObject = this.remoteStream;
+    // Ring may deliver audio before video. Starting an audio-only MediaStream
+    // is rejected by the Companion app after its orientation reload because
+    // that new Web View has no playback gesture. Let the video track make the
+    // stream playable first, like Home Assistant's native camera component.
+    if (event.track.kind !== "video") return;
     void video.play().catch(() => this.retryPlaybackMuted(video, token));
   }
 
@@ -615,8 +620,13 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     this.actualMuted = true;
     video.muted = true;
     this.showStatusMessage(localize(this.hass, "talkback.playback_muted"));
-    void video.play().catch(() => {
-      if (token === this.connectionToken) void this.fail(localize(this.hass, "viewer.live_failed"));
+    queueMicrotask(() => {
+      if (token !== this.connectionToken || !video.isConnected) return;
+      void video.play().catch(() => {
+        if (token === this.connectionToken) {
+          void this.fail(localize(this.hass, "viewer.live_failed"));
+        }
+      });
     });
   }
 

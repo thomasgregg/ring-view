@@ -4,6 +4,16 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.5.6] - 2026-09-07
+
+### Fixed
+
+- Restore Ring live video muted after a Companion Web View rebuild so iOS does
+  not reject audible autoplay when no fresh tap exists, while normal opens
+  continue to follow the configured audio preference.
+- Wait for Ring's video track before starting the media element when audio
+  arrives first, matching Home Assistant's native camera playback sequence.
+
 ## [0.5.5] - 2026-09-07
 
 ### Fixed

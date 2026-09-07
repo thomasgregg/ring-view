@@ -2531,11 +2531,13 @@ let y = class extends S {
       })
     );
     const i = this.renderRoot.querySelector("video");
-    !i || i.srcObject === this.remoteStream || (i.srcObject = this.remoteStream, i.play().catch(() => this.retryPlaybackMuted(i, e)));
+    i && (i.srcObject !== this.remoteStream && (i.srcObject = this.remoteStream), t.track.kind === "video" && i.play().catch(() => this.retryPlaybackMuted(i, e)));
   }
   retryPlaybackMuted(t, e) {
-    e === this.connectionToken && (this.actualMuted = !0, t.muted = !0, this.showStatusMessage(a(this.hass, "talkback.playback_muted")), t.play().catch(() => {
-      e === this.connectionToken && this.fail(a(this.hass, "viewer.live_failed"));
+    e === this.connectionToken && (this.actualMuted = !0, t.muted = !0, this.showStatusMessage(a(this.hass, "talkback.playback_muted")), queueMicrotask(() => {
+      e !== this.connectionToken || !t.isConnected || t.play().catch(() => {
+        e === this.connectionToken && this.fail(a(this.hass, "viewer.live_failed"));
+      });
     }));
   }
   handleConnectionState(t) {
@@ -2844,7 +2846,7 @@ let m = class extends S {
     };
   }
   showDialog(t) {
-    this.hass && (this.open && this.finishClose(!1, !1), this.config = t.config, this.opener = t.opener, this.returnUrl = t.returnUrl ?? it(tt()), this.mode = t.mode, this.liveMuted = this.config.live_muted, this.recordingStarted = this.mode === "live" || this.config.autoplay_recording, this.retryCount = 0, this.audioFallbackAttempted = !1, this.recordingPlaybackPending = !1, this.recordingPlaybackStarted = !1, this.recordingMuted = !1, this.liveHasAudio = void 0, this.recordingVideoFailed = !1, this.suspended = !1, this.statusAnnouncement = "", this.lastDoorbellState = this.config.doorbell_entity ? this.hass.states[this.config.doorbell_entity]?.state : void 0, this.setRingingUntil(t.ringingUntil), this.open = !0, this.syncUrl(), this.attachGlobalListeners(), t.restored && this.mode === "live" ? this.scheduleLiveReconnect(zi) : this.startMedia(), this.updateComplete.then(() => this.focusInitialControl()));
+    this.hass && (this.open && this.finishClose(!1, !1), this.config = t.config, this.opener = t.opener, this.returnUrl = t.returnUrl ?? it(tt()), this.mode = t.mode, this.liveMuted = t.restored && this.mode === "live" ? !0 : this.config.live_muted, this.recordingStarted = this.mode === "live" || this.config.autoplay_recording, this.retryCount = 0, this.audioFallbackAttempted = !1, this.recordingPlaybackPending = !1, this.recordingPlaybackStarted = !1, this.recordingMuted = !1, this.liveHasAudio = void 0, this.recordingVideoFailed = !1, this.suspended = !1, this.statusAnnouncement = "", this.lastDoorbellState = this.config.doorbell_entity ? this.hass.states[this.config.doorbell_entity]?.state : void 0, this.setRingingUntil(t.ringingUntil), this.open = !0, this.syncUrl(), this.attachGlobalListeners(), t.restored && this.mode === "live" ? this.scheduleLiveReconnect(zi) : this.startMedia(), this.updateComplete.then(() => this.focusInitialControl()));
   }
   closeDialog() {
     return this.finishClose(), !0;

@@ -92,7 +92,13 @@ export class RingViewDialog extends LitElement {
     this.opener = params.opener;
     this.returnUrl = params.returnUrl ?? removeRingViewUrl(currentUrl());
     this.mode = params.mode;
-    this.liveMuted = this.config.live_muted;
+    // The Companion app's replacement Web View has no fresh user gesture, and
+    // its default WebKit policy requires one for audible autoplay. Match the
+    // native camera recovery path by restoring the picture muted; a normal
+    // user-opened Live view still follows the configured audio preference.
+    this.liveMuted = params.restored && this.mode === "live"
+      ? true
+      : this.config.live_muted;
     this.recordingStarted = this.mode === "live" || this.config.autoplay_recording;
     this.retryCount = 0;
     this.audioFallbackAttempted = false;

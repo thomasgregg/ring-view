@@ -15,7 +15,9 @@ open. Home Assistant's `refreshUrl` history convention lets a matching card
 reconstruct the dialog if an iOS Companion Web View rebuild occurs during
 rotation. Closing the viewer removes those parameters. Camera credentials,
 media URLs, and microphone state are never stored there; media and talkback are
-negotiated again after restoration.
+negotiated again after restoration. A restored Live session starts muted to
+comply with the iOS Companion Web View's user-gesture requirement for audible
+playback; the native video control can enable sound afterward.
 
 The implementation currently expects `ha-camera-stream` to expose these properties:
 

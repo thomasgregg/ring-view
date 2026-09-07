@@ -301,6 +301,13 @@ test("restores the open camera viewer after a Companion-style frontend reload", 
   await expect(page.getByRole("button", { name: "Close camera viewer" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Hold to talk" })).toBeVisible();
   await expect(page.locator("ring-view-ring-webrtc-player")).toBeVisible();
+  await expect
+    .poll(() =>
+      page
+        .locator("ring-view-ring-webrtc-player")
+        .evaluate((element) => (element as HTMLElement & { muted: boolean }).muted),
+    )
+    .toBe(true);
 
   await page.setViewportSize({ width: 932, height: 430 });
   await expect(page.getByRole("dialog")).toBeVisible();
@@ -323,6 +330,9 @@ test("does not overlap a failed live session with reconnecting controls", async 
   await page.getByRole("tab", { name: "Live" }).click();
   const player = page.locator("ring-view-ring-webrtc-player");
   await expect(player).toBeVisible();
+  await expect.poll(() => player.evaluate((element) =>
+    (element as HTMLElement & { muted: boolean }).muted
+  )).toBe(false);
 
   await player.evaluate((element) => {
     element.dispatchEvent(

@@ -183,6 +183,31 @@ describe("Ring WebRTC player", () => {
     expect(player.shadowRoot?.textContent).not.toContain("Connected and listening");
   });
 
+  it("waits for video before playback and retries an iOS rejection muted", async () => {
+    const play = vi.mocked(HTMLMediaElement.prototype.play);
+    play.mockRejectedValueOnce(new DOMException("Gesture required", "NotAllowedError"));
+    play.mockResolvedValueOnce(undefined);
+    const { player, peer } = await mount(
+      async () => new MockMediaStream([]) as unknown as MediaStream,
+    );
+    const audio = new MockTrack("audio");
+    const videoTrack = new MockTrack("video");
+
+    peer.ontrack?.({ track: audio } as unknown as RTCTrackEvent);
+    await flush();
+    expect(play).not.toHaveBeenCalled();
+
+    peer.ontrack?.({ track: videoTrack } as unknown as RTCTrackEvent);
+    await flush();
+    await player.updateComplete;
+
+    expect(play).toHaveBeenCalledTimes(2);
+    expect(player.shadowRoot?.querySelector<HTMLVideoElement>("video")?.muted).toBe(true);
+    expect(player.shadowRoot?.textContent).toContain(
+      "The browser started live view muted.",
+    );
+  });
+
   it("requests the microphone on hold without another offer and stops on release", async () => {
     const microphone = new MockTrack("audio");
     const localStream = new MockMediaStream([microphone]);

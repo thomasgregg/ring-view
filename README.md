@@ -56,7 +56,9 @@ Ring View fills that gap:
   Assistant owns the viewer above the responsive dashboard, so moving or
   recreating the card does not interrupt it. If the iOS Companion app rebuilds
   its Web View during rotation, the viewer restores the matching camera and
-  reconnects just like Home Assistant's native camera dialog. The renderer is
+  reconnects just like Home Assistant's native camera dialog. The restored
+  live picture starts muted because the replacement iOS Web View has no fresh
+  audio-playback gesture; use the native video control to enable sound. The renderer is
   torn down when the mode changes, the viewer closes, or the browser goes Back.
   Hidden tabs suspend native playback and immediately stop active talkback.
 - **A polished, consistent interface.** Recording and Live use the same compact icon language on the card and in the viewer.
@@ -282,7 +284,7 @@ view.
 
 The dashboard requests an authenticated still through Home Assistant's camera proxy. It sizes the request to the rendered card and screen pixel density, refreshes it every ten seconds only while visible, and reacts to meaningful layout changes. It does not mount `ha-camera-stream` or preconnect a live renderer.
 
-Inside the viewer, Ring View delegates camera rendering to Home Assistant so the platform can select the appropriate WebRTC, HLS, or MJPEG path. Home Assistant's application-level dialog manager owns the open viewer and its browser-history entry, allowing responsive Sections layouts to reflow or recreate the dashboard card without closing the viewer. A recording starts automatically unless `autoplay_recording` is disabled. Live starts only when selected. If audible autoplay is rejected by the browser, Ring View retries muted. When two-way audio is enabled, Ring View uses its single-session WebRTC player for Live instead.
+Inside the viewer, Ring View delegates camera rendering to Home Assistant so the platform can select the appropriate WebRTC, HLS, or MJPEG path. Home Assistant's application-level dialog manager owns the open viewer and its browser-history entry, allowing responsive Sections layouts to reflow or recreate the dashboard card without closing the viewer. A recording starts automatically unless `autoplay_recording` is disabled. Live starts only when selected. If audible autoplay is rejected by the browser, Ring View retries muted. A Live view reconstructed after a Companion orientation reload deliberately starts muted because the replacement Web View has no new audio-playback gesture. When two-way audio is enabled, Ring View uses its single-session WebRTC player for Live instead.
 
 Unavailable or missing entities are reported immediately. A live connection times out after 20 seconds and retries once. If Home Assistant's camera renderer is unavailable, recording playback can fall back to the current ephemeral `video_url`; Live offers Home Assistant's standard camera dialog instead.
 
