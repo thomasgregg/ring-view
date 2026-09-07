@@ -259,8 +259,7 @@ test("keeps hold to talk near the video edge on desktop and mobile", async ({ pa
     const player = document.createElement(
       "ring-view-ring-webrtc-player",
     ) as unknown as HTMLElement & { statusMessage: string };
-    player.statusMessage =
-      "Two-way audio needs an HTTPS Home Assistant connection. Video remains connected.";
+    player.statusMessage = "Microphone access requires HTTPS.";
     frame.append(player);
     document.body.replaceChildren(frame);
   });
@@ -281,18 +280,23 @@ test("keeps hold to talk near the video edge on desktop and mobile", async ({ pa
     const frameBox = await frame.boundingBox();
     const controlsBox = await controls.boundingBox();
     expect((frameBox?.y ?? 0) + (frameBox?.height ?? 0) - ((controlsBox?.y ?? 0) + (controlsBox?.height ?? 0))).toBeLessThanOrEqual(24);
-
-    if (viewport.width <= 600) {
-      const buttonBox = await talkButton.boundingBox();
-      const statusBox = await status.boundingBox();
-      expect((statusBox?.y ?? 0) + (statusBox?.height ?? 0)).toBeLessThanOrEqual(
-        (buttonBox?.y ?? 0) - 6,
-      );
-      expect(statusBox?.x).toBeGreaterThanOrEqual(0);
-      expect((statusBox?.x ?? 0) + (statusBox?.width ?? 0)).toBeLessThanOrEqual(
-        viewport.width,
-      );
-    }
+    const buttonBox = await talkButton.boundingBox();
+    const statusBox = await status.boundingBox();
+    expect(Math.abs(
+      (statusBox?.x ?? 0) + (statusBox?.width ?? 0) / 2
+        - ((frameBox?.x ?? 0) + (frameBox?.width ?? 0) / 2),
+    )).toBeLessThanOrEqual(1);
+    expect(Math.abs(
+      (statusBox?.y ?? 0) + (statusBox?.height ?? 0) / 2
+        - ((frameBox?.y ?? 0) + (frameBox?.height ?? 0) / 2),
+    )).toBeLessThanOrEqual(1);
+    expect((statusBox?.y ?? 0) + (statusBox?.height ?? 0)).toBeLessThanOrEqual(
+      (buttonBox?.y ?? 0) - 6,
+    );
+    expect(statusBox?.x).toBeGreaterThanOrEqual(0);
+    expect((statusBox?.x ?? 0) + (statusBox?.width ?? 0)).toBeLessThanOrEqual(
+      viewport.width,
+    );
   }
 });
 

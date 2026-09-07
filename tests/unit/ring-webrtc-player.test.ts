@@ -118,6 +118,7 @@ describe("Ring WebRTC player", () => {
 
   afterEach(() => {
     document.body.replaceChildren();
+    vi.useRealTimers();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
     if (originalMediaDevices) {
@@ -255,18 +256,22 @@ describe("Ring WebRTC player", () => {
     const getUserMedia = vi.fn(async () => new MockMediaStream([]) as unknown as MediaStream);
     const { player, peer } = await mount(getUserMedia);
     Object.defineProperty(window, "isSecureContext", { configurable: true, value: false });
+    vi.useFakeTimers();
 
     const button = player.shadowRoot?.querySelector<HTMLButtonElement>("button");
     if (!button) throw new Error("Talk button was not rendered");
     dispatchPointer(button, "pointerdown");
-    await flush();
+    await Promise.resolve();
     await player.updateComplete;
 
     expect(getUserMedia).not.toHaveBeenCalled();
     expect(peer.replaceTrack).not.toHaveBeenCalled();
     expect(peer.close).not.toHaveBeenCalled();
-    expect(player.shadowRoot?.textContent).toContain(
-      "Two-way audio needs an HTTPS Home Assistant connection. Video remains connected.",
-    );
+    expect(player.shadowRoot?.textContent).toContain("Microphone access requires HTTPS.");
+
+    await vi.advanceTimersByTimeAsync(3_000);
+    await player.updateComplete;
+
+    expect(player.shadowRoot?.textContent).not.toContain("Microphone access requires HTTPS.");
   });
 });

@@ -109,7 +109,7 @@
   "talkback.no_microphone": "Kein Mikrofon gefunden. Das Video bleibt verbunden.",
   "talkback.microphone_busy": "Das Mikrofon ist nicht verfügbar. Das Video bleibt verbunden.",
   "talkback.microphone_ended": "Das Mikrofon wurde beendet. Das Video bleibt verbunden.",
-  "talkback.https_required": "Zwei-Wege-Audio erfordert eine HTTPS-Verbindung zu Home Assistant. Das Video bleibt verbunden.",
+  "talkback.https_required": "Mikrofonzugriff erfordert HTTPS.",
   "talkback.playback_muted": "Der Browser hat die Live-Ansicht stumm gestartet. Ton kann über die Videosteuerung aktiviert werden.",
   "talkback.temporarily_disconnected": "Verbindung unterbrochen. Wiederherstellung derselben Sitzung wird abgewartet.",
   "talkback.webrtc_unavailable": "Dieser Browser oder die Home-Assistant-Verbindung kann Zwei-Wege-Audio nicht starten."

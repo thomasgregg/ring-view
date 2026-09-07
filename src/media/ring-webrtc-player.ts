@@ -24,6 +24,8 @@ interface CameraWebRtcClientConfig {
   dataChannel?: string;
 }
 
+const STATUS_MESSAGE_DURATION_MS = 3_000;
+
 function describeMicrophoneError(hass: HomeAssistant | undefined, error: unknown): string {
   if (error instanceof DOMException) {
     if (error.name === "NotAllowedError") return localize(hass, "talkback.permission_denied");
@@ -119,17 +121,19 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     .session-status {
       position: absolute;
       z-index: 4;
-      inset: auto auto 14px 16px;
-      max-width: calc(100% - 32px);
+      inset: 50% auto auto 50%;
+      max-width: min(560px, calc(100% - 32px));
       padding: 6px 10px;
+      box-sizing: border-box;
       overflow: hidden;
       border-radius: 999px;
       color: rgba(255, 255, 255, 0.92);
       background: rgba(0, 0, 0, 0.66);
       font-size: 12px;
       line-height: 16px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      text-align: center;
+      transform: translate(-50%, -50%);
+      white-space: normal;
       pointer-events: none;
     }
 
@@ -138,15 +142,6 @@ export class RingViewRingWebRtcPlayer extends LitElement {
         inset-inline: max(12px, env(safe-area-inset-right))
           max(12px, env(safe-area-inset-left));
         bottom: 8px;
-      }
-
-      .session-status {
-        inset-inline: max(12px, env(safe-area-inset-left))
-          max(12px, env(safe-area-inset-right));
-        bottom: calc(max(8px, env(safe-area-inset-bottom)) + 54px);
-        max-width: none;
-        text-align: center;
-        white-space: normal;
       }
     }
 
@@ -190,6 +185,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
   private activePointerId?: number;
   private keyboardPressed = false;
   private pressToken = 0;
+  private statusMessageTimeout?: number;
 
   public connectedCallback(): void {
     super.connectedCallback();
@@ -200,6 +196,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
   public disconnectedCallback(): void {
     window.removeEventListener("blur", this.handleWindowBlur);
     document.removeEventListener("visibilitychange", this.handleVisibilityChange);
+    this.clearStatusMessageTimeout();
     this.connectionToken += 1;
     void this.disposeSession();
     super.disconnectedCallback();
@@ -289,7 +286,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     if (track) track.enabled = false;
     if (this.microphoneState === "active") {
       this.microphoneState = "ready";
-      this.statusMessage = "";
+      this.showStatusMessage("");
     }
   };
 
@@ -312,7 +309,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     const token = ++this.connectionToken;
     this.connectionState = "starting";
     this.microphoneState = "not-requested";
-    this.statusMessage = localize(this.hass, "talkback.connecting");
+    this.showStatusMessage(localize(this.hass, "talkback.connecting"));
     this.readyDispatched = false;
     this.pendingLocalCandidates = [];
     this.pendingRemoteCandidates = [];
@@ -379,13 +376,13 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     }
     if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
       this.microphoneState = "unsupported";
-      this.statusMessage = localize(this.hass, "talkback.https_required");
+      this.showStatusMessage(localize(this.hass, "talkback.https_required"));
       return false;
     }
 
     const token = this.connectionToken;
     this.microphoneState = "requesting";
-    this.statusMessage = "";
+    this.showStatusMessage("");
     const request = (async (): Promise<boolean> => {
       let localStream: MediaStream | undefined;
       try {
@@ -411,7 +408,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
           this.cancelActivePress();
           this.localStream = undefined;
           this.microphoneState = "failed";
-          this.statusMessage = localize(this.hass, "talkback.microphone_ended");
+          this.showStatusMessage(localize(this.hass, "talkback.microphone_ended"));
         });
         await this.audioSender.replaceTrack(track);
         if (token !== this.connectionToken) {
@@ -422,13 +419,13 @@ export class RingViewRingWebRtcPlayer extends LitElement {
         this.localStream?.getTracks().forEach((item) => item.stop());
         this.localStream = localStream;
         this.microphoneState = "ready";
-        this.statusMessage = "";
+        this.showStatusMessage("");
         return true;
       } catch (error) {
         localStream?.getTracks().forEach((track) => track.stop());
         if (token !== this.connectionToken) return false;
         this.microphoneState = "failed";
-        this.statusMessage = describeMicrophoneError(this.hass, error);
+        this.showStatusMessage(describeMicrophoneError(this.hass, error));
         return false;
       }
     })();
@@ -494,7 +491,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     if (!track) return;
     track.enabled = true;
     this.microphoneState = "active";
-    this.statusMessage = "";
+    this.showStatusMessage("");
   }
 
   private isTalkPressed(): boolean {
@@ -609,7 +606,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     if (token !== this.connectionToken) return;
     this.actualMuted = true;
     video.muted = true;
-    this.statusMessage = localize(this.hass, "talkback.playback_muted");
+    this.showStatusMessage(localize(this.hass, "talkback.playback_muted"));
     void video.play().catch(() => {
       if (token === this.connectionToken) void this.fail(localize(this.hass, "viewer.live_failed"));
     });
@@ -627,10 +624,10 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     if (token !== this.connectionToken || !this.peerConnection) return;
     this.connectionState = this.peerConnection.connectionState;
     if (this.connectionState === "connected") {
-      this.statusMessage = "";
+      this.showStatusMessage("");
     } else if (this.connectionState === "disconnected") {
       this.cancelActivePress();
-      this.statusMessage = localize(this.hass, "talkback.temporarily_disconnected");
+      this.showStatusMessage(localize(this.hass, "talkback.temporarily_disconnected"));
     } else if (this.connectionState === "failed") {
       void this.fail(localize(this.hass, "viewer.live_failed"));
     }
@@ -640,8 +637,24 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     this.connectionToken += 1;
     await this.disposeSession();
     this.connectionState = "failed";
-    this.statusMessage = message;
+    this.showStatusMessage(message);
     this.dispatchFailure(message);
+  }
+
+  private showStatusMessage(message: string): void {
+    this.clearStatusMessageTimeout();
+    this.statusMessage = message;
+    if (!message) return;
+    this.statusMessageTimeout = window.setTimeout(() => {
+      this.statusMessageTimeout = undefined;
+      this.statusMessage = "";
+    }, STATUS_MESSAGE_DURATION_MS);
+  }
+
+  private clearStatusMessageTimeout(): void {
+    if (this.statusMessageTimeout === undefined) return;
+    window.clearTimeout(this.statusMessageTimeout);
+    this.statusMessageTimeout = undefined;
   }
 
   private dispatchFailure(message: string): void {

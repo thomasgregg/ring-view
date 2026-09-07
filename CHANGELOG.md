@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-09-07
+
+### Fixed
+
+- Center talkback status messages in portrait and landscape, hide them after the
+  same brief interval as the video controls, and shorten the HTTPS notice.
+
 ## [0.5.1] - 2026-09-07
 
 ### Changed
