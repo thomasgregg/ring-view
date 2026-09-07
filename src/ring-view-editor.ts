@@ -132,6 +132,7 @@ function configSchema(
         { name: "remember_last_mode", selector: { boolean: {} } },
         { name: "autoplay_recording", selector: { boolean: {} } },
         { name: "live_muted", selector: { boolean: {} } },
+        { name: "two_way_audio", selector: { boolean: {} } },
       ],
     },
     {
@@ -140,7 +141,6 @@ function configSchema(
       flatten: true,
       iconPath: mdiDoorbellVideo,
       schema: [
-        { name: "two_way_audio", selector: { boolean: {} } },
         {
           name: "doorbell_entity",
           selector: { entity: { domain: "event", device_class: "doorbell" } },

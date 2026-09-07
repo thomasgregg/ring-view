@@ -284,6 +284,7 @@ describe("visual editor", () => {
       "remember_last_mode",
       "autoplay_recording",
       "live_muted",
+      "two_way_audio",
     ]);
     const doorbellFeatures = form?.schema?.find(
       (field) => field.name === "doorbell_features",
@@ -295,7 +296,6 @@ describe("visual editor", () => {
       "Zwei-Wege-Audio aktivieren",
     );
     expect(doorbellFeatures?.schema?.map((field) => field.name)).toEqual([
-      "two_way_audio",
       "doorbell_entity",
     ]);
     expect(defaultMode?.selector).toMatchObject({

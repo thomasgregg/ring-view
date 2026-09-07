@@ -4,6 +4,15 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.5.11] - 2026-09-07
+
+### Changed
+
+- Move **Enable two-way audio** from **Doorbell features** to **Viewer behavior**,
+  directly below **Start Live muted**, since talkback is useful on cameras without
+  a doorbell too. Existing settings, playback, and viewer controls are unchanged.
+- This stable release does not include the temporary playback diagnostic panel.
+
 ## [0.5.10] - 2026-09-07
 
 ### Fixed

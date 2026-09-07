@@ -3546,7 +3546,8 @@ function Zi(e, t) {
         },
         { name: "remember_last_mode", selector: { boolean: {} } },
         { name: "autoplay_recording", selector: { boolean: {} } },
-        { name: "live_muted", selector: { boolean: {} } }
+        { name: "live_muted", selector: { boolean: {} } },
+        { name: "two_way_audio", selector: { boolean: {} } }
       ]
     },
     {
@@ -3555,7 +3556,6 @@ function Zi(e, t) {
       flatten: !0,
       iconPath: ut,
       schema: [
-        { name: "two_way_audio", selector: { boolean: {} } },
         {
           name: "doorbell_entity",
           selector: { entity: { domain: "event", device_class: "doorbell" } }
