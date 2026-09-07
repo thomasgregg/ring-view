@@ -51,6 +51,14 @@ The blueprint requires Home Assistant **2026.7 or newer**, a Ring recording
 entity with `last_video_id`, and a working Companion app notification device.
 The optional backend patch is not required for this automation.
 
+On some newer wired Ring cameras using 24/7 recording, an
+[upstream Home Assistant issue](https://github.com/home-assistant/core/issues/176299)
+can leave the recording entity's `last_video_id` stuck on an old event. The
+immediate doorbell notification still arrives, but the blueprint cannot detect
+a new recording and therefore leaves the notification without a recording
+preview after the two-minute wait. The issue reporter found that disabling
+24/7 recording and using periodic snapshots restored recording updates.
+
 ## Build on the same Ring event
 
 You can use the doorbell event in additional Home Assistant automations to:

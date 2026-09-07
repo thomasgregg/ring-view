@@ -80,6 +80,7 @@ The temporary backend patch does not bypass this restriction.
 | Reconnecting, followed by Retry/error | Check Home Assistant connectivity and Ring Live availability. Repeated failures after session teardown can match the [known backend defect](backend-patch.md). |
 | Hold to talk is unavailable | Wait for playback; confirm the official Ring live entity, HTTPS, and microphone permission. |
 | Missing/unavailable camera | Check the configured entity IDs and enable the recording entity in the Ring device if needed. |
+| Last recording remains on an old clip | On some newer wired Ring cameras, 24/7 recording can leave Home Assistant's `last_recording` entity stuck on an old event. This is an [upstream Home Assistant issue](https://github.com/home-assistant/core/issues/176299), not a Ring View cache: the card's preview and Last recording view can update only when Home Assistant supplies a new `last_video_id` or `video_url`. The issue reporter found that disabling 24/7 recording and using periodic snapshots restored updates. Live view, talkback, and Ding alerts use separate entities and remain available. |
 | Old card behavior after updating | Confirm the installed HACS version and refresh the frontend. In the iOS Companion app, **Clear Web View Cache** may be necessary. |
 | No new phone preview | Check the blueprint's selected recording entity and whether a new `last_video_id` appeared within two minutes. See [notifications](notifications.md). |
 
