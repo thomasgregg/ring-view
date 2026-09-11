@@ -1,4 +1,4 @@
-# <img src="https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/ring-view-icon.png" alt="" width="56" height="56" align="middle"> Ring View
+# <img src="https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/ring-view-icon.png" alt="" width="48" height="48" align="absmiddle"> Ring View
 
 [![Latest release](https://img.shields.io/github/v/release/thomasgregg/ring-view?display_name=tag&sort=semver)](https://github.com/thomasgregg/ring-view/releases/latest)
 [![Validate](https://github.com/thomasgregg/ring-view/actions/workflows/validate.yml/badge.svg)](https://github.com/thomasgregg/ring-view/actions/workflows/validate.yml)
