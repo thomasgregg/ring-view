@@ -4,6 +4,19 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-09-11
+
+### Changed
+
+- Match the visitor-action dock's 6 px horizontal outer inset to the spacing on
+  both sides of the divider, improving optical balance without changing the
+  compact phone layout.
+
+### Tests
+
+- Verify the combined dock's outer padding and viewport containment on desktop
+  and phone.
+
 ## [0.6.1] - 2026-09-11
 
 ### Changed

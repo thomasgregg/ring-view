@@ -153,6 +153,8 @@ test("merges Talk and door access into one divided action dock", async ({ page }
   await expect(dock).toBeVisible();
   await expect(talk).toBeDisabled();
   await expect(door).toBeVisible();
+  await expect(dock).toHaveCSS("padding-left", "6px");
+  await expect(dock).toHaveCSS("padding-right", "6px");
   const divider = dock.locator(".visitor-action-divider");
   await expect(divider).toBeVisible();
   await expect(divider).toHaveCSS("margin-left", "6px");
@@ -163,6 +165,12 @@ test("merges Talk and door access into one divided action dock", async ({ page }
   await expect(door).toHaveCSS("border-top-left-radius", "0px");
   await expect(door).toHaveCSS("border-bottom-left-radius", "0px");
   await expect(door).toHaveCSS("border-top-right-radius", "999px");
+
+  const dockBox = await dock.boundingBox();
+  const viewport = page.viewportSize();
+  if (!dockBox || !viewport) throw new Error("Action dock geometry unavailable");
+  expect(dockBox.x).toBeGreaterThanOrEqual(0);
+  expect(dockBox.x + dockBox.width).toBeLessThanOrEqual(viewport.width);
 });
 
 test("requires a complete hold before opening the configured door", async ({ page }) => {

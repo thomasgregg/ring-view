@@ -36,7 +36,8 @@ at the bottom of the viewer:
   surface, so they read as one visitor interaction.
 - A short, low-contrast vertical bar separates the communication action from the
   physical-access action. Balanced spacing on both sides gives the divider room
-  to breathe without making the dock look like two unrelated buttons.
+  to breathe without making the dock look like two unrelated buttons. Matching
+  horizontal inset at the two outer edges keeps that spacing optically balanced.
 - In the combined dock, only the two outer ends are rounded. The sides facing
   the divider are flat, so hover, hold, active, and success fills read as two
   segments of one control instead of nested pills.

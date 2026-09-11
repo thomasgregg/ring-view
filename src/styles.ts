@@ -392,7 +392,7 @@ export const dialogStyles = css`
     align-items: center;
     justify-content: center;
     gap: 0;
-    padding: 3px;
+    padding: 3px 6px;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.42);
     border-radius: 999px;

@@ -1,6 +1,6 @@
 {
   "name": "ring-view",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "A polished Home Assistant view for Ring recordings, Live, talkback, and door access.",
   "type": "module",
   "main": "dist/ring-view.js",
