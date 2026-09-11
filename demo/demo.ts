@@ -131,6 +131,9 @@ const doorContact: HassEntity = {
   },
 };
 recording.attributes.recorded_at = "2026-09-06T12:00:00Z";
+if (query.get("recording_video") === "pending") {
+  recording.attributes.video_url = "/demo/pending-recording.mp4";
+}
 
 let ringSubscriptions = 0;
 let ringSessionSequence = 0;

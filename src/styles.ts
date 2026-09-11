@@ -337,6 +337,10 @@ export const dialogStyles = css`
     opacity: 0.01;
   }
 
+  .video-fallback.pending {
+    opacity: 0;
+  }
+
   .dialog-ring-alert {
     position: absolute;
     z-index: 6;

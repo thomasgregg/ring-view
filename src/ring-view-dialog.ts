@@ -878,7 +878,10 @@ export class RingViewDialog extends LitElement {
               `${entityId}:${this.session}:recording-video`,
               html`
               <video
-                class="video-fallback"
+                class=${classMap({
+                  "video-fallback": true,
+                  pending: this.mediaStatus === "pending",
+                })}
                 src=${fallbackUrl}
                 poster=${poster}
                 playsinline

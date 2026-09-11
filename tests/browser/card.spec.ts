@@ -141,6 +141,18 @@ test("falls back to native live playback without talkback for a generic camera",
   await expect(page.getByRole("img", { name: "Synthetic demo camera media" })).toBeVisible();
 });
 
+test("shows only the Ring View loader while a direct recording is pending", async ({ page }) => {
+  await page.route("**/pending-recording.mp4", async () => undefined);
+  await page.goto("/demo/?recording_video=pending");
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+
+  const recording = page.locator("video.video-fallback.pending");
+  await expect(recording).toBeAttached();
+  await expect(recording).toHaveCSS("opacity", "0");
+  await expect(page.locator(".state-layer .spinner")).toBeVisible();
+  await expect(page.getByText("Loading last recording…")).toBeVisible();
+});
+
 test("merges Talk and door access into one divided action dock", async ({ page }) => {
   await page.goto(
     "/demo/?mode=live&two_way_audio=1&door=1&door_action=open",

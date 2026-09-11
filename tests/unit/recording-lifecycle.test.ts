@@ -43,6 +43,18 @@ describe("recording player lifecycle", () => {
     vi.restoreAllMocks();
   });
 
+  it("hides native video chrome until the recording can play", async () => {
+    const { dialog, video } = await mount();
+    expect(video().classList.contains("pending")).toBe(true);
+    expect(dialog.shadowRoot!.querySelector(".spinner")).not.toBeNull();
+
+    video().dispatchEvent(new Event("canplay"));
+    await flush();
+
+    expect(video().classList.contains("pending")).toBe(false);
+    expect(dialog.shadowRoot!.querySelector(".spinner")).toBeNull();
+  });
+
   it("recognizes each replacement recording after repeated app backgrounding", async () => {
     const visibility = vi.spyOn(document, "hidden", "get").mockReturnValue(false);
     const { dialog, video } = await mount();

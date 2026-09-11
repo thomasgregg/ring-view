@@ -249,7 +249,7 @@ let H = class extends HTMLElement {
 };
 H.elementStyles = [], H.shadowRootOptions = { mode: "open" }, H[q("elementProperties")] = /* @__PURE__ */ new Map(), H[q("finalized")] = /* @__PURE__ */ new Map(), It?.({ ReactiveElement: H }), (oe.reactiveElementVersions ??= []).push("2.1.2");
 const ye = globalThis, Ve = (e) => e, ee = ye.trustedTypes, He = ee ? ee.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, it = "$lit$", T = `lit$${Math.random().toFixed(9).slice(2)}$`, ot = "?" + T, Vt = `<${ot}>`, I = document, N = () => I.createComment(""), B = (e) => e === null || typeof e != "object" && typeof e != "function", ke = Array.isArray, Ht = (e) => ke(e) || typeof e?.[Symbol.iterator] == "function", se = `[ 	
-\f\r]`, U = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Oe = /-->/g, Ue = />/g, L = RegExp(`>|${se}(?:([^\\s"'>=/]+)(${se}*=${se}*(?:[^ 	
+\f\r]`, z = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Oe = /-->/g, Ue = />/g, L = RegExp(`>|${se}(?:([^\\s"'>=/]+)(${se}*=${se}*(?:[^ 	
 \f\r"'\`<>=]|("|')|))|$)`, "g"), ze = /'/g, qe = /"/g, rt = /^(?:script|style|textarea|title)$/i, Ot = (e) => (t, ...i) => ({ _$litType$: e, strings: t, values: i }), h = Ot(1), P = /* @__PURE__ */ Symbol.for("lit-noChange"), c = /* @__PURE__ */ Symbol.for("lit-nothing"), Ne = /* @__PURE__ */ new WeakMap(), D = I.createTreeWalker(I, 129);
 function nt(e, t) {
   if (!ke(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
@@ -257,13 +257,13 @@ function nt(e, t) {
 }
 const Ut = (e, t) => {
   const i = e.length - 1, o = [];
-  let r, n = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", a = U;
+  let r, n = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", a = z;
   for (let l = 0; l < i; l++) {
     const d = e[l];
     let u, v, g = -1, A = 0;
-    for (; A < d.length && (a.lastIndex = A, v = a.exec(d), v !== null); ) A = a.lastIndex, a === U ? v[1] === "!--" ? a = Oe : v[1] !== void 0 ? a = Ue : v[2] !== void 0 ? (rt.test(v[2]) && (r = RegExp("</" + v[2], "g")), a = L) : v[3] !== void 0 && (a = L) : a === L ? v[0] === ">" ? (a = r ?? U, g = -1) : v[1] === void 0 ? g = -2 : (g = a.lastIndex - v[2].length, u = v[1], a = v[3] === void 0 ? L : v[3] === '"' ? qe : ze) : a === qe || a === ze ? a = L : a === Oe || a === Ue ? a = U : (a = L, r = void 0);
+    for (; A < d.length && (a.lastIndex = A, v = a.exec(d), v !== null); ) A = a.lastIndex, a === z ? v[1] === "!--" ? a = Oe : v[1] !== void 0 ? a = Ue : v[2] !== void 0 ? (rt.test(v[2]) && (r = RegExp("</" + v[2], "g")), a = L) : v[3] !== void 0 && (a = L) : a === L ? v[0] === ">" ? (a = r ?? z, g = -1) : v[1] === void 0 ? g = -2 : (g = a.lastIndex - v[2].length, u = v[1], a = v[3] === void 0 ? L : v[3] === '"' ? qe : ze) : a === qe || a === ze ? a = L : a === Oe || a === Ue ? a = z : (a = L, r = void 0);
     const S = a === L && e[l + 1].startsWith("/>") ? " " : "";
-    n += a === U ? d + Vt : g >= 0 ? (o.push(u), d.slice(0, g) + it + d.slice(g) + T + S) : d + T + (g === -2 ? l : S);
+    n += a === z ? d + Vt : g >= 0 ? (o.push(u), d.slice(0, g) + it + d.slice(g) + T + S) : d + T + (g === -2 ? l : S);
   }
   return [nt(e, n + (e[i] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), o];
 };
@@ -304,11 +304,11 @@ class F {
     return o.innerHTML = t, o;
   }
 }
-function O(e, t, i = e, o) {
+function U(e, t, i = e, o) {
   if (t === P) return t;
   let r = o !== void 0 ? i._$Co?.[o] : i._$Cl;
   const n = B(t) ? void 0 : t._$litDirective$;
-  return r?.constructor !== n && (r?._$AO?.(!1), n === void 0 ? r = void 0 : (r = new n(e), r._$AT(e, i, o)), o !== void 0 ? (i._$Co ??= [])[o] = r : i._$Cl = r), r !== void 0 && (t = O(e, r._$AS(e, t.values), r, o)), t;
+  return r?.constructor !== n && (r?._$AO?.(!1), n === void 0 ? r = void 0 : (r = new n(e), r._$AT(e, i, o)), o !== void 0 ? (i._$Co ??= [])[o] = r : i._$Cl = r), r !== void 0 && (t = U(e, r._$AS(e, t.values), r, o)), t;
 }
 class zt {
   constructor(t, i) {
@@ -357,7 +357,7 @@ class W {
     return this._$AB;
   }
   _$AI(t, i = this) {
-    t = O(this, t, i), B(t) ? t === c || t == null || t === "" ? (this._$AH !== c && this._$AR(), this._$AH = c) : t !== this._$AH && t !== P && this._(t) : t._$litType$ !== void 0 ? this.$(t) : t.nodeType !== void 0 ? this.T(t) : Ht(t) ? this.k(t) : this._(t);
+    t = U(this, t, i), B(t) ? t === c || t == null || t === "" ? (this._$AH !== c && this._$AR(), this._$AH = c) : t !== this._$AH && t !== P && this._(t) : t._$litType$ !== void 0 ? this.$(t) : t.nodeType !== void 0 ? this.T(t) : Ht(t) ? this.k(t) : this._(t);
   }
   O(t) {
     return this._$AA.parentNode.insertBefore(t, this._$AB);
@@ -410,11 +410,11 @@ class re {
   _$AI(t, i = this, o, r) {
     const n = this.strings;
     let a = !1;
-    if (n === void 0) t = O(this, t, i, 0), a = !B(t) || t !== this._$AH && t !== P, a && (this._$AH = t);
+    if (n === void 0) t = U(this, t, i, 0), a = !B(t) || t !== this._$AH && t !== P, a && (this._$AH = t);
     else {
       const l = t;
       let d, u;
-      for (t = n[0], d = 0; d < n.length - 1; d++) u = O(this, l[o + d], i, d), u === P && (u = this._$AH[d]), a ||= !B(u) || u !== this._$AH[d], u === c ? t = c : t !== c && (t += (u ?? "") + n[d + 1]), this._$AH[d] = u;
+      for (t = n[0], d = 0; d < n.length - 1; d++) u = U(this, l[o + d], i, d), u === P && (u = this._$AH[d]), a ||= !B(u) || u !== this._$AH[d], u === c ? t = c : t !== c && (t += (u ?? "") + n[d + 1]), this._$AH[d] = u;
     }
     a && !r && this.j(t);
   }
@@ -443,7 +443,7 @@ class Bt extends re {
     super(t, i, o, r, n), this.type = 5;
   }
   _$AI(t, i = this) {
-    if ((t = O(this, t, i, 0) ?? c) === P) return;
+    if ((t = U(this, t, i, 0) ?? c) === P) return;
     const o = this._$AH, r = t === c && o !== c || t.capture !== o.capture || t.once !== o.once || t.passive !== o.passive, n = t !== c && (o === c || r);
     r && this.element.removeEventListener(this.name, this, o), n && this.element.addEventListener(this.name, this, t), this._$AH = t;
   }
@@ -459,7 +459,7 @@ class Ft {
     return this._$AM._$AU;
   }
   _$AI(t) {
-    O(this, t);
+    U(this, t);
   }
 }
 const Kt = ye.litHtmlPolyfillSupport;
@@ -1479,6 +1479,10 @@ const wi = j`
     opacity: 0.01;
   }
 
+  .video-fallback.pending {
+    opacity: 0;
+  }
+
   .dialog-ring-alert {
     position: absolute;
     z-index: 6;
@@ -2421,7 +2425,7 @@ window.customCards.some((e) => e.type === le) || window.customCards.push({
     } : null;
   }
 });
-const z = $e(class extends Se {
+const O = $e(class extends Se {
   constructor(e) {
     if (super(e), e.type !== st.ATTRIBUTE || e.name !== "class" || e.strings?.length > 2) throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.");
   }
@@ -2812,7 +2816,7 @@ let w = class extends C {
       ` : c}
       ${!this.externalControls && i && this.readyDispatched && !this.playbackBlocked ? h`<div class="talkback-controls">
         <button
-          class=${z({ "talk-button": !0, active: e })}
+          class=${O({ "talk-button": !0, active: e })}
           type="button"
           aria-label=${r}
           aria-pressed=${String(e)}
@@ -3491,7 +3495,7 @@ let f = class extends C {
               </div>
             ` : c}
         <div
-          class=${z({
+          class=${O({
       "visitor-action-dock": !0,
       "door-only": e && !t,
       "talk-only": t && !e
@@ -3501,7 +3505,7 @@ let f = class extends C {
         >
           ${t ? h`
                 <button
-                  class=${z({
+                  class=${O({
       "visitor-action": !0,
       "talk-action": !0,
       active: this.talkbackTalking
@@ -3525,7 +3529,7 @@ let f = class extends C {
           ${e && t ? h`<span class="visitor-action-divider" aria-hidden="true"></span>` : c}
           ${e ? h`
                 <button
-                  class=${z({
+                  class=${O({
       "visitor-action": !0,
       "door-action": !0,
       "contact-open": a,
@@ -3653,7 +3657,7 @@ let f = class extends C {
     const e = this.activeEntity(), t = this.activeEntityId(), i = _(e), o = !i && !this.suspended && (this.mode === "live" || this.recordingStarted), r = lt(this.config.aspect_ratio), n = pt(this.hass, e, t), a = this.mode === "last_recording" && typeof e?.attributes.video_url == "string" ? e.attributes.video_url : void 0, l = o && ["pending", "ready", "playback-blocked"].includes(this.mediaStatus), d = !!(l && a && !this.recordingVideoFailed), u = !!(o && this.mode === "live" && this.config.two_way_audio && fe(this.hass, t));
     return h`
       <div
-        class=${z({
+        class=${O({
       "media-frame": !0,
       "auto-ratio": this.config.aspect_ratio === "auto"
     })}
@@ -3701,7 +3705,10 @@ let f = class extends C {
       `${t}:${this.session}:recording-video`,
       h`
               <video
-                class="video-fallback"
+                class=${O({
+        "video-fallback": !0,
+        pending: this.mediaStatus === "pending"
+      })}
                 src=${a}
                 poster=${n}
                 playsinline

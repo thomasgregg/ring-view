@@ -4,6 +4,19 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.6.3] - 2026-09-11
+
+### Fixed
+
+- Hide the browser's native video surface while a direct recording is still
+  loading, preventing its buffering indicator from appearing underneath Ring
+  View's loading spinner.
+
+### Tests
+
+- Verify the pending recording surface stays hidden while the Ring View loader
+  remains visible on desktop and phone.
+
 ## [0.6.2] - 2026-09-11
 
 ### Changed
