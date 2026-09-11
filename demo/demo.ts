@@ -236,8 +236,6 @@ card.setConfig({
   two_way_audio: query.get("two_way_audio") === "1",
   door_entity: query.get("door") === "1" ? door.entity_id : undefined,
   door_action: query.get("door_action") === "open" ? "open" : "unlock",
-  door_control_layout:
-    query.get("door_layout") === "replace" ? "replace_talk" : "alongside_talk",
   door_control_visibility:
     query.get("door_visibility") === "all" ? "all_views" : "live_only",
   door_hold_to_activate: query.get("door_hold") !== "0",

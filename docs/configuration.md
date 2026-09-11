@@ -39,7 +39,6 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `door_entity` | Yes — Door access | Not set | `lock.*` entity ID | Enables the door-access beta for the selected Home Assistant lock. |
 | `door_action` | Yes — Door access | `unlock` | `unlock`, `open` | Calls `lock.unlock`, or `lock.open` for locks that advertise latch-opening support. |
 | `door_control_visibility` | Yes — Door access | `live_only` | `live_only`, `all_views` | Shows the door action only in Live by default, or also over recordings. |
-| `door_control_layout` | Yes — Door access | `alongside_talk` | `alongside_talk`, `replace_talk` | Shares one dock with Talk or replaces Talk when both controls are available. |
 | `door_hold_to_activate` | Yes — Door access | `true` | `true`, `false` | Requires a 900 ms press-and-hold confirmation. Disable for one-tap operation. |
 | `show_name` | Yes — Config tab | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer. |
 | `preview_source` | Yes — Dashboard preview | `last_recording` | `last_recording`, `live`, `default`, `snapshot`, `newest` | Chooses the entity used for the dashboard still. `default` follows the view that will open; `newest` compares the optional snapshot with the latest recording. |
@@ -82,7 +81,6 @@ doorbell_entity: event.front_door_ding
 door_entity: lock.front_door
 door_action: open
 door_control_visibility: live_only
-door_control_layout: alongside_talk
 door_hold_to_activate: true
 
 show_name: true
@@ -103,10 +101,9 @@ Ring View 0.2 and newer use this flat configuration only. Earlier nested `previe
 ## Door access beta
 
 Open **Door access** and select a Home Assistant lock to enable the feature. The
-remaining settings appear only after a lock is selected; the Talk layout appears
-only when two-way audio is enabled. Removing the lock returns the card to its
-previous behavior and removes the inactive door settings from the saved visual
-configuration.
+remaining settings appear only after a lock is selected. Removing the lock
+returns the card to its previous behavior and removes the inactive door settings
+from the saved visual configuration.
 
 **Unlock** uses the standard `lock.unlock` service. **Open door** uses
 `lock.open`, intended for locks such as compatible Nuki devices that can release
@@ -121,8 +118,8 @@ tap, click, Space, or Enter activation.
 **Live view only** is the recommended default. **Live and recordings** is
 available for users who intentionally want door access while viewing historical
 footage. When Talk and door access are both visible, they share one dock with a
-short divider. The dock collapses cleanly when one action is hidden or configured
-to replace the other.
+short divider. If Talk is disabled or unsupported by the configured camera, the
+dock automatically collapses to the door-only pill.
 
 [Full door-access beta specification](door-access-beta.md)
 

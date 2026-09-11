@@ -178,7 +178,7 @@ test("requires a complete hold before opening the configured door", async ({ pag
   await expect(page.getByRole("button", { name: "Door opened" })).toBeVisible();
 });
 
-test("configures door visibility and replacement of Talk independently", async ({ page }) => {
+test("configures door visibility and collapses automatically without Talk", async ({ page }) => {
   await page.goto("/demo/?door=1");
   await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
   await expect(page.locator(".door-action")).toHaveCount(0);
@@ -186,7 +186,7 @@ test("configures door visibility and replacement of Talk independently", async (
   await expect(page.locator(".door-action")).toBeVisible();
 
   await page.goto(
-    "/demo/?door=1&door_visibility=all&two_way_audio=1&door_layout=replace",
+    "/demo/?door=1&door_visibility=all&two_way_audio=1&live_platform=generic",
   );
   await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
   await expect(page.locator(".door-action")).toBeVisible();

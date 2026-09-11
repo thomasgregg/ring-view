@@ -139,27 +139,6 @@ function configSchema(
         },
       },
     );
-    if (config.two_way_audio) {
-      doorAccess.push({
-        name: "door_control_layout",
-        required: true,
-        selector: {
-          select: {
-            mode: "dropdown",
-            options: [
-              {
-                value: "alongside_talk",
-                label: localize(hass, "editor.door_layout_both"),
-              },
-              {
-                value: "replace_talk",
-                label: localize(hass, "editor.door_layout_replace"),
-              },
-            ],
-          },
-        },
-      });
-    }
     doorAccess.push({
       name: "door_hold_to_activate",
       selector: { boolean: {} },
@@ -310,7 +289,6 @@ const LABELS: Record<string, TranslationKey> = {
   door_entity: "editor.door_entity",
   door_action: "editor.door_action",
   door_control_visibility: "editor.door_control_visibility",
-  door_control_layout: "editor.door_control_layout",
   door_hold_to_activate: "editor.door_hold_to_activate",
   card_appearance: "editor.card_appearance",
   name: "editor.name",
@@ -331,7 +309,6 @@ const HELPERS: Record<string, TranslationKey> = {
   door_entity: "editor.helper_door_entity",
   door_action: "editor.helper_door_action",
   door_control_visibility: "editor.helper_door_control_visibility",
-  door_control_layout: "editor.helper_door_control_layout",
   door_hold_to_activate: "editor.helper_door_hold_to_activate",
   show_name: "editor.helper_show_name",
   preview_source: "editor.helper_preview_source",
@@ -423,7 +400,6 @@ export class RingViewEditor extends LitElement {
     this.config = next;
     const inactiveDoorOptions = new Set([
       "door_action",
-      "door_control_layout",
       "door_control_visibility",
       "door_hold_to_activate",
     ]);

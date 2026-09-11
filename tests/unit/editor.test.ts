@@ -375,7 +375,6 @@ describe("visual editor", () => {
       "door_entity",
       "door_action",
       "door_control_visibility",
-      "door_control_layout",
       "door_hold_to_activate",
     ]);
 

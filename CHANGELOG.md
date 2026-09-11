@@ -4,6 +4,19 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.6.0-beta.2] - 2026-09-11
+
+### Changed
+
+- Remove the redundant **When Talk is available** setting. Ring View now always
+  shows the unified Talk/door dock when Talk is supported and automatically
+  collapses to the door-only pill when Talk is disabled or unsupported.
+
+### Tests
+
+- Verify the simpler editor schema, merged supported-camera layout, and automatic
+  door-only fallback for unsupported cameras.
+
 ## [0.6.0-beta.1] - 2026-09-11
 
 ### Added

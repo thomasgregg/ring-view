@@ -338,7 +338,7 @@ export class RingViewDialog extends LitElement {
 
   private renderVisitorActions(): TemplateResult | typeof nothing {
     const showDoor = this.shouldShowDoorControl();
-    const showTalk = this.shouldShowTalkControl(showDoor);
+    const showTalk = this.shouldShowTalkControl();
     if (!showDoor && !showTalk) return nothing;
 
     const doorDisabled = showDoor ? this.doorActionDisabled() : true;
@@ -450,19 +450,13 @@ export class RingViewDialog extends LitElement {
     );
   }
 
-  private shouldShowTalkControl(showDoor: boolean): boolean {
-    if (
-      this.mode !== "live"
-      || !this.config?.two_way_audio
-      || !this.hass
-      || !supportsRingTalkback(this.hass, this.config.live_entity)
-      || !["pending", "ready", "playback-blocked"].includes(this.mediaStatus)
-    ) {
-      return false;
-    }
-    return !(
-      showDoor
-      && this.config.door_control_layout === "replace_talk"
+  private shouldShowTalkControl(): boolean {
+    return Boolean(
+      this.mode === "live"
+      && this.config?.two_way_audio
+      && this.hass
+      && supportsRingTalkback(this.hass, this.config.live_entity)
+      && ["pending", "ready", "playback-blocked"].includes(this.mediaStatus),
     );
   }
 

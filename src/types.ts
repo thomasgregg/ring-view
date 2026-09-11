@@ -9,7 +9,6 @@ export type PreviewFallback = "last_recording" | "snapshot";
 export type AspectRatio = "auto" | "16:9" | "4:3" | "1:1";
 export type FitMode = "cover" | "contain";
 export type DoorAction = "unlock" | "open";
-export type DoorControlLayout = "alongside_talk" | "replace_talk";
 export type DoorControlVisibility = "live_only" | "all_views";
 
 export interface HassEntity {
@@ -83,7 +82,6 @@ export interface RingViewConfig {
   doorbell_entity?: string;
   door_entity?: string;
   door_action?: DoorAction;
-  door_control_layout?: DoorControlLayout;
   door_control_visibility?: DoorControlVisibility;
   door_hold_to_activate?: boolean;
   show_name?: boolean;

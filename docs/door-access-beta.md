@@ -4,7 +4,7 @@
 
 ## Status and intent
 
-Door access is introduced as an opt-in beta in `0.6.0-beta.1`. It lets a Ring
+Door access is available as an opt-in beta in `0.6.0-beta.2`. It lets a Ring
 View camera viewer operate a Home Assistant `lock.*` entity—for example, a Nuki
 lock—without leaving the camera view.
 
@@ -52,8 +52,9 @@ Door access appears only when `door_entity` is configured.
   operation next to a current camera view.
 - **Live and recordings** is an explicit option for households that need the
   action in both modes.
-- When Talk is available, the default is **Show both controls** in the shared
-  dock. **Replace Talk** shows only the door action.
+- When Talk is available, both controls always appear in the shared dock.
+- When Talk is disabled or unsupported, the dock automatically collapses to the
+  door-only pill. No separate layout setting is needed.
 - Talk itself remains a Live-only action because it depends on the live WebRTC
   session.
 
@@ -131,8 +132,7 @@ The **Door access** section uses progressive disclosure:
 1. Initially, show only **Door lock**.
 2. Once a `lock.*` entity is selected, reveal **Action when pressed**, **Show
    control in**, and **Require hold to activate**.
-3. Reveal **When Talk is available** only when two-way audio is enabled.
-4. If the lock does not support `open`, explain the issue next to the
+3. If the lock does not support `open`, explain the issue next to the
    configuration while leaving **Unlock** available.
 
 This places the highest-impact choice first, keeps inactive settings out of the
@@ -145,7 +145,6 @@ way, and presents dependent choices only when they can affect the viewer.
 | `door_entity` | Not set | `lock.*` entity ID | Enables door access for the selected lock. |
 | `door_action` | `unlock` | `unlock`, `open` | Selects the Home Assistant lock service. |
 | `door_control_visibility` | `live_only` | `live_only`, `all_views` | Limits the control to Live or also shows it over recordings. |
-| `door_control_layout` | `alongside_talk` | `alongside_talk`, `replace_talk` | Merges the door action with Talk or replaces Talk when both could appear. |
 | `door_hold_to_activate` | `true` | `true`, `false` | Requires the 900 ms hold confirmation or enables one-tap operation. |
 
 Example:
@@ -159,7 +158,6 @@ two_way_audio: true
 door_entity: lock.front_door
 door_action: open
 door_control_visibility: live_only
-door_control_layout: alongside_talk
 door_hold_to_activate: true
 ```
 
@@ -182,6 +180,8 @@ door_hold_to_activate: true
 - A single remaining action renders as one centered pill without a divider.
 - A short hold never calls a lock service; a completed hold calls it once.
 - One-tap mode calls once per deliberate activation.
+- Talk appears beside the door action whenever it is supported, and the dock
+  collapses automatically when Talk is unavailable.
 - `open` is blocked when the lock does not advertise support.
 - Unavailable and jammed locks cannot be operated.
 - Live-only and Live-plus-recordings visibility work independently of the opening
@@ -189,4 +189,4 @@ door_hold_to_activate: true
 - Pointer, touch, and keyboard interaction receive equivalent feedback.
 - English and German labels, errors, and announcements are included.
 - Desktop and phone browser tests cover the merged dock, cancellation, service
-  call, visibility, and replacement layout.
+  call, visibility, and automatic door-only fallback.

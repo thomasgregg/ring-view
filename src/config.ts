@@ -12,7 +12,6 @@ const DEFAULTS = {
   live_muted: false,
   two_way_audio: false,
   door_action: "unlock",
-  door_control_layout: "alongside_talk",
   door_control_visibility: "live_only",
   door_hold_to_activate: true,
   show_name: false,
@@ -34,7 +33,6 @@ const PREVIEW_FALLBACKS = new Set(["last_recording", "snapshot"]);
 const ASPECT_RATIOS = new Set(["auto", "16:9", "4:3", "1:1"]);
 const FIT_MODES = new Set(["cover", "contain"]);
 const DOOR_ACTIONS = new Set(["unlock", "open"]);
-const DOOR_CONTROL_LAYOUTS = new Set(["alongside_talk", "replace_talk"]);
 const DOOR_CONTROL_VISIBILITIES = new Set(["live_only", "all_views"]);
 
 function assertCameraEntity(
@@ -98,12 +96,6 @@ export function validateConfig(config: RingViewConfig): void {
     throw new Error(localize(undefined, "config.door_action"));
   }
   if (
-    config.door_control_layout
-    && !DOOR_CONTROL_LAYOUTS.has(config.door_control_layout)
-  ) {
-    throw new Error(localize(undefined, "config.door_control_layout"));
-  }
-  if (
     config.door_control_visibility
     && !DOOR_CONTROL_VISIBILITIES.has(config.door_control_visibility)
   ) {
@@ -129,8 +121,6 @@ export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
     doorbell_entity: config.doorbell_entity || undefined,
     door_entity: config.door_entity || undefined,
     door_action: config.door_action ?? DEFAULTS.door_action,
-    door_control_layout:
-      config.door_control_layout ?? DEFAULTS.door_control_layout,
     door_control_visibility:
       config.door_control_visibility ?? DEFAULTS.door_control_visibility,
     door_hold_to_activate:

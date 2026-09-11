@@ -13,7 +13,6 @@ doorbell_entity: event.front_door_ding
 door_entity: lock.front_door
 door_action: unlock
 door_control_visibility: live_only
-door_control_layout: alongside_talk
 door_hold_to_activate: true
 
 show_name: false
