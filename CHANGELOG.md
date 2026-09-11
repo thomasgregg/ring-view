@@ -4,6 +4,25 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.7.0-beta.4] - 2026-09-11
+
+### Fixed
+
+- Keep the inline Live connection status clear of the fixed Talk/door dock at
+  short card heights by using a compact horizontal loading layout with reserved
+  header and control space.
+
+### Documentation
+
+- Reorganize the README around the dashboard modes and commonly confused
+  settings, with a use-case matrix and complete examples for a simple viewer,
+  wall tablet, muted Live monitor, and fullscreen-only door access.
+
+### Tests
+
+- Verify at the minimum card height on both desktop and iPhone profiles that
+  the connection status ends above the visitor-action dock.
+
 ## [0.7.0-beta.3] - 2026-09-11
 
 ### Changed

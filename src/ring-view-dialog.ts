@@ -1078,8 +1078,16 @@ export class RingViewDialog extends LitElement {
     }
 
     if (this.mediaStatus === "pending" || this.mediaStatus === "retrying") {
+      const hasVisitorControls =
+        this.shouldShowDoorControl() || this.shouldShowTalkControl();
       return html`
-        <div class="state-layer" role="status">
+        <div
+          class=${classMap({
+            "state-layer": true,
+            "with-visitor-controls": hasVisitorControls,
+          })}
+          role="status"
+        >
           <div class="state-card">
             <div class="spinner" aria-hidden="true"></div>
             <div class="state-title">

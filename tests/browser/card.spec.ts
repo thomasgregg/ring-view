@@ -223,6 +223,33 @@ test("keeps the inline action dock consistently sized across card widths", async
   expect(dockBox.x + dockBox.width).toBeLessThanOrEqual(cardBox.x + cardBox.width);
 });
 
+test("keeps inline connection status clear of fixed visitor controls", async ({
+  page,
+}) => {
+  await page.goto(
+    "/demo/?dashboard=interactive&dashboard_start=live&two_way_audio=1&door=1&dashboard_door=1&door_action=open&delay=8000",
+  );
+
+  const card = page.locator("ring-view");
+  await card.evaluate((element) => {
+    element.style.width = "420px";
+    element.style.height = "180px";
+  });
+
+  const state = card.locator(".state-layer.with-visitor-controls .state-card");
+  const dock = card.locator(".visitor-action-dock");
+  await expect(state).toBeVisible();
+  await expect(dock).toBeVisible();
+
+  const [stateBox, dockBox] = await Promise.all([
+    state.boundingBox(),
+    dock.boundingBox(),
+  ]);
+  if (!stateBox || !dockBox) throw new Error("Inline loading geometry unavailable");
+
+  expect(stateBox.y + stateBox.height).toBeLessThan(dockBox.y);
+});
+
 test("stops inline media before expanding and resumes it after fullscreen closes", async ({
   page,
 }) => {

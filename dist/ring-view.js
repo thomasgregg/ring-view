@@ -66,7 +66,7 @@ const { is: Tt, defineProperty: Lt, getOwnPropertyDescriptor: Pt, getOwnProperty
   return i;
 } }, Ae = (e, t) => !Tt(e, t), He = { attribute: !0, type: String, converter: ie, reflect: !1, useDefault: !1, hasChanged: Ae };
 Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata"), se.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
-let O = class extends HTMLElement {
+let H = class extends HTMLElement {
   static addInitializer(t) {
     this._$Ei(), (this.l ??= []).push(t);
   }
@@ -247,10 +247,10 @@ let O = class extends HTMLElement {
   firstUpdated(t) {
   }
 };
-O.elementStyles = [], O.shadowRootOptions = { mode: "open" }, O[q("elementProperties")] = /* @__PURE__ */ new Map(), O[q("finalized")] = /* @__PURE__ */ new Map(), Ot?.({ ReactiveElement: O }), (se.reactiveElementVersions ??= []).push("2.1.2");
-const $e = globalThis, Ue = (e) => e, oe = $e.trustedTypes, ze = oe ? oe.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, rt = "$lit$", T = `lit$${Math.random().toFixed(9).slice(2)}$`, nt = "?" + T, Ht = `<${nt}>`, V = document, N = () => V.createComment(""), B = (e) => e === null || typeof e != "object" && typeof e != "function", Se = Array.isArray, Ut = (e) => Se(e) || typeof e?.[Symbol.iterator] == "function", le = `[ 	
+H.elementStyles = [], H.shadowRootOptions = { mode: "open" }, H[q("elementProperties")] = /* @__PURE__ */ new Map(), H[q("finalized")] = /* @__PURE__ */ new Map(), Ot?.({ ReactiveElement: H }), (se.reactiveElementVersions ??= []).push("2.1.2");
+const $e = globalThis, Ue = (e) => e, oe = $e.trustedTypes, ze = oe ? oe.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, rt = "$lit$", T = `lit$${Math.random().toFixed(9).slice(2)}$`, nt = "?" + T, Ht = `<${nt}>`, O = document, N = () => O.createComment(""), B = (e) => e === null || typeof e != "object" && typeof e != "function", Se = Array.isArray, Ut = (e) => Se(e) || typeof e?.[Symbol.iterator] == "function", le = `[ 	
 \f\r]`, z = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, qe = /-->/g, Ne = />/g, D = RegExp(`>|${le}(?:([^\\s"'>=/]+)(${le}*=${le}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), Be = /'/g, Fe = /"/g, st = /^(?:script|style|textarea|title)$/i, zt = (e) => (t, ...i) => ({ _$litType$: e, strings: t, values: i }), h = zt(1), L = /* @__PURE__ */ Symbol.for("lit-noChange"), l = /* @__PURE__ */ Symbol.for("lit-nothing"), Ke = /* @__PURE__ */ new WeakMap(), I = V.createTreeWalker(V, 129);
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Be = /'/g, Fe = /"/g, st = /^(?:script|style|textarea|title)$/i, zt = (e) => (t, ...i) => ({ _$litType$: e, strings: t, values: i }), h = zt(1), L = /* @__PURE__ */ Symbol.for("lit-noChange"), l = /* @__PURE__ */ Symbol.for("lit-nothing"), Ke = /* @__PURE__ */ new WeakMap(), V = O.createTreeWalker(O, 129);
 function at(e, t) {
   if (!Se(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
   return ze !== void 0 ? ze.createHTML(t) : t;
@@ -273,11 +273,11 @@ class F {
     this.parts = [];
     let s = 0, a = 0;
     const c = t.length - 1, d = this.parts, [p, v] = qt(t, i);
-    if (this.el = F.createElement(p, o), I.currentNode = this.el.content, i === 2 || i === 3) {
+    if (this.el = F.createElement(p, o), V.currentNode = this.el.content, i === 2 || i === 3) {
       const g = this.el.content.firstChild;
       g.replaceWith(...g.childNodes);
     }
-    for (; (r = I.nextNode()) !== null && d.length < c; ) {
+    for (; (r = V.nextNode()) !== null && d.length < c; ) {
       if (r.nodeType === 1) {
         if (r.hasAttributes()) for (const g of r.getAttributeNames()) if (g.endsWith(rt)) {
           const A = v[a++], S = r.getAttribute(g).split(T), Y = /([.?@])?(.*)/.exec(A);
@@ -287,7 +287,7 @@ class F {
           const g = r.textContent.split(T), A = g.length - 1;
           if (A > 0) {
             r.textContent = oe ? oe.emptyScript : "";
-            for (let S = 0; S < A; S++) r.append(g[S], N()), I.nextNode(), d.push({ type: 2, index: ++s });
+            for (let S = 0; S < A; S++) r.append(g[S], N()), V.nextNode(), d.push({ type: 2, index: ++s });
             r.append(g[A], N());
           }
         }
@@ -300,7 +300,7 @@ class F {
     }
   }
   static createElement(t, i) {
-    const o = V.createElement("template");
+    const o = O.createElement("template");
     return o.innerHTML = t, o;
   }
 }
@@ -321,17 +321,17 @@ class Nt {
     return this._$AM._$AU;
   }
   u(t) {
-    const { el: { content: i }, parts: o } = this._$AD, r = (t?.creationScope ?? V).importNode(i, !0);
-    I.currentNode = r;
-    let s = I.nextNode(), a = 0, c = 0, d = o[0];
+    const { el: { content: i }, parts: o } = this._$AD, r = (t?.creationScope ?? O).importNode(i, !0);
+    V.currentNode = r;
+    let s = V.nextNode(), a = 0, c = 0, d = o[0];
     for (; d !== void 0; ) {
       if (a === d.index) {
         let p;
         d.type === 2 ? p = new W(s, s.nextSibling, this, t) : d.type === 1 ? p = new d.ctor(s, d.name, d.strings, this, t) : d.type === 6 && (p = new jt(s, this, t)), this._$AV.push(p), d = o[++c];
       }
-      a !== d?.index && (s = I.nextNode(), a++);
+      a !== d?.index && (s = V.nextNode(), a++);
     }
-    return I.currentNode = V, r;
+    return V.currentNode = O, r;
   }
   p(t) {
     let i = 0;
@@ -366,7 +366,7 @@ class W {
     this._$AH !== t && (this._$AR(), this._$AH = this.O(t));
   }
   _(t) {
-    this._$AH !== l && B(this._$AH) ? this._$AA.nextSibling.data = t : this.T(V.createTextNode(t)), this._$AH = t;
+    this._$AH !== l && B(this._$AH) ? this._$AA.nextSibling.data = t : this.T(O.createTextNode(t)), this._$AH = t;
   }
   $(t) {
     const { values: i, _$litType$: o } = t, r = typeof o == "number" ? this._$AC(t) : (o.el === void 0 && (o.el = F.createElement(at(o.h, o.h[0]), this.options)), o);
@@ -474,7 +474,7 @@ const Zt = (e, t, i) => {
   return r._$AI(e), r;
 };
 const xe = globalThis;
-let E = class extends O {
+let E = class extends H {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
   }
@@ -2104,6 +2104,22 @@ const Si = j`
     bottom: 8px;
     left: 8px;
   }
+
+  :host([inline]) .state-layer.with-visitor-controls {
+    padding: 56px 16px 68px;
+  }
+
+  :host([inline]) .state-layer.with-visitor-controls .state-card {
+    width: auto;
+    max-width: 100%;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  :host([inline]) .state-layer.with-visitor-controls .spinner {
+    flex: 0 0 auto;
+  }
 `, Ci = j`
   :host {
     display: block;
@@ -2232,7 +2248,7 @@ function Mi(e, t) {
     } catch {
     }
 }
-const H = Ce(class extends Ee {
+const I = Ce(class extends Ee {
   constructor(e) {
     if (super(e), e.type !== dt.ATTRIBUTE || e.name !== "class" || e.strings?.length > 2) throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.");
   }
@@ -2623,7 +2639,7 @@ let y = class extends E {
       ` : l}
       ${!this.externalControls && i && this.readyDispatched && !this.playbackBlocked ? h`<div class="talkback-controls">
         <button
-          class=${H({ "talk-button": !0, active: e })}
+          class=${I({ "talk-button": !0, active: e })}
           type="button"
           aria-label=${r}
           aria-pressed=${String(e)}
@@ -3343,7 +3359,7 @@ let f = class extends E {
               </div>
             ` : l}
         <div
-          class=${H({
+          class=${I({
       "visitor-action-dock": !0,
       "door-only": e && !t,
       "talk-only": t && !e
@@ -3353,7 +3369,7 @@ let f = class extends E {
         >
           ${t ? h`
                 <button
-                  class=${H({
+                  class=${I({
       "visitor-action": !0,
       "talk-action": !0,
       active: this.talkbackTalking
@@ -3377,7 +3393,7 @@ let f = class extends E {
           ${e && t ? h`<span class="visitor-action-divider" aria-hidden="true"></span>` : l}
           ${e ? h`
                 <button
-                  class=${H({
+                  class=${I({
       "visitor-action": !0,
       "door-action": !0,
       "contact-open": a,
@@ -3507,7 +3523,7 @@ let f = class extends E {
     const e = this.activeEntity(), t = this.activeEntityId(), i = w(e), o = !i && !this.suspended && (this.mode === "live" || this.recordingStarted), r = ht(this.config.aspect_ratio), s = vt(this.hass, e, t), a = this.mode === "last_recording" && typeof e?.attributes.video_url == "string" ? e.attributes.video_url : void 0, c = o && ["pending", "ready", "playback-blocked"].includes(this.mediaStatus), d = !!(c && a && !this.recordingVideoFailed), p = !!(o && this.mode === "live" && this.config.two_way_audio && be(this.hass, t));
     return h`
       <div
-        class=${H({
+        class=${I({
       "media-frame": !0,
       "auto-ratio": this.config.aspect_ratio === "auto"
     })}
@@ -3570,7 +3586,7 @@ let f = class extends E {
       `${t}:${this.session}:recording-video`,
       h`
               <video
-                class=${H({
+                class=${I({
         "video-fallback": !0,
         pending: this.mediaStatus === "pending"
       })}
@@ -3610,7 +3626,8 @@ let f = class extends E {
         </div>
       `;
     }
-    return this.suspended ? h`
+    if (this.suspended)
+      return h`
         <div class="state-layer" role="status">
           <div class="state-card">
             <div class="state-title">
@@ -3618,7 +3635,10 @@ let f = class extends E {
             </div>
           </div>
         </div>
-      ` : this.inline && !this.inlineStarted ? l : this.mode === "live" && this.mediaStatus === "awaiting-resume" ? h`
+      `;
+    if (this.inline && !this.inlineStarted) return l;
+    if (this.mode === "live" && this.mediaStatus === "awaiting-resume")
+      return h`
         <div class="state-layer play-layer">
           <button class="action-button primary play-recording resume-live" type="button"
             @click=${this.resumeLive}>
@@ -3626,7 +3646,9 @@ let f = class extends E {
             <span>${n(this.hass, "viewer.resume_live")}</span>
           </button>
         </div>
-      ` : this.mode === "last_recording" && !this.recordingStarted ? h`
+      `;
+    if (this.mode === "last_recording" && !this.recordingStarted)
+      return h`
         <div class="state-layer play-layer">
           <button
             class="action-button primary play-recording"
@@ -3638,8 +3660,17 @@ let f = class extends E {
             <span>${n(this.hass, "viewer.play_recording")}</span>
           </button>
         </div>
-      ` : this.mediaStatus === "pending" || this.mediaStatus === "retrying" ? h`
-        <div class="state-layer" role="status">
+      `;
+    if (this.mediaStatus === "pending" || this.mediaStatus === "retrying") {
+      const i = this.shouldShowDoorControl() || this.shouldShowTalkControl();
+      return h`
+        <div
+          class=${I({
+        "state-layer": !0,
+        "with-visitor-controls": i
+      })}
+          role="status"
+        >
           <div class="state-card">
             <div class="spinner" aria-hidden="true"></div>
             <div class="state-title">
@@ -3647,7 +3678,9 @@ let f = class extends E {
             </div>
           </div>
         </div>
-      ` : this.mediaStatus === "compatibility" && !t ? h`
+      `;
+    }
+    return this.mediaStatus === "compatibility" && !t ? h`
         <div class="state-layer" role="alert">
           <div class="state-card">
             <div class="state-title">

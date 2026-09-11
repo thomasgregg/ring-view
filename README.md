@@ -53,32 +53,124 @@ live_entity: camera.front_door_live_view
 
 Tap the card to open the viewer. The history icon selects the latest recording; the red dot selects Live. Enable **Viewer behavior → Two-way audio** to add **Hold to talk**. Microphone access needs an HTTPS Home Assistant connection and your permission.
 
-### Dashboard behavior beta
+### Choose your dashboard experience (beta)
 
-`0.7.0-beta.3` adds an optional interactive dashboard surface. Existing cards
-stay on **Open fullscreen viewer**, so installing the beta alone changes no card
-behavior. In **Dashboard card → Dashboard behavior**, choose **Control camera in
-card** to expose the same Recording/Live controls directly in Lovelace.
+Start with **Dashboard card → Dashboard behavior** in the visual editor. This is
+the main choice:
 
-| Setting | Default | What it does |
+| Choose | What you see on the dashboard | Best for |
 | --- | --- | --- |
-| Dashboard behavior | Open fullscreen viewer | Keeps the existing passive still-image card, or enables direct controls. |
-| Start media automatically | No — wait for a tap | Shows a still until Recording or Live is chosen; optional Recording and Live startup are available. |
-| Start dashboard Live muted | On | Prevents unexpected sound on wall tablets and improves browser autoplay compatibility. |
-| Door control location | Fullscreen viewer only | Keeps the door action behind the viewer, or places it on both the interactive dashboard card and fullscreen viewer. |
+| **Open fullscreen viewer** (default) | A clean still image. Tap it to open the complete viewer. | Phones, ordinary dashboards, and the simplest setup. |
+| **Control camera in card** | Recording/Live selectors, media, fullscreen, optional Talk, and optional door access directly on the card. | Wall tablets and dashboards where immediate control matters. |
 
-The inline card has a dedicated fullscreen button. It stops its own player
-before opening fullscreen and resumes only after the viewer closes. A Live-only
-door action stays disabled until Live has a ready picture. Hidden cards suspend
-their media, and duplicate cards sharing a camera never run overlapping inline
-Live sessions. In the on-demand recording state, the still image itself is the
-Play surface—there is no large button covering the camera view. Both dashboard
-modes require at least a 12-column by 3-row Sections card.
+Both choices use a minimum Sections size of **12 columns × 3 rows**. Installing
+the beta does not change an existing card: **Open fullscreen viewer** remains the
+default.
 
-This is a prerelease feature. To return completely to today’s stable behavior,
-redownload `v0.6.3` in HACS; no dashboard configuration conversion is required.
+If you choose **Control camera in card**, the next setting is **Start media
+automatically**:
 
-Selecting **Door access → Door lock** adds an optional **Unlock** or **Open door** action. It defaults to Live view and a 900 ms hold confirmation. When Talk is available, both actions form one segmented control with a subtle divider and flat inner edges; when Talk is disabled or unsupported, the dock automatically collapses to a fully rounded door-only pill.
+| Choose | What happens |
+| --- | --- |
+| **No — wait for a tap** (default) | Shows a still image and opens no camera stream. Select Live, or tap the image while Recording is selected, when you want to start. |
+| **Last recording** | Starts the latest recording when the card becomes visible. |
+| **Live** | Starts a Ring Live session when the card becomes visible. **Start dashboard Live muted** is enabled by default. |
+
+The interactive card has its own fullscreen button. Hidden cards suspend their
+media, and cards sharing the same camera do not start overlapping inline Live
+sessions. Opening fullscreen stops the card player first and resumes it only
+after fullscreen closes.
+
+#### Five settings that do different jobs
+
+| Visual editor setting | It controls | It does not control |
+| --- | --- | --- |
+| **Dashboard behavior** | Whether the dashboard is a still image or an interactive camera. | Which media starts. |
+| **Start media automatically** | What an interactive dashboard card starts: nothing, Recording, or Live. | What opens in fullscreen. |
+| **Open viewer on** | Whether fullscreen initially shows Recording or Live. | The interactive dashboard startup. |
+| **Show control in** | Whether the door action appears only in Live or also over recordings. | Whether it appears on the dashboard. |
+| **Door control location** | Fullscreen only, or dashboard and fullscreen. | Whether Talk is supported or where the door action is safe to use. |
+
+Talk is always Live-only and requires **Enable two-way audio** plus the official
+Ring Live view camera. If Talk and door access are both available, they form one
+segmented dock. If either is unavailable, the dock automatically becomes one
+fully rounded control—there is no separate layout setting.
+
+#### Common combinations
+
+| Use case | Dashboard behavior | Startup | Door location | Suggested safety |
+| --- | --- | --- | --- | --- |
+| Normal phone or desktop dashboard | Open fullscreen viewer | — | Fullscreen only | Live-only door action with hold enabled. |
+| Shared family dashboard | Open fullscreen viewer | — | Fullscreen only | Keep the door action out of the dashboard. |
+| Wall tablet, start only when needed | Control camera in card | No — wait for a tap | Dashboard and fullscreen | Live-only, muted Live, hold enabled. |
+| Always-on entrance monitor | Control camera in card | Live | Your choice | Start muted; add dashboard door access only on a trusted tablet. |
+
+#### Copy-and-paste examples
+
+The two camera entities are the only required settings.
+
+**1. Simple card that opens fullscreen**
+
+```yaml
+type: custom:ring-view
+recording_entity: camera.front_door_last_recording
+live_entity: camera.front_door_live_view
+```
+
+**2. Wall tablet with on-demand media, Talk, and a Nuki-style latch action**
+
+```yaml
+type: custom:ring-view
+recording_entity: camera.front_door_last_recording
+live_entity: camera.front_door_live_view
+
+dashboard_behavior: interactive
+dashboard_start: on_demand
+dashboard_live_muted: true
+two_way_audio: true
+
+door_entity: lock.front_door
+door_contact_entity: binary_sensor.front_door_contact
+door_action: open
+door_control_visibility: live_only
+door_control_location: dashboard_and_viewer
+door_hold_to_activate: true
+```
+
+**3. Muted Live monitor with Talk but no door control**
+
+```yaml
+type: custom:ring-view
+recording_entity: camera.front_door_last_recording
+live_entity: camera.front_door_live_view
+
+dashboard_behavior: interactive
+dashboard_start: live
+dashboard_live_muted: true
+two_way_audio: true
+```
+
+**4. Door access kept inside the fullscreen viewer**
+
+```yaml
+type: custom:ring-view
+recording_entity: camera.front_door_last_recording
+live_entity: camera.front_door_live_view
+
+door_entity: lock.front_door
+door_contact_entity: binary_sensor.front_door_contact
+door_action: unlock
+door_control_visibility: live_only
+door_control_location: viewer_only
+door_hold_to_activate: true
+```
+
+Selecting **Door access → Door lock** enables the optional **Unlock** or **Open
+door** action. It defaults to Live view, fullscreen only, and a 900 ms hold
+confirmation. The door contact sensor is optional.
+
+This is a prerelease feature. To return completely to the stable experience,
+redownload `v0.6.3` in HACS.
 
 ### Door access at a glance
 

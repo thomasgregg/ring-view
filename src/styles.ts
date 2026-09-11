@@ -907,6 +907,22 @@ export const dialogStyles = css`
     bottom: 8px;
     left: 8px;
   }
+
+  :host([inline]) .state-layer.with-visitor-controls {
+    padding: 56px 16px 68px;
+  }
+
+  :host([inline]) .state-layer.with-visitor-controls .state-card {
+    width: auto;
+    max-width: 100%;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  :host([inline]) .state-layer.with-visitor-controls .spinner {
+    flex: 0 0 auto;
+  }
 `;
 
 export const editorStyles = css`
