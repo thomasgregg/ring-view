@@ -178,7 +178,7 @@ test("keeps viewer-only door access out of the dashboard", async ({
   await expect(page.locator("ring-view ring-view-dialog .door-action")).toHaveCount(0);
 });
 
-test("scales the inline action dock with the card while keeping touch targets", async ({
+test("keeps the inline action dock consistently sized across card widths", async ({
   page,
 }) => {
   await page.goto(
@@ -210,9 +210,9 @@ test("scales the inline action dock with the card while keeping touch targets", 
   const compact = await measureAt(360);
   const roomy = await measureAt(720);
   expect(compact.height).toBeGreaterThanOrEqual(44);
-  expect(roomy.font).toBeGreaterThan(compact.font);
-  expect(roomy.height).toBeGreaterThan(compact.height);
-  expect(roomy.icon).toBeGreaterThan(compact.icon);
+  expect(roomy.font).toBe(compact.font);
+  expect(roomy.height).toBe(compact.height);
+  expect(roomy.icon).toBe(compact.icon);
 
   const [cardBox, dockBox] = await Promise.all([
     page.locator("ring-view").boundingBox(),

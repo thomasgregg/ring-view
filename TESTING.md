@@ -31,8 +31,8 @@ npm run build
 The unit suite covers configuration defaults and validation, snapshot timestamp parsing and freshest-preview fallbacks, native editor structure and progressive dashboard fields, entity and talkback capability states, unsupported-camera fallback, doorbell alerts, timeout invalidation, passive-dashboard privacy, single-renderer switching, close teardown, disconnect teardown, single-offer two-way audio, press-to-talk muting, interrupted microphone permission, and insecure-connection guidance.
 
 The browser suite additionally covers the unobstructed on-demand image start
-surface, automatic starts, door-location and Live-readiness gating, fluid inline
-action sizing, inert edit previews, duplicate inline cards, and inline-to-fullscreen
+surface, automatic starts, door-location and Live-readiness gating, fixed inline
+action sizing across card widths, inert edit previews, duplicate inline cards, and inline-to-fullscreen
 handoff without overlapping streams. Existing opening, switching, recovery,
 accessibility, layout, and stream-count checks remain.
 

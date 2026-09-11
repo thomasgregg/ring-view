@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.7.0-beta.3] - 2026-09-11
+
+### Changed
+
+- Restore the established fixed Talk/door button sizing after beta feedback;
+  the dock remains responsive through containment and the 44 px touch target.
+
 ## [0.7.0-beta.2] - 2026-09-11
 
 ### Changed

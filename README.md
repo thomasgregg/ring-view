@@ -55,7 +55,7 @@ Tap the card to open the viewer. The history icon selects the latest recording; 
 
 ### Dashboard behavior beta
 
-`0.7.0-beta.2` adds an optional interactive dashboard surface. Existing cards
+`0.7.0-beta.3` adds an optional interactive dashboard surface. Existing cards
 stay on **Open fullscreen viewer**, so installing the beta alone changes no card
 behavior. In **Dashboard card → Dashboard behavior**, choose **Control camera in
 card** to expose the same Recording/Live controls directly in Lovelace.

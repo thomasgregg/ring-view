@@ -861,8 +861,6 @@ export const dialogStyles = css`
     width: 100%;
     height: 100%;
     min-height: 120px;
-    container-name: ring-view-inline;
-    container-type: inline-size;
   }
 
   :host([inline]) .dialog {
@@ -906,55 +904,8 @@ export const dialogStyles = css`
 
   :host([inline]) .visitor-controls {
     right: 8px;
-    bottom: clamp(8px, calc(4px + 1cqw), 14px);
+    bottom: 8px;
     left: 8px;
-  }
-
-  :host([inline]) .visitor-action-dock {
-    padding-block: clamp(3px, calc(1px + 0.45cqw), 5px);
-    padding-inline: clamp(4px, calc(2px + 0.6cqw), 8px);
-  }
-
-  :host([inline]) .visitor-action {
-    min-height: clamp(44px, calc(36px + 2.4cqw), 56px);
-    box-sizing: border-box;
-    gap: clamp(5px, calc(3px + 0.8cqw), 10px);
-    padding-block: clamp(8px, calc(5px + 0.7cqw), 11px);
-    padding-inline: clamp(8px, calc(5px + 1.3cqw), 17px);
-    font-size: clamp(12px, calc(9px + 0.8cqw), 16px);
-    line-height: 1.25;
-  }
-
-  :host([inline]) .visitor-action-dock:not(.door-only):not(.talk-only)
-    .visitor-action {
-    flex: 1 1 auto;
-  }
-
-  :host([inline]) .visitor-action svg {
-    width: clamp(18px, calc(13px + 1.4cqw), 24px);
-    height: clamp(18px, calc(13px + 1.4cqw), 24px);
-  }
-
-  :host([inline]) .visitor-action-divider {
-    height: clamp(24px, calc(18px + 1.5cqw), 30px);
-    margin-inline: clamp(3px, calc(1px + 0.7cqw), 7px);
-  }
-
-  :host([inline]) .door-contact-state {
-    font-size: clamp(9px, calc(7px + 0.5cqw), 11px);
-    line-height: 1.2;
-  }
-
-  @container ring-view-inline (max-width: 319px) {
-    .visitor-action > span {
-      display: none;
-    }
-
-    .visitor-action {
-      width: 44px;
-      flex: 0 0 44px;
-      padding-inline: 10px;
-    }
   }
 `;
 

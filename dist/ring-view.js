@@ -1,4 +1,4 @@
-var de = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z", Xe = "M10,21H14A2,2 0 0,1 12,23A2,2 0 0,1 10,21M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M17,11A5,5 0 0,0 12,6A5,5 0 0,0 7,11V18H17V11M19.75,3.19L18.33,4.61C20.04,6.3 21,8.6 21,11H23C23,8.07 21.84,5.25 19.75,3.19M1,11H3C3,8.6 3.96,6.3 5.67,4.61L4.25,3.19C2.16,5.25 1,8.07 1,11Z", _t = "M9,12C9,11.19 9.3,10.5 9.89,9.89C10.5,9.3 11.19,9 12,9C12.81,9 13.5,9.3 14.11,9.89C14.7,10.5 15,11.19 15,12C15,12.81 14.7,13.5 14.11,14.11C13.5,14.7 12.81,15 12,15C11.19,15 10.5,14.7 9.89,14.11C9.3,13.5 9,12.81 9,12M5.53,8.44L7.31,10.22L5.53,12L7.31,13.78L5.53,15.56L2,12L5.53,8.44M8.44,18.47L10.22,16.69L12,18.47L13.78,16.69L15.56,18.47L12,22L8.44,18.47M18.47,15.56L16.69,13.78L18.47,12L16.69,10.22L18.47,8.44L22,12L18.47,15.56M15.56,5.53L13.78,7.31L12,5.53L10.22,7.31L8.44,5.53L12,2L15.56,5.53Z", bt = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z", wt = "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z", yt = "M16,11H18V13H16V11M12,3H19C20.11,3 21,3.89 21,5V19H22V21H2V19H10V5C10,3.89 10.89,3 12,3M12,5V19H19V5H12Z", De = "M12,3C10.89,3 10,3.89 10,5H3V19H2V21H22V19H21V5C21,3.89 20.11,3 19,3H12M12,5H19V19H12V5M5,11H7V13H5V11Z", kt = "M14 15C14 16.11 13.11 17 12 17S10 16.11 10 15 10.9 13 12 13 14 13.9 14 15M18 4V20C18 21.1 17.11 22 16 22H8C6.9 22 6 21.11 6 20V4C6 2.9 6.9 2 8 2H16C17.11 2 18 2.9 18 4M10.5 7C10.5 7.83 11.17 8.5 12 8.5S13.5 7.83 13.5 7 12.83 5.5 12 5.5 10.5 6.17 10.5 7M16 10H8V20H16V10Z", At = "M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z", xt = "M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3", $t = "M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z", et = "M10 13C11.1 13 12 13.89 12 15C12 16.11 11.11 17 10 17S8 16.11 8 15 8.9 13 10 13M18 1C15.24 1 13 3.24 13 6V8H4C2.9 8 2 8.9 2 10V20C2 21.1 2.9 22 4 22H16C17.1 22 18 21.1 18 20V10C18 8.9 17.1 8 16 8H15V6C15 4.34 16.34 3 18 3S21 4.34 21 6V8H23V6C23 3.24 20.76 1 18 1M16 10V20H4V10H16Z", tt = "M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z", it = "M19,11C19,12.19 18.66,13.3 18.1,14.28L16.87,13.05C17.14,12.43 17.3,11.74 17.3,11H19M15,11.16L9,5.18V5A3,3 0 0,1 12,2A3,3 0 0,1 15,5V11L15,11.16M4.27,3L21,19.73L19.73,21L15.54,16.81C14.77,17.27 13.91,17.58 13,17.72V21H11V17.72C7.72,17.23 5,14.41 5,11H6.7C6.7,14 9.24,16.1 12,16.1C12.81,16.1 13.6,15.91 14.31,15.58L12.65,13.92L12,14A3,3 0 0,1 9,11V10.28L3,4.27L4.27,3Z", St = "M12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2C17.5,2 22,6 22,11A6,6 0 0,1 16,17H14.2C13.9,17 13.7,17.2 13.7,17.5C13.7,17.6 13.8,17.7 13.8,17.8C14.2,18.3 14.4,18.9 14.4,19.5C14.5,20.9 13.4,22 12,22M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C12.3,20 12.5,19.8 12.5,19.5C12.5,19.3 12.4,19.2 12.4,19.1C12,18.6 11.8,18.1 11.8,17.5C11.8,16.1 12.9,15 14.3,15H16A4,4 0 0,0 20,11C20,7.1 16.4,4 12,4M6.5,10C7.3,10 8,10.7 8,11.5C8,12.3 7.3,13 6.5,13C5.7,13 5,12.3 5,11.5C5,10.7 5.7,10 6.5,10M9.5,6C10.3,6 11,6.7 11,7.5C11,8.3 10.3,9 9.5,9C8.7,9 8,8.3 8,7.5C8,6.7 8.7,6 9.5,6M14.5,6C15.3,6 16,6.7 16,7.5C16,8.3 15.3,9 14.5,9C13.7,9 13,8.3 13,7.5C13,6.7 13.7,6 14.5,6M17.5,10C18.3,10 19,10.7 19,11.5C19,12.3 18.3,13 17.5,13C16.7,13 16,12.3 16,11.5C16,10.7 16.7,10 17.5,10Z", ue = "M8,5.14V19.14L19,12.14L8,5.14Z", Ct = "M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M10,16.5L16,12L10,7.5V16.5Z";
+var de = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z", Xe = "M10,21H14A2,2 0 0,1 12,23A2,2 0 0,1 10,21M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M17,11A5,5 0 0,0 12,6A5,5 0 0,0 7,11V18H17V11M19.75,3.19L18.33,4.61C20.04,6.3 21,8.6 21,11H23C23,8.07 21.84,5.25 19.75,3.19M1,11H3C3,8.6 3.96,6.3 5.67,4.61L4.25,3.19C2.16,5.25 1,8.07 1,11Z", _t = "M9,12C9,11.19 9.3,10.5 9.89,9.89C10.5,9.3 11.19,9 12,9C12.81,9 13.5,9.3 14.11,9.89C14.7,10.5 15,11.19 15,12C15,12.81 14.7,13.5 14.11,14.11C13.5,14.7 12.81,15 12,15C11.19,15 10.5,14.7 9.89,14.11C9.3,13.5 9,12.81 9,12M5.53,8.44L7.31,10.22L5.53,12L7.31,13.78L5.53,15.56L2,12L5.53,8.44M8.44,18.47L10.22,16.69L12,18.47L13.78,16.69L15.56,18.47L12,22L8.44,18.47M18.47,15.56L16.69,13.78L18.47,12L16.69,10.22L18.47,8.44L22,12L18.47,15.56M15.56,5.53L13.78,7.31L12,5.53L10.22,7.31L8.44,5.53L12,2L15.56,5.53Z", bt = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z", wt = "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z", yt = "M16,11H18V13H16V11M12,3H19C20.11,3 21,3.89 21,5V19H22V21H2V19H10V5C10,3.89 10.89,3 12,3M12,5V19H19V5H12Z", De = "M12,3C10.89,3 10,3.89 10,5H3V19H2V21H22V19H21V5C21,3.89 20.11,3 19,3H12M12,5H19V19H12V5M5,11H7V13H5V11Z", kt = "M14 15C14 16.11 13.11 17 12 17S10 16.11 10 15 10.9 13 12 13 14 13.9 14 15M18 4V20C18 21.1 17.11 22 16 22H8C6.9 22 6 21.11 6 20V4C6 2.9 6.9 2 8 2H16C17.11 2 18 2.9 18 4M10.5 7C10.5 7.83 11.17 8.5 12 8.5S13.5 7.83 13.5 7 12.83 5.5 12 5.5 10.5 6.17 10.5 7M16 10H8V20H16V10Z", At = "M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z", $t = "M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3", St = "M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z", et = "M10 13C11.1 13 12 13.89 12 15C12 16.11 11.11 17 10 17S8 16.11 8 15 8.9 13 10 13M18 1C15.24 1 13 3.24 13 6V8H4C2.9 8 2 8.9 2 10V20C2 21.1 2.9 22 4 22H16C17.1 22 18 21.1 18 20V10C18 8.9 17.1 8 16 8H15V6C15 4.34 16.34 3 18 3S21 4.34 21 6V8H23V6C23 3.24 20.76 1 18 1M16 10V20H4V10H16Z", tt = "M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z", it = "M19,11C19,12.19 18.66,13.3 18.1,14.28L16.87,13.05C17.14,12.43 17.3,11.74 17.3,11H19M15,11.16L9,5.18V5A3,3 0 0,1 12,2A3,3 0 0,1 15,5V11L15,11.16M4.27,3L21,19.73L19.73,21L15.54,16.81C14.77,17.27 13.91,17.58 13,17.72V21H11V17.72C7.72,17.23 5,14.41 5,11H6.7C6.7,14 9.24,16.1 12,16.1C12.81,16.1 13.6,15.91 14.31,15.58L12.65,13.92L12,14A3,3 0 0,1 9,11V10.28L3,4.27L4.27,3Z", xt = "M12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2C17.5,2 22,6 22,11A6,6 0 0,1 16,17H14.2C13.9,17 13.7,17.2 13.7,17.5C13.7,17.6 13.8,17.7 13.8,17.8C14.2,18.3 14.4,18.9 14.4,19.5C14.5,20.9 13.4,22 12,22M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C12.3,20 12.5,19.8 12.5,19.5C12.5,19.3 12.4,19.2 12.4,19.1C12,18.6 11.8,18.1 11.8,17.5C11.8,16.1 12.9,15 14.3,15H16A4,4 0 0,0 20,11C20,7.1 16.4,4 12,4M6.5,10C7.3,10 8,10.7 8,11.5C8,12.3 7.3,13 6.5,13C5.7,13 5,12.3 5,11.5C5,10.7 5.7,10 6.5,10M9.5,6C10.3,6 11,6.7 11,7.5C11,8.3 10.3,9 9.5,9C8.7,9 8,8.3 8,7.5C8,6.7 8.7,6 9.5,6M14.5,6C15.3,6 16,6.7 16,7.5C16,8.3 15.3,9 14.5,9C13.7,9 13,8.3 13,7.5C13,6.7 13.7,6 14.5,6M17.5,10C18.3,10 19,10.7 19,11.5C19,12.3 18.3,13 17.5,13C16.7,13 16,12.3 16,11.5C16,10.7 16.7,10 17.5,10Z", ue = "M8,5.14V19.14L19,12.14L8,5.14Z", Ct = "M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M10,16.5L16,12L10,7.5V16.5Z";
 const X = globalThis, ye = X.ShadowRoot && (X.ShadyCSS === void 0 || X.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, ke = /* @__PURE__ */ Symbol(), Ie = /* @__PURE__ */ new WeakMap();
 let ot = class {
   constructor(t, i, o) {
@@ -248,11 +248,11 @@ let O = class extends HTMLElement {
   }
 };
 O.elementStyles = [], O.shadowRootOptions = { mode: "open" }, O[q("elementProperties")] = /* @__PURE__ */ new Map(), O[q("finalized")] = /* @__PURE__ */ new Map(), Ot?.({ ReactiveElement: O }), (se.reactiveElementVersions ??= []).push("2.1.2");
-const xe = globalThis, Ue = (e) => e, oe = xe.trustedTypes, ze = oe ? oe.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, rt = "$lit$", T = `lit$${Math.random().toFixed(9).slice(2)}$`, nt = "?" + T, Ht = `<${nt}>`, V = document, N = () => V.createComment(""), B = (e) => e === null || typeof e != "object" && typeof e != "function", $e = Array.isArray, Ut = (e) => $e(e) || typeof e?.[Symbol.iterator] == "function", le = `[ 	
+const $e = globalThis, Ue = (e) => e, oe = $e.trustedTypes, ze = oe ? oe.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, rt = "$lit$", T = `lit$${Math.random().toFixed(9).slice(2)}$`, nt = "?" + T, Ht = `<${nt}>`, V = document, N = () => V.createComment(""), B = (e) => e === null || typeof e != "object" && typeof e != "function", Se = Array.isArray, Ut = (e) => Se(e) || typeof e?.[Symbol.iterator] == "function", le = `[ 	
 \f\r]`, z = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, qe = /-->/g, Ne = />/g, D = RegExp(`>|${le}(?:([^\\s"'>=/]+)(${le}*=${le}*(?:[^ 	
 \f\r"'\`<>=]|("|')|))|$)`, "g"), Be = /'/g, Fe = /"/g, st = /^(?:script|style|textarea|title)$/i, zt = (e) => (t, ...i) => ({ _$litType$: e, strings: t, values: i }), h = zt(1), L = /* @__PURE__ */ Symbol.for("lit-noChange"), l = /* @__PURE__ */ Symbol.for("lit-nothing"), Ke = /* @__PURE__ */ new WeakMap(), I = V.createTreeWalker(V, 129);
 function at(e, t) {
-  if (!$e(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
+  if (!Se(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
   return ze !== void 0 ? ze.createHTML(t) : t;
 }
 const qt = (e, t) => {
@@ -262,8 +262,8 @@ const qt = (e, t) => {
     const d = e[c];
     let p, v, g = -1, A = 0;
     for (; A < d.length && (a.lastIndex = A, v = a.exec(d), v !== null); ) A = a.lastIndex, a === z ? v[1] === "!--" ? a = qe : v[1] !== void 0 ? a = Ne : v[2] !== void 0 ? (st.test(v[2]) && (r = RegExp("</" + v[2], "g")), a = D) : v[3] !== void 0 && (a = D) : a === D ? v[0] === ">" ? (a = r ?? z, g = -1) : v[1] === void 0 ? g = -2 : (g = a.lastIndex - v[2].length, p = v[1], a = v[3] === void 0 ? D : v[3] === '"' ? Fe : Be) : a === Fe || a === Be ? a = D : a === qe || a === Ne ? a = z : (a = D, r = void 0);
-    const $ = a === D && e[c + 1].startsWith("/>") ? " " : "";
-    s += a === z ? d + Ht : g >= 0 ? (o.push(p), d.slice(0, g) + rt + d.slice(g) + T + $) : d + T + (g === -2 ? c : $);
+    const S = a === D && e[c + 1].startsWith("/>") ? " " : "";
+    s += a === z ? d + Ht : g >= 0 ? (o.push(p), d.slice(0, g) + rt + d.slice(g) + T + S) : d + T + (g === -2 ? c : S);
   }
   return [at(e, s + (e[i] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), o];
 };
@@ -280,14 +280,14 @@ class F {
     for (; (r = I.nextNode()) !== null && d.length < c; ) {
       if (r.nodeType === 1) {
         if (r.hasAttributes()) for (const g of r.getAttributeNames()) if (g.endsWith(rt)) {
-          const A = v[a++], $ = r.getAttribute(g).split(T), Y = /([.?@])?(.*)/.exec(A);
-          d.push({ type: 1, index: s, name: Y[2], strings: $, ctor: Y[1] === "." ? Bt : Y[1] === "?" ? Ft : Y[1] === "@" ? Kt : ae }), r.removeAttribute(g);
+          const A = v[a++], S = r.getAttribute(g).split(T), Y = /([.?@])?(.*)/.exec(A);
+          d.push({ type: 1, index: s, name: Y[2], strings: S, ctor: Y[1] === "." ? Bt : Y[1] === "?" ? Ft : Y[1] === "@" ? Kt : ae }), r.removeAttribute(g);
         } else g.startsWith(T) && (d.push({ type: 6, index: s }), r.removeAttribute(g));
         if (st.test(r.tagName)) {
           const g = r.textContent.split(T), A = g.length - 1;
           if (A > 0) {
             r.textContent = oe ? oe.emptyScript : "";
-            for (let $ = 0; $ < A; $++) r.append(g[$], N()), I.nextNode(), d.push({ type: 2, index: ++s });
+            for (let S = 0; S < A; S++) r.append(g[S], N()), I.nextNode(), d.push({ type: 2, index: ++s });
             r.append(g[A], N());
           }
         }
@@ -381,7 +381,7 @@ class W {
     return i === void 0 && Ke.set(t.strings, i = new F(t)), i;
   }
   k(t) {
-    $e(this._$AH) || (this._$AH = [], this._$AR());
+    Se(this._$AH) || (this._$AH = [], this._$AR());
     const i = this._$AH;
     let o, r = 0;
     for (const s of t) r === i.length ? i.push(o = new W(this.O(N()), this.O(N()), this, this.options)) : o = i[r], o._$AI(s), r++;
@@ -462,8 +462,8 @@ class jt {
     U(this, t);
   }
 }
-const Wt = xe.litHtmlPolyfillSupport;
-Wt?.(F, W), (xe.litHtmlVersions ??= []).push("3.3.3");
+const Wt = $e.litHtmlPolyfillSupport;
+Wt?.(F, W), ($e.litHtmlVersions ??= []).push("3.3.3");
 const Zt = (e, t, i) => {
   const o = i?.renderBefore ?? t;
   let r = o._$litPart$;
@@ -473,7 +473,7 @@ const Zt = (e, t, i) => {
   }
   return r._$AI(e), r;
 };
-const Se = globalThis;
+const xe = globalThis;
 let E = class extends O {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
@@ -496,10 +496,10 @@ let E = class extends O {
     return L;
   }
 };
-E._$litElement$ = !0, E.finalized = !0, Se.litElementHydrateSupport?.({ LitElement: E });
-const Gt = Se.litElementPolyfillSupport;
+E._$litElement$ = !0, E.finalized = !0, xe.litElementHydrateSupport?.({ LitElement: E });
+const Gt = xe.litElementPolyfillSupport;
 Gt?.({ LitElement: E });
-(Se.litElementVersions ??= []).push("4.2.2");
+(xe.litElementVersions ??= []).push("4.2.2");
 const dt = { ATTRIBUTE: 1 }, Ce = (e) => (...t) => ({ _$litDirective$: e, values: t });
 let Ee = class {
   constructor(t) {
@@ -1189,17 +1189,17 @@ async function Ai(e, t) {
 function Ge(e) {
   return e === "live" ? h`<span class="mode-icon mode-icon-live" aria-hidden="true"></span>` : h`
     <svg class="mode-icon mode-icon-recording" viewBox="0 0 24 24" aria-hidden="true">
-      <path d=${xt}></path>
+      <path d=${$t}></path>
     </svg>
   `;
 }
-function xi(e, t) {
+function $i(e, t) {
   return n(
     t,
     e === "live" ? "common.live" : "common.last_recording"
   );
 }
-const $i = j`
+const Si = j`
   :host {
     display: block;
     min-width: 0;
@@ -1342,7 +1342,7 @@ const $i = j`
       display: none;
     }
   }
-`, Si = j`
+`, xi = j`
   :host {
     position: fixed;
     inset: 0;
@@ -2058,8 +2058,6 @@ const $i = j`
     width: 100%;
     height: 100%;
     min-height: 120px;
-    container-name: ring-view-inline;
-    container-type: inline-size;
   }
 
   :host([inline]) .dialog {
@@ -2103,55 +2101,8 @@ const $i = j`
 
   :host([inline]) .visitor-controls {
     right: 8px;
-    bottom: clamp(8px, calc(4px + 1cqw), 14px);
+    bottom: 8px;
     left: 8px;
-  }
-
-  :host([inline]) .visitor-action-dock {
-    padding-block: clamp(3px, calc(1px + 0.45cqw), 5px);
-    padding-inline: clamp(4px, calc(2px + 0.6cqw), 8px);
-  }
-
-  :host([inline]) .visitor-action {
-    min-height: clamp(44px, calc(36px + 2.4cqw), 56px);
-    box-sizing: border-box;
-    gap: clamp(5px, calc(3px + 0.8cqw), 10px);
-    padding-block: clamp(8px, calc(5px + 0.7cqw), 11px);
-    padding-inline: clamp(8px, calc(5px + 1.3cqw), 17px);
-    font-size: clamp(12px, calc(9px + 0.8cqw), 16px);
-    line-height: 1.25;
-  }
-
-  :host([inline]) .visitor-action-dock:not(.door-only):not(.talk-only)
-    .visitor-action {
-    flex: 1 1 auto;
-  }
-
-  :host([inline]) .visitor-action svg {
-    width: clamp(18px, calc(13px + 1.4cqw), 24px);
-    height: clamp(18px, calc(13px + 1.4cqw), 24px);
-  }
-
-  :host([inline]) .visitor-action-divider {
-    height: clamp(24px, calc(18px + 1.5cqw), 30px);
-    margin-inline: clamp(3px, calc(1px + 0.7cqw), 7px);
-  }
-
-  :host([inline]) .door-contact-state {
-    font-size: clamp(9px, calc(7px + 0.5cqw), 11px);
-    line-height: 1.2;
-  }
-
-  @container ring-view-inline (max-width: 319px) {
-    .visitor-action > span {
-      display: none;
-    }
-
-    .visitor-action {
-      width: 44px;
-      flex: 0 0 44px;
-      padding-inline: 10px;
-    }
   }
 `, Ci = j`
   :host {
@@ -2345,7 +2296,7 @@ async function mt() {
   }
   return Ui(ne, Hi);
 }
-let x = class extends E {
+let $ = class extends E {
   constructor() {
     super(...arguments), this.controls = !0, this.muted = !0, this.allowExoPlayer = !0, this.fitMode = "cover", this.passiveSurface = !1, this.nativeAvailable = !!customElements.get(ne), this.handledStreamEvents = /* @__PURE__ */ new WeakSet(), this.ready = !1, this.handleSurfaceClick = (e) => {
       if (!this.passiveSurface || e.detail === 0 || !this.eventHost) return;
@@ -2472,7 +2423,7 @@ let x = class extends E {
     );
   }
 };
-x.styles = j`
+$.styles = j`
     :host {
       display: block;
       width: 100%;
@@ -2491,31 +2442,31 @@ x.styles = j`
   `;
 R([
   _({ attribute: !1 })
-], x.prototype, "stateObj", 2);
+], $.prototype, "stateObj", 2);
 R([
   _({ type: Boolean })
-], x.prototype, "controls", 2);
+], $.prototype, "controls", 2);
 R([
   _({ type: Boolean })
-], x.prototype, "muted", 2);
+], $.prototype, "muted", 2);
 R([
   _({ type: Boolean, attribute: "allow-exoplayer" })
-], x.prototype, "allowExoPlayer", 2);
+], $.prototype, "allowExoPlayer", 2);
 R([
   _({ type: Number, attribute: !1 })
-], x.prototype, "aspectRatio", 2);
+], $.prototype, "aspectRatio", 2);
 R([
   _({ attribute: !1 })
-], x.prototype, "fitMode", 2);
+], $.prototype, "fitMode", 2);
 R([
   _({ type: Boolean, attribute: "passive-surface" })
-], x.prototype, "passiveSurface", 2);
+], $.prototype, "passiveSurface", 2);
 R([
   u()
-], x.prototype, "nativeAvailable", 2);
-x = R([
+], $.prototype, "nativeAvailable", 2);
+$ = R([
   Z("ring-view-native-camera-adapter")
-], x);
+], $);
 const zi = (e) => e ?? l;
 var qi = Object.defineProperty, Ni = Object.getOwnPropertyDescriptor, k = (e, t, i, o) => {
   for (var r = o > 1 ? void 0 : o ? Ni(t, i) : t, s = e.length - 1, a; s >= 0; s--)
@@ -3501,7 +3452,7 @@ let f = class extends E {
   }
   doorActionIcon() {
     const e = this.doorEntity(), t = this.doorContactState();
-    return t === "open" ? De : t === "closed" ? yt : t === "unknown" || w(e) || e?.state === "jammed" || this.config?.door_action === "open" && !te(e) || this.doorActionStatus === "error" ? de : this.doorActionStatus === "working" ? $t : this.doorActionStatus === "success" ? bt : this.config?.door_action === "open" ? De : et;
+    return t === "open" ? De : t === "closed" ? yt : t === "unknown" || w(e) || e?.state === "jammed" || this.config?.door_action === "open" && !te(e) || this.doorActionStatus === "error" ? de : this.doorActionStatus === "working" ? St : this.doorActionStatus === "success" ? bt : this.config?.door_action === "open" ? De : et;
   }
   talkbackPlayer() {
     return this.shadowRoot?.querySelector("ring-view-ring-webrtc-player") ?? null;
@@ -3943,7 +3894,7 @@ let f = class extends E {
     !this.inline || !this.open || this.mode !== "live" || (this.resetVisitorActions(), this.clearAutomaticLiveRecovery(), this.lifecycle.dispose(), this.releaseInlineLive(), this.session = this.lifecycle.current(), this.automaticLiveRetry = !1, this.mediaStatus = "awaiting-resume", this.statusAnnouncement = n(this.hass, "viewer.resume_live"));
   }
 };
-f.styles = Si;
+f.styles = xi;
 m([
   _({ attribute: !1 })
 ], f.prototype, "hass", 2);
@@ -4088,7 +4039,7 @@ var no = Object.defineProperty, so = Object.getOwnPropertyDescriptor, M = (e, t,
 const ao = 1e4, lo = 640, co = 16 / 9, Je = 16, ho = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
   Xt
 )}`;
-let S = class extends E {
+let x = class extends E {
   constructor() {
     super(...arguments), this.preview = !1, this.previewFailed = !1, this.ringAlertVisible = !1, this.previewIntersecting = !1, this.previewVisible = !1, this.previewRequestId = 0, this.lastRingAlertAt = 0, this.previewMarkersInitialized = !1, this.inlinePausedForViewer = !1, this.openViewer = () => {
       if (this.preview || this.isInCardPicker()) return;
@@ -4209,7 +4160,7 @@ let S = class extends E {
           tabindex=${d ? "0" : l}
           aria-label=${d ? n(this.hass, "card.open_viewer", {
       name: i,
-      mode: xi(o, this.hass)
+      mode: $i(o, this.hass)
     }) : n(this.hass, "card.preview_alt", { name: i })}
           title=${d ? n(
       this.hass,
@@ -4352,10 +4303,10 @@ let S = class extends E {
     this.lastPreviewSize = { width: d, height: p };
     const v = this.previewEntityId(), g = this.hass, A = ++this.previewRequestId;
     try {
-      const $ = await ki(g, v, d, p);
+      const S = await ki(g, v, d, p);
       if (A !== this.previewRequestId || !this.isConnected || !this.previewVisible || this.previewEntityId() !== v)
         return;
-      this.lastPoster = $, this.previewFailed = !1;
+      this.lastPoster = S, this.previewFailed = !1;
     } catch {
     }
   }
@@ -4374,31 +4325,31 @@ let S = class extends E {
     return !1;
   }
 };
-S.styles = $i;
+x.styles = Si;
 M([
   _({ attribute: !1 })
-], S.prototype, "hass", 2);
+], x.prototype, "hass", 2);
 M([
   _({ reflect: !0 })
-], S.prototype, "layout", 2);
+], x.prototype, "layout", 2);
 M([
   _({ type: Boolean })
-], S.prototype, "preview", 2);
+], x.prototype, "preview", 2);
 M([
   u()
-], S.prototype, "config", 2);
+], x.prototype, "config", 2);
 M([
   u()
-], S.prototype, "previewFailed", 2);
+], x.prototype, "previewFailed", 2);
 M([
   u()
-], S.prototype, "lastPoster", 2);
+], x.prototype, "lastPoster", 2);
 M([
   u()
-], S.prototype, "ringAlertVisible", 2);
-S = M([
+], x.prototype, "ringAlertVisible", 2);
+x = M([
   Z(ve)
-], S);
+], x);
 window.customCards = window.customCards || [];
 window.customCards.some((e) => e.type === ve) || window.customCards.push({
   type: ve,
@@ -4661,7 +4612,7 @@ function vo(e, t) {
       name: "card_appearance",
       type: "expandable",
       flatten: !0,
-      iconPath: St,
+      iconPath: xt,
       schema: [
         { name: "name", selector: { text: {} } },
         { name: "show_name", selector: { boolean: {} } },
@@ -4874,5 +4825,5 @@ const mo = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   }
 }, Symbol.toStringTag, { value: "Module" }));
 export {
-  S as RingView
+  x as RingView
 };
