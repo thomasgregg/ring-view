@@ -18,7 +18,7 @@ let ot = class {
     return this.cssText;
   }
 };
-const Et = (e) => new ot(typeof e == "string" ? e : e + "", void 0, ke), W = (e, ...t) => {
+const Et = (e) => new ot(typeof e == "string" ? e : e + "", void 0, ke), j = (e, ...t) => {
   const i = e.length === 1 ? e[0] : t.reduce((o, r, s) => o + ((a) => {
     if (a._$cssResult$ === !0) return a.cssText;
     if (typeof a == "number") return a;
@@ -327,7 +327,7 @@ class Nt {
     for (; d !== void 0; ) {
       if (a === d.index) {
         let p;
-        d.type === 2 ? p = new j(s, s.nextSibling, this, t) : d.type === 1 ? p = new d.ctor(s, d.name, d.strings, this, t) : d.type === 6 && (p = new Wt(s, this, t)), this._$AV.push(p), d = o[++c];
+        d.type === 2 ? p = new W(s, s.nextSibling, this, t) : d.type === 1 ? p = new d.ctor(s, d.name, d.strings, this, t) : d.type === 6 && (p = new jt(s, this, t)), this._$AV.push(p), d = o[++c];
       }
       a !== d?.index && (s = V.nextNode(), a++);
     }
@@ -338,7 +338,7 @@ class Nt {
     for (const o of this._$AV) o !== void 0 && (o.strings !== void 0 ? (o._$AI(t, o, i), i += o.strings.length - 2) : o._$AI(t[i])), i++;
   }
 }
-class j {
+class W {
   get _$AU() {
     return this._$AM?._$AU ?? this._$Cv;
   }
@@ -384,7 +384,7 @@ class j {
     Se(this._$AH) || (this._$AH = [], this._$AR());
     const i = this._$AH;
     let o, r = 0;
-    for (const s of t) r === i.length ? i.push(o = new j(this.O(N()), this.O(N()), this, this.options)) : o = i[r], o._$AI(s), r++;
+    for (const s of t) r === i.length ? i.push(o = new W(this.O(N()), this.O(N()), this, this.options)) : o = i[r], o._$AI(s), r++;
     r < i.length && (this._$AR(o && o._$AB.nextSibling, r), i.length = r);
   }
   _$AR(t = this._$AA.nextSibling, i) {
@@ -451,7 +451,7 @@ class Kt extends ae {
     typeof this._$AH == "function" ? this._$AH.call(this.options?.host ?? this.element, t) : this._$AH.handleEvent(t);
   }
 }
-class Wt {
+class jt {
   constructor(t, i, o) {
     this.element = t, this.type = 6, this._$AN = void 0, this._$AM = i, this.options = o;
   }
@@ -462,14 +462,14 @@ class Wt {
     U(this, t);
   }
 }
-const jt = $e.litHtmlPolyfillSupport;
-jt?.(F, j), ($e.litHtmlVersions ??= []).push("3.3.3");
+const Wt = $e.litHtmlPolyfillSupport;
+Wt?.(F, W), ($e.litHtmlVersions ??= []).push("3.3.3");
 const Zt = (e, t, i) => {
   const o = i?.renderBefore ?? t;
   let r = o._$litPart$;
   if (r === void 0) {
     const s = i?.renderBefore ?? null;
-    o._$litPart$ = r = new j(t.insertBefore(N(), s), s, void 0, i ?? {});
+    o._$litPart$ = r = new W(t.insertBefore(N(), s), s, void 0, i ?? {});
   }
   return r._$AI(e), r;
 };
@@ -956,7 +956,7 @@ const Xt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "door.unlock_when_ready_aria": "Unlock available after live video connects",
   "door.unlock_failed": "Couldn’t unlock the door.",
   "door.open_failed": "Couldn’t open the door."
-}, We = {
+}, je = {
   de: ei,
   en: ti
 };
@@ -968,7 +968,7 @@ function oi(e) {
   return ii(e).trim().toLowerCase().split(/[-_]/)[0] === "de" ? "de" : "en";
 }
 function n(e, t, i = {}) {
-  return (We[oi(e)][t] ?? We.en[t]).replace(
+  return (je[oi(e)][t] ?? je.en[t]).replace(
     /\{([a-z_]+)\}/gi,
     (r, s) => s in i ? String(i[s]) : r
   );
@@ -1157,7 +1157,7 @@ function he(e, t) {
     })
   );
 }
-const yi = 9e3, je = /* @__PURE__ */ new WeakMap();
+const yi = 9e3, We = /* @__PURE__ */ new WeakMap();
 function vt(e, t, i) {
   const o = t?.attributes.entity_picture;
   return typeof o == "string" && o.length > 0 ? e.hassUrl(o) : e.hassUrl(`/api/camera_proxy/${encodeURIComponent(i)}`);
@@ -1170,8 +1170,8 @@ function Ze(e) {
   return Math.max(1, Math.ceil(Number.isFinite(e) ? e : 1));
 }
 async function Ai(e, t) {
-  let i = je.get(e);
-  i || (i = /* @__PURE__ */ new Map(), je.set(e, i));
+  let i = We.get(e);
+  i || (i = /* @__PURE__ */ new Map(), We.set(e, i));
   const o = Date.now(), r = i.get(t);
   if (r && r.expiresAt > o) return r.promise;
   const s = e.callWS({
@@ -1205,7 +1205,7 @@ function $i(e, t) {
     e === "live" ? "common.live" : "common.last_recording"
   );
 }
-const Si = W`
+const Si = j`
   :host {
     display: block;
     min-width: 0;
@@ -1348,7 +1348,7 @@ const Si = W`
       display: none;
     }
   }
-`, xi = W`
+`, xi = j`
   :host {
     position: fixed;
     inset: 0;
@@ -1391,7 +1391,7 @@ const Si = W`
     inset: 0 0 auto;
     z-index: 5;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
     min-height: 72px;
     padding: 14px 16px 18px 20px;
@@ -1402,8 +1402,11 @@ const Si = W`
   }
 
   h2 {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
     margin: 0;
-    max-width: calc(50% - 72px);
+    max-width: 100%;
     overflow: hidden;
     color: #fff;
     font-size: var(--ha-font-size-xl, 20px);
@@ -1415,9 +1418,11 @@ const Si = W`
   }
 
   .header-actions {
-    grid-column: 2;
+    grid-column: 3;
+    grid-row: 1;
     display: flex;
     align-items: center;
+    justify-self: end;
     gap: 2px;
     pointer-events: auto;
   }
@@ -1467,14 +1472,12 @@ const Si = W`
   }
 
   .mode-switch {
-    position: absolute;
-    z-index: 5;
-    top: 14px;
-    inset-inline-start: 50%;
+    grid-column: 2;
+    grid-row: 1;
     display: flex;
     align-items: center;
+    justify-self: center;
     gap: 2px;
-    transform: translateX(-50%);
     pointer-events: auto;
   }
 
@@ -1965,10 +1968,6 @@ const Si = W`
       transform: translateY(-50%);
     }
 
-    .mode-switch {
-      top: calc(10px + env(safe-area-inset-top));
-    }
-
     .visitor-controls {
       right: max(8px, env(safe-area-inset-right));
       bottom: max(8px, env(safe-area-inset-bottom));
@@ -2015,10 +2014,6 @@ const Si = W`
       max-height: none;
       aspect-ratio: auto;
       transform: none;
-    }
-
-    .mode-switch {
-      top: calc(10px + env(safe-area-inset-top));
     }
 
     .visitor-controls {
@@ -2098,11 +2093,8 @@ const Si = W`
   }
 
   :host([inline]) h2 {
-    max-width: 120px;
-  }
-
-  :host([inline]) .mode-switch {
-    top: 10px;
+    font-size: var(--ha-font-size-l, 16px);
+    line-height: 20px;
   }
 
   :host([inline]) .visitor-controls {
@@ -2126,7 +2118,7 @@ const Si = W`
   :host([inline]) .state-layer.with-visitor-controls .spinner {
     flex: 0 0 auto;
   }
-`, Ci = W`
+`, Ci = j`
   :host {
     display: block;
     min-width: 0;
@@ -2445,7 +2437,7 @@ let $ = class extends E {
     );
   }
 };
-$.styles = W`
+$.styles = j`
     :host {
       display: block;
       width: 100%;
@@ -2871,7 +2863,7 @@ let y = class extends E {
     return h`<svg viewBox="0 0 24 24" aria-hidden="true"><path d=${e}></path></svg>`;
   }
 };
-y.styles = W`
+y.styles = j`
     :host {
       position: absolute;
       inset: 0;
@@ -3063,10 +3055,10 @@ class Ki {
     this.clearTimeout(), this.generation += 1;
   }
 }
-var Wi = Object.defineProperty, ji = Object.getOwnPropertyDescriptor, m = (e, t, i, o) => {
-  for (var r = o > 1 ? void 0 : o ? ji(t, i) : t, s = e.length - 1, a; s >= 0; s--)
+var ji = Object.defineProperty, Wi = Object.getOwnPropertyDescriptor, m = (e, t, i, o) => {
+  for (var r = o > 1 ? void 0 : o ? Wi(t, i) : t, s = e.length - 1, a; s >= 0; s--)
     (a = e[s]) && (r = (o ? a(t, i, r) : a(r)) || r);
-  return o && r && Wi(t, i, r), r;
+  return o && r && ji(t, i, r), r;
 };
 const Zi = 20, Gi = 2500, Yi = 900, Qi = 2e3, Ji = 3e3;
 let f = class extends E {
@@ -3286,8 +3278,8 @@ let f = class extends E {
                 ${this.icon(this.inline ? At : wt)}
               </button>
             </div>
+            ${this.renderModeSwitch()}
           </header>
-          ${this.renderModeSwitch()}
           ${this.renderVisitorActions()}
         </div>
         <div class="sr-only" aria-live="polite" aria-atomic="true">

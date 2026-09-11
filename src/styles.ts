@@ -188,7 +188,7 @@ export const dialogStyles = css`
     inset: 0 0 auto;
     z-index: 5;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
     min-height: 72px;
     padding: 14px 16px 18px 20px;
@@ -199,8 +199,11 @@ export const dialogStyles = css`
   }
 
   h2 {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
     margin: 0;
-    max-width: calc(50% - 72px);
+    max-width: 100%;
     overflow: hidden;
     color: #fff;
     font-size: var(--ha-font-size-xl, 20px);
@@ -212,9 +215,11 @@ export const dialogStyles = css`
   }
 
   .header-actions {
-    grid-column: 2;
+    grid-column: 3;
+    grid-row: 1;
     display: flex;
     align-items: center;
+    justify-self: end;
     gap: 2px;
     pointer-events: auto;
   }
@@ -264,14 +269,12 @@ export const dialogStyles = css`
   }
 
   .mode-switch {
-    position: absolute;
-    z-index: 5;
-    top: 14px;
-    inset-inline-start: 50%;
+    grid-column: 2;
+    grid-row: 1;
     display: flex;
     align-items: center;
+    justify-self: center;
     gap: 2px;
-    transform: translateX(-50%);
     pointer-events: auto;
   }
 
@@ -762,10 +765,6 @@ export const dialogStyles = css`
       transform: translateY(-50%);
     }
 
-    .mode-switch {
-      top: calc(10px + env(safe-area-inset-top));
-    }
-
     .visitor-controls {
       right: max(8px, env(safe-area-inset-right));
       bottom: max(8px, env(safe-area-inset-bottom));
@@ -812,10 +811,6 @@ export const dialogStyles = css`
       max-height: none;
       aspect-ratio: auto;
       transform: none;
-    }
-
-    .mode-switch {
-      top: calc(10px + env(safe-area-inset-top));
     }
 
     .visitor-controls {
@@ -895,11 +890,8 @@ export const dialogStyles = css`
   }
 
   :host([inline]) h2 {
-    max-width: 120px;
-  }
-
-  :host([inline]) .mode-switch {
-    top: 10px;
+    font-size: var(--ha-font-size-l, 16px);
+    line-height: 20px;
   }
 
   :host([inline]) .visitor-controls {

@@ -856,16 +856,94 @@ test("renders native-style header controls without duplicate media actions", asy
 test("places the optional camera name at the top left in both views", async ({
   page,
 }) => {
-  await page.goto("/demo/?name=1");
-  const card = page.getByRole("button", { name: /Open Entrance viewer/ });
+  const cameraName = "Thomas Gregg Front Door Camera With A Long Name";
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(
+    `/demo/?name=1&camera_name=${encodeURIComponent(cameraName)}`,
+  );
+  const root = page.locator("#card-root");
+  await root.evaluate((element) => {
+    element.style.width = "340px";
+  });
+  const card = page.locator("ring-view .preview");
   const name = page.locator("ring-view .name");
-  await expect(name).toHaveText("Entrance");
+  await expect(name).toHaveText(cameraName);
   const cardBox = await card.boundingBox();
   const nameBox = await name.boundingBox();
+  if (!cardBox || !nameBox) throw new Error("Card name geometry unavailable");
   expect((nameBox?.y ?? 0) - (cardBox?.y ?? 0)).toBeLessThan(32);
+  expect(nameBox.x + nameBox.width).toBeLessThanOrEqual(
+    cardBox.x + cardBox.width - 12,
+  );
+  await expect(name).toHaveCSS("text-overflow", "ellipsis");
 
   await card.click();
-  await expect(page.getByRole("heading", { name: "Entrance" })).toBeVisible();
+  const heading = page.getByRole("heading", { name: cameraName });
+  const modeSwitch = page.getByRole("tablist", { name: "Camera view" });
+  const close = page.getByRole("button", { name: "Close camera viewer" });
+  await expect(heading).toBeVisible();
+  const [headingBox, modeBox, closeBox] = await Promise.all([
+    heading.boundingBox(),
+    modeSwitch.boundingBox(),
+    close.boundingBox(),
+  ]);
+  if (!headingBox || !modeBox || !closeBox) {
+    throw new Error("Viewer header geometry unavailable");
+  }
+  expect(headingBox.x + headingBox.width).toBeLessThanOrEqual(modeBox.x - 8);
+  expect(modeBox.x + modeBox.width).toBeLessThanOrEqual(closeBox.x - 8);
+  await expect(heading).toHaveCSS("font-size", "20px");
+});
+
+test("keeps a long inline camera name clear of header controls at every card width", async ({
+  page,
+}) => {
+  const cameraName = "Thomas Gregg Front Door Camera With A Long Name";
+  await page.goto(
+    `/demo/?dashboard=interactive&name=1&camera_name=${encodeURIComponent(cameraName)}`,
+  );
+
+  const root = page.locator("#card-root");
+  const card = page.locator("ring-view");
+  const heading = card.getByRole("heading", { name: cameraName });
+  const modeSwitch = card.getByRole("tablist", { name: "Camera view" });
+  const expand = card.getByRole("button", {
+    name: "Open fullscreen camera viewer",
+  });
+  await expect(heading).toBeVisible();
+  await expect(heading).toHaveCSS("font-size", "16px");
+  await expect(heading).toHaveCSS("text-overflow", "ellipsis");
+
+  for (const width of [320, 340, 360, 480, 720]) {
+    await root.evaluate((element, value) => {
+      element.style.width = `${value}px`;
+    }, width);
+    await page.evaluate(() => new Promise(requestAnimationFrame));
+
+    const [cardBox, headingBox, modeBox, expandBox] = await Promise.all([
+      card.boundingBox(),
+      heading.boundingBox(),
+      modeSwitch.boundingBox(),
+      expand.boundingBox(),
+    ]);
+    if (!cardBox || !headingBox || !modeBox || !expandBox) {
+      throw new Error(`Inline header geometry unavailable at ${width}px`);
+    }
+
+    expect(headingBox.x).toBeGreaterThanOrEqual(cardBox.x);
+    expect(headingBox.x + headingBox.width).toBeLessThanOrEqual(modeBox.x - 8);
+    expect(modeBox.x + modeBox.width).toBeLessThanOrEqual(expandBox.x - 8);
+    expect(expandBox.x + expandBox.width).toBeLessThanOrEqual(
+      cardBox.x + cardBox.width,
+    );
+
+    if (width <= 360) {
+      const isTruncated = await heading.evaluate(
+        (element) => element.scrollWidth > element.clientWidth,
+      );
+      expect(isTruncated).toBe(true);
+    }
+  }
 });
 
 test("hides the camera name from both views when disabled", async ({ page }) => {

@@ -242,7 +242,7 @@ card.setConfig({
   recording_entity: recording.entity_id,
   live_entity: live.entity_id,
   snapshot_entity: snapshot.entity_id,
-  name: "Entrance",
+  name: query.get("camera_name") || "Entrance",
   default_mode: query.get("mode") === "live" ? "live" : "last_recording",
   remember_last_mode: query.get("remember") === "1",
   autoplay_recording: query.get("autoplay") !== "0",

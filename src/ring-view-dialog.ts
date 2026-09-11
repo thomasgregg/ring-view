@@ -331,8 +331,8 @@ export class RingViewDialog extends LitElement {
                 ${this.icon(this.inline ? mdiFullscreen : mdiClose)}
               </button>
             </div>
+            ${this.renderModeSwitch()}
           </header>
-          ${this.renderModeSwitch()}
           ${this.renderVisitorActions()}
         </div>
         <div class="sr-only" aria-live="polite" aria-atomic="true">

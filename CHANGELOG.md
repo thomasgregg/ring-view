@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-09-11
+
+### Fixed
+
+- Keep long camera names clear of the mode switch and header actions at every
+  supported card width, truncating the name with an ellipsis when needed.
+- Reduce the inline camera-name size to 16px while retaining the 20px
+  fullscreen heading.
+
+### Tests
+
+- Cover long camera-name geometry, truncation, control spacing, and font sizes
+  across compact and wide dashboard layouts.
+
 ## [0.7.1] - 2026-09-11
 
 ### Maintenance
