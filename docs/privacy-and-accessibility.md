@@ -22,6 +22,12 @@ The card supports keyboard activation, Escape to close, focus trapping and resto
   viewer closes, changes view, loses focus, or becomes hidden. A user who disables
   this confirmation accepts one-tap operation for everyone allowed to use that
   dashboard and entity.
+- Interactive dashboard controls are opt-in. Door access requires a second
+  explicit opt-in, and a Live-only action cannot run until the inline Live
+  picture is ready. Home Assistant edit and card-picker previews never connect
+  or expose visitor actions.
+- Inline media stops before fullscreen opens, suspends when its card or tab is
+  hidden, and is coordinated across duplicate cards for the same Live camera.
 - The optional remembered view stores only the selected mode for that entity pair in the local browser.
 
 ## A note on privacy & legality

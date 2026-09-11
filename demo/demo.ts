@@ -257,6 +257,16 @@ card.setConfig({
   door_control_visibility:
     query.get("door_visibility") === "all" ? "all_views" : "live_only",
   door_hold_to_activate: query.get("door_hold") !== "0",
+  dashboard_behavior:
+    query.get("dashboard") === "interactive" ? "interactive" : "open_viewer",
+  dashboard_start:
+    query.get("dashboard_start") === "recording"
+      ? "last_recording"
+      : query.get("dashboard_start") === "live"
+        ? "live"
+        : "on_demand",
+  dashboard_live_muted: query.get("dashboard_muted") !== "0",
+  door_control_on_dashboard: query.get("dashboard_door") === "1",
 });
 card.hass = hass;
 document.querySelector("#card-root")!.append(card);

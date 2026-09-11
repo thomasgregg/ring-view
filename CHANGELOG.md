@@ -4,6 +4,33 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.7.0-beta.1] - 2026-09-11
+
+### Added
+
+- Add an opt-in **Control camera in card** dashboard mode with Recording/Live
+  tabs, playback, Talk, optional door access, and an explicit fullscreen button.
+- Add separate dashboard startup choices: wait for a tap, start the last
+  recording, or start Live muted by default.
+- Add a second explicit opt-in before door access is exposed on the dashboard.
+
+### Safety and lifecycle
+
+- Keep all existing cards on the passive **Open fullscreen viewer** behavior by
+  default, and keep edit/configuration previews non-interactive.
+- Require a ready Live picture before enabling a Live-only inline door action.
+- Stop inline media before opening fullscreen, suspend it while hidden, and
+  prevent duplicate inline cards from opening overlapping Live sessions for the
+  same camera.
+- Keep inline failure states intentionally compact: the existing mode tabs
+  replace a duplicate switch button, while unavailable visitor actions hide.
+
+### Tests
+
+- Cover defaults and validation, progressive editor disclosure, on-demand
+  startup, door opt-in/readiness, edit-preview safety, duplicate cards, and
+  inline/fullscreen session handoff on desktop and phone.
+
 ## [0.6.3] - 2026-09-11
 
 ### Fixed

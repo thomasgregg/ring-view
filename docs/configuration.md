@@ -34,6 +34,9 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `remember_last_mode` | Yes — Config tab | `false` | `true`, `false` | Remembers the most recent view in the current browser and uses it instead of `default_mode`. |
 | `autoplay_recording` | Yes — Config tab | `true` | `true`, `false` | Starts the latest recording immediately; when disabled, the viewer waits for Play. |
 | `live_muted` | Yes — Config tab | `false` | `true`, `false` | Starts Live muted. Browser autoplay rules can still require muted playback. |
+| `dashboard_behavior` | Yes — Dashboard card | `open_viewer` | `open_viewer`, `interactive` | Keeps the passive card that opens fullscreen, or exposes camera controls directly in the card. |
+| `dashboard_start` | Yes — Dashboard card, interactive only | `on_demand` | `on_demand`, `last_recording`, `live` | Waits for a tap, starts the recording, or starts Live when an interactive card becomes visible. |
+| `dashboard_live_muted` | Yes — Dashboard card, interactive only | `true` | `true`, `false` | Controls audio when Live starts inside the dashboard. Muted is recommended for tablets and autoplay. |
 | `two_way_audio` | Yes — Viewer behavior | `false` | `true`, `false` | Uses one direct WebRTC session for live video, listening, and push-to-talk when `live_entity` is an official Ring `live_view` camera. |
 | `doorbell_entity` | Yes, Doorbell features | Not set | `event.*` entity ID | Displays a temporary ring alert when the selected doorbell event reports `ring`. |
 | `door_entity` | Yes — Door access | Not set | `lock.*` entity ID | Enables door access for the selected Home Assistant lock. |
@@ -41,6 +44,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `door_action` | Yes — Door access | `unlock` | `unlock`, `open` | Calls `lock.unlock`, or `lock.open` for locks that advertise latch-opening support. |
 | `door_control_visibility` | Yes — Door access | `live_only` | `live_only`, `all_views` | Shows the door action only in Live by default, or also over recordings. |
 | `door_hold_to_activate` | Yes — Door access | `true` | `true`, `false` | Requires a 900 ms press-and-hold confirmation. Disable for one-tap operation. |
+| `door_control_on_dashboard` | Yes — Door access, interactive only | `false` | `true`, `false` | Separately allows the configured door action to appear on the interactive dashboard card. |
 | `show_name` | Yes — Config tab | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer. |
 | `preview_source` | Yes — Dashboard preview | `last_recording` | `last_recording`, `live`, `default`, `snapshot`, `newest` | Chooses the entity used for the dashboard still. `default` follows the view that will open; `newest` compares the optional snapshot with the latest recording. |
 | `preview_fallback` | Yes — Dashboard preview | `last_recording` | `last_recording`, `snapshot` | Chooses the still used by `newest` when capture times or update order cannot be compared. Only shown for `newest`. |
@@ -76,6 +80,10 @@ remember_last_mode: false
 autoplay_recording: true
 live_muted: false
 
+dashboard_behavior: interactive
+dashboard_start: on_demand
+dashboard_live_muted: true
+
 two_way_audio: true
 doorbell_entity: event.front_door_ding
 
@@ -84,6 +92,7 @@ door_contact_entity: binary_sensor.front_door_contact
 door_action: open
 door_control_visibility: live_only
 door_hold_to_activate: true
+door_control_on_dashboard: false
 
 show_name: true
 preview_source: newest
@@ -99,6 +108,27 @@ grid_options:
 ```
 
 Ring View 0.2 and newer use this flat configuration only. Earlier nested `preview`, `appearance`, `viewer`, and `performance` structures are not supported.
+
+## Dashboard card behavior
+
+Open **Dashboard card** and choose one of two intentionally distinct surfaces:
+
+| Behavior | Dashboard | Fullscreen |
+| --- | --- | --- |
+| **Open fullscreen viewer** (default) | One passive still image; tapping opens the viewer. | Recording, Live, Talk, and configured door access. |
+| **Control camera in card** (beta) | Recording/Live tabs, media controls, optional Talk and optional door access, plus fullscreen. | The same full viewer, opened with the currently selected mode. |
+
+The interactive fields appear only after that mode is selected. **No — wait for
+a tap** is the safest startup and does not mount a player until Recording or
+Live is chosen. Automatic Live starts only while the card is visible and is
+muted by default. Home Assistant edit and card-picker previews never connect to
+the camera and never expose Talk or door actions.
+
+Door access has its own additional switch because enabling an inline camera does
+not imply permission to operate a lock from the dashboard. With Live-only
+visibility, the action reads **Waiting for Live…** and stays disabled until the
+current Live player is ready. It hides if Live fails, leaving the compact Retry
+state and the existing mode tabs.
 
 ## Door access
 
@@ -137,7 +167,7 @@ dock automatically collapses to the door-only pill.
 
 ## Freshest snapshot preview
 
-Open **Dashboard preview**, set **Image source** to **Newest snapshot or
+With **Open fullscreen viewer** selected, open **Dashboard card**, set **Image source** to **Newest snapshot or
 recording**, and select the now-visible **Device snapshot camera**. Ring View still
 renders only one passive image on the dashboard, and tapping it opens the
 configured Recording or Live view—there is no third viewer tab.

@@ -22,6 +22,8 @@ import { cardStyles } from "./styles";
 import type { GridOptions, HomeAssistant, NormalizedConfig, RingViewConfig } from "./types";
 import { entityIsUnavailable, friendlyName } from "./utilities/entity-validation";
 import { loadMode } from "./utilities/mode-storage";
+import "./ring-view-dialog";
+import type { RingViewDialog } from "./ring-view-dialog";
 import {
   decodeRingViewUrl,
   ringViewUrlMatchesConfig,
@@ -46,6 +48,7 @@ export class RingView extends LitElement {
 
   @property({ attribute: false }) public hass?: HomeAssistant;
   @property({ reflect: true }) public layout?: string;
+  @property({ type: Boolean }) public preview = false;
   @state() private config?: NormalizedConfig;
   @state() private previewFailed = false;
   @state() private lastPoster?: string;
@@ -67,6 +70,7 @@ export class RingView extends LitElement {
   private recordingMarker?: string;
   private snapshotTimestamp?: number;
   private latestObservedPreviewSource?: "last_recording" | "snapshot";
+  private inlinePausedForViewer = false;
 
   public static async getConfigElement(): Promise<HTMLElement> {
     await import("./ring-view-editor");
@@ -129,6 +133,7 @@ export class RingView extends LitElement {
 
   public connectedCallback(): void {
     super.connectedCallback();
+    document.addEventListener("viewer-closed", this.handleViewerClosed);
     this.updateRingAlert();
     void this.updateComplete.then(() => {
       if (this.isConnected && !this.isInCardPicker()) this.setupPreviewLifecycle();
@@ -136,6 +141,7 @@ export class RingView extends LitElement {
   }
 
   public disconnectedCallback(): void {
+    document.removeEventListener("viewer-closed", this.handleViewerClosed);
     this.teardownPreviewLifecycle();
     this.clearRingAlertTimer();
     if (this.restoreViewerTimer !== undefined) {
@@ -195,8 +201,13 @@ export class RingView extends LitElement {
 
   protected updated(changed: PropertyValues<this>): void {
     const configChanged = (changed as unknown as Map<PropertyKey, unknown>).has("config");
+    if ((configChanged || changed.has("preview")) && !this.isInCardPicker()) {
+      this.teardownPreviewLifecycle();
+      this.setupPreviewLifecycle();
+    }
     if (
       !this.isInCardPicker() &&
+      this.config?.dashboard_behavior === "open_viewer" &&
       (changed.has("hass") || configChanged) &&
       this.previewVisible
     ) {
@@ -204,6 +215,13 @@ export class RingView extends LitElement {
     }
     if (!this.isInCardPicker() && this.hass && this.config) {
       this.scheduleViewerRestore();
+    }
+    if (
+      !this.isInCardPicker()
+      && !this.preview
+      && this.config?.dashboard_behavior === "interactive"
+    ) {
+      this.initializeInlineViewer();
     }
   }
 
@@ -219,29 +237,49 @@ export class RingView extends LitElement {
       );
     const openingMode = this.ringAlertVisible ? "live" : loadMode(this.config);
     const pickerPreview = this.isInCardPicker();
+    const safePreview = pickerPreview || this.preview;
     const unavailable = pickerPreview ? false : entityIsUnavailable(previewEntity);
     const style = {
       "--ring-view-aspect-ratio": aspectRatioCss(this.config.aspect_ratio),
       "--ring-view-fit-mode": this.config.fit_mode,
     };
 
+    if (this.config.dashboard_behavior === "interactive" && !safePreview) {
+      return html`
+        <ha-card class="interactive">
+          <div class="inline-shell" style=${styleMap(style)}>
+            <ring-view-dialog
+              inline
+              .hass=${this.hass}
+              @ring-view-expand=${this.openExpandedViewer}
+            ></ring-view-dialog>
+          </div>
+        </ha-card>
+      `;
+    }
+
+    const previewInteractive = !safePreview;
     return html`
-      <ha-card>
+      <ha-card class=${safePreview ? "safe-preview" : nothing}>
         <div
           class="preview"
           style=${styleMap(style)}
-          role="button"
-          tabindex="0"
-          aria-label=${localize(this.hass, "card.open_viewer", {
-            name,
-            mode: modeLabel(openingMode, this.hass),
-          })}
-          title=${localize(
-            this.hass,
-            openingMode === "live" ? "card.open_live" : "card.open_recording",
-          )}
-          @click=${this.openViewer}
-          @keydown=${this.handleKeyDown}
+          role=${previewInteractive ? "button" : "img"}
+          tabindex=${previewInteractive ? "0" : nothing}
+          aria-label=${previewInteractive
+            ? localize(this.hass, "card.open_viewer", {
+                name,
+                mode: modeLabel(openingMode, this.hass),
+              })
+            : localize(this.hass, "card.preview_alt", { name })}
+          title=${previewInteractive
+            ? localize(
+                this.hass,
+                openingMode === "live" ? "card.open_live" : "card.open_recording",
+              )
+            : nothing}
+          @click=${previewInteractive ? this.openViewer : undefined}
+          @keydown=${previewInteractive ? this.handleKeyDown : undefined}
         >
           ${!unavailable && !this.previewFailed
             ? html`
@@ -309,6 +347,7 @@ export class RingView extends LitElement {
   }
 
   private openViewer = (): void => {
+    if (this.preview || this.isInCardPicker()) return;
     // Timers may be throttled while the app is hidden; never open Live for an
     // expired ring just because its timeout has not run yet.
     this.updateRingAlert();
@@ -321,6 +360,46 @@ export class RingView extends LitElement {
         ? this.lastRingAlertAt + RING_ALERT_DURATION_MS
         : undefined,
     });
+  };
+
+  private initializeInlineViewer(): void {
+    if (!this.hass || !this.config || this.inlinePausedForViewer) return;
+    const viewer = this.renderRoot.querySelector<RingViewDialog>(
+      "ring-view-dialog[inline]",
+    );
+    if (!viewer) return;
+    viewer.hass = this.hass;
+    viewer.showInline({
+      config: this.config,
+      mode: this.ringAlertVisible ? "live" : loadMode(this.config),
+      start: this.ringAlertVisible ? "on_demand" : this.config.dashboard_start,
+      ringingUntil: this.ringAlertVisible
+        ? this.lastRingAlertAt + RING_ALERT_DURATION_MS
+        : undefined,
+    });
+    viewer.setInlineVisible(this.previewVisible);
+  }
+
+  private openExpandedViewer = (
+    event: CustomEvent<{ mode: "last_recording" | "live"; ringingUntil?: number }>,
+  ): void => {
+    if (!this.config) return;
+    event.stopPropagation();
+    const viewer = event.currentTarget as RingViewDialog;
+    viewer.stopInline();
+    this.inlinePausedForViewer = true;
+    showRingViewDialog(viewer, {
+      config: this.config,
+      mode: event.detail.mode,
+      opener: viewer,
+      ringingUntil: event.detail.ringingUntil,
+    });
+  };
+
+  private handleViewerClosed = (): void => {
+    if (!this.inlinePausedForViewer) return;
+    this.inlinePausedForViewer = false;
+    void this.updateComplete.then(() => this.initializeInlineViewer());
   };
 
   private scheduleViewerRestore(): void {
@@ -336,6 +415,12 @@ export class RingView extends LitElement {
       const restore = decodeRingViewUrl();
       if (!ringViewUrlMatchesConfig(restore, this.config)) return;
       const trigger = this.renderRoot.querySelector<HTMLElement>(".preview") ?? undefined;
+      if (this.config.dashboard_behavior === "interactive") {
+        this.renderRoot
+          .querySelector<RingViewDialog>("ring-view-dialog[inline]")
+          ?.stopInline();
+        this.inlinePausedForViewer = true;
+      }
       showRingViewDialog(trigger ?? this, {
         config: this.config,
         mode: restore.mode,
@@ -397,7 +482,9 @@ export class RingView extends LitElement {
   private setupPreviewLifecycle(): void {
     if (this.isInCardPicker()) return;
     if (this.previewIntersectionObserver || this.previewResizeObserver) return;
-    const preview = this.renderRoot.querySelector<HTMLElement>(".preview");
+    const preview = this.renderRoot.querySelector<HTMLElement>(
+      ".preview, .inline-shell",
+    );
     if (!preview) return;
 
     if (typeof IntersectionObserver === "undefined") {
@@ -428,6 +515,9 @@ export class RingView extends LitElement {
   }
 
   private teardownPreviewLifecycle(): void {
+    this.renderRoot
+      .querySelector<RingViewDialog>("ring-view-dialog[inline]")
+      ?.setInlineVisible(false);
     this.previewIntersectionObserver?.disconnect();
     this.previewResizeObserver?.disconnect();
     this.previewIntersectionObserver = undefined;
@@ -452,6 +542,13 @@ export class RingView extends LitElement {
     const visible = this.previewIntersecting && document.visibilityState !== "hidden";
     if (visible === this.previewVisible) return;
     this.previewVisible = visible;
+    if (this.config?.dashboard_behavior === "interactive" && !this.preview) {
+      this.stopPreviewRefreshTimer();
+      this.renderRoot
+        .querySelector<RingViewDialog>("ring-view-dialog[inline]")
+        ?.setInlineVisible(visible);
+      return;
+    }
     if (visible) {
       void this.refreshPreview(true);
       this.previewRefreshTimer = window.setInterval(() => {

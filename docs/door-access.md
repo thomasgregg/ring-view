@@ -54,6 +54,11 @@ Door access appears only when `door_entity` is configured.
 
 - **Live view only** is the default and recommended visibility. It keeps the door
   operation next to a current camera view.
+- An interactive dashboard card requires the separate **Allow door control on
+  dashboard** opt-in. Selecting a lock alone exposes the action only in the
+  fullscreen viewer.
+- On an interactive card, a Live-only action is disabled as **Waiting for
+  Live…** until the current Live picture is ready and hides if Live fails.
 - **Live and recordings** is an explicit option for households that need the
   action in both modes.
 - When Talk is available, both controls always appear in the shared dock.
@@ -154,7 +159,7 @@ capabilities.
 The full editor order is:
 
 1. Cameras
-2. Dashboard preview
+2. Dashboard card
 3. Viewer behavior
 4. Doorbell features
 5. Door access
@@ -166,7 +171,9 @@ The **Door access** section uses progressive disclosure:
 2. Once a `lock.*` entity is selected, reveal the optional **Door contact
    sensor**, followed by **Action when pressed**, **Show control in**, and
    **Require hold to activate**.
-3. If the lock does not support `open`, explain the issue next to the
+3. When the dashboard behavior is interactive, also reveal **Allow door
+   control on dashboard** after the safer viewer-only settings.
+4. If the lock does not support `open`, explain the issue next to the
    configuration while leaving **Unlock** available.
 
 This places the highest-impact choice first, keeps inactive settings out of the
@@ -181,6 +188,7 @@ way, and presents dependent choices only when they can affect the viewer.
 | Action when pressed | `door_action` | `unlock` | `unlock`, `open` | Calls `lock.unlock`, or `lock.open` to release the latch when supported. |
 | Show control in | `door_control_visibility` | `live_only` | `live_only`, `all_views` | Keeps the control in Live only, or explicitly also shows it over recordings. |
 | Require hold to activate | `door_hold_to_activate` | `true` | `true`, `false` | Requires the 900 ms hold confirmation; `false` enables one-tap operation. |
+| Allow door control on dashboard | `door_control_on_dashboard` | `false` | `true`, `false` | Separately exposes the action on an interactive dashboard card. |
 
 Example:
 

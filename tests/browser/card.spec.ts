@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { mdiDoorClosed, mdiDoorOpen } from "@mdi/js";
-import type { HomeAssistant } from "../../src/types";
+import type { HomeAssistant, RingViewConfig } from "../../src/types";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/demo/");
@@ -114,17 +114,146 @@ test("progressively reveals related dashboard preview settings", async ({ page }
   });
 
   expect(states).toEqual({
-    initial: [{ name: "preview_source", required: true }],
+    initial: [
+      { name: "dashboard_behavior", required: true },
+      { name: "preview_source", required: true },
+    ],
     snapshot: [
+      { name: "dashboard_behavior", required: true },
       { name: "preview_source", required: true },
       { name: "snapshot_entity", required: true },
     ],
     newest: [
+      { name: "dashboard_behavior", required: true },
       { name: "preview_source", required: true },
       { name: "snapshot_entity", required: true },
       { name: "preview_fallback", required: true },
     ],
   });
+});
+
+test("keeps an interactive dashboard idle until the user chooses media", async ({
+  page,
+}) => {
+  await page.goto(
+    "/demo/?dashboard=interactive&door=1&dashboard_door=1&live_platform=generic",
+  );
+
+  await expect(page.getByRole("region", { name: "Camera view" })).toBeVisible();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByRole("tab", { name: "Last recording" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await expect(page.getByRole("button", { name: "Play last recording" })).toBeVisible();
+  expect(await page.evaluate(() => window.demoActiveStreams ?? 0)).toBe(0);
+
+  await page.getByRole("tab", { name: "Live" }).click();
+  const door = page.getByRole("button", { name: "Waiting for Live…" });
+  await expect(door).toBeVisible();
+  await expect(door).toBeDisabled();
+  await expect(page.getByRole("img", { name: "Synthetic demo camera media" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Hold to unlock" })).toBeEnabled();
+});
+
+test("requires a separate opt-in before showing door access on the dashboard", async ({
+  page,
+}) => {
+  await page.goto(
+    "/demo/?dashboard=interactive&dashboard_start=live&door=1&live_platform=generic",
+  );
+
+  await expect(page.getByRole("img", { name: "Synthetic demo camera media" })).toBeVisible();
+  await expect(page.locator("ring-view ring-view-dialog .door-action")).toHaveCount(0);
+});
+
+test("stops inline media before expanding and resumes it after fullscreen closes", async ({
+  page,
+}) => {
+  await page.goto(
+    "/demo/?dashboard=interactive&dashboard_start=live&live_platform=generic",
+  );
+  await expect(page.getByRole("img", { name: "Synthetic demo camera media" })).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.demoActiveStreams ?? 0)).toBe(1);
+
+  await page.getByRole("button", { name: "Open fullscreen camera viewer" }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.demoActiveStreams ?? 0)).toBe(1);
+  expect(await page.evaluate(() => window.demoPeakStreams ?? 0)).toBe(1);
+
+  await page.getByRole("button", { name: "Close camera viewer" }).click();
+  await expect(page.getByRole("region", { name: "Camera view" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "Synthetic demo camera media" })).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.demoActiveStreams ?? 0)).toBe(1);
+  expect(await page.evaluate(() => window.demoPeakStreams ?? 0)).toBe(1);
+});
+
+test("keeps one Live session when duplicate interactive cards share a camera", async ({
+  page,
+}) => {
+  await page.goto(
+    "/demo/?dashboard=interactive&dashboard_start=live&live_platform=generic",
+  );
+  await expect(page.getByRole("img", { name: "Synthetic demo camera media" })).toBeVisible();
+
+  await page.evaluate(() => {
+    const first = document.querySelector("ring-view") as HTMLElement & {
+      hass: HomeAssistant;
+    };
+    const root = document.querySelector<HTMLElement>("#card-root")!;
+    root.style.display = "grid";
+    root.style.gridTemplateColumns = "repeat(2, minmax(0, 1fr))";
+    root.style.gap = "12px";
+    const second = document.createElement("ring-view");
+    second.setConfig({
+      recording_entity: "camera.latest_recording",
+      live_entity: "camera.live_view",
+      dashboard_behavior: "interactive",
+      dashboard_start: "live",
+    });
+    second.hass = first.hass;
+    root.append(second);
+  });
+
+  const cards = page.locator("ring-view");
+  await expect(cards).toHaveCount(2);
+  await expect(cards.nth(1).getByRole("button", { name: "Resume live view" })).toBeVisible();
+  expect(await page.evaluate(() => window.demoActiveStreams ?? 0)).toBe(1);
+  expect(await page.evaluate(() => window.demoPeakStreams ?? 0)).toBe(1);
+
+  await cards.nth(1).getByRole("button", { name: "Resume live view" }).click();
+  await expect(cards.nth(0).getByRole("button", { name: "Resume live view" })).toBeVisible();
+  await expect(cards.nth(1).getByRole("img", { name: "Synthetic demo camera media" })).toBeVisible();
+  expect(await page.evaluate(() => window.demoActiveStreams ?? 0)).toBe(1);
+  expect(await page.evaluate(() => window.demoPeakStreams ?? 0)).toBe(1);
+});
+
+test("never connects or exposes actions in the Home Assistant edit preview", async ({
+  page,
+}) => {
+  await expect(page.locator("ring-view")).toBeAttached();
+  await page.evaluate(() => {
+    const card = document.querySelector("ring-view") as HTMLElement & {
+      preview: boolean;
+      setConfig: (config: RingViewConfig) => void;
+    };
+    card.preview = true;
+    card.setConfig({
+      recording_entity: "camera.latest_recording",
+      live_entity: "camera.live_view",
+      dashboard_behavior: "interactive",
+      dashboard_start: "live",
+      two_way_audio: true,
+      door_entity: "lock.front_door",
+      door_control_on_dashboard: true,
+    });
+  });
+
+  await expect(page.locator("ring-view img")).toBeVisible();
+  await expect(page.locator("ring-view ring-view-dialog")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /Open Entrance viewer/ })).toHaveCount(0);
+  expect(await page.evaluate(() => window.demoActiveStreams ?? 0)).toBe(0);
+  expect(await page.evaluate(() => window.demoDoorCalls ?? [])).toHaveLength(0);
 });
 
 test("falls back to native live playback without talkback for a generic camera", async ({

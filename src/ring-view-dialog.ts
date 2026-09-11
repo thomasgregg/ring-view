@@ -5,6 +5,7 @@ import {
   mdiClose,
   mdiDoorClosed,
   mdiDoorOpen,
+  mdiFullscreen,
   mdiLoading,
   mdiLockOpenVariantOutline,
   mdiMicrophone,
@@ -40,6 +41,7 @@ import { renderModeIcon } from "./mode-icon";
 import { dialogStyles } from "./styles";
 import type {
   CameraMode,
+  DashboardStart,
   HassEntity,
   HomeAssistant,
   NormalizedConfig,
@@ -85,6 +87,7 @@ export class RingViewDialog extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
   @property({ attribute: false }) public config?: NormalizedConfig;
   @property({ type: Boolean, reflect: true }) public open = false;
+  @property({ type: Boolean, reflect: true }) public inline = false;
 
   @state() private ringing = false;
   @state() private mode: CameraMode = "last_recording";
@@ -103,6 +106,7 @@ export class RingViewDialog extends LitElement {
   @state() private talkbackTalking = false;
   @state() private doorActionStatus: DoorActionStatus = "idle";
   @state() private doorFeedback?: { message: string };
+  @state() private inlineStarted = true;
 
   private lifecycle = new StreamLifecycle();
   private opener?: HTMLElement;
@@ -124,6 +128,8 @@ export class RingViewDialog extends LitElement {
   private doorHoldTimer?: number;
   private doorFeedbackTimer?: number;
   private doorActionToken = 0;
+  private inlineVisible = false;
+  private inlineActive = false;
 
   public showDialog(params: RingViewDialogParams): void {
     if (!this.hass) return;
@@ -135,6 +141,7 @@ export class RingViewDialog extends LitElement {
       return;
     }
     if (this.open) this.finishClose(false, false);
+    this.inline = false;
     this.config = params.config;
     this.opener = params.opener;
     this.returnUrl = params.returnUrl ?? removeRingViewUrl(currentUrl());
@@ -167,6 +174,52 @@ export class RingViewDialog extends LitElement {
       this.startMedia();
     }
     void this.updateComplete.then(() => this.focusInitialControl());
+  }
+
+  public showInline(params: {
+    config: NormalizedConfig;
+    mode: CameraMode;
+    start: DashboardStart;
+    ringingUntil?: number;
+  }): void {
+    if (!this.hass) return;
+    if (this.inline && this.open && this.config === params.config) {
+      this.setRingingUntil(params.ringingUntil);
+      return;
+    }
+    if (this.open) this.finishClose(false, false);
+    this.inline = true;
+    this.config = params.config;
+    this.mode = params.start === "live"
+      ? "live"
+      : params.start === "last_recording"
+        ? "last_recording"
+        : params.mode;
+    this.liveMuted = this.config.dashboard_live_muted;
+    this.inlineStarted = params.start !== "on_demand";
+    this.recordingStarted = this.mode === "live" || this.inlineStarted;
+    this.resetMediaAttempt();
+    this.automaticLiveRetry = true;
+    this.pageUnloading = false;
+    this.suspended = !this.inlineActive;
+    this.statusAnnouncement = "";
+    this.resetVisitorActions();
+    this.lastDoorbellState = this.config.doorbell_entity
+      ? this.hass.states[this.config.doorbell_entity]?.state
+      : undefined;
+    this.setRingingUntil(params.ringingUntil);
+    this.open = true;
+    this.attachGlobalListeners();
+    if (this.inlineStarted && this.inlineActive) this.startMedia();
+  }
+
+  public setInlineVisible(visible: boolean): void {
+    this.inlineVisible = visible;
+    this.updateInlineActivity();
+  }
+
+  public stopInline(): void {
+    if (this.inline) this.finishClose(false, false);
   }
 
   public isOpenFor(params: RingViewDialogParams): boolean {
@@ -217,6 +270,7 @@ export class RingViewDialog extends LitElement {
     if (entityIsUnavailable(entity) && this.mediaStatus !== "error") {
       this.clearAutomaticLiveRecovery();
       this.lifecycle.dispose();
+      this.releaseInlineLive();
       this.session = this.lifecycle.current();
       this.mediaStatus = "error";
       this.statusAnnouncement = localize(this.hass, "viewer.entity_unavailable");
@@ -236,12 +290,14 @@ export class RingViewDialog extends LitElement {
     };
 
     return html`
-      <div class="backdrop" @pointerdown=${this.handleBackdrop}></div>
+      ${this.inline
+        ? nothing
+        : html`<div class="backdrop" @pointerdown=${this.handleBackdrop}></div>`}
       <section
         class="dialog"
         style=${styleMap(style)}
-        role="dialog"
-        aria-modal="true"
+        role=${this.inline ? "region" : "dialog"}
+        aria-modal=${this.inline ? nothing : "true"}
         aria-labelledby=${showTitle ? "ring-view-dialog-title" : nothing}
         aria-label=${showTitle
           ? nothing
@@ -257,17 +313,22 @@ export class RingViewDialog extends LitElement {
               : nothing}
             <div class="header-actions">
               <button
-                class="icon-button close"
+                class=${this.inline ? "icon-button expand" : "icon-button close"}
                 type="button"
-                aria-label=${localize(this.hass, "viewer.close_aria")}
-                title=${localizeHaOrFallback(
+                aria-label=${localize(
                   this.hass,
-                  "ui.common.close",
-                  "common.close",
+                  this.inline ? "viewer.expand_aria" : "viewer.close_aria",
                 )}
-                @click=${this.close}
+                title=${this.inline
+                  ? localize(this.hass, "viewer.expand_aria")
+                  : localizeHaOrFallback(
+                      this.hass,
+                      "ui.common.close",
+                      "common.close",
+                    )}
+                @click=${this.inline ? this.expand : this.close}
               >
-                ${this.icon(mdiClose)}
+                ${this.icon(this.inline ? mdiFullscreen : mdiClose)}
               </button>
             </div>
           </header>
@@ -458,6 +519,14 @@ export class RingViewDialog extends LitElement {
   private shouldShowDoorControl(): boolean {
     return Boolean(
       this.config?.door_entity
+      && (!this.inline || this.config.door_control_on_dashboard)
+      && (
+        !this.inline
+        || this.config.door_control_visibility === "all_views"
+        || ["pending", "retrying", "ready", "playback-blocked"].includes(
+          this.mediaStatus,
+        )
+      )
       && (
         this.mode === "live"
         || this.config.door_control_visibility === "all_views"
@@ -501,6 +570,14 @@ export class RingViewDialog extends LitElement {
     ) {
       return true;
     }
+    if (
+      this.inline
+      && this.config.door_control_visibility === "live_only"
+      && this.mode === "live"
+      && this.mediaStatus !== "ready"
+    ) {
+      return true;
+    }
     if (this.config.door_action === "open") {
       return !supportsLockOpen(entity) || ["open", "opening"].includes(entity?.state ?? "");
     }
@@ -516,6 +593,14 @@ export class RingViewDialog extends LitElement {
     if (entity?.state === "jammed") return localize(this.hass, "door.jammed");
     if (this.config?.door_action === "open" && !supportsLockOpen(entity)) {
       return localize(this.hass, "door.open_unsupported");
+    }
+    if (
+      this.inline
+      && this.config?.door_control_visibility === "live_only"
+      && this.mode === "live"
+      && this.mediaStatus !== "ready"
+    ) {
+      return localize(this.hass, "door.waiting_for_live");
     }
     if (
       this.doorActionStatus === "working"
@@ -917,7 +1002,7 @@ export class RingViewDialog extends LitElement {
               <button class="action-button primary" type="button" @click=${this.retry}>
                 ${localize(this.hass, "common.retry")}
               </button>
-              ${this.renderAlternateModeButton()}
+              ${this.inline ? nothing : this.renderAlternateModeButton()}
             </div>
           </div>
         </div>
@@ -932,6 +1017,25 @@ export class RingViewDialog extends LitElement {
               ${localize(this.hass, "viewer.suspended")}
             </div>
           </div>
+        </div>
+      `;
+    }
+
+    if (this.inline && !this.inlineStarted) {
+      const isLive = this.mode === "live";
+      return html`
+        <div class="state-layer play-layer">
+          <button
+            class="action-button primary play-recording"
+            type="button"
+            @click=${isLive ? this.startInlineLive : this.startRecording}
+          >
+            ${this.icon(mdiPlay)}
+            <span>${localize(
+              this.hass,
+              isLive ? "viewer.start_live" : "viewer.play_recording",
+            )}</span>
+          </button>
         </div>
       `;
     }
@@ -995,7 +1099,7 @@ export class RingViewDialog extends LitElement {
               <button class="action-button primary" type="button" @click=${this.openMoreInfo}>
                 ${localize(this.hass, "viewer.open_ha_camera")}
               </button>
-              ${this.renderAlternateModeButton()}
+              ${this.inline ? nothing : this.renderAlternateModeButton()}
             </div>
           </div>
         </div>
@@ -1020,7 +1124,7 @@ export class RingViewDialog extends LitElement {
               <button class="action-button primary" type="button" @click=${this.retry}>
                 ${localize(this.hass, "common.retry")}
               </button>
-              ${this.renderAlternateModeButton()}
+              ${this.inline ? nothing : this.renderAlternateModeButton()}
             </div>
           </div>
         </div>
@@ -1043,15 +1147,30 @@ export class RingViewDialog extends LitElement {
   }
 
   private selectMode(mode: CameraMode): void {
-    if (!this.config || mode === this.mode) return;
+    if (!this.config) return;
+    if (mode === this.mode) {
+      if (this.inline && !this.inlineStarted) {
+        this.inlineStarted = true;
+        this.recordingStarted = true;
+        this.resetMediaAttempt();
+        this.startMedia();
+      }
+      return;
+    }
     this.resetVisitorActions();
     this.clearAutomaticLiveRecovery();
     this.lifecycle.dispose();
+    this.releaseInlineLive();
     this.automaticLiveRetry = true;
     this.mode = mode;
     saveMode(this.config, mode);
-    this.liveMuted = this.config.live_muted;
-    this.recordingStarted = mode === "live" || this.config.autoplay_recording;
+    this.liveMuted = this.inline
+      ? this.config.dashboard_live_muted
+      : this.config.live_muted;
+    this.inlineStarted = true;
+    this.recordingStarted = this.inline
+      ? true
+      : mode === "live" || this.config.autoplay_recording;
     this.resetMediaAttempt();
     this.statusAnnouncement = localize(
       this.hass,
@@ -1072,9 +1191,17 @@ export class RingViewDialog extends LitElement {
       this.mediaStatus = "idle";
       return;
     }
+    if (this.inline && !this.inlineStarted) {
+      this.mediaStatus = "idle";
+      return;
+    }
     if (entityIsUnavailable(this.activeEntity())) {
       this.mediaStatus = "error";
       this.statusAnnouncement = localize(this.hass, "viewer.entity_unavailable");
+      return;
+    }
+    if (this.inline && this.mode === "live" && !this.claimInlineLive()) {
+      this.waitForLiveResume();
       return;
     }
     this.mediaStatus = "pending";
@@ -1227,6 +1354,7 @@ export class RingViewDialog extends LitElement {
     this.cancelTalkPress();
     this.clearAutomaticLiveRecovery();
     this.lifecycle.dispose();
+    this.releaseInlineLive();
     this.session = this.lifecycle.current();
     this.automaticLiveRetry = false;
     this.mediaStatus = "awaiting-resume";
@@ -1282,6 +1410,7 @@ export class RingViewDialog extends LitElement {
 
   private resumeLive = (): void => {
     if (!this.open || this.mode !== "live" || this.mediaStatus !== "awaiting-resume") return;
+    if (this.inline) this.claimInlineLive(true);
     this.clearAutomaticLiveRecovery();
     this.resetMediaAttempt();
     this.startMedia();
@@ -1315,6 +1444,7 @@ export class RingViewDialog extends LitElement {
       return;
     }
     this.lifecycle.dispose();
+    this.releaseInlineLive();
     this.session = this.lifecycle.current();
     this.mediaStatus = "error";
     this.statusAnnouncement =
@@ -1339,7 +1469,14 @@ export class RingViewDialog extends LitElement {
 
   private startRecording = (): void => {
     if (this.mode !== "last_recording" || this.recordingStarted) return;
+    this.inlineStarted = true;
     this.recordingStarted = true;
+    this.startMedia();
+  };
+
+  private startInlineLive = (): void => {
+    if (!this.inline || this.mode !== "live" || this.inlineStarted) return;
+    this.inlineStarted = true;
     this.startMedia();
   };
 
@@ -1375,7 +1512,19 @@ export class RingViewDialog extends LitElement {
     if (event.target === event.currentTarget) this.close();
   };
 
+  private expand = (): void => {
+    if (!this.inline || !this.config) return;
+    this.dispatchEvent(
+      new CustomEvent("ring-view-expand", {
+        detail: { mode: this.mode, ringingUntil: this.ringingUntil },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  };
+
   private handleKeyDown = (event: KeyboardEvent): void => {
+    if (this.inline) return;
     if (event.key === "Escape") {
       if (document.fullscreenElement) return;
       event.preventDefault();
@@ -1424,6 +1573,7 @@ export class RingViewDialog extends LitElement {
   }
 
   private focusInitialControl(): void {
+    if (this.inline) return;
     this.renderRoot.querySelector<HTMLElement>(".close")?.focus();
   }
 
@@ -1449,6 +1599,10 @@ export class RingViewDialog extends LitElement {
   private handlePageHide = (): void => {
     this.pageUnloading = true;
     this.resetVisitorActions();
+    if (this.inline) {
+      this.suspendInline();
+      return;
+    }
     if (!this.open || this.mode !== "live") return;
     this.renderRoot.querySelector<RingViewRingWebRtcPlayer>("ring-view-ring-webrtc-player")?.stopTalking();
     this.waitForLiveResume();
@@ -1457,6 +1611,10 @@ export class RingViewDialog extends LitElement {
   private handlePageShow = (event: PageTransitionEvent): void => {
     const returning = this.pageUnloading;
     this.pageUnloading = false;
+    if (this.inline) {
+      this.updateInlineActivity();
+      return;
+    }
     if (returning && event.persisted && this.open && this.mode === "live") {
       this.prepareAutomaticLiveResume();
     }
@@ -1464,6 +1622,10 @@ export class RingViewDialog extends LitElement {
 
   private handleVisibilityChange = (): void => {
     if (!this.open) return;
+    if (this.inline) {
+      this.updateInlineActivity();
+      return;
+    }
     if (document.hidden) this.cancelDoorHold();
     if (this.automaticLiveRecovery === "waiting") {
       this.tryAutomaticLiveResume();
@@ -1492,6 +1654,35 @@ export class RingViewDialog extends LitElement {
       this.startMedia();
     }
   };
+
+  private updateInlineActivity(): void {
+    const active = Boolean(
+      this.inlineVisible
+      && document.visibilityState !== "hidden"
+      && !this.pageUnloading,
+    );
+    if (active === this.inlineActive) return;
+    this.inlineActive = active;
+    if (!this.inline || !this.open) return;
+    if (!active) {
+      this.suspendInline();
+      return;
+    }
+    this.suspended = false;
+    if (this.inlineStarted) this.startMedia();
+  }
+
+  private suspendInline(): void {
+    this.inlineActive = false;
+    if (!this.inline || !this.open) return;
+    this.resetVisitorActions();
+    this.clearAutomaticLiveRecovery();
+    this.lifecycle.dispose();
+    this.releaseInlineLive();
+    this.session = this.lifecycle.current();
+    this.suspended = true;
+    this.mediaStatus = "idle";
+  }
 
   private detectDoorbellEvent(previous?: HomeAssistant): void {
     const entityId = this.config?.doorbell_entity;
@@ -1533,7 +1724,7 @@ export class RingViewDialog extends LitElement {
   }
 
   private syncUrl(): void {
-    if (!this.open || !this.config || !this.returnUrl) return;
+    if (this.inline || !this.open || !this.config || !this.returnUrl) return;
     const viewerUrl = createRingViewUrl(this.returnUrl, {
       liveEntity: this.config.live_entity,
       recordingEntity: this.config.recording_entity,
@@ -1547,6 +1738,7 @@ export class RingViewDialog extends LitElement {
 
   private finishClose(restoreFocus = true, notifyManager = true): void {
     if (!this.open) return;
+    const wasInline = this.inline;
     this.clearAutomaticLiveRecovery();
     const opener = this.opener;
     const returnUrl = this.returnUrl;
@@ -1555,6 +1747,7 @@ export class RingViewDialog extends LitElement {
       .querySelector<RingViewRingWebRtcPlayer>("ring-view-ring-webrtc-player")
       ?.stopTalking();
     this.lifecycle.dispose();
+    this.releaseInlineLive();
     this.session = this.lifecycle.current();
     this.mediaStatus = "idle";
     this.open = false;
@@ -1577,9 +1770,11 @@ export class RingViewDialog extends LitElement {
     ) {
       replaceCurrentUrl(returnUrl, null);
     }
-    this.dispatchEvent(
-      new CustomEvent("viewer-closed", { bubbles: true, composed: true }),
-    );
+    if (!wasInline) {
+      this.dispatchEvent(
+        new CustomEvent("viewer-closed", { bubbles: true, composed: true }),
+      );
+    }
     if (notifyManager) {
       this.dispatchEvent(
         new CustomEvent("dialog-closed", {
@@ -1591,6 +1786,7 @@ export class RingViewDialog extends LitElement {
     }
     this.config = undefined;
     this.returnUrl = undefined;
+    this.inlineStarted = true;
     if (restoreFocus && opener?.isConnected) opener.focus();
     this.opener = undefined;
   }
@@ -1599,7 +1795,40 @@ export class RingViewDialog extends LitElement {
     return html`<svg viewBox="0 0 24 24" aria-hidden="true"><path d=${path}></path></svg>`;
   }
 
+  private claimInlineLive(takeOver = false): boolean {
+    const entityId = this.config?.live_entity;
+    if (!this.inline || !entityId) return true;
+    const current = inlineLiveOwners.get(entityId);
+    if (current && current !== this) {
+      if (!takeOver) return false;
+      current.pauseForInlineTakeover();
+    }
+    inlineLiveOwners.set(entityId, this);
+    return true;
+  }
+
+  private releaseInlineLive(): void {
+    const entityId = this.config?.live_entity;
+    if (entityId && inlineLiveOwners.get(entityId) === this) {
+      inlineLiveOwners.delete(entityId);
+    }
+  }
+
+  private pauseForInlineTakeover(): void {
+    if (!this.inline || !this.open || this.mode !== "live") return;
+    this.resetVisitorActions();
+    this.clearAutomaticLiveRecovery();
+    this.lifecycle.dispose();
+    this.releaseInlineLive();
+    this.session = this.lifecycle.current();
+    this.automaticLiveRetry = false;
+    this.mediaStatus = "awaiting-resume";
+    this.statusAnnouncement = localize(this.hass, "viewer.resume_live");
+  }
+
 }
+
+const inlineLiveOwners = new Map<string, RingViewDialog>();
 
 declare global {
   interface HTMLElementTagNameMap {

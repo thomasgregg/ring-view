@@ -22,7 +22,7 @@ See what happened, check what is happening, and answer the door—all without le
 - **Go from recording to Live in one tap.** Switch views inside the same viewer, with familiar playback and sound controls.
 - **Listen and talk to visitors.** Optional **Hold to talk** adds push-to-talk to the official Ring live camera, using the same connection as the video.
 - **Operate the door while you watch.** Door access adds a configurable Home Assistant lock action, with a safe hold gesture, optional physical-door status, and a shared Talk/door control dock.
-- **Keep your dashboard quiet.** A lightweight still image previews the camera; no live player runs in the dashboard.
+- **Choose a calm or hands-on dashboard.** Keep the lightweight still-image card, or opt into direct Recording, Live, Talk, and door controls for a wall tablet.
 - **Show the freshest view.** Optionally combine the latest recording with a Ring-MQTT snapshot camera for the dashboard preview.
 - **Know when someone rings.** A temporary doorbell alert highlights the card. Tap it to open Live.
 - **Take the doorbell beyond the dashboard.** The included notification blueprint sends a phone alert, then adds a preview when the recording is ready.
@@ -53,6 +53,29 @@ live_entity: camera.front_door_live_view
 
 Tap the card to open the viewer. The history icon selects the latest recording; the red dot selects Live. Enable **Viewer behavior → Two-way audio** to add **Hold to talk**. Microphone access needs an HTTPS Home Assistant connection and your permission.
 
+### Dashboard behavior beta
+
+`0.7.0-beta.1` adds an optional interactive dashboard surface. Existing cards
+stay on **Open fullscreen viewer**, so installing the beta alone changes no card
+behavior. In **Dashboard card → Dashboard behavior**, choose **Control camera in
+card** to expose the same Recording/Live controls directly in Lovelace.
+
+| Setting | Default | What it does |
+| --- | --- | --- |
+| Dashboard behavior | Open fullscreen viewer | Keeps the existing passive still-image card, or enables direct controls. |
+| Start media automatically | No — wait for a tap | Shows a still until Recording or Live is chosen; optional Recording and Live startup are available. |
+| Start dashboard Live muted | On | Prevents unexpected sound on wall tablets and improves browser autoplay compatibility. |
+| Allow door control on dashboard | Off | Separately opts the high-impact door action into the dashboard surface. |
+
+The inline card has a dedicated fullscreen button. It stops its own player
+before opening fullscreen and resumes only after the viewer closes. A Live-only
+door action stays disabled until Live has a ready picture. Hidden cards suspend
+their media, and duplicate cards sharing a camera never run overlapping inline
+Live sessions.
+
+This is a prerelease feature. To return completely to today’s stable behavior,
+redownload `v0.6.3` in HACS; no dashboard configuration conversion is required.
+
 Selecting **Door access → Door lock** adds an optional **Unlock** or **Open door** action. It defaults to Live view and a 900 ms hold confirmation. When Talk is available, both actions form one segmented control with a subtle divider and flat inner edges; when Talk is disabled or unsupported, the dock automatically collapses to a fully rounded door-only pill.
 
 ### Door access at a glance
@@ -73,6 +96,7 @@ The door contact is optional. When one is configured, its icon represents the ph
 | Action when pressed | `door_action` | `unlock` | Chooses `lock.unlock` or supported `lock.open` latch release. |
 | Show control in | `door_control_visibility` | Live only | Keeps the action in Live, or explicitly also shows it over recordings. |
 | Require hold to activate | `door_hold_to_activate` | On | Requires a 900 ms hold; turning it off enables one-tap operation. |
+| Allow door control on dashboard | `door_control_on_dashboard` | Off | Exposes the action on an interactive dashboard card only after explicit opt-in. |
 
 See the [door-access guide](docs/door-access.md) for complete state, safety, service, and configuration details.
 

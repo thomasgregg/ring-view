@@ -1,16 +1,16 @@
-var ne = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z", Qe = "M10,21H14A2,2 0 0,1 12,23A2,2 0 0,1 10,21M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M17,11A5,5 0 0,0 12,6A5,5 0 0,0 7,11V18H17V11M19.75,3.19L18.33,4.61C20.04,6.3 21,8.6 21,11H23C23,8.07 21.84,5.25 19.75,3.19M1,11H3C3,8.6 3.96,6.3 5.67,4.61L4.25,3.19C2.16,5.25 1,8.07 1,11Z", mt = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z", bt = "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z", _t = "M16,11H18V13H16V11M12,3H19C20.11,3 21,3.89 21,5V19H22V21H2V19H10V5C10,3.89 10.89,3 12,3M12,5V19H19V5H12Z", Pe = "M12,3C10.89,3 10,3.89 10,5H3V19H2V21H22V19H21V5C21,3.89 20.11,3 19,3H12M12,5H19V19H12V5M5,11H7V13H5V11Z", wt = "M14 15C14 16.11 13.11 17 12 17S10 16.11 10 15 10.9 13 12 13 14 13.9 14 15M18 4V20C18 21.1 17.11 22 16 22H8C6.9 22 6 21.11 6 20V4C6 2.9 6.9 2 8 2H16C17.11 2 18 2.9 18 4M10.5 7C10.5 7.83 11.17 8.5 12 8.5S13.5 7.83 13.5 7 12.83 5.5 12 5.5 10.5 6.17 10.5 7M16 10H8V20H16V10Z", yt = "M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3", kt = "M19,19H5V5H19M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M13.96,12.29L11.21,15.83L9.25,13.47L6.5,17H17.5L13.96,12.29Z", At = "M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z", Je = "M10 13C11.1 13 12 13.89 12 15C12 16.11 11.11 17 10 17S8 16.11 8 15 8.9 13 10 13M18 1C15.24 1 13 3.24 13 6V8H4C2.9 8 2 8.9 2 10V20C2 21.1 2.9 22 4 22H16C17.1 22 18 21.1 18 20V10C18 8.9 17.1 8 16 8H15V6C15 4.34 16.34 3 18 3S21 4.34 21 6V8H23V6C23 3.24 20.76 1 18 1M16 10V20H4V10H16Z", Xe = "M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z", et = "M19,11C19,12.19 18.66,13.3 18.1,14.28L16.87,13.05C17.14,12.43 17.3,11.74 17.3,11H19M15,11.16L9,5.18V5A3,3 0 0,1 12,2A3,3 0 0,1 15,5V11L15,11.16M4.27,3L21,19.73L19.73,21L15.54,16.81C14.77,17.27 13.91,17.58 13,17.72V21H11V17.72C7.72,17.23 5,14.41 5,11H6.7C6.7,14 9.24,16.1 12,16.1C12.81,16.1 13.6,15.91 14.31,15.58L12.65,13.92L12,14A3,3 0 0,1 9,11V10.28L3,4.27L4.27,3Z", $t = "M12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2C17.5,2 22,6 22,11A6,6 0 0,1 16,17H14.2C13.9,17 13.7,17.2 13.7,17.5C13.7,17.6 13.8,17.7 13.8,17.8C14.2,18.3 14.4,18.9 14.4,19.5C14.5,20.9 13.4,22 12,22M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C12.3,20 12.5,19.8 12.5,19.5C12.5,19.3 12.4,19.2 12.4,19.1C12,18.6 11.8,18.1 11.8,17.5C11.8,16.1 12.9,15 14.3,15H16A4,4 0 0,0 20,11C20,7.1 16.4,4 12,4M6.5,10C7.3,10 8,10.7 8,11.5C8,12.3 7.3,13 6.5,13C5.7,13 5,12.3 5,11.5C5,10.7 5.7,10 6.5,10M9.5,6C10.3,6 11,6.7 11,7.5C11,8.3 10.3,9 9.5,9C8.7,9 8,8.3 8,7.5C8,6.7 8.7,6 9.5,6M14.5,6C15.3,6 16,6.7 16,7.5C16,8.3 15.3,9 14.5,9C13.7,9 13,8.3 13,7.5C13,6.7 13.7,6 14.5,6M17.5,10C18.3,10 19,10.7 19,11.5C19,12.3 18.3,13 17.5,13C16.7,13 16,12.3 16,11.5C16,10.7 16.7,10 17.5,10Z", ce = "M8,5.14V19.14L19,12.14L8,5.14Z", St = "M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M10,16.5L16,12L10,7.5V16.5Z";
-const Q = globalThis, be = Q.ShadowRoot && (Q.ShadyCSS === void 0 || Q.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, _e = /* @__PURE__ */ Symbol(), Me = /* @__PURE__ */ new WeakMap();
-let tt = class {
+var le = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z", Xe = "M10,21H14A2,2 0 0,1 12,23A2,2 0 0,1 10,21M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M17,11A5,5 0 0,0 12,6A5,5 0 0,0 7,11V18H17V11M19.75,3.19L18.33,4.61C20.04,6.3 21,8.6 21,11H23C23,8.07 21.84,5.25 19.75,3.19M1,11H3C3,8.6 3.96,6.3 5.67,4.61L4.25,3.19C2.16,5.25 1,8.07 1,11Z", _t = "M9,12C9,11.19 9.3,10.5 9.89,9.89C10.5,9.3 11.19,9 12,9C12.81,9 13.5,9.3 14.11,9.89C14.7,10.5 15,11.19 15,12C15,12.81 14.7,13.5 14.11,14.11C13.5,14.7 12.81,15 12,15C11.19,15 10.5,14.7 9.89,14.11C9.3,13.5 9,12.81 9,12M5.53,8.44L7.31,10.22L5.53,12L7.31,13.78L5.53,15.56L2,12L5.53,8.44M8.44,18.47L10.22,16.69L12,18.47L13.78,16.69L15.56,18.47L12,22L8.44,18.47M18.47,15.56L16.69,13.78L18.47,12L16.69,10.22L18.47,8.44L22,12L18.47,15.56M15.56,5.53L13.78,7.31L12,5.53L10.22,7.31L8.44,5.53L12,2L15.56,5.53Z", bt = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z", wt = "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z", yt = "M16,11H18V13H16V11M12,3H19C20.11,3 21,3.89 21,5V19H22V21H2V19H10V5C10,3.89 10.89,3 12,3M12,5V19H19V5H12Z", De = "M12,3C10.89,3 10,3.89 10,5H3V19H2V21H22V19H21V5C21,3.89 20.11,3 19,3H12M12,5H19V19H12V5M5,11H7V13H5V11Z", kt = "M14 15C14 16.11 13.11 17 12 17S10 16.11 10 15 10.9 13 12 13 14 13.9 14 15M18 4V20C18 21.1 17.11 22 16 22H8C6.9 22 6 21.11 6 20V4C6 2.9 6.9 2 8 2H16C17.11 2 18 2.9 18 4M10.5 7C10.5 7.83 11.17 8.5 12 8.5S13.5 7.83 13.5 7 12.83 5.5 12 5.5 10.5 6.17 10.5 7M16 10H8V20H16V10Z", At = "M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z", $t = "M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3", St = "M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z", et = "M10 13C11.1 13 12 13.89 12 15C12 16.11 11.11 17 10 17S8 16.11 8 15 8.9 13 10 13M18 1C15.24 1 13 3.24 13 6V8H4C2.9 8 2 8.9 2 10V20C2 21.1 2.9 22 4 22H16C17.1 22 18 21.1 18 20V10C18 8.9 17.1 8 16 8H15V6C15 4.34 16.34 3 18 3S21 4.34 21 6V8H23V6C23 3.24 20.76 1 18 1M16 10V20H4V10H16Z", tt = "M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z", it = "M19,11C19,12.19 18.66,13.3 18.1,14.28L16.87,13.05C17.14,12.43 17.3,11.74 17.3,11H19M15,11.16L9,5.18V5A3,3 0 0,1 12,2A3,3 0 0,1 15,5V11L15,11.16M4.27,3L21,19.73L19.73,21L15.54,16.81C14.77,17.27 13.91,17.58 13,17.72V21H11V17.72C7.72,17.23 5,14.41 5,11H6.7C6.7,14 9.24,16.1 12,16.1C12.81,16.1 13.6,15.91 14.31,15.58L12.65,13.92L12,14A3,3 0 0,1 9,11V10.28L3,4.27L4.27,3Z", xt = "M12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2C17.5,2 22,6 22,11A6,6 0 0,1 16,17H14.2C13.9,17 13.7,17.2 13.7,17.5C13.7,17.6 13.8,17.7 13.8,17.8C14.2,18.3 14.4,18.9 14.4,19.5C14.5,20.9 13.4,22 12,22M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C12.3,20 12.5,19.8 12.5,19.5C12.5,19.3 12.4,19.2 12.4,19.1C12,18.6 11.8,18.1 11.8,17.5C11.8,16.1 12.9,15 14.3,15H16A4,4 0 0,0 20,11C20,7.1 16.4,4 12,4M6.5,10C7.3,10 8,10.7 8,11.5C8,12.3 7.3,13 6.5,13C5.7,13 5,12.3 5,11.5C5,10.7 5.7,10 6.5,10M9.5,6C10.3,6 11,6.7 11,7.5C11,8.3 10.3,9 9.5,9C8.7,9 8,8.3 8,7.5C8,6.7 8.7,6 9.5,6M14.5,6C15.3,6 16,6.7 16,7.5C16,8.3 15.3,9 14.5,9C13.7,9 13,8.3 13,7.5C13,6.7 13.7,6 14.5,6M17.5,10C18.3,10 19,10.7 19,11.5C19,12.3 18.3,13 17.5,13C16.7,13 16,12.3 16,11.5C16,10.7 16.7,10 17.5,10Z", X = "M8,5.14V19.14L19,12.14L8,5.14Z", Ct = "M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M10,16.5L16,12L10,7.5V16.5Z";
+const ee = globalThis, ye = ee.ShadowRoot && (ee.ShadyCSS === void 0 || ee.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, ke = /* @__PURE__ */ Symbol(), Ie = /* @__PURE__ */ new WeakMap();
+let ot = class {
   constructor(t, i, o) {
-    if (this._$cssResult$ = !0, o !== _e) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
+    if (this._$cssResult$ = !0, o !== ke) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
     this.cssText = t, this.t = i;
   }
   get styleSheet() {
     let t = this.o;
     const i = this.t;
-    if (be && t === void 0) {
+    if (ye && t === void 0) {
       const o = i !== void 0 && i.length === 1;
-      o && (t = Me.get(i)), t === void 0 && ((this.o = t = new CSSStyleSheet()).replaceSync(this.cssText), o && Me.set(i, t));
+      o && (t = Ie.get(i)), t === void 0 && ((this.o = t = new CSSStyleSheet()).replaceSync(this.cssText), o && Ie.set(i, t));
     }
     return t;
   }
@@ -18,28 +18,28 @@ let tt = class {
     return this.cssText;
   }
 };
-const xt = (e) => new tt(typeof e == "string" ? e : e + "", void 0, _e), j = (e, ...t) => {
-  const i = e.length === 1 ? e[0] : t.reduce((o, r, n) => o + ((a) => {
+const Et = (e) => new ot(typeof e == "string" ? e : e + "", void 0, ke), j = (e, ...t) => {
+  const i = e.length === 1 ? e[0] : t.reduce((o, r, s) => o + ((a) => {
     if (a._$cssResult$ === !0) return a.cssText;
     if (typeof a == "number") return a;
     throw Error("Value passed to 'css' function must be a 'css' function result: " + a + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
-  })(r) + e[n + 1], e[0]);
-  return new tt(i, e, _e);
-}, Ct = (e, t) => {
-  if (be) e.adoptedStyleSheets = t.map((i) => i instanceof CSSStyleSheet ? i : i.styleSheet);
+  })(r) + e[s + 1], e[0]);
+  return new ot(i, e, ke);
+}, Rt = (e, t) => {
+  if (ye) e.adoptedStyleSheets = t.map((i) => i instanceof CSSStyleSheet ? i : i.styleSheet);
   else for (const i of t) {
-    const o = document.createElement("style"), r = Q.litNonce;
+    const o = document.createElement("style"), r = ee.litNonce;
     r !== void 0 && o.setAttribute("nonce", r), o.textContent = i.cssText, e.appendChild(o);
   }
-}, Le = be ? (e) => e : (e) => e instanceof CSSStyleSheet ? ((t) => {
+}, Ve = ye ? (e) => e : (e) => e instanceof CSSStyleSheet ? ((t) => {
   let i = "";
   for (const o of t.cssRules) i += o.cssText;
-  return xt(i);
+  return Et(i);
 })(e) : e;
-const { is: Et, defineProperty: Rt, getOwnPropertyDescriptor: Tt, getOwnPropertyNames: Pt, getOwnPropertySymbols: Mt, getPrototypeOf: Lt } = Object, oe = globalThis, De = oe.trustedTypes, Dt = De ? De.emptyScript : "", It = oe.reactiveElementPolyfillSupport, q = (e, t) => e, X = { toAttribute(e, t) {
+const { is: Tt, defineProperty: Lt, getOwnPropertyDescriptor: Pt, getOwnPropertyNames: Mt, getOwnPropertySymbols: Dt, getPrototypeOf: It } = Object, ae = globalThis, He = ae.trustedTypes, Vt = He ? He.emptyScript : "", Ht = ae.reactiveElementPolyfillSupport, q = (e, t) => e, oe = { toAttribute(e, t) {
   switch (t) {
     case Boolean:
-      e = e ? Dt : null;
+      e = e ? Vt : null;
       break;
     case Object:
     case Array:
@@ -64,8 +64,8 @@ const { is: Et, defineProperty: Rt, getOwnPropertyDescriptor: Tt, getOwnProperty
       }
   }
   return i;
-} }, we = (e, t) => !Et(e, t), Ie = { attribute: !0, type: String, converter: X, reflect: !1, useDefault: !1, hasChanged: we };
-Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata"), oe.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
+} }, Ae = (e, t) => !Tt(e, t), Oe = { attribute: !0, type: String, converter: oe, reflect: !1, useDefault: !1, hasChanged: Ae };
+Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata"), ae.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
 let H = class extends HTMLElement {
   static addInitializer(t) {
     this._$Ei(), (this.l ??= []).push(t);
@@ -73,35 +73,35 @@ let H = class extends HTMLElement {
   static get observedAttributes() {
     return this.finalize(), this._$Eh && [...this._$Eh.keys()];
   }
-  static createProperty(t, i = Ie) {
+  static createProperty(t, i = Oe) {
     if (i.state && (i.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(t) && ((i = Object.create(i)).wrapped = !0), this.elementProperties.set(t, i), !i.noAccessor) {
       const o = /* @__PURE__ */ Symbol(), r = this.getPropertyDescriptor(t, o, i);
-      r !== void 0 && Rt(this.prototype, t, r);
+      r !== void 0 && Lt(this.prototype, t, r);
     }
   }
   static getPropertyDescriptor(t, i, o) {
-    const { get: r, set: n } = Tt(this.prototype, t) ?? { get() {
+    const { get: r, set: s } = Pt(this.prototype, t) ?? { get() {
       return this[i];
     }, set(a) {
       this[i] = a;
     } };
     return { get: r, set(a) {
-      const l = r?.call(this);
-      n?.call(this, a), this.requestUpdate(t, l, o);
+      const c = r?.call(this);
+      s?.call(this, a), this.requestUpdate(t, c, o);
     }, configurable: !0, enumerable: !0 };
   }
   static getPropertyOptions(t) {
-    return this.elementProperties.get(t) ?? Ie;
+    return this.elementProperties.get(t) ?? Oe;
   }
   static _$Ei() {
     if (this.hasOwnProperty(q("elementProperties"))) return;
-    const t = Lt(this);
+    const t = It(this);
     t.finalize(), t.l !== void 0 && (this.l = [...t.l]), this.elementProperties = new Map(t.elementProperties);
   }
   static finalize() {
     if (this.hasOwnProperty(q("finalized"))) return;
     if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(q("properties"))) {
-      const i = this.properties, o = [...Pt(i), ...Mt(i)];
+      const i = this.properties, o = [...Mt(i), ...Dt(i)];
       for (const r of o) this.createProperty(r, i[r]);
     }
     const t = this[Symbol.metadata];
@@ -120,8 +120,8 @@ let H = class extends HTMLElement {
     const i = [];
     if (Array.isArray(t)) {
       const o = new Set(t.flat(1 / 0).reverse());
-      for (const r of o) i.unshift(Le(r));
-    } else t !== void 0 && i.push(Le(t));
+      for (const r of o) i.unshift(Ve(r));
+    } else t !== void 0 && i.push(Ve(t));
     return i;
   }
   static _$Eu(t, i) {
@@ -147,7 +147,7 @@ let H = class extends HTMLElement {
   }
   createRenderRoot() {
     const t = this.shadowRoot ?? this.attachShadow(this.constructor.shadowRootOptions);
-    return Ct(t, this.constructor.elementStyles), t;
+    return Rt(t, this.constructor.elementStyles), t;
   }
   connectedCallback() {
     this.renderRoot ??= this.createRenderRoot(), this.enableUpdating(!0), this._$EO?.forEach((t) => t.hostConnected?.());
@@ -163,29 +163,29 @@ let H = class extends HTMLElement {
   _$ET(t, i) {
     const o = this.constructor.elementProperties.get(t), r = this.constructor._$Eu(t, o);
     if (r !== void 0 && o.reflect === !0) {
-      const n = (o.converter?.toAttribute !== void 0 ? o.converter : X).toAttribute(i, o.type);
-      this._$Em = t, n == null ? this.removeAttribute(r) : this.setAttribute(r, n), this._$Em = null;
+      const s = (o.converter?.toAttribute !== void 0 ? o.converter : oe).toAttribute(i, o.type);
+      this._$Em = t, s == null ? this.removeAttribute(r) : this.setAttribute(r, s), this._$Em = null;
     }
   }
   _$AK(t, i) {
     const o = this.constructor, r = o._$Eh.get(t);
     if (r !== void 0 && this._$Em !== r) {
-      const n = o.getPropertyOptions(r), a = typeof n.converter == "function" ? { fromAttribute: n.converter } : n.converter?.fromAttribute !== void 0 ? n.converter : X;
+      const s = o.getPropertyOptions(r), a = typeof s.converter == "function" ? { fromAttribute: s.converter } : s.converter?.fromAttribute !== void 0 ? s.converter : oe;
       this._$Em = r;
-      const l = a.fromAttribute(i, n.type);
-      this[r] = l ?? this._$Ej?.get(r) ?? l, this._$Em = null;
+      const c = a.fromAttribute(i, s.type);
+      this[r] = c ?? this._$Ej?.get(r) ?? c, this._$Em = null;
     }
   }
-  requestUpdate(t, i, o, r = !1, n) {
+  requestUpdate(t, i, o, r = !1, s) {
     if (t !== void 0) {
       const a = this.constructor;
-      if (r === !1 && (n = this[t]), o ??= a.getPropertyOptions(t), !((o.hasChanged ?? we)(n, i) || o.useDefault && o.reflect && n === this._$Ej?.get(t) && !this.hasAttribute(a._$Eu(t, o)))) return;
+      if (r === !1 && (s = this[t]), o ??= a.getPropertyOptions(t), !((o.hasChanged ?? Ae)(s, i) || o.useDefault && o.reflect && s === this._$Ej?.get(t) && !this.hasAttribute(a._$Eu(t, o)))) return;
       this.C(t, i, o);
     }
     this.isUpdatePending === !1 && (this._$ES = this._$EP());
   }
-  C(t, i, { useDefault: o, reflect: r, wrapped: n }, a) {
-    o && !(this._$Ej ??= /* @__PURE__ */ new Map()).has(t) && (this._$Ej.set(t, a ?? i ?? this[t]), n !== !0 || a !== void 0) || (this._$AL.has(t) || (this.hasUpdated || o || (i = void 0), this._$AL.set(t, i)), r === !0 && this._$Em !== t && (this._$Eq ??= /* @__PURE__ */ new Set()).add(t));
+  C(t, i, { useDefault: o, reflect: r, wrapped: s }, a) {
+    o && !(this._$Ej ??= /* @__PURE__ */ new Map()).has(t) && (this._$Ej.set(t, a ?? i ?? this[t]), s !== !0 || a !== void 0) || (this._$AL.has(t) || (this.hasUpdated || o || (i = void 0), this._$AL.set(t, i)), r === !0 && this._$Em !== t && (this._$Eq ??= /* @__PURE__ */ new Set()).add(t));
   }
   async _$EP() {
     this.isUpdatePending = !0;
@@ -204,13 +204,13 @@ let H = class extends HTMLElement {
     if (!this.isUpdatePending) return;
     if (!this.hasUpdated) {
       if (this.renderRoot ??= this.createRenderRoot(), this._$Ep) {
-        for (const [r, n] of this._$Ep) this[r] = n;
+        for (const [r, s] of this._$Ep) this[r] = s;
         this._$Ep = void 0;
       }
       const o = this.constructor.elementProperties;
-      if (o.size > 0) for (const [r, n] of o) {
-        const { wrapped: a } = n, l = this[r];
-        a !== !0 || this._$AL.has(r) || l === void 0 || this.C(r, void 0, n, l);
+      if (o.size > 0) for (const [r, s] of o) {
+        const { wrapped: a } = s, c = this[r];
+        a !== !0 || this._$AL.has(r) || c === void 0 || this.C(r, void 0, s, c);
       }
     }
     let t = !1;
@@ -247,70 +247,70 @@ let H = class extends HTMLElement {
   firstUpdated(t) {
   }
 };
-H.elementStyles = [], H.shadowRootOptions = { mode: "open" }, H[q("elementProperties")] = /* @__PURE__ */ new Map(), H[q("finalized")] = /* @__PURE__ */ new Map(), It?.({ ReactiveElement: H }), (oe.reactiveElementVersions ??= []).push("2.1.2");
-const ye = globalThis, Ve = (e) => e, ee = ye.trustedTypes, He = ee ? ee.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, it = "$lit$", T = `lit$${Math.random().toFixed(9).slice(2)}$`, ot = "?" + T, Vt = `<${ot}>`, I = document, N = () => I.createComment(""), B = (e) => e === null || typeof e != "object" && typeof e != "function", ke = Array.isArray, Ht = (e) => ke(e) || typeof e?.[Symbol.iterator] == "function", se = `[ 	
-\f\r]`, z = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Oe = /-->/g, Ue = />/g, L = RegExp(`>|${se}(?:([^\\s"'>=/]+)(${se}*=${se}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), ze = /'/g, qe = /"/g, rt = /^(?:script|style|textarea|title)$/i, Ot = (e) => (t, ...i) => ({ _$litType$: e, strings: t, values: i }), h = Ot(1), P = /* @__PURE__ */ Symbol.for("lit-noChange"), c = /* @__PURE__ */ Symbol.for("lit-nothing"), Ne = /* @__PURE__ */ new WeakMap(), D = I.createTreeWalker(I, 129);
-function nt(e, t) {
-  if (!ke(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
-  return He !== void 0 ? He.createHTML(t) : t;
+H.elementStyles = [], H.shadowRootOptions = { mode: "open" }, H[q("elementProperties")] = /* @__PURE__ */ new Map(), H[q("finalized")] = /* @__PURE__ */ new Map(), Ht?.({ ReactiveElement: H }), (ae.reactiveElementVersions ??= []).push("2.1.2");
+const $e = globalThis, Ue = (e) => e, re = $e.trustedTypes, ze = re ? re.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, rt = "$lit$", T = `lit$${Math.random().toFixed(9).slice(2)}$`, nt = "?" + T, Ot = `<${nt}>`, V = document, B = () => V.createComment(""), N = (e) => e === null || typeof e != "object" && typeof e != "function", Se = Array.isArray, Ut = (e) => Se(e) || typeof e?.[Symbol.iterator] == "function", ce = `[ 	
+\f\r]`, z = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, qe = /-->/g, Be = />/g, D = RegExp(`>|${ce}(?:([^\\s"'>=/]+)(${ce}*=${ce}*(?:[^ 	
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Ne = /'/g, Fe = /"/g, st = /^(?:script|style|textarea|title)$/i, zt = (e) => (t, ...i) => ({ _$litType$: e, strings: t, values: i }), h = zt(1), L = /* @__PURE__ */ Symbol.for("lit-noChange"), l = /* @__PURE__ */ Symbol.for("lit-nothing"), Ke = /* @__PURE__ */ new WeakMap(), I = V.createTreeWalker(V, 129);
+function at(e, t) {
+  if (!Se(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
+  return ze !== void 0 ? ze.createHTML(t) : t;
 }
-const Ut = (e, t) => {
+const qt = (e, t) => {
   const i = e.length - 1, o = [];
-  let r, n = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", a = z;
-  for (let l = 0; l < i; l++) {
-    const d = e[l];
-    let u, v, g = -1, A = 0;
-    for (; A < d.length && (a.lastIndex = A, v = a.exec(d), v !== null); ) A = a.lastIndex, a === z ? v[1] === "!--" ? a = Oe : v[1] !== void 0 ? a = Ue : v[2] !== void 0 ? (rt.test(v[2]) && (r = RegExp("</" + v[2], "g")), a = L) : v[3] !== void 0 && (a = L) : a === L ? v[0] === ">" ? (a = r ?? z, g = -1) : v[1] === void 0 ? g = -2 : (g = a.lastIndex - v[2].length, u = v[1], a = v[3] === void 0 ? L : v[3] === '"' ? qe : ze) : a === qe || a === ze ? a = L : a === Oe || a === Ue ? a = z : (a = L, r = void 0);
-    const S = a === L && e[l + 1].startsWith("/>") ? " " : "";
-    n += a === z ? d + Vt : g >= 0 ? (o.push(u), d.slice(0, g) + it + d.slice(g) + T + S) : d + T + (g === -2 ? l : S);
+  let r, s = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", a = z;
+  for (let c = 0; c < i; c++) {
+    const d = e[c];
+    let p, v, g = -1, A = 0;
+    for (; A < d.length && (a.lastIndex = A, v = a.exec(d), v !== null); ) A = a.lastIndex, a === z ? v[1] === "!--" ? a = qe : v[1] !== void 0 ? a = Be : v[2] !== void 0 ? (st.test(v[2]) && (r = RegExp("</" + v[2], "g")), a = D) : v[3] !== void 0 && (a = D) : a === D ? v[0] === ">" ? (a = r ?? z, g = -1) : v[1] === void 0 ? g = -2 : (g = a.lastIndex - v[2].length, p = v[1], a = v[3] === void 0 ? D : v[3] === '"' ? Fe : Ne) : a === Fe || a === Ne ? a = D : a === qe || a === Be ? a = z : (a = D, r = void 0);
+    const S = a === D && e[c + 1].startsWith("/>") ? " " : "";
+    s += a === z ? d + Ot : g >= 0 ? (o.push(p), d.slice(0, g) + rt + d.slice(g) + T + S) : d + T + (g === -2 ? c : S);
   }
-  return [nt(e, n + (e[i] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), o];
+  return [at(e, s + (e[i] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), o];
 };
 class F {
   constructor({ strings: t, _$litType$: i }, o) {
     let r;
     this.parts = [];
-    let n = 0, a = 0;
-    const l = t.length - 1, d = this.parts, [u, v] = Ut(t, i);
-    if (this.el = F.createElement(u, o), D.currentNode = this.el.content, i === 2 || i === 3) {
+    let s = 0, a = 0;
+    const c = t.length - 1, d = this.parts, [p, v] = qt(t, i);
+    if (this.el = F.createElement(p, o), I.currentNode = this.el.content, i === 2 || i === 3) {
       const g = this.el.content.firstChild;
       g.replaceWith(...g.childNodes);
     }
-    for (; (r = D.nextNode()) !== null && d.length < l; ) {
+    for (; (r = I.nextNode()) !== null && d.length < c; ) {
       if (r.nodeType === 1) {
-        if (r.hasAttributes()) for (const g of r.getAttributeNames()) if (g.endsWith(it)) {
+        if (r.hasAttributes()) for (const g of r.getAttributeNames()) if (g.endsWith(rt)) {
           const A = v[a++], S = r.getAttribute(g).split(T), Y = /([.?@])?(.*)/.exec(A);
-          d.push({ type: 1, index: n, name: Y[2], strings: S, ctor: Y[1] === "." ? qt : Y[1] === "?" ? Nt : Y[1] === "@" ? Bt : re }), r.removeAttribute(g);
-        } else g.startsWith(T) && (d.push({ type: 6, index: n }), r.removeAttribute(g));
-        if (rt.test(r.tagName)) {
+          d.push({ type: 1, index: s, name: Y[2], strings: S, ctor: Y[1] === "." ? Nt : Y[1] === "?" ? Ft : Y[1] === "@" ? Kt : de }), r.removeAttribute(g);
+        } else g.startsWith(T) && (d.push({ type: 6, index: s }), r.removeAttribute(g));
+        if (st.test(r.tagName)) {
           const g = r.textContent.split(T), A = g.length - 1;
           if (A > 0) {
-            r.textContent = ee ? ee.emptyScript : "";
-            for (let S = 0; S < A; S++) r.append(g[S], N()), D.nextNode(), d.push({ type: 2, index: ++n });
-            r.append(g[A], N());
+            r.textContent = re ? re.emptyScript : "";
+            for (let S = 0; S < A; S++) r.append(g[S], B()), I.nextNode(), d.push({ type: 2, index: ++s });
+            r.append(g[A], B());
           }
         }
-      } else if (r.nodeType === 8) if (r.data === ot) d.push({ type: 2, index: n });
+      } else if (r.nodeType === 8) if (r.data === nt) d.push({ type: 2, index: s });
       else {
         let g = -1;
-        for (; (g = r.data.indexOf(T, g + 1)) !== -1; ) d.push({ type: 7, index: n }), g += T.length - 1;
+        for (; (g = r.data.indexOf(T, g + 1)) !== -1; ) d.push({ type: 7, index: s }), g += T.length - 1;
       }
-      n++;
+      s++;
     }
   }
   static createElement(t, i) {
-    const o = I.createElement("template");
+    const o = V.createElement("template");
     return o.innerHTML = t, o;
   }
 }
 function U(e, t, i = e, o) {
-  if (t === P) return t;
+  if (t === L) return t;
   let r = o !== void 0 ? i._$Co?.[o] : i._$Cl;
-  const n = B(t) ? void 0 : t._$litDirective$;
-  return r?.constructor !== n && (r?._$AO?.(!1), n === void 0 ? r = void 0 : (r = new n(e), r._$AT(e, i, o)), o !== void 0 ? (i._$Co ??= [])[o] = r : i._$Cl = r), r !== void 0 && (t = U(e, r._$AS(e, t.values), r, o)), t;
+  const s = N(t) ? void 0 : t._$litDirective$;
+  return r?.constructor !== s && (r?._$AO?.(!1), s === void 0 ? r = void 0 : (r = new s(e), r._$AT(e, i, o)), o !== void 0 ? (i._$Co ??= [])[o] = r : i._$Cl = r), r !== void 0 && (t = U(e, r._$AS(e, t.values), r, o)), t;
 }
-class zt {
+class Bt {
   constructor(t, i) {
     this._$AV = [], this._$AN = void 0, this._$AD = t, this._$AM = i;
   }
@@ -321,17 +321,17 @@ class zt {
     return this._$AM._$AU;
   }
   u(t) {
-    const { el: { content: i }, parts: o } = this._$AD, r = (t?.creationScope ?? I).importNode(i, !0);
-    D.currentNode = r;
-    let n = D.nextNode(), a = 0, l = 0, d = o[0];
+    const { el: { content: i }, parts: o } = this._$AD, r = (t?.creationScope ?? V).importNode(i, !0);
+    I.currentNode = r;
+    let s = I.nextNode(), a = 0, c = 0, d = o[0];
     for (; d !== void 0; ) {
       if (a === d.index) {
-        let u;
-        d.type === 2 ? u = new W(n, n.nextSibling, this, t) : d.type === 1 ? u = new d.ctor(n, d.name, d.strings, this, t) : d.type === 6 && (u = new Ft(n, this, t)), this._$AV.push(u), d = o[++l];
+        let p;
+        d.type === 2 ? p = new W(s, s.nextSibling, this, t) : d.type === 1 ? p = new d.ctor(s, d.name, d.strings, this, t) : d.type === 6 && (p = new jt(s, this, t)), this._$AV.push(p), d = o[++c];
       }
-      a !== d?.index && (n = D.nextNode(), a++);
+      a !== d?.index && (s = I.nextNode(), a++);
     }
-    return D.currentNode = I, r;
+    return I.currentNode = V, r;
   }
   p(t) {
     let i = 0;
@@ -343,7 +343,7 @@ class W {
     return this._$AM?._$AU ?? this._$Cv;
   }
   constructor(t, i, o, r) {
-    this.type = 2, this._$AH = c, this._$AN = void 0, this._$AA = t, this._$AB = i, this._$AM = o, this.options = r, this._$Cv = r?.isConnected ?? !0;
+    this.type = 2, this._$AH = l, this._$AN = void 0, this._$AA = t, this._$AB = i, this._$AM = o, this.options = r, this._$Cv = r?.isConnected ?? !0;
   }
   get parentNode() {
     let t = this._$AA.parentNode;
@@ -357,7 +357,7 @@ class W {
     return this._$AB;
   }
   _$AI(t, i = this) {
-    t = U(this, t, i), B(t) ? t === c || t == null || t === "" ? (this._$AH !== c && this._$AR(), this._$AH = c) : t !== this._$AH && t !== P && this._(t) : t._$litType$ !== void 0 ? this.$(t) : t.nodeType !== void 0 ? this.T(t) : Ht(t) ? this.k(t) : this._(t);
+    t = U(this, t, i), N(t) ? t === l || t == null || t === "" ? (this._$AH !== l && this._$AR(), this._$AH = l) : t !== this._$AH && t !== L && this._(t) : t._$litType$ !== void 0 ? this.$(t) : t.nodeType !== void 0 ? this.T(t) : Ut(t) ? this.k(t) : this._(t);
   }
   O(t) {
     return this._$AA.parentNode.insertBefore(t, this._$AB);
@@ -366,92 +366,92 @@ class W {
     this._$AH !== t && (this._$AR(), this._$AH = this.O(t));
   }
   _(t) {
-    this._$AH !== c && B(this._$AH) ? this._$AA.nextSibling.data = t : this.T(I.createTextNode(t)), this._$AH = t;
+    this._$AH !== l && N(this._$AH) ? this._$AA.nextSibling.data = t : this.T(V.createTextNode(t)), this._$AH = t;
   }
   $(t) {
-    const { values: i, _$litType$: o } = t, r = typeof o == "number" ? this._$AC(t) : (o.el === void 0 && (o.el = F.createElement(nt(o.h, o.h[0]), this.options)), o);
+    const { values: i, _$litType$: o } = t, r = typeof o == "number" ? this._$AC(t) : (o.el === void 0 && (o.el = F.createElement(at(o.h, o.h[0]), this.options)), o);
     if (this._$AH?._$AD === r) this._$AH.p(i);
     else {
-      const n = new zt(r, this), a = n.u(this.options);
-      n.p(i), this.T(a), this._$AH = n;
+      const s = new Bt(r, this), a = s.u(this.options);
+      s.p(i), this.T(a), this._$AH = s;
     }
   }
   _$AC(t) {
-    let i = Ne.get(t.strings);
-    return i === void 0 && Ne.set(t.strings, i = new F(t)), i;
+    let i = Ke.get(t.strings);
+    return i === void 0 && Ke.set(t.strings, i = new F(t)), i;
   }
   k(t) {
-    ke(this._$AH) || (this._$AH = [], this._$AR());
+    Se(this._$AH) || (this._$AH = [], this._$AR());
     const i = this._$AH;
     let o, r = 0;
-    for (const n of t) r === i.length ? i.push(o = new W(this.O(N()), this.O(N()), this, this.options)) : o = i[r], o._$AI(n), r++;
+    for (const s of t) r === i.length ? i.push(o = new W(this.O(B()), this.O(B()), this, this.options)) : o = i[r], o._$AI(s), r++;
     r < i.length && (this._$AR(o && o._$AB.nextSibling, r), i.length = r);
   }
   _$AR(t = this._$AA.nextSibling, i) {
     for (this._$AP?.(!1, !0, i); t !== this._$AB; ) {
-      const o = Ve(t).nextSibling;
-      Ve(t).remove(), t = o;
+      const o = Ue(t).nextSibling;
+      Ue(t).remove(), t = o;
     }
   }
   setConnected(t) {
     this._$AM === void 0 && (this._$Cv = t, this._$AP?.(t));
   }
 }
-class re {
+class de {
   get tagName() {
     return this.element.tagName;
   }
   get _$AU() {
     return this._$AM._$AU;
   }
-  constructor(t, i, o, r, n) {
-    this.type = 1, this._$AH = c, this._$AN = void 0, this.element = t, this.name = i, this._$AM = r, this.options = n, o.length > 2 || o[0] !== "" || o[1] !== "" ? (this._$AH = Array(o.length - 1).fill(new String()), this.strings = o) : this._$AH = c;
+  constructor(t, i, o, r, s) {
+    this.type = 1, this._$AH = l, this._$AN = void 0, this.element = t, this.name = i, this._$AM = r, this.options = s, o.length > 2 || o[0] !== "" || o[1] !== "" ? (this._$AH = Array(o.length - 1).fill(new String()), this.strings = o) : this._$AH = l;
   }
   _$AI(t, i = this, o, r) {
-    const n = this.strings;
+    const s = this.strings;
     let a = !1;
-    if (n === void 0) t = U(this, t, i, 0), a = !B(t) || t !== this._$AH && t !== P, a && (this._$AH = t);
+    if (s === void 0) t = U(this, t, i, 0), a = !N(t) || t !== this._$AH && t !== L, a && (this._$AH = t);
     else {
-      const l = t;
-      let d, u;
-      for (t = n[0], d = 0; d < n.length - 1; d++) u = U(this, l[o + d], i, d), u === P && (u = this._$AH[d]), a ||= !B(u) || u !== this._$AH[d], u === c ? t = c : t !== c && (t += (u ?? "") + n[d + 1]), this._$AH[d] = u;
+      const c = t;
+      let d, p;
+      for (t = s[0], d = 0; d < s.length - 1; d++) p = U(this, c[o + d], i, d), p === L && (p = this._$AH[d]), a ||= !N(p) || p !== this._$AH[d], p === l ? t = l : t !== l && (t += (p ?? "") + s[d + 1]), this._$AH[d] = p;
     }
     a && !r && this.j(t);
   }
   j(t) {
-    t === c ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, t ?? "");
+    t === l ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, t ?? "");
   }
 }
-class qt extends re {
+class Nt extends de {
   constructor() {
     super(...arguments), this.type = 3;
   }
   j(t) {
-    this.element[this.name] = t === c ? void 0 : t;
+    this.element[this.name] = t === l ? void 0 : t;
   }
 }
-class Nt extends re {
+class Ft extends de {
   constructor() {
     super(...arguments), this.type = 4;
   }
   j(t) {
-    this.element.toggleAttribute(this.name, !!t && t !== c);
+    this.element.toggleAttribute(this.name, !!t && t !== l);
   }
 }
-class Bt extends re {
-  constructor(t, i, o, r, n) {
-    super(t, i, o, r, n), this.type = 5;
+class Kt extends de {
+  constructor(t, i, o, r, s) {
+    super(t, i, o, r, s), this.type = 5;
   }
   _$AI(t, i = this) {
-    if ((t = U(this, t, i, 0) ?? c) === P) return;
-    const o = this._$AH, r = t === c && o !== c || t.capture !== o.capture || t.once !== o.once || t.passive !== o.passive, n = t !== c && (o === c || r);
-    r && this.element.removeEventListener(this.name, this, o), n && this.element.addEventListener(this.name, this, t), this._$AH = t;
+    if ((t = U(this, t, i, 0) ?? l) === L) return;
+    const o = this._$AH, r = t === l && o !== l || t.capture !== o.capture || t.once !== o.once || t.passive !== o.passive, s = t !== l && (o === l || r);
+    r && this.element.removeEventListener(this.name, this, o), s && this.element.addEventListener(this.name, this, t), this._$AH = t;
   }
   handleEvent(t) {
     typeof this._$AH == "function" ? this._$AH.call(this.options?.host ?? this.element, t) : this._$AH.handleEvent(t);
   }
 }
-class Ft {
+class jt {
   constructor(t, i, o) {
     this.element = t, this.type = 6, this._$AN = void 0, this._$AM = i, this.options = o;
   }
@@ -462,19 +462,19 @@ class Ft {
     U(this, t);
   }
 }
-const Kt = ye.litHtmlPolyfillSupport;
-Kt?.(F, W), (ye.litHtmlVersions ??= []).push("3.3.3");
-const jt = (e, t, i) => {
+const Wt = $e.litHtmlPolyfillSupport;
+Wt?.(F, W), ($e.litHtmlVersions ??= []).push("3.3.3");
+const Zt = (e, t, i) => {
   const o = i?.renderBefore ?? t;
   let r = o._$litPart$;
   if (r === void 0) {
-    const n = i?.renderBefore ?? null;
-    o._$litPart$ = r = new W(t.insertBefore(N(), n), n, void 0, i ?? {});
+    const s = i?.renderBefore ?? null;
+    o._$litPart$ = r = new W(t.insertBefore(B(), s), s, void 0, i ?? {});
   }
   return r._$AI(e), r;
 };
-const Ae = globalThis;
-let C = class extends H {
+const xe = globalThis;
+let E = class extends H {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
   }
@@ -484,7 +484,7 @@ let C = class extends H {
   }
   update(t) {
     const i = this.render();
-    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(t), this._$Do = jt(i, this.renderRoot, this.renderOptions);
+    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(t), this._$Do = Zt(i, this.renderRoot, this.renderOptions);
   }
   connectedCallback() {
     super.connectedCallback(), this._$Do?.setConnected(!0);
@@ -493,15 +493,15 @@ let C = class extends H {
     super.disconnectedCallback(), this._$Do?.setConnected(!1);
   }
   render() {
-    return P;
+    return L;
   }
 };
-C._$litElement$ = !0, C.finalized = !0, Ae.litElementHydrateSupport?.({ LitElement: C });
-const Wt = Ae.litElementPolyfillSupport;
-Wt?.({ LitElement: C });
-(Ae.litElementVersions ??= []).push("4.2.2");
-const st = { ATTRIBUTE: 1 }, $e = (e) => (...t) => ({ _$litDirective$: e, values: t });
-let Se = class {
+E._$litElement$ = !0, E.finalized = !0, xe.litElementHydrateSupport?.({ LitElement: E });
+const Gt = xe.litElementPolyfillSupport;
+Gt?.({ LitElement: E });
+(xe.litElementVersions ??= []).push("4.2.2");
+const dt = { ATTRIBUTE: 1 }, Ce = (e) => (...t) => ({ _$litDirective$: e, values: t });
+let Ee = class {
   constructor(t) {
   }
   get _$AU() {
@@ -517,9 +517,9 @@ let Se = class {
     return this.render(...i);
   }
 };
-const at = "important", Zt = " !" + at, dt = $e(class extends Se {
+const lt = "important", Yt = " !" + lt, pe = Ce(class extends Ee {
   constructor(e) {
-    if (super(e), e.type !== st.ATTRIBUTE || e.name !== "style" || e.strings?.length > 2) throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
+    if (super(e), e.type !== dt.ATTRIBUTE || e.name !== "style" || e.strings?.length > 2) throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
   }
   render(e) {
     return Object.keys(e).reduce((t, i) => {
@@ -535,11 +535,11 @@ const at = "important", Zt = " !" + at, dt = $e(class extends Se {
       const r = t[o];
       if (r != null) {
         this.ft.add(o);
-        const n = typeof r == "string" && r.endsWith(Zt);
-        o.includes("-") || n ? i.setProperty(o, n ? r.slice(0, -11) : r, n ? at : "") : i[o] = r;
+        const s = typeof r == "string" && r.endsWith(Yt);
+        o.includes("-") || s ? i.setProperty(o, s ? r.slice(0, -11) : r, s ? lt : "") : i[o] = r;
       }
     }
-    return P;
+    return L;
   }
 });
 const Z = (e) => (t, i) => {
@@ -547,37 +547,37 @@ const Z = (e) => (t, i) => {
     customElements.define(e, t);
   }) : customElements.define(e, t);
 };
-const Gt = { attribute: !0, type: String, converter: X, reflect: !1, hasChanged: we }, Yt = (e = Gt, t, i) => {
+const Qt = { attribute: !0, type: String, converter: oe, reflect: !1, hasChanged: Ae }, Jt = (e = Qt, t, i) => {
   const { kind: o, metadata: r } = i;
-  let n = globalThis.litPropertyMetadata.get(r);
-  if (n === void 0 && globalThis.litPropertyMetadata.set(r, n = /* @__PURE__ */ new Map()), o === "setter" && ((e = Object.create(e)).wrapped = !0), n.set(i.name, e), o === "accessor") {
+  let s = globalThis.litPropertyMetadata.get(r);
+  if (s === void 0 && globalThis.litPropertyMetadata.set(r, s = /* @__PURE__ */ new Map()), o === "setter" && ((e = Object.create(e)).wrapped = !0), s.set(i.name, e), o === "accessor") {
     const { name: a } = i;
-    return { set(l) {
+    return { set(c) {
       const d = t.get.call(this);
-      t.set.call(this, l), this.requestUpdate(a, d, e, !0, l);
-    }, init(l) {
-      return l !== void 0 && this.C(a, void 0, e, l), l;
+      t.set.call(this, c), this.requestUpdate(a, d, e, !0, c);
+    }, init(c) {
+      return c !== void 0 && this.C(a, void 0, e, c), c;
     } };
   }
   if (o === "setter") {
     const { name: a } = i;
-    return function(l) {
+    return function(c) {
       const d = this[a];
-      t.call(this, l), this.requestUpdate(a, d, e, !0, l);
+      t.call(this, c), this.requestUpdate(a, d, e, !0, c);
     };
   }
   throw Error("Unsupported decorator location: " + o);
 };
-function b(e) {
-  return (t, i) => typeof i == "object" ? Yt(e, t, i) : ((o, r, n) => {
-    const a = r.hasOwnProperty(n);
-    return r.constructor.createProperty(n, o), a ? Object.getOwnPropertyDescriptor(r, n) : void 0;
+function _(e) {
+  return (t, i) => typeof i == "object" ? Jt(e, t, i) : ((o, r, s) => {
+    const a = r.hasOwnProperty(s);
+    return r.constructor.createProperty(s, o), a ? Object.getOwnPropertyDescriptor(r, s) : void 0;
   })(e, t, i);
 }
-function p(e) {
-  return b({ ...e, state: !0, attribute: !1 });
+function u(e) {
+  return _({ ...e, state: !0, attribute: !1 });
 }
-const Qt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Synthetic camera preview">
+const Xt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Synthetic camera preview">
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#8fb6c9"/>
@@ -608,7 +608,7 @@ const Qt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
     <path d="M200 0v900M600 0v900M1000 0v900M1400 0v900"/>
   </g>
 </svg>
-`, Jt = {
+`, ei = {
   "common.camera": "Kamera",
   "common.close": "Schließen",
   "common.last_recording": "Letzte Aufnahme",
@@ -618,7 +618,13 @@ const Qt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "editor.recording_entity": "Kamera für letzte Aufnahme",
   "editor.live_entity": "Live-Kamera",
   "editor.snapshot_entity": "Kamera für Geräte-Schnappschuss",
-  "editor.dashboard_preview": "Dashboard-Vorschau",
+  "editor.dashboard_preview": "Dashboard-Karte",
+  "editor.dashboard_behavior": "Dashboard-Verhalten",
+  "editor.dashboard_behavior_viewer": "Vollbildansicht öffnen",
+  "editor.dashboard_behavior_interactive": "Kamera in der Karte steuern",
+  "editor.dashboard_start": "Medien automatisch starten",
+  "editor.dashboard_start_on_demand": "Nein — auf Tippen warten",
+  "editor.dashboard_live_muted": "Dashboard-Liveansicht stumm starten",
   "editor.viewer_behavior": "Anzeigeverhalten",
   "editor.default_mode": "Ansicht öffnen mit",
   "editor.remember_last_mode": "Zuletzt gewählte Ansicht merken",
@@ -637,6 +643,7 @@ const Qt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "editor.door_visibility_live": "Nur Live-Ansicht — empfohlen",
   "editor.door_visibility_all": "Live-Ansicht und Aufnahmen",
   "editor.door_hold_to_activate": "Zum Aktivieren halten",
+  "editor.door_control_on_dashboard": "Türsteuerung auf dem Dashboard erlauben",
   "editor.card_appearance": "Kartendarstellung",
   "editor.name": "Kameraname",
   "editor.show_name": "Kameranamen anzeigen",
@@ -644,6 +651,9 @@ const Qt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "editor.preview_fallback": "Wenn Aufnahmezeiten nicht vergleichbar sind",
   "editor.aspect_ratio": "Bildformat",
   "editor.fit_mode": "Bildanpassung",
+  "editor.helper_dashboard_behavior": "Behalte die gewohnte Vorschau oder zeige die Kamerasteuerung direkt auf dem Dashboard.",
+  "editor.helper_dashboard_start": "Bei Bedarf wird ein Standbild angezeigt, bis Aufnahme oder Live gewählt wird.",
+  "editor.helper_dashboard_live_muted": "Empfohlen für Wand-Tablets und automatische Starts. Ton kann im Player aktiviert werden.",
   "editor.helper_default_mode": "Beim direkten Öffnen der Live-Ansicht wird eine Ring-Live-Sitzung gestartet.",
   "editor.helper_remember_last_mode": "Verwendet die zuletzt gewählte Ansicht anstelle der Startansicht.",
   "editor.helper_autoplay_recording": "Deaktivieren, um vor dem Laden der Aufnahme eine Wiedergabetaste anzuzeigen.",
@@ -655,6 +665,7 @@ const Qt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "editor.helper_door_action": "Öffnen gibt bei unterstützten Schlössern die Falle frei. Entriegeln löst nur das Schloss.",
   "editor.helper_door_control_visibility": "Nur Live ist die sicherere Voreinstellung. Live und Aufnahmen hält das Bedienelement auch über historischem Material aktiv.",
   "editor.helper_door_hold_to_activate": "Vor Ablauf einer Sekunde loslassen, um abzubrechen. Wenn deaktiviert, betätigt ein einzelnes Tippen die Tür.",
+  "editor.helper_door_control_on_dashboard": "Standardmäßig aus, damit die Tür erst nach ausdrücklicher Freigabe vom Dashboard bedient werden kann.",
   "editor.helper_show_name": "Wird oben links auf der Karte und in der Kameraansicht angezeigt.",
   "editor.helper_preview_source": "Verwendet immer ein Standbild und bindet auf dem Dashboard keinen Livestream ein.",
   "editor.helper_snapshot_entity": "Wähle die von Ring-MQTT oder einer anderen Integration bereitgestellte Schnappschuss-Kamera.",
@@ -702,15 +713,19 @@ const Qt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "config.door_contact_entity": "door_contact_entity muss eine Binärsensor-Entität sein.",
   "config.door_action": "door_action muss unlock oder open sein.",
   "config.door_control_visibility": "door_control_visibility muss live_only oder all_views sein.",
+  "config.dashboard_behavior": "dashboard_behavior muss open_viewer oder interactive sein.",
+  "config.dashboard_start": "dashboard_start muss on_demand, last_recording oder live sein.",
   "ring.alert": "Jemand ist an der Tür",
   "ring.open_live": "Live-Ansicht öffnen",
   "viewer.close_aria": "Kameraansicht schließen",
+  "viewer.expand_aria": "Kameraansicht im Vollbild öffnen",
   "viewer.camera_view": "Kameraansicht",
   "viewer.entity_unavailable": "Kamera-Entität ist nicht verfügbar.",
   "viewer.suspended": "Wiedergabe pausiert, solange dieser Tab ausgeblendet ist.",
   "viewer.connecting_live": "Ring-Live-Ansicht wird verbunden…",
   "viewer.loading_recording": "Letzte Aufnahme wird geladen…",
   "viewer.play_recording": "Letzte Aufnahme abspielen",
+  "viewer.start_live": "Live-Ansicht starten",
   "viewer.resume_live": "Live-Ansicht fortsetzen",
   "viewer.native_unavailable_title": "Native Kamerawiedergabe ist nicht verfügbar.",
   "viewer.native_unavailable_detail": "Diese Home-Assistant-Version stellt die erwartete Kamerakomponente nicht bereit.",
@@ -758,9 +773,10 @@ const Qt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "door.open_unsupported": "Öffnen nicht unterstützt",
   "door.contact_open": "Tür offen",
   "door.contact_unknown": "Status unbekannt",
+  "door.waiting_for_live": "Warten auf Live…",
   "door.unlock_failed": "Die Tür konnte nicht entriegelt werden.",
   "door.open_failed": "Die Tür konnte nicht geöffnet werden."
-}, Xt = {
+}, ti = {
   "common.camera": "Camera",
   "common.close": "Close",
   "common.last_recording": "Last recording",
@@ -770,7 +786,13 @@ const Qt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "editor.recording_entity": "Last recording camera",
   "editor.live_entity": "Live camera",
   "editor.snapshot_entity": "Device snapshot camera",
-  "editor.dashboard_preview": "Dashboard preview",
+  "editor.dashboard_preview": "Dashboard card",
+  "editor.dashboard_behavior": "Dashboard behavior",
+  "editor.dashboard_behavior_viewer": "Open fullscreen viewer",
+  "editor.dashboard_behavior_interactive": "Control camera in card",
+  "editor.dashboard_start": "Start media automatically",
+  "editor.dashboard_start_on_demand": "No — wait for a tap",
+  "editor.dashboard_live_muted": "Start dashboard Live muted",
   "editor.viewer_behavior": "Viewer behavior",
   "editor.default_mode": "Open viewer on",
   "editor.remember_last_mode": "Remember last selected view",
@@ -789,6 +811,7 @@ const Qt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "editor.door_visibility_live": "Live view only — recommended",
   "editor.door_visibility_all": "Live and recordings",
   "editor.door_hold_to_activate": "Require hold to activate",
+  "editor.door_control_on_dashboard": "Allow door control on dashboard",
   "editor.card_appearance": "Card appearance",
   "editor.name": "Camera name",
   "editor.show_name": "Show camera name",
@@ -796,6 +819,9 @@ const Qt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "editor.preview_fallback": "If capture times cannot be compared",
   "editor.aspect_ratio": "Image shape",
   "editor.fit_mode": "Image crop",
+  "editor.helper_dashboard_behavior": "Keep the familiar preview, or put camera controls directly on the dashboard.",
+  "editor.helper_dashboard_start": "On demand shows a still image until you choose Recording or Live.",
+  "editor.helper_dashboard_live_muted": "Recommended for wall tablets and automatic starts. You can enable sound from the player.",
   "editor.helper_default_mode": "Opening directly on Live starts a Ring live session.",
   "editor.helper_remember_last_mode": "Uses the most recent choice instead of the opening view.",
   "editor.helper_autoplay_recording": "Turn off to show a Play button before loading the recording.",
@@ -807,6 +833,7 @@ const Qt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "editor.helper_door_action": "Open releases the latch on supported locks. Unlock only releases the lock.",
   "editor.helper_door_control_visibility": "Live only is the safer default. Live and recordings keeps the control active over historical footage.",
   "editor.helper_door_hold_to_activate": "Release before one second to cancel. Turning this off makes a single tap operate the door.",
+  "editor.helper_door_control_on_dashboard": "Off by default so a door cannot be operated from the dashboard until you explicitly allow it.",
   "editor.helper_show_name": "Shown at the top left of both the card and viewer.",
   "editor.helper_preview_source": "Always uses a still image and never mounts a live stream on the dashboard.",
   "editor.helper_snapshot_entity": "Choose the snapshot camera provided by Ring-MQTT or another integration.",
@@ -854,15 +881,19 @@ const Qt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "config.door_contact_entity": "door_contact_entity must be a binary sensor entity.",
   "config.door_action": "door_action must be unlock or open.",
   "config.door_control_visibility": "door_control_visibility must be live_only or all_views.",
+  "config.dashboard_behavior": "dashboard_behavior must be open_viewer or interactive.",
+  "config.dashboard_start": "dashboard_start must be on_demand, last_recording, or live.",
   "ring.alert": "Someone is at the door",
   "ring.open_live": "Open live view",
   "viewer.close_aria": "Close camera viewer",
+  "viewer.expand_aria": "Open fullscreen camera viewer",
   "viewer.camera_view": "Camera view",
   "viewer.entity_unavailable": "Camera entity is unavailable.",
   "viewer.suspended": "Playback paused while this tab is hidden.",
   "viewer.connecting_live": "Connecting to Ring live view…",
   "viewer.loading_recording": "Loading last recording…",
   "viewer.play_recording": "Play last recording",
+  "viewer.start_live": "Start live view",
   "viewer.resume_live": "Resume live view",
   "viewer.native_unavailable_title": "Native camera playback is unavailable.",
   "viewer.native_unavailable_detail": "This Home Assistant version did not provide the expected camera component.",
@@ -910,29 +941,30 @@ const Qt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "door.open_unsupported": "Open unsupported",
   "door.contact_open": "Door open",
   "door.contact_unknown": "Status unknown",
+  "door.waiting_for_live": "Waiting for Live…",
   "door.unlock_failed": "Couldn’t unlock the door.",
   "door.open_failed": "Couldn’t open the door."
-}, Be = {
-  de: Jt,
-  en: Xt
+}, je = {
+  de: ei,
+  en: ti
 };
-function ei(e) {
+function ii(e) {
   const t = typeof document > "u" ? void 0 : document.documentElement.lang, i = typeof navigator > "u" ? void 0 : navigator.language;
   return e?.language || e?.locale?.language || t || i || "en";
 }
-function ti(e) {
-  return ei(e).trim().toLowerCase().split(/[-_]/)[0] === "de" ? "de" : "en";
+function oi(e) {
+  return ii(e).trim().toLowerCase().split(/[-_]/)[0] === "de" ? "de" : "en";
 }
-function s(e, t, i = {}) {
-  return (Be[ti(e)][t] ?? Be.en[t]).replace(
+function n(e, t, i = {}) {
+  return (je[oi(e)][t] ?? je.en[t]).replace(
     /\{([a-z_]+)\}/gi,
-    (r, n) => n in i ? String(i[n]) : r
+    (r, s) => s in i ? String(i[s]) : r
   );
 }
 function ct(e, t, i) {
-  return e?.localize?.(t) || s(e, i);
+  return e?.localize?.(t) || n(e, i);
 }
-const xe = "custom:ring-view", le = "ring-view", ii = "Ring View", y = {
+const Re = "custom:ring-view", ve = "ring-view", ri = "Ring View", b = {
   default_mode: "last_recording",
   remember_last_mode: !1,
   autoplay_recording: !0,
@@ -941,77 +973,89 @@ const xe = "custom:ring-view", le = "ring-view", ii = "Ring View", y = {
   door_action: "unlock",
   door_control_visibility: "live_only",
   door_hold_to_activate: !0,
+  dashboard_behavior: "open_viewer",
+  dashboard_start: "on_demand",
+  dashboard_live_muted: !0,
+  door_control_on_dashboard: !1,
   show_name: !1,
   preview_source: "last_recording",
   preview_fallback: "last_recording",
   aspect_ratio: "16:9",
   fit_mode: "cover"
-}, oi = /* @__PURE__ */ new Set(["last_recording", "live"]), ri = /* @__PURE__ */ new Set([
+}, ni = /* @__PURE__ */ new Set(["last_recording", "live"]), si = /* @__PURE__ */ new Set([
   "last_recording",
   "live",
   "default",
   "snapshot",
   "newest"
-]), ni = /* @__PURE__ */ new Set(["last_recording", "snapshot"]), si = /* @__PURE__ */ new Set(["auto", "16:9", "4:3", "1:1"]), ai = /* @__PURE__ */ new Set(["cover", "contain"]), di = /* @__PURE__ */ new Set(["unlock", "open"]), ci = /* @__PURE__ */ new Set(["live_only", "all_views"]);
-function ae(e, t) {
+]), ai = /* @__PURE__ */ new Set(["last_recording", "snapshot"]), di = /* @__PURE__ */ new Set(["auto", "16:9", "4:3", "1:1"]), li = /* @__PURE__ */ new Set(["cover", "contain"]), ci = /* @__PURE__ */ new Set(["unlock", "open"]), hi = /* @__PURE__ */ new Set(["live_only", "all_views"]), ui = /* @__PURE__ */ new Set(["open_viewer", "interactive"]), pi = /* @__PURE__ */ new Set(["on_demand", "last_recording", "live"]);
+function he(e, t) {
   if (typeof e != "string" || !e.startsWith("camera."))
     throw new Error(
-      s(void 0, "config.entity_required", {
-        label: s(void 0, t)
+      n(void 0, "config.entity_required", {
+        label: n(void 0, t)
       })
     );
 }
-function li(e) {
+function vi(e) {
   if (!e || typeof e != "object")
-    throw new Error(s(void 0, "config.invalid"));
-  if (ae(e.recording_entity, "config.recording_entity"), ae(e.live_entity, "config.live_entity"), e.snapshot_entity !== void 0 && e.snapshot_entity !== "" && ae(e.snapshot_entity, "config.snapshot_entity"), e.default_mode && !oi.has(e.default_mode))
-    throw new Error(s(void 0, "config.default_mode"));
-  if (e.preview_source && !ri.has(e.preview_source))
-    throw new Error(s(void 0, "config.preview_source"));
-  if (e.preview_fallback && !ni.has(e.preview_fallback))
-    throw new Error(s(void 0, "config.preview_fallback"));
-  if (e.aspect_ratio && !si.has(e.aspect_ratio))
-    throw new Error(s(void 0, "config.aspect_ratio"));
-  if (e.fit_mode && !ai.has(e.fit_mode))
-    throw new Error(s(void 0, "config.fit_mode"));
+    throw new Error(n(void 0, "config.invalid"));
+  if (he(e.recording_entity, "config.recording_entity"), he(e.live_entity, "config.live_entity"), e.snapshot_entity !== void 0 && e.snapshot_entity !== "" && he(e.snapshot_entity, "config.snapshot_entity"), e.default_mode && !ni.has(e.default_mode))
+    throw new Error(n(void 0, "config.default_mode"));
+  if (e.preview_source && !si.has(e.preview_source))
+    throw new Error(n(void 0, "config.preview_source"));
+  if (e.preview_fallback && !ai.has(e.preview_fallback))
+    throw new Error(n(void 0, "config.preview_fallback"));
+  if (e.aspect_ratio && !di.has(e.aspect_ratio))
+    throw new Error(n(void 0, "config.aspect_ratio"));
+  if (e.fit_mode && !li.has(e.fit_mode))
+    throw new Error(n(void 0, "config.fit_mode"));
   if (e.doorbell_entity !== void 0 && e.doorbell_entity !== "" && (typeof e.doorbell_entity != "string" || !e.doorbell_entity.startsWith("event.")))
-    throw new Error(s(void 0, "config.doorbell_entity"));
+    throw new Error(n(void 0, "config.doorbell_entity"));
   if (e.door_entity !== void 0 && e.door_entity !== "" && (typeof e.door_entity != "string" || !e.door_entity.startsWith("lock.")))
-    throw new Error(s(void 0, "config.door_entity"));
+    throw new Error(n(void 0, "config.door_entity"));
   if (e.door_contact_entity !== void 0 && e.door_contact_entity !== "" && (typeof e.door_contact_entity != "string" || !e.door_contact_entity.startsWith("binary_sensor.")))
-    throw new Error(s(void 0, "config.door_contact_entity"));
-  if (e.door_action && !di.has(e.door_action))
-    throw new Error(s(void 0, "config.door_action"));
-  if (e.door_control_visibility && !ci.has(e.door_control_visibility))
-    throw new Error(s(void 0, "config.door_control_visibility"));
+    throw new Error(n(void 0, "config.door_contact_entity"));
+  if (e.door_action && !ci.has(e.door_action))
+    throw new Error(n(void 0, "config.door_action"));
+  if (e.door_control_visibility && !hi.has(e.door_control_visibility))
+    throw new Error(n(void 0, "config.door_control_visibility"));
+  if (e.dashboard_behavior && !ui.has(e.dashboard_behavior))
+    throw new Error(n(void 0, "config.dashboard_behavior"));
+  if (e.dashboard_start && !pi.has(e.dashboard_start))
+    throw new Error(n(void 0, "config.dashboard_start"));
 }
-function he(e) {
-  return li(e), {
-    type: e.type ?? xe,
+function ge(e) {
+  return vi(e), {
+    type: e.type ?? Re,
     recording_entity: e.recording_entity,
     live_entity: e.live_entity,
     snapshot_entity: e.snapshot_entity || void 0,
     name: e.name,
-    default_mode: e.default_mode ?? y.default_mode,
-    remember_last_mode: e.remember_last_mode ?? y.remember_last_mode,
-    autoplay_recording: e.autoplay_recording ?? y.autoplay_recording,
-    live_muted: e.live_muted ?? y.live_muted,
-    two_way_audio: e.two_way_audio ?? y.two_way_audio,
+    default_mode: e.default_mode ?? b.default_mode,
+    remember_last_mode: e.remember_last_mode ?? b.remember_last_mode,
+    autoplay_recording: e.autoplay_recording ?? b.autoplay_recording,
+    live_muted: e.live_muted ?? b.live_muted,
+    two_way_audio: e.two_way_audio ?? b.two_way_audio,
     doorbell_entity: e.doorbell_entity || void 0,
     door_entity: e.door_entity || void 0,
     door_contact_entity: e.door_contact_entity || void 0,
-    door_action: e.door_action ?? y.door_action,
-    door_control_visibility: e.door_control_visibility ?? y.door_control_visibility,
-    door_hold_to_activate: e.door_hold_to_activate ?? y.door_hold_to_activate,
-    show_name: e.show_name ?? y.show_name,
-    preview_source: e.preview_source ?? y.preview_source,
-    preview_fallback: e.preview_fallback ?? y.preview_fallback,
-    aspect_ratio: e.aspect_ratio ?? y.aspect_ratio,
-    fit_mode: e.fit_mode ?? y.fit_mode,
+    door_action: e.door_action ?? b.door_action,
+    door_control_visibility: e.door_control_visibility ?? b.door_control_visibility,
+    door_hold_to_activate: e.door_hold_to_activate ?? b.door_hold_to_activate,
+    dashboard_behavior: e.dashboard_behavior ?? b.dashboard_behavior,
+    dashboard_start: e.dashboard_start ?? b.dashboard_start,
+    dashboard_live_muted: e.dashboard_live_muted ?? b.dashboard_live_muted,
+    door_control_on_dashboard: e.door_control_on_dashboard ?? b.door_control_on_dashboard,
+    show_name: e.show_name ?? b.show_name,
+    preview_source: e.preview_source ?? b.preview_source,
+    preview_fallback: e.preview_fallback ?? b.preview_fallback,
+    aspect_ratio: e.aspect_ratio ?? b.aspect_ratio,
+    fit_mode: e.fit_mode ?? b.fit_mode,
     grid_options: e.grid_options
   };
 }
-function lt(e) {
+function ht(e) {
   switch (e) {
     case "16:9":
       return 16 / 9;
@@ -1023,18 +1067,18 @@ function lt(e) {
       return;
   }
 }
-function hi(e) {
+function gi(e) {
   return e === "auto" ? "16 / 9" : e.replace(":", " / ");
 }
-const Ce = "ring-view-live-entity", Ee = "ring-view-recording-entity", Re = "ring-view-mode", te = "ring-view-ringing-until";
-function ht() {
+const Te = "ring-view-live-entity", Le = "ring-view-recording-entity", Pe = "ring-view-mode", ne = "ring-view-ringing-until";
+function ut() {
   return `${window.location.pathname}${window.location.search}${window.location.hash}`;
 }
-function ue(e = window.location.search) {
-  const t = e instanceof URLSearchParams ? e : new URLSearchParams(e), i = t.get(Ce), o = t.get(Ee), r = t.get(Re);
+function fe(e = window.location.search) {
+  const t = e instanceof URLSearchParams ? e : new URLSearchParams(e), i = t.get(Te), o = t.get(Le), r = t.get(Pe);
   if (!i?.startsWith("camera.") || !o?.startsWith("camera.") || r !== "live" && r !== "last_recording")
     return;
-  const n = t.get(te), a = n === null ? void 0 : Number(n);
+  const s = t.get(ne), a = s === null ? void 0 : Number(s);
   return {
     liveEntity: i,
     recordingEntity: o,
@@ -1042,24 +1086,24 @@ function ue(e = window.location.search) {
     ringingUntil: a !== void 0 && Number.isFinite(a) ? a : void 0
   };
 }
-function pe(e, t) {
+function me(e, t) {
   return e?.liveEntity === t.live_entity && e.recordingEntity === t.recording_entity;
 }
-function ui(e, t) {
+function fi(e, t) {
   const i = new URL(e, window.location.origin);
-  return i.searchParams.set(Ce, t.liveEntity), i.searchParams.set(Ee, t.recordingEntity), i.searchParams.set(Re, t.mode), t.ringingUntil !== void 0 && t.ringingUntil > Date.now() ? i.searchParams.set(te, String(t.ringingUntil)) : i.searchParams.delete(te), `${i.pathname}${i.search}${i.hash}`;
+  return i.searchParams.set(Te, t.liveEntity), i.searchParams.set(Le, t.recordingEntity), i.searchParams.set(Pe, t.mode), t.ringingUntil !== void 0 && t.ringingUntil > Date.now() ? i.searchParams.set(ne, String(t.ringingUntil)) : i.searchParams.delete(ne), `${i.pathname}${i.search}${i.hash}`;
 }
-function ut(e) {
+function pt(e) {
   const t = new URL(e, window.location.origin);
-  return t.searchParams.delete(Ce), t.searchParams.delete(Ee), t.searchParams.delete(Re), t.searchParams.delete(te), `${t.pathname}${t.search}${t.hash}`;
+  return t.searchParams.delete(Te), t.searchParams.delete(Le), t.searchParams.delete(Pe), t.searchParams.delete(ne), `${t.pathname}${t.search}${t.hash}`;
 }
-function ve(e, t) {
+function _e(e, t) {
   try {
     const i = window.history.state && typeof window.history.state == "object" ? window.history.state : {};
     let o = i;
     if (t === null) {
-      const { refreshUrl: r, ...n } = i;
-      o = n;
+      const { refreshUrl: r, ...s } = i;
+      o = s;
     } else t !== void 0 && (o = { ...i, refreshUrl: t });
     window.history.replaceState(
       o,
@@ -1069,25 +1113,25 @@ function ve(e, t) {
   } catch {
   }
 }
-const Te = "ring-view-dialog", ge = 12e3;
+const Me = "ring-view-dialog", te = 12e3;
 let K;
-function pi(e) {
+function mi(e) {
   K = e;
 }
-function vi(e) {
+function _i(e) {
   K === e && (K = void 0);
 }
-function gi(e) {
+function bi(e) {
   return !e.restored || !K?.isOpenFor(e) ? !1 : (K.adoptRestoredDialog(e), !0);
 }
-function Fe(e, t) {
-  if (gi(t)) return;
-  const i = ut(ht());
-  ve(i), e.dispatchEvent(
+function ue(e, t) {
+  if (bi(t)) return;
+  const i = pt(ut());
+  _e(i), e.dispatchEvent(
     new CustomEvent("show-dialog", {
       detail: {
-        dialogTag: Te,
-        dialogImport: () => Promise.resolve().then(() => no),
+        dialogTag: Me,
+        dialogImport: () => Promise.resolve().then(() => Ji),
         dialogParams: { ...t, returnUrl: i },
         addHistory: !0
       },
@@ -1096,24 +1140,24 @@ function Fe(e, t) {
     })
   );
 }
-const fi = 9e3, Ke = /* @__PURE__ */ new WeakMap();
-function pt(e, t, i) {
+const wi = 9e3, We = /* @__PURE__ */ new WeakMap();
+function vt(e, t, i) {
   const o = t?.attributes.entity_picture;
   return typeof o == "string" && o.length > 0 ? e.hassUrl(o) : e.hassUrl(`/api/camera_proxy/${encodeURIComponent(i)}`);
 }
-async function mi(e, t, i, o) {
-  const r = await bi(e, t), n = r.includes("?") ? "&" : "?";
-  return `${r}${n}width=${je(i)}&height=${je(o)}`;
+async function yi(e, t, i, o) {
+  const r = await ki(e, t), s = r.includes("?") ? "&" : "?";
+  return `${r}${s}width=${Ze(i)}&height=${Ze(o)}`;
 }
-function je(e) {
+function Ze(e) {
   return Math.max(1, Math.ceil(Number.isFinite(e) ? e : 1));
 }
-async function bi(e, t) {
-  let i = Ke.get(e);
-  i || (i = /* @__PURE__ */ new Map(), Ke.set(e, i));
+async function ki(e, t) {
+  let i = We.get(e);
+  i || (i = /* @__PURE__ */ new Map(), We.set(e, i));
   const o = Date.now(), r = i.get(t);
   if (r && r.expiresAt > o) return r.promise;
-  const n = e.callWS({
+  const s = e.callWS({
     type: "auth/sign_path",
     path: `/api/camera_proxy/${encodeURIComponent(t)}`
   }).then((a) => {
@@ -1122,29 +1166,29 @@ async function bi(e, t) {
     return e.hassUrl(a.path);
   });
   i.set(t, {
-    expiresAt: o + fi,
-    promise: n
+    expiresAt: o + wi,
+    promise: s
   });
   try {
-    return await n;
+    return await s;
   } catch (a) {
     throw i.delete(t), a;
   }
 }
-function We(e) {
+function Ge(e) {
   return e === "live" ? h`<span class="mode-icon mode-icon-live" aria-hidden="true"></span>` : h`
     <svg class="mode-icon mode-icon-recording" viewBox="0 0 24 24" aria-hidden="true">
-      <path d=${yt}></path>
+      <path d=${$t}></path>
     </svg>
   `;
 }
-function _i(e, t) {
-  return s(
+function Ai(e, t) {
+  return n(
     t,
     e === "live" ? "common.live" : "common.last_recording"
   );
 }
-const wi = j`
+const $i = j`
   :host {
     display: block;
     min-width: 0;
@@ -1163,6 +1207,28 @@ const wi = j`
     box-shadow: var(--ha-card-box-shadow, none);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  ha-card.interactive {
+    cursor: default;
+  }
+
+  ha-card.safe-preview {
+    cursor: default;
+  }
+
+  .inline-shell {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 120px;
+    aspect-ratio: var(--ring-view-aspect-ratio, 16 / 9);
+    overflow: hidden;
+    background: #000;
+  }
+
+  :host([layout="grid"]) .inline-shell {
+    aspect-ratio: auto;
   }
 
   .preview {
@@ -1265,7 +1331,7 @@ const wi = j`
       display: none;
     }
   }
-`, yi = j`
+`, Si = j`
   :host {
     position: fixed;
     inset: 0;
@@ -1946,7 +2012,62 @@ const wi = j`
       width: 100%;
     }
   }
-`, ki = j`
+
+  :host([inline]) {
+    position: relative;
+    inset: auto;
+    z-index: auto;
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 120px;
+  }
+
+  :host([inline]) .dialog {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    transform: none;
+  }
+
+  :host([inline]) .body {
+    width: 100%;
+    height: 100%;
+  }
+
+  :host([inline]) .media-frame {
+    top: auto;
+    width: 100%;
+    height: 100%;
+    min-height: 120px;
+    max-height: none;
+    transform: none;
+  }
+
+  :host([inline]) .header {
+    min-height: 64px;
+    padding: 10px 10px 14px 16px;
+  }
+
+  :host([inline]) h2 {
+    max-width: 120px;
+  }
+
+  :host([inline]) .mode-switch {
+    top: 10px;
+  }
+
+  :host([inline]) .visitor-controls {
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+  }
+`, xi = j`
   :host {
     display: block;
     min-width: 0;
@@ -1963,471 +2084,120 @@ const wi = j`
     gap: 8px;
     margin: 0 0 12px;
   }
-`, Ai = 2, $i = 1;
-function _(e) {
+`, Ci = 2, Ei = 1;
+function w(e) {
   return !e || e.state === "unavailable" || e.state === "unknown";
 }
-function vt(e) {
-  return (Number(e?.attributes.supported_features ?? 0) & Ai) !== 0;
+function gt(e) {
+  return (Number(e?.attributes.supported_features ?? 0) & Ci) !== 0;
 }
-function fe(e, t) {
-  return e.entities?.[t]?.platform === "ring" && vt(e.states[t]);
+function be(e, t) {
+  return e.entities?.[t]?.platform === "ring" && gt(e.states[t]);
 }
-function J(e) {
-  return (Number(e?.attributes.supported_features ?? 0) & $i) !== 0;
+function ie(e) {
+  return (Number(e?.attributes.supported_features ?? 0) & Ei) !== 0;
 }
-function Si(e) {
+function Ri(e) {
   return !!(e?.attributes.video_url || e?.attributes.entity_picture);
 }
-function xi(e, t) {
+function Ti(e, t) {
   if (!e || !t) return [];
   const i = e.states[t.recording_entity], o = e.states[t.live_entity], r = [];
-  if (_(i) ? r.push({
+  if (w(i) ? r.push({
     kind: "recording",
-    message: s(e, "warning.unavailable", {
-      name: x(i, t.recording_entity)
+    message: n(e, "warning.unavailable", {
+      name: C(i, t.recording_entity)
     })
-  }) : Si(i) || r.push({
+  }) : Ri(i) || r.push({
     kind: "recording",
-    message: s(e, "warning.recording_media")
-  }), _(o) ? r.push({
+    message: n(e, "warning.recording_media")
+  }), w(o) ? r.push({
     kind: "live",
-    message: s(e, "warning.unavailable", {
-      name: x(o, t.live_entity)
+    message: n(e, "warning.unavailable", {
+      name: C(o, t.live_entity)
     })
-  }) : vt(o) ? t.two_way_audio && !fe(e, t.live_entity) && r.push({
+  }) : gt(o) ? t.two_way_audio && !be(e, t.live_entity) && r.push({
     kind: "talkback",
-    message: s(e, "warning.talkback_unsupported")
+    message: n(e, "warning.talkback_unsupported")
   }) : r.push({
     kind: "live",
-    message: s(e, "warning.live_stream")
+    message: n(e, "warning.live_stream")
   }), t.snapshot_entity && ["snapshot", "newest"].includes(t.preview_source)) {
-    const n = e.states[t.snapshot_entity];
-    _(n) && r.push({
+    const s = e.states[t.snapshot_entity];
+    w(s) && r.push({
       kind: "snapshot",
-      message: s(e, "warning.unavailable", {
-        name: x(n, t.snapshot_entity)
+      message: n(e, "warning.unavailable", {
+        name: C(s, t.snapshot_entity)
       })
     });
   } else ["snapshot", "newest"].includes(t.preview_source) && r.push({
     kind: "snapshot",
-    message: s(e, "warning.snapshot_required")
+    message: n(e, "warning.snapshot_required")
   });
   if (t.doorbell_entity) {
-    const n = e.states[t.doorbell_entity];
-    _(n) ? r.push({
+    const s = e.states[t.doorbell_entity];
+    w(s) ? r.push({
       kind: "doorbell",
-      message: s(e, "warning.unavailable", {
-        name: x(n, t.doorbell_entity)
+      message: n(e, "warning.unavailable", {
+        name: C(s, t.doorbell_entity)
       })
-    }) : Array.isArray(n?.attributes.event_types) && !n.attributes.event_types.includes("ring") && r.push({
+    }) : Array.isArray(s?.attributes.event_types) && !s.attributes.event_types.includes("ring") && r.push({
       kind: "doorbell",
-      message: s(e, "warning.doorbell_event")
+      message: n(e, "warning.doorbell_event")
     });
   }
   if (t.door_entity) {
-    const n = e.states[t.door_entity];
-    _(n) ? r.push({
+    const s = e.states[t.door_entity];
+    w(s) ? r.push({
       kind: "door",
-      message: s(e, "warning.unavailable", {
-        name: x(n, t.door_entity)
+      message: n(e, "warning.unavailable", {
+        name: C(s, t.door_entity)
       })
-    }) : t.door_action === "open" && !J(n) && r.push({
+    }) : t.door_action === "open" && !ie(s) && r.push({
       kind: "door",
-      message: s(e, "warning.door_open_unsupported")
+      message: n(e, "warning.door_open_unsupported")
     });
   }
   if (t.door_contact_entity) {
-    const n = e.states[t.door_contact_entity];
-    _(n) && r.push({
+    const s = e.states[t.door_contact_entity];
+    w(s) && r.push({
       kind: "door_contact",
-      message: s(e, "warning.unavailable", {
-        name: x(n, t.door_contact_entity)
+      message: n(e, "warning.unavailable", {
+        name: C(s, t.door_contact_entity)
       })
     });
   }
   return customElements.get("ha-camera-stream") || r.push({
     kind: "compatibility",
-    message: s(e, "warning.compatibility")
+    message: n(e, "warning.compatibility")
   }), r;
 }
-function x(e, t) {
+function C(e, t) {
   return e?.attributes.friendly_name || t;
 }
-const Ci = "ring-view:mode:";
-function gt(e) {
-  return `${Ci}${e.recording_entity}|${e.live_entity}`;
+const Li = "ring-view:mode:";
+function ft(e) {
+  return `${Li}${e.recording_entity}|${e.live_entity}`;
 }
-function de(e) {
+function Q(e) {
   if (!e.remember_last_mode) return e.default_mode;
   try {
-    const t = window.localStorage.getItem(gt(e));
+    const t = window.localStorage.getItem(ft(e));
     return t === "live" || t === "last_recording" ? t : e.default_mode;
   } catch {
     return e.default_mode;
   }
 }
-function Ei(e, t) {
+function Pi(e, t) {
   if (e.remember_last_mode)
     try {
-      window.localStorage.setItem(gt(e), t);
+      window.localStorage.setItem(ft(e), t);
     } catch {
     }
 }
-const Ri = [
-  "timestamp",
-  "capture_timestamp",
-  "captured_at",
-  "recorded_at",
-  "last_recording_at",
-  "recording_timestamp"
-];
-function Ti(e) {
-  if (typeof e == "number")
-    return !Number.isFinite(e) || e <= 0 ? void 0 : e < 1e12 ? e * 1e3 : e;
-  if (typeof e != "string" || e.trim() === "") return;
-  const t = Number(e);
-  if (Number.isFinite(t) && t > 0)
-    return t < 1e12 ? t * 1e3 : t;
-  const i = Date.parse(e);
-  return Number.isFinite(i) && i > 0 ? i : void 0;
-}
-function me(e) {
-  if (e)
-    for (const t of Ri) {
-      const i = Ti(e.attributes[t]);
-      if (i !== void 0) return i;
-    }
-}
-function Pi(e) {
-  if (e)
-    for (const t of ["last_video_id", "video_url", "entity_picture"]) {
-      const i = e.attributes[t];
-      if (typeof i == "string" && i !== "") return `${t}:${i}`;
-      if (typeof i == "number" && Number.isFinite(i)) return `${t}:${i}`;
-    }
-}
-function Mi(e, t, i) {
-  const o = t.recording_entity, r = t.snapshot_entity;
-  if (!r) return o;
-  const n = e.states[o], a = e.states[r], l = !_(n), d = !_(a);
-  if (l && !d) return o;
-  if (d && !l) return r;
-  if (l && d) {
-    const u = me(n), v = me(a);
-    if (u !== void 0 && v !== void 0)
-      return u !== v ? v > u ? r : o : t.preview_fallback === "snapshot" ? r : o;
-    if (i !== void 0)
-      return i === "snapshot" ? r : o;
-  }
-  return t.preview_fallback === "snapshot" ? r : o;
-}
-function Li(e, t, i, o) {
-  switch (t.preview_source) {
-    case "live":
-      return t.live_entity;
-    case "snapshot":
-      return t.snapshot_entity ?? t.recording_entity;
-    case "newest":
-      return Mi(e, t, o);
-    case "default":
-      return i === "live" ? t.live_entity : t.recording_entity;
-    default:
-      return t.recording_entity;
-  }
-}
-var Di = Object.defineProperty, Ii = Object.getOwnPropertyDescriptor, V = (e, t, i, o) => {
-  for (var r = o > 1 ? void 0 : o ? Ii(t, i) : t, n = e.length - 1, a; n >= 0; n--)
-    (a = e[n]) && (r = (o ? a(t, i, r) : a(r)) || r);
-  return o && r && Di(t, i, r), r;
-};
-const Vi = 1e4, Hi = 640, Oi = 16 / 9, Ze = 16, Ui = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
-  Qt
-)}`;
-let E = class extends C {
-  constructor() {
-    super(...arguments), this.previewFailed = !1, this.ringAlertVisible = !1, this.previewIntersecting = !1, this.previewVisible = !1, this.previewRequestId = 0, this.lastRingAlertAt = 0, this.previewMarkersInitialized = !1, this.openViewer = () => {
-      this.updateRingAlert();
-      const e = this.renderRoot.querySelector(".preview") ?? void 0;
-      Fe(e ?? this, {
-        config: this.config,
-        mode: this.ringAlertVisible ? "live" : de(this.config),
-        opener: e,
-        ringingUntil: this.ringAlertVisible ? this.lastRingAlertAt + ge : void 0
-      });
-    }, this.handleKeyDown = (e) => {
-      e.key !== "Enter" && e.key !== " " || (e.preventDefault(), this.openViewer());
-    }, this.handlePreviewError = () => {
-      this.previewFailed = !0;
-    }, this.handleDocumentVisibility = () => {
-      this.updatePreviewVisibility();
-    };
-  }
-  static async getConfigElement() {
-    return await Promise.resolve().then(() => uo), document.createElement("ring-view-editor");
-  }
-  static getStubConfig(e) {
-    const t = Object.keys(e?.states ?? {}).filter((r) => r.startsWith("camera.")), i = t.find(
-      (r) => (Number(e?.states[r]?.attributes.supported_features ?? 0) & 2) !== 0
-    ) ?? t.find((r) => /live(_view)?$/i.test(r)) ?? t[1] ?? "camera.live_view", o = t.find(
-      (r) => r !== i && (Number(e?.states[r]?.attributes.supported_features ?? 0) & 2) === 0
-    ) ?? t.find((r) => r !== i) ?? t[0] ?? "camera.latest_recording";
-    return {
-      type: xe,
-      recording_entity: o,
-      live_entity: i
-    };
-  }
-  setConfig(e) {
-    const t = he(e);
-    (t.recording_entity !== this.config?.recording_entity || t.snapshot_entity !== this.config?.snapshot_entity) && (this.previewMarkersInitialized = !1, this.recordingMarker = void 0, this.snapshotTimestamp = void 0, this.latestObservedPreviewSource = void 0), this.config = t;
-  }
-  getCardSize() {
-    return 3;
-  }
-  getGridOptions() {
-    return {
-      columns: 12,
-      rows: 3,
-      min_columns: 6,
-      min_rows: 2,
-      ...this.config?.grid_options
-    };
-  }
-  connectedCallback() {
-    super.connectedCallback(), this.updateRingAlert(), this.updateComplete.then(() => {
-      this.isConnected && !this.isInCardPicker() && this.setupPreviewLifecycle();
-    });
-  }
-  disconnectedCallback() {
-    this.teardownPreviewLifecycle(), this.clearRingAlertTimer(), this.restoreViewerTimer !== void 0 && (window.clearTimeout(this.restoreViewerTimer), this.restoreViewerTimer = void 0), super.disconnectedCallback();
-  }
-  shouldUpdate(e) {
-    for (const i of e.keys())
-      if (i !== "hass") return !0;
-    if (!e.has("hass") || !this.hass || !this.config) return !1;
-    const t = e.get("hass");
-    return t ? t.language !== this.hass.language || t.locale?.language !== this.hass.locale?.language || t.states[this.config.recording_entity] !== this.hass.states[this.config.recording_entity] || t.states[this.config.live_entity] !== this.hass.states[this.config.live_entity] || this.config.snapshot_entity !== void 0 && t.states[this.config.snapshot_entity] !== this.hass.states[this.config.snapshot_entity] || this.config.doorbell_entity !== void 0 && t.states[this.config.doorbell_entity] !== this.hass.states[this.config.doorbell_entity] || this.config.door_entity !== void 0 && t.states[this.config.door_entity] !== this.hass.states[this.config.door_entity] || this.config.door_contact_entity !== void 0 && t.states[this.config.door_contact_entity] !== this.hass.states[this.config.door_contact_entity] : !0;
-  }
-  willUpdate(e) {
-    if (!this.hass || !this.config || (this.observePreviewMedia(), this.detectDoorbellEvent(e.get("hass")), this.isInCardPicker())) return;
-    const t = this.previewEntityId(), i = pt(this.hass, this.hass.states[t], t);
-    (t !== this.activePreviewEntityId || i !== this.lastFallbackPoster) && (this.activePreviewEntityId = t, this.lastFallbackPoster = i, this.lastPoster = i, this.lastPreviewSize = void 0, this.previewRequestId += 1, this.previewFailed = !1);
-  }
-  updated(e) {
-    const t = e.has("config");
-    !this.isInCardPicker() && (e.has("hass") || t) && this.previewVisible && this.refreshPreview(!0), !this.isInCardPicker() && this.hass && this.config && this.scheduleViewerRestore();
-  }
-  render() {
-    if (!this.hass || !this.config) return c;
-    const e = this.previewEntityId(), t = this.hass.states[e], i = this.config.name || x(
-      this.hass.states[this.config.recording_entity],
-      s(this.hass, "common.camera")
-    ), o = this.ringAlertVisible ? "live" : de(this.config), r = this.isInCardPicker(), n = r ? !1 : _(t), a = {
-      "--ring-view-aspect-ratio": hi(this.config.aspect_ratio),
-      "--ring-view-fit-mode": this.config.fit_mode
-    };
-    return h`
-      <ha-card>
-        <div
-          class="preview"
-          style=${dt(a)}
-          role="button"
-          tabindex="0"
-          aria-label=${s(this.hass, "card.open_viewer", {
-      name: i,
-      mode: _i(o, this.hass)
-    })}
-          title=${s(
-      this.hass,
-      o === "live" ? "card.open_live" : "card.open_recording"
-    )}
-          @click=${this.openViewer}
-          @keydown=${this.handleKeyDown}
-        >
-          ${!n && !this.previewFailed ? h`
-                <img
-                  src=${r ? Ui : this.lastPoster ?? ""}
-                  alt=${s(this.hass, "card.preview_alt", { name: i })}
-                  @error=${this.handlePreviewError}
-                />
-              ` : h`<div class="placeholder">
-                ${s(this.hass, "card.preview_unavailable")}
-              </div>`}
-          ${this.config.show_name ? h`<div class="name">${i}</div>` : c}
-          ${this.ringAlertVisible ? h`<div class="ring-alert" role="status">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d=${Qe}></path>
-                </svg>
-                <span>${s(this.hass, "ring.alert")}</span>
-              </div>` : c}
-        </div>
-      </ha-card>
-    `;
-  }
-  previewEntityId() {
-    return Li(
-      this.hass,
-      this.config,
-      de(this.config),
-      this.latestObservedPreviewSource
-    );
-  }
-  observePreviewMedia() {
-    const e = Pi(
-      this.hass?.states[this.config.recording_entity]
-    ), t = me(
-      this.config.snapshot_entity ? this.hass?.states[this.config.snapshot_entity] : void 0
-    );
-    if (!this.previewMarkersInitialized) {
-      this.previewMarkersInitialized = !0, this.recordingMarker = e, this.snapshotTimestamp = t;
-      return;
-    }
-    const i = e !== void 0 && e !== this.recordingMarker, o = t !== void 0 && t !== this.snapshotTimestamp;
-    i !== o ? this.latestObservedPreviewSource = i ? "last_recording" : "snapshot" : i && (this.latestObservedPreviewSource = void 0), this.recordingMarker = e, this.snapshotTimestamp = t;
-  }
-  scheduleViewerRestore() {
-    if (this.restoreViewerTimer !== void 0 || !this.config) return;
-    const e = ue();
-    pe(e, this.config) && (this.restoreViewerTimer = window.setTimeout(() => {
-      if (this.restoreViewerTimer = void 0, !this.isConnected || !this.hass || !this.config) return;
-      const t = ue();
-      if (!pe(t, this.config)) return;
-      const i = this.renderRoot.querySelector(".preview") ?? void 0;
-      Fe(i ?? this, {
-        config: this.config,
-        mode: t.mode,
-        opener: i,
-        restored: !0,
-        ringingUntil: t.ringingUntil !== void 0 && t.ringingUntil > Date.now() ? t.ringingUntil : void 0
-      });
-    }, 0));
-  }
-  detectDoorbellEvent(e) {
-    const t = this.config?.doorbell_entity;
-    if (!t || !e || !this.hass) return;
-    const i = e.states[t], o = this.hass.states[t];
-    if (!o || i?.state === o.state || ["unknown", "unavailable"].includes(o.state) || o.attributes.event_type !== void 0 && o.attributes.event_type !== "ring")
-      return;
-    const r = Date.now();
-    r - this.lastRingAlertAt < 5e3 || (this.lastRingAlertAt = r, this.updateRingAlert());
-  }
-  updateRingAlert() {
-    this.clearRingAlertTimer();
-    const e = this.lastRingAlertAt + ge - Date.now();
-    this.ringAlertVisible = this.lastRingAlertAt > 0 && e > 0, this.ringAlertVisible && this.isConnected && (this.ringAlertTimer = window.setTimeout(() => this.updateRingAlert(), e));
-  }
-  clearRingAlertTimer() {
-    this.ringAlertTimer !== void 0 && (window.clearTimeout(this.ringAlertTimer), this.ringAlertTimer = void 0);
-  }
-  setupPreviewLifecycle() {
-    if (this.isInCardPicker() || this.previewIntersectionObserver || this.previewResizeObserver) return;
-    const e = this.renderRoot.querySelector(".preview");
-    e && (typeof IntersectionObserver > "u" ? this.previewIntersecting = !0 : (this.previewIntersectionObserver = new IntersectionObserver((t) => {
-      const i = t[t.length - 1];
-      i && (this.previewIntersecting = i.isIntersecting || i.intersectionRatio > 0, this.updatePreviewVisibility());
-    }), this.previewIntersectionObserver.observe(e)), typeof ResizeObserver < "u" && (this.previewResizeObserver = new ResizeObserver(() => {
-      !this.previewVisible || this.previewResizeFrame !== void 0 || (this.previewResizeFrame = window.requestAnimationFrame(() => {
-        this.previewResizeFrame = void 0, this.refreshPreview(!1);
-      }));
-    }), this.previewResizeObserver.observe(e)), document.addEventListener("visibilitychange", this.handleDocumentVisibility), this.updatePreviewVisibility());
-  }
-  teardownPreviewLifecycle() {
-    this.previewIntersectionObserver?.disconnect(), this.previewResizeObserver?.disconnect(), this.previewIntersectionObserver = void 0, this.previewResizeObserver = void 0, document.removeEventListener("visibilitychange", this.handleDocumentVisibility), this.stopPreviewRefreshTimer(), this.previewResizeFrame !== void 0 && (window.cancelAnimationFrame(this.previewResizeFrame), this.previewResizeFrame = void 0), this.previewVisible = !1, this.previewIntersecting = !1, this.previewRequestId += 1;
-  }
-  updatePreviewVisibility() {
-    if (this.isInCardPicker()) return;
-    const e = this.previewIntersecting && document.visibilityState !== "hidden";
-    if (e !== this.previewVisible) {
-      if (this.previewVisible = e, e) {
-        this.refreshPreview(!0), this.previewRefreshTimer = window.setInterval(() => {
-          this.refreshPreview(!0);
-        }, Vi);
-        return;
-      }
-      this.stopPreviewRefreshTimer(), this.previewRequestId += 1;
-    }
-  }
-  stopPreviewRefreshTimer() {
-    this.previewRefreshTimer !== void 0 && (window.clearInterval(this.previewRefreshTimer), this.previewRefreshTimer = void 0);
-  }
-  async refreshPreview(e) {
-    if (this.isInCardPicker() || !this.previewVisible || !this.hass || !this.config) return;
-    const t = this.renderRoot.querySelector(".preview");
-    if (!t) return;
-    const i = Math.max(1, window.devicePixelRatio || 1), o = t.clientWidth || t.getBoundingClientRect().width, r = o > 0 ? o : Hi, n = t.clientHeight || t.getBoundingClientRect().height, a = lt(this.config.aspect_ratio) ?? Oi, l = n > 0 ? n : r / a, d = Math.ceil(r * i), u = Math.ceil(l * i);
-    if (!e && this.lastPreviewSize && Math.abs(d - this.lastPreviewSize.width) < Ze && Math.abs(u - this.lastPreviewSize.height) < Ze)
-      return;
-    this.lastPreviewSize = { width: d, height: u };
-    const v = this.previewEntityId(), g = this.hass, A = ++this.previewRequestId;
-    try {
-      const S = await mi(g, v, d, u);
-      if (A !== this.previewRequestId || !this.isConnected || !this.previewVisible || this.previewEntityId() !== v)
-        return;
-      this.lastPoster = S, this.previewFailed = !1;
-    } catch {
-    }
-  }
-  /**
-   * Home Assistant mounts picker previews inside `hui-card-picker`. Keep that
-   * catalog surface representative without exposing a user's camera image.
-   * The standard `preview` property is also used while editing dashboards, so
-   * the ancestor check intentionally distinguishes the picker from edit mode.
-   */
-  isInCardPicker() {
-    let e = this.parentNode ?? this.getRootNode();
-    for (; e; ) {
-      if (e instanceof Element && e.localName === "hui-card-picker") return !0;
-      e = e instanceof ShadowRoot ? e.host : e.parentNode;
-    }
-    return !1;
-  }
-};
-E.styles = wi;
-V([
-  b({ attribute: !1 })
-], E.prototype, "hass", 2);
-V([
-  b({ reflect: !0 })
-], E.prototype, "layout", 2);
-V([
-  p()
-], E.prototype, "config", 2);
-V([
-  p()
-], E.prototype, "previewFailed", 2);
-V([
-  p()
-], E.prototype, "lastPoster", 2);
-V([
-  p()
-], E.prototype, "ringAlertVisible", 2);
-E = V([
-  Z(le)
-], E);
-window.customCards = window.customCards || [];
-window.customCards.some((e) => e.type === le) || window.customCards.push({
-  type: le,
-  name: ii,
-  description: s(void 0, "card.description"),
-  preview: !0,
-  getEntitySuggestion: (e, t) => {
-    if (!t.startsWith("camera.")) return null;
-    const i = Object.keys(e.states).find(
-      (o) => o !== t && o.startsWith("camera.") && /live(_view)?$/i.test(o)
-    );
-    return i ? {
-      config: {
-        type: xe,
-        recording_entity: t,
-        live_entity: i
-      }
-    } : null;
-  }
-});
-const O = $e(class extends Se {
+const O = Ce(class extends Ee {
   constructor(e) {
-    if (super(e), e.type !== st.ATTRIBUTE || e.name !== "class" || e.strings?.length > 2) throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.");
+    if (super(e), e.type !== dt.ATTRIBUTE || e.name !== "class" || e.strings?.length > 2) throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.");
   }
   render(e) {
     return " " + Object.keys(e).filter((t) => e[t]).join(" ") + " ";
@@ -2444,28 +2214,28 @@ const O = $e(class extends Se {
       const r = !!t[o];
       r === this.st.has(o) || this.nt?.has(o) || (r ? (i.add(o), this.st.add(o)) : (i.remove(o), this.st.delete(o)));
     }
-    return P;
+    return L;
   }
 });
-const zi = {}, qi = (e, t = zi) => e._$AH = t;
-const Ge = $e(class extends Se {
+const Mi = {}, Di = (e, t = Mi) => e._$AH = t;
+const Ye = Ce(class extends Ee {
   constructor() {
-    super(...arguments), this.key = c;
+    super(...arguments), this.key = l;
   }
   render(e, t) {
     return this.key = e, t;
   }
   update(e, [t, i]) {
-    return t !== this.key && (qi(e), this.key = t), i;
+    return t !== this.key && (Di(e), this.key = t), i;
   }
 });
-var Ni = Object.defineProperty, Bi = Object.getOwnPropertyDescriptor, R = (e, t, i, o) => {
-  for (var r = o > 1 ? void 0 : o ? Bi(t, i) : t, n = e.length - 1, a; n >= 0; n--)
-    (a = e[n]) && (r = (o ? a(t, i, r) : a(r)) || r);
-  return o && r && Ni(t, i, r), r;
+var Ii = Object.defineProperty, Vi = Object.getOwnPropertyDescriptor, R = (e, t, i, o) => {
+  for (var r = o > 1 ? void 0 : o ? Vi(t, i) : t, s = e.length - 1, a; s >= 0; s--)
+    (a = e[s]) && (r = (o ? a(t, i, r) : a(r)) || r);
+  return o && r && Ii(t, i, r), r;
 };
-const ie = "ha-camera-stream", Fi = 8e3, Ye = "ring-view-native-layout";
-async function Ki(e, t) {
+const se = "ha-camera-stream", Hi = 8e3, Qe = "ring-view-native-layout";
+async function Oi(e, t) {
   if (customElements.get(e)) return !0;
   let i;
   try {
@@ -2481,17 +2251,17 @@ async function Ki(e, t) {
     i !== void 0 && window.clearTimeout(i);
   }
 }
-async function ft() {
-  if (customElements.get(ie)) return !0;
+async function mt() {
+  if (customElements.get(se)) return !0;
   try {
     await (await window.loadCardHelpers?.())?.importMoreInfoControl?.("camera");
   } catch {
   }
-  return Ki(ie, Fi);
+  return Oi(se, Hi);
 }
-let $ = class extends C {
+let $ = class extends E {
   constructor() {
-    super(...arguments), this.controls = !0, this.muted = !0, this.allowExoPlayer = !0, this.fitMode = "cover", this.passiveSurface = !1, this.nativeAvailable = !!customElements.get(ie), this.handledStreamEvents = /* @__PURE__ */ new WeakSet(), this.ready = !1, this.handleSurfaceClick = (e) => {
+    super(...arguments), this.controls = !0, this.muted = !0, this.allowExoPlayer = !0, this.fitMode = "cover", this.passiveSurface = !1, this.nativeAvailable = !!customElements.get(se), this.handledStreamEvents = /* @__PURE__ */ new WeakSet(), this.ready = !1, this.handleSurfaceClick = (e) => {
       if (!this.passiveSurface || e.detail === 0 || !this.eventHost) return;
       const t = this.eventHost.getBoundingClientRect(), i = this.controls ? 64 : 0;
       e.clientY >= t.bottom - i || (e.preventDefault(), e.stopImmediatePropagation());
@@ -2526,7 +2296,7 @@ let $ = class extends C {
     this.detachEventListeners(), this.replaceChildren(), super.disconnectedCallback();
   }
   render() {
-    return !this.nativeAvailable || !this.stateObj ? c : h`
+    return !this.nativeAvailable || !this.stateObj ? l : h`
       <ha-camera-stream
         .stateObj=${this.stateObj}
         .controls=${this.controls}
@@ -2539,11 +2309,11 @@ let $ = class extends C {
   }
   updated() {
     if (!this.nativeAvailable) return;
-    const e = this.renderRoot.querySelector(ie);
+    const e = this.renderRoot.querySelector(se);
     e && this.attachEventListeners(e);
   }
   async loadNativeComponent() {
-    const e = await ft();
+    const e = await mt();
     if (this.isConnected) {
       if (!e) {
         this.dispatchFailure("component-unavailable");
@@ -2563,9 +2333,9 @@ let $ = class extends C {
     }), this.mediaObserver.observe(t, { childList: !0, subtree: !0 }), this.prepareNativeRoot(t), this.detectReadyMedia(t));
   }
   prepareNativeRoot(e) {
-    if (e.getElementById(Ye)) return;
+    if (e.getElementById(Qe)) return;
     const t = document.createElement("style");
-    t.id = Ye, t.textContent = `
+    t.id = Qe, t.textContent = `
       :host {
         display: block;
         width: 100%;
@@ -2634,48 +2404,48 @@ $.styles = j`
     }
   `;
 R([
-  b({ attribute: !1 })
+  _({ attribute: !1 })
 ], $.prototype, "stateObj", 2);
 R([
-  b({ type: Boolean })
+  _({ type: Boolean })
 ], $.prototype, "controls", 2);
 R([
-  b({ type: Boolean })
+  _({ type: Boolean })
 ], $.prototype, "muted", 2);
 R([
-  b({ type: Boolean, attribute: "allow-exoplayer" })
+  _({ type: Boolean, attribute: "allow-exoplayer" })
 ], $.prototype, "allowExoPlayer", 2);
 R([
-  b({ type: Number, attribute: !1 })
+  _({ type: Number, attribute: !1 })
 ], $.prototype, "aspectRatio", 2);
 R([
-  b({ attribute: !1 })
+  _({ attribute: !1 })
 ], $.prototype, "fitMode", 2);
 R([
-  b({ type: Boolean, attribute: "passive-surface" })
+  _({ type: Boolean, attribute: "passive-surface" })
 ], $.prototype, "passiveSurface", 2);
 R([
-  p()
+  u()
 ], $.prototype, "nativeAvailable", 2);
 $ = R([
   Z("ring-view-native-camera-adapter")
 ], $);
-const ji = (e) => e ?? c;
-var Wi = Object.defineProperty, Zi = Object.getOwnPropertyDescriptor, k = (e, t, i, o) => {
-  for (var r = o > 1 ? void 0 : o ? Zi(t, i) : t, n = e.length - 1, a; n >= 0; n--)
-    (a = e[n]) && (r = (o ? a(t, i, r) : a(r)) || r);
-  return o && r && Wi(t, i, r), r;
+const Ui = (e) => e ?? l;
+var zi = Object.defineProperty, qi = Object.getOwnPropertyDescriptor, k = (e, t, i, o) => {
+  for (var r = o > 1 ? void 0 : o ? qi(t, i) : t, s = e.length - 1, a; s >= 0; s--)
+    (a = e[s]) && (r = (o ? a(t, i, r) : a(r)) || r);
+  return o && r && zi(t, i, r), r;
 };
-const Gi = 3e3;
-function Yi(e, t) {
+const Bi = 3e3;
+function Ni(e, t) {
   if (t instanceof DOMException) {
-    if (t.name === "NotAllowedError") return s(e, "talkback.permission_denied");
-    if (t.name === "NotFoundError") return s(e, "talkback.no_microphone");
-    if (t.name === "NotReadableError") return s(e, "talkback.microphone_busy");
+    if (t.name === "NotAllowedError") return n(e, "talkback.permission_denied");
+    if (t.name === "NotFoundError") return n(e, "talkback.no_microphone");
+    if (t.name === "NotReadableError") return n(e, "talkback.microphone_busy");
   }
   return t instanceof Error ? t.message : String(t);
 }
-let w = class extends C {
+let y = class extends E {
   constructor() {
     super(...arguments), this.entityId = "", this.muted = !1, this.fitMode = "cover", this.externalControls = !1, this.microphoneState = "not-requested", this.connectionState = "starting", this.statusMessage = "", this.actualMuted = !1, this.playbackBlocked = !1, this.readyDispatched = !1, this.connectionToken = 0, this.startAttempted = !1, this.pendingLocalCandidates = [], this.pendingRemoteCandidates = [], this.playbackRequestPending = !1, this.startQueued = !1, this.keyboardPressed = !1, this.externalPressed = !1, this.pressToken = 0, this.stopTalking = () => {
       const e = this.externalPressed;
@@ -2696,7 +2466,7 @@ let w = class extends C {
       if (this.microphoneRequest)
         return this.microphoneRequest;
       if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia)
-        return this.microphoneState = "unsupported", this.showStatusMessage(s(this.hass, "talkback.https_required")), !1;
+        return this.microphoneState = "unsupported", this.showStatusMessage(n(this.hass, "talkback.https_required")), !1;
       const e = this.connectionToken;
       this.microphoneState = "requesting", this.showStatusMessage("");
       const t = (async () => {
@@ -2713,12 +2483,12 @@ let w = class extends C {
           }), e !== this.connectionToken || !this.audioSender)
             return i.getTracks().forEach((r) => r.stop()), !1;
           const o = i.getAudioTracks()[0];
-          if (!o) throw new Error(s(this.hass, "talkback.no_microphone"));
+          if (!o) throw new Error(n(this.hass, "talkback.no_microphone"));
           return o.enabled = !1, o.addEventListener("ended", () => {
-            e !== this.connectionToken || this.localStream !== i || (this.cancelActivePress(), this.localStream = void 0, this.microphoneState = "failed", this.showStatusMessage(s(this.hass, "talkback.microphone_ended")));
+            e !== this.connectionToken || this.localStream !== i || (this.cancelActivePress(), this.localStream = void 0, this.microphoneState = "failed", this.showStatusMessage(n(this.hass, "talkback.microphone_ended")));
           }), await this.audioSender.replaceTrack(o), e !== this.connectionToken ? (i.getTracks().forEach((r) => r.stop()), !1) : (this.localStream?.getTracks().forEach((r) => r.stop()), this.localStream = i, this.microphoneState = "ready", this.showStatusMessage(""), !0);
         } catch (o) {
-          return i?.getTracks().forEach((r) => r.stop()), e !== this.connectionToken || (this.microphoneState = "failed", this.showStatusMessage(Yi(this.hass, o))), !1;
+          return i?.getTracks().forEach((r) => r.stop()), e !== this.connectionToken || (this.microphoneState = "failed", this.showStatusMessage(Ni(this.hass, o))), !1;
         }
       })();
       this.microphoneRequest = t;
@@ -2797,30 +2567,30 @@ let w = class extends C {
     }));
   }
   render() {
-    const e = this.microphoneState === "active", t = this.microphoneState === "requesting", i = this.connectionState === "connected", o = `--ring-view-talkback-fit-mode: ${this.fitMode}`, r = t ? s(this.hass, "talkback.requesting_microphone") : e ? s(this.hass, "talkback.release_to_stop") : s(this.hass, "talkback.hold_to_talk");
+    const e = this.microphoneState === "active", t = this.microphoneState === "requesting", i = this.connectionState === "connected", o = `--ring-view-talkback-fit-mode: ${this.fitMode}`, r = t ? n(this.hass, "talkback.requesting_microphone") : e ? n(this.hass, "talkback.release_to_stop") : n(this.hass, "talkback.hold_to_talk");
     return h`
       <video
         style=${o}
         autoplay
         playsinline
         controls
-        poster=${ji(this.poster)}
+        poster=${Ui(this.poster)}
         .muted=${this.actualMuted}
         @playing=${this.handlePlaying}
       ></video>
       ${this.playbackBlocked ? h`
         <button class="playback-resume" type="button" tabindex="0" @click=${this.resumePlayback}>
-          ${this.icon(ce)}
-          <span>${s(this.hass, "viewer.resume_live")}</span>
+          ${this.icon(X)}
+          <span>${n(this.hass, "viewer.resume_live")}</span>
         </button>
-      ` : c}
+      ` : l}
       ${!this.externalControls && i && this.readyDispatched && !this.playbackBlocked ? h`<div class="talkback-controls">
         <button
           class=${O({ "talk-button": !0, active: e })}
           type="button"
           aria-label=${r}
           aria-pressed=${String(e)}
-          @contextmenu=${(n) => n.preventDefault()}
+          @contextmenu=${(s) => s.preventDefault()}
           @pointerdown=${this.handleTalkPointerDown}
           @pointerup=${this.handleTalkPointerEnd}
           @pointercancel=${this.handleTalkPointerEnd}
@@ -2828,13 +2598,13 @@ let w = class extends C {
           @keydown=${this.handleTalkKeyDown}
           @keyup=${this.handleTalkKeyUp}
         >
-          ${this.icon(e ? Xe : et)}
+          ${this.icon(e ? tt : it)}
           <span>${r}</span>
         </button>
-      </div>` : c}
+      </div>` : l}
       ${this.statusMessage && !this.playbackBlocked ? h`<div class="session-status" role="status" aria-live="polite">
             ${this.statusMessage}
-          </div>` : c}
+          </div>` : l}
     `;
   }
   async restartSession() {
@@ -2844,7 +2614,7 @@ let w = class extends C {
   async startSession() {
     if (this.startAttempted || !this.hass || !this.entityId) return;
     if (!this.hass.connection || typeof RTCPeerConnection > "u") {
-      this.dispatchFailure(s(this.hass, "talkback.webrtc_unavailable"));
+      this.dispatchFailure(n(this.hass, "talkback.webrtc_unavailable"));
       return;
     }
     this.startAttempted = !0, this.startedEntityId = this.entityId;
@@ -2853,7 +2623,7 @@ let w = class extends C {
       this.requestLiveResume();
       return;
     }
-    this.signalingConnection = t, t.addEventListener?.("disconnected", this.requestLiveResume), this.connectionState = "starting", this.microphoneState = "not-requested", this.showStatusMessage(s(this.hass, "talkback.connecting")), this.readyDispatched = !1, this.playbackBlocked = !1, this.pendingLocalCandidates = [], this.pendingRemoteCandidates = [], this.sessionId = void 0;
+    this.signalingConnection = t, t.addEventListener?.("disconnected", this.requestLiveResume), this.connectionState = "starting", this.microphoneState = "not-requested", this.showStatusMessage(n(this.hass, "talkback.connecting")), this.readyDispatched = !1, this.playbackBlocked = !1, this.pendingLocalCandidates = [], this.pendingRemoteCandidates = [], this.sessionId = void 0;
     try {
       const i = await this.hass.callWS({
         type: "camera/webrtc/get_client_config",
@@ -2868,8 +2638,8 @@ let w = class extends C {
         direction: "sendrecv"
       });
       this.audioSender = r.sender, o.addTransceiver("video", { direction: "recvonly" });
-      const n = await o.createOffer();
-      if (await o.setLocalDescription(n), e !== this.connectionToken || !o.localDescription?.sdp) return;
+      const s = await o.createOffer();
+      if (await o.setLocalDescription(s), e !== this.connectionToken || !o.localDescription?.sdp) return;
       this.unsubscribePromise = Promise.resolve(
         t.subscribeMessage(
           (a) => {
@@ -2919,7 +2689,7 @@ let w = class extends C {
         else if (e.type === "candidate") {
           const i = e.candidate.sdpMid != null || e.candidate.sdpMLineIndex != null ? e.candidate : { ...e.candidate, sdpMid: "0" };
           this.peerConnection.remoteDescription ? await this.peerConnection.addIceCandidate(i) : this.pendingRemoteCandidates.push(i);
-        } else e.type === "error" && this.fail(e.message || e.code || s(this.hass, "viewer.live_failed"));
+        } else e.type === "error" && this.fail(e.message || e.code || n(this.hass, "viewer.live_failed"));
       } catch (i) {
         t === this.connectionToken && this.fail(i instanceof Error ? i.message : String(i));
       }
@@ -2969,7 +2739,7 @@ let w = class extends C {
     i && (i.srcObject !== this.remoteStream && (i.srcObject = this.remoteStream), e.track.kind === "video" && i.play().catch(() => this.retryPlaybackMuted(i, t)));
   }
   retryPlaybackMuted(e, t) {
-    t === this.connectionToken && (this.actualMuted = !0, e.muted = !0, this.showStatusMessage(s(this.hass, "talkback.playback_muted")), queueMicrotask(() => {
+    t === this.connectionToken && (this.actualMuted = !0, e.muted = !0, this.showStatusMessage(n(this.hass, "talkback.playback_muted")), queueMicrotask(() => {
       t !== this.connectionToken || !e.isConnected || e.play().catch((i) => {
         t === this.connectionToken && this.handlePlaybackRejection(i);
       });
@@ -2983,10 +2753,10 @@ let w = class extends C {
       }));
       return;
     }
-    this.fail(s(this.hass, "viewer.live_failed"));
+    this.fail(n(this.hass, "viewer.live_failed"));
   }
   handleConnectionState(e) {
-    e !== this.connectionToken || !this.peerConnection || (this.connectionState = this.peerConnection.connectionState, this.connectionState === "connected" ? this.showStatusMessage("") : this.connectionState === "disconnected" ? (this.cancelActivePress(), this.showStatusMessage(s(this.hass, "talkback.temporarily_disconnected"))) : this.connectionState === "failed" && this.fail(s(this.hass, "viewer.live_failed")));
+    e !== this.connectionToken || !this.peerConnection || (this.connectionState = this.peerConnection.connectionState, this.connectionState === "connected" ? this.showStatusMessage("") : this.connectionState === "disconnected" ? (this.cancelActivePress(), this.showStatusMessage(n(this.hass, "talkback.temporarily_disconnected"))) : this.connectionState === "failed" && this.fail(n(this.hass, "viewer.live_failed")));
   }
   fail(e) {
     const t = ++this.connectionToken;
@@ -2995,7 +2765,7 @@ let w = class extends C {
   showStatusMessage(e) {
     this.clearStatusMessageTimeout(), this.statusMessage = e, e && (this.statusMessageTimeout = window.setTimeout(() => {
       this.statusMessageTimeout = void 0, this.statusMessage = "";
-    }, Gi));
+    }, Bi));
   }
   dispatchTalkbackState() {
     const e = {
@@ -3042,7 +2812,7 @@ let w = class extends C {
     return h`<svg viewBox="0 0 24 24" aria-hidden="true"><path d=${e}></path></svg>`;
   }
 };
-w.styles = j`
+y.styles = j`
     :host {
       position: absolute;
       inset: 0;
@@ -3172,45 +2942,45 @@ w.styles = j`
     }
   `;
 k([
-  b({ attribute: !1 })
-], w.prototype, "hass", 2);
+  _({ attribute: !1 })
+], y.prototype, "hass", 2);
 k([
-  b({ attribute: !1 })
-], w.prototype, "entityId", 2);
+  _({ attribute: !1 })
+], y.prototype, "entityId", 2);
 k([
-  b({ type: Boolean })
-], w.prototype, "muted", 2);
+  _({ type: Boolean })
+], y.prototype, "muted", 2);
 k([
-  b({ attribute: !1 })
-], w.prototype, "fitMode", 2);
+  _({ attribute: !1 })
+], y.prototype, "fitMode", 2);
 k([
-  b({ attribute: !1 })
-], w.prototype, "poster", 2);
+  _({ attribute: !1 })
+], y.prototype, "poster", 2);
 k([
-  b({ type: Boolean })
-], w.prototype, "externalControls", 2);
+  _({ type: Boolean })
+], y.prototype, "externalControls", 2);
 k([
-  p()
-], w.prototype, "microphoneState", 2);
+  u()
+], y.prototype, "microphoneState", 2);
 k([
-  p()
-], w.prototype, "connectionState", 2);
+  u()
+], y.prototype, "connectionState", 2);
 k([
-  p()
-], w.prototype, "statusMessage", 2);
+  u()
+], y.prototype, "statusMessage", 2);
 k([
-  p()
-], w.prototype, "actualMuted", 2);
+  u()
+], y.prototype, "actualMuted", 2);
 k([
-  p()
-], w.prototype, "playbackBlocked", 2);
+  u()
+], y.prototype, "playbackBlocked", 2);
 k([
-  p()
-], w.prototype, "readyDispatched", 2);
-w = k([
+  u()
+], y.prototype, "readyDispatched", 2);
+y = k([
   Z("ring-view-ring-webrtc-player")
-], w);
-class Qi {
+], y);
+class Fi {
   constructor() {
     this.generation = 0;
   }
@@ -3234,15 +3004,15 @@ class Qi {
     this.clearTimeout(), this.generation += 1;
   }
 }
-var Ji = Object.defineProperty, Xi = Object.getOwnPropertyDescriptor, m = (e, t, i, o) => {
-  for (var r = o > 1 ? void 0 : o ? Xi(t, i) : t, n = e.length - 1, a; n >= 0; n--)
-    (a = e[n]) && (r = (o ? a(t, i, r) : a(r)) || r);
-  return o && r && Ji(t, i, r), r;
+var Ki = Object.defineProperty, ji = Object.getOwnPropertyDescriptor, m = (e, t, i, o) => {
+  for (var r = o > 1 ? void 0 : o ? ji(t, i) : t, s = e.length - 1, a; s >= 0; s--)
+    (a = e[s]) && (r = (o ? a(t, i, r) : a(r)) || r);
+  return o && r && Ki(t, i, r), r;
 };
-const eo = 20, to = 2500, io = 900, oo = 2e3, ro = 3e3;
-let f = class extends C {
+const Wi = 20, Zi = 2500, Gi = 900, Yi = 2e3, Qi = 3e3;
+let f = class extends E {
   constructor() {
-    super(...arguments), this.open = !1, this.ringing = !1, this.mode = "last_recording", this.mediaStatus = "idle", this.session = 0, this.suspended = !1, this.recordingMuted = !1, this.recordingStarted = !0, this.liveMuted = !0, this.recordingVideoFailed = !1, this.retryCount = 0, this.statusAnnouncement = "", this.talkbackReady = !1, this.talkbackRequesting = !1, this.talkbackTalking = !1, this.doorActionStatus = "idle", this.lifecycle = new Qi(), this.recordingPlayback = /* @__PURE__ */ new WeakSet(), this.automaticLiveRetry = !0, this.pageUnloading = !1, this.talkKeyboardPressed = !1, this.doorKeyboardPressed = !1, this.doorActionToken = 0, this.handleTalkbackState = (e) => {
+    super(...arguments), this.open = !1, this.inline = !1, this.ringing = !1, this.mode = "last_recording", this.mediaStatus = "idle", this.session = 0, this.suspended = !1, this.recordingMuted = !1, this.recordingStarted = !0, this.liveMuted = !0, this.recordingVideoFailed = !1, this.retryCount = 0, this.statusAnnouncement = "", this.talkbackReady = !1, this.talkbackRequesting = !1, this.talkbackTalking = !1, this.doorActionStatus = "idle", this.inlineStarted = !0, this.lifecycle = new Fi(), this.recordingPlayback = /* @__PURE__ */ new WeakSet(), this.automaticLiveRetry = !0, this.pageUnloading = !1, this.talkKeyboardPressed = !1, this.doorKeyboardPressed = !1, this.doorActionToken = 0, this.inlineVisible = !1, this.inlineActive = !1, this.handleTalkbackState = (e) => {
       e.currentTarget === this.renderRoot.querySelector("ring-view-ring-webrtc-player") && (e.detail.ready || this.cancelTalkPress(e.currentTarget), this.talkbackReady = e.detail.ready, this.talkbackRequesting = e.detail.requesting, this.talkbackTalking = e.detail.talking);
     }, this.handleTalkPointerDown = (e) => {
       e.button !== 0 || !e.isPrimary || this.talkPointerId !== void 0 || !this.talkbackReady || (e.preventDefault(), e.currentTarget?.setPointerCapture?.(e.pointerId), this.talkPointerId = e.pointerId, this.talkbackPlayer()?.startTalking());
@@ -3263,16 +3033,16 @@ let f = class extends C {
     }, this.handleDoorClick = () => {
       this.config?.door_hold_to_activate || this.doorActionDisabled() || this.executeDoorAction();
     }, this.handleMediaReady = (e) => {
-      this.acceptsMediaEvent(e) && (this.clearAutomaticLiveRecovery(), this.lifecycle.clearTimeout(), this.mediaStatus = "ready", this.statusAnnouncement = this.mode === "live" ? this.liveAudioStatus() : this.recordingMuted ? s(this.hass, "viewer.recording_loaded_muted") : s(this.hass, "viewer.recording_loaded_audio"));
+      this.acceptsMediaEvent(e) && (this.clearAutomaticLiveRecovery(), this.lifecycle.clearTimeout(), this.mediaStatus = "ready", this.statusAnnouncement = this.mode === "live" ? this.liveAudioStatus() : this.recordingMuted ? n(this.hass, "viewer.recording_loaded_muted") : n(this.hass, "viewer.recording_loaded_audio"));
     }, this.handleMediaCapabilities = (e) => {
-      this.mode !== "live" || typeof e.detail?.hasAudio != "boolean" || this.liveMuted && e.detail.hasAudio === !1 || (this.liveHasAudio = this.liveHasAudio === !0 || e.detail.hasAudio, this.mediaStatus === "ready" && this.liveHasAudio ? this.statusAnnouncement = s(this.hass, "viewer.live_connected_audio") : this.mediaStatus === "ready" && this.liveHasAudio === !1 && (this.statusAnnouncement = s(this.hass, "viewer.live_connected_no_audio")));
+      this.mode !== "live" || typeof e.detail?.hasAudio != "boolean" || this.liveMuted && e.detail.hasAudio === !1 || (this.liveHasAudio = this.liveHasAudio === !0 || e.detail.hasAudio, this.mediaStatus === "ready" && this.liveHasAudio ? this.statusAnnouncement = n(this.hass, "viewer.live_connected_audio") : this.mediaStatus === "ready" && this.liveHasAudio === !1 && (this.statusAnnouncement = n(this.hass, "viewer.live_connected_no_audio")));
     }, this.handleRecordingVideoError = (e) => {
-      this.mode !== "last_recording" || !this.acceptsMediaEvent(e) || (this.recordingVideoFailed = !0, this.statusAnnouncement = s(this.hass, "viewer.trying_ha"), this.startMedia());
+      this.mode !== "last_recording" || !this.acceptsMediaEvent(e) || (this.recordingVideoFailed = !0, this.statusAnnouncement = n(this.hass, "viewer.trying_ha"), this.startMedia());
     }, this.handleRecordingCanPlay = (e) => {
       const t = e.currentTarget, i = this.session;
       !(t instanceof HTMLVideoElement) || this.recordingPlayback.has(t) || !this.isCurrentRecording(t, i) || (this.recordingPlayback.add(t), this.playRecording(t, i));
     }, this.handleMediaError = (e) => {
-      !this.acceptsMediaEvent(e) || e.detail !== "component-unavailable" || (this.clearAutomaticLiveRecovery(), this.lifecycle.clearTimeout(), this.mediaStatus = "compatibility", this.statusAnnouncement = s(this.hass, "viewer.native_unavailable_title"));
+      !this.acceptsMediaEvent(e) || e.detail !== "component-unavailable" || (this.clearAutomaticLiveRecovery(), this.lifecycle.clearTimeout(), this.mediaStatus = "compatibility", this.statusAnnouncement = n(this.hass, "viewer.native_unavailable_title"));
     }, this.handleRingWebRtcError = (e) => {
       !this.acceptsMediaEvent(e) || this.mode !== "live" || !this.config?.two_way_audio || this.failMedia();
     }, this.handleLiveResumeRequired = (e) => {
@@ -3280,17 +3050,19 @@ let f = class extends C {
     }, this.tryAutomaticLiveResume = () => {
       if (this.automaticLiveRecovery !== "waiting" || !this.open || !this.isConnected || this.mode !== "live" || this.mediaStatus !== "awaiting-resume" || this.pageUnloading) return;
       const e = this.hass?.connection;
-      this.recoveryConnection !== e && (this.recoveryConnection?.removeEventListener?.("ready", this.handleRecoveryConnectionReady), this.recoveryConnection = e, e?.addEventListener?.("ready", this.handleRecoveryConnectionReady)), !(document.hidden || e?.connected === !1 || this.config?.two_way_audio && !e || _(this.activeEntity())) && (this.clearAutomaticLiveRecovery(), this.automaticLiveRecovery = "attempting", this.liveMuted = !0, this.statusAnnouncement = s(this.hass, "viewer.connecting_live"), this.startMedia());
+      this.recoveryConnection !== e && (this.recoveryConnection?.removeEventListener?.("ready", this.handleRecoveryConnectionReady), this.recoveryConnection = e, e?.addEventListener?.("ready", this.handleRecoveryConnectionReady)), !(document.hidden || e?.connected === !1 || this.config?.two_way_audio && !e || w(this.activeEntity())) && (this.clearAutomaticLiveRecovery(), this.automaticLiveRecovery = "attempting", this.liveMuted = !0, this.statusAnnouncement = n(this.hass, "viewer.connecting_live"), this.startMedia());
     }, this.handleRecoveryConnectionReady = () => {
       queueMicrotask(this.tryAutomaticLiveResume);
     }, this.resumeLive = () => {
-      !this.open || this.mode !== "live" || this.mediaStatus !== "awaiting-resume" || (this.clearAutomaticLiveRecovery(), this.resetMediaAttempt(), this.startMedia(), this.updateComplete.then(() => this.focusInitialControl()));
+      !this.open || this.mode !== "live" || this.mediaStatus !== "awaiting-resume" || (this.inline && this.claimInlineLive(!0), this.clearAutomaticLiveRecovery(), this.resetMediaAttempt(), this.startMedia(), this.updateComplete.then(() => this.focusInitialControl()));
     }, this.handlePlaybackBlocked = (e) => {
-      !this.acceptsMediaEvent(e) || this.mode !== "live" || (this.lifecycle.clearTimeout(), this.mediaStatus = "playback-blocked", this.statusAnnouncement = s(this.hass, "viewer.resume_live"));
+      !this.acceptsMediaEvent(e) || this.mode !== "live" || (this.lifecycle.clearTimeout(), this.mediaStatus = "playback-blocked", this.statusAnnouncement = n(this.hass, "viewer.resume_live"));
     }, this.retry = () => {
       this.clearAutomaticLiveRecovery(), this.resetMediaAttempt(), this.startMedia();
     }, this.startRecording = () => {
-      this.mode !== "last_recording" || this.recordingStarted || (this.recordingStarted = !0, this.startMedia());
+      this.mode !== "last_recording" || this.recordingStarted || (this.inlineStarted = !0, this.recordingStarted = !0, this.startMedia());
+    }, this.startInlineLive = () => {
+      !this.inline || this.mode !== "live" || this.inlineStarted || (this.inlineStarted = !0, this.startMedia());
     }, this.openMoreInfo = () => {
       this.dispatchEvent(
         new CustomEvent("hass-more-info", {
@@ -3301,7 +3073,16 @@ let f = class extends C {
       );
     }, this.handleBackdrop = (e) => {
       e.target === e.currentTarget && this.close();
+    }, this.expand = () => {
+      !this.inline || !this.config || this.dispatchEvent(
+        new CustomEvent("ring-view-expand", {
+          detail: { mode: this.mode, ringingUntil: this.ringingUntil },
+          bubbles: !0,
+          composed: !0
+        })
+      );
     }, this.handleKeyDown = (e) => {
+      if (this.inline) return;
       if (e.key === "Escape") {
         if (document.fullscreenElement) return;
         e.preventDefault(), e.stopPropagation(), this.close();
@@ -3325,12 +3106,24 @@ let f = class extends C {
     }, this.handleWindowBlur = () => {
       this.cancelDoorHold(), this.cancelTalkPress();
     }, this.handlePageHide = () => {
-      this.pageUnloading = !0, this.resetVisitorActions(), !(!this.open || this.mode !== "live") && (this.renderRoot.querySelector("ring-view-ring-webrtc-player")?.stopTalking(), this.waitForLiveResume());
+      if (this.pageUnloading = !0, this.resetVisitorActions(), this.inline) {
+        this.suspendInline();
+        return;
+      }
+      !this.open || this.mode !== "live" || (this.renderRoot.querySelector("ring-view-ring-webrtc-player")?.stopTalking(), this.waitForLiveResume());
     }, this.handlePageShow = (e) => {
       const t = this.pageUnloading;
-      this.pageUnloading = !1, t && e.persisted && this.open && this.mode === "live" && this.prepareAutomaticLiveResume();
+      if (this.pageUnloading = !1, this.inline) {
+        this.updateInlineActivity();
+        return;
+      }
+      t && e.persisted && this.open && this.mode === "live" && this.prepareAutomaticLiveResume();
     }, this.handleVisibilityChange = () => {
       if (this.open) {
+        if (this.inline) {
+          this.updateInlineActivity();
+          return;
+        }
         if (document.hidden && this.cancelDoorHold(), this.automaticLiveRecovery === "waiting") {
           this.tryAutomaticLiveResume();
           return;
@@ -3355,8 +3148,23 @@ let f = class extends C {
         this.adoptRestoredDialog(e), this.syncUrl();
         return;
       }
-      this.open && this.finishClose(!1, !1), this.config = e.config, this.opener = e.opener, this.returnUrl = e.returnUrl ?? ut(ht()), this.mode = e.mode, this.liveMuted = e.restored && this.mode === "live" ? !0 : this.config.live_muted, this.recordingStarted = this.mode === "live" || this.config.autoplay_recording, this.resetMediaAttempt(), this.automaticLiveRetry = !e.restored, this.pageUnloading = !1, this.suspended = !1, this.statusAnnouncement = "", this.resetVisitorActions(), this.lastDoorbellState = this.config.doorbell_entity ? this.hass.states[this.config.doorbell_entity]?.state : void 0, this.setRingingUntil(e.ringingUntil), this.open = !0, pi(this), this.syncUrl(), this.attachGlobalListeners(), e.restored && this.mode === "live" ? this.prepareAutomaticLiveResume() : this.startMedia(), this.updateComplete.then(() => this.focusInitialControl());
+      this.open && this.finishClose(!1, !1), this.inline = !1, this.config = e.config, this.opener = e.opener, this.returnUrl = e.returnUrl ?? pt(ut()), this.mode = e.mode, this.liveMuted = e.restored && this.mode === "live" ? !0 : this.config.live_muted, this.recordingStarted = this.mode === "live" || this.config.autoplay_recording, this.resetMediaAttempt(), this.automaticLiveRetry = !e.restored, this.pageUnloading = !1, this.suspended = !1, this.statusAnnouncement = "", this.resetVisitorActions(), this.lastDoorbellState = this.config.doorbell_entity ? this.hass.states[this.config.doorbell_entity]?.state : void 0, this.setRingingUntil(e.ringingUntil), this.open = !0, mi(this), this.syncUrl(), this.attachGlobalListeners(), e.restored && this.mode === "live" ? this.prepareAutomaticLiveResume() : this.startMedia(), this.updateComplete.then(() => this.focusInitialControl());
     }
+  }
+  showInline(e) {
+    if (this.hass) {
+      if (this.inline && this.open && this.config === e.config) {
+        this.setRingingUntil(e.ringingUntil);
+        return;
+      }
+      this.open && this.finishClose(!1, !1), this.inline = !0, this.config = e.config, this.mode = e.start === "live" ? "live" : e.start === "last_recording" ? "last_recording" : e.mode, this.liveMuted = this.config.dashboard_live_muted, this.inlineStarted = e.start !== "on_demand", this.recordingStarted = this.mode === "live" || this.inlineStarted, this.resetMediaAttempt(), this.automaticLiveRetry = !0, this.pageUnloading = !1, this.suspended = !this.inlineActive, this.statusAnnouncement = "", this.resetVisitorActions(), this.lastDoorbellState = this.config.doorbell_entity ? this.hass.states[this.config.doorbell_entity]?.state : void 0, this.setRingingUntil(e.ringingUntil), this.open = !0, this.attachGlobalListeners(), this.inlineStarted && this.inlineActive && this.startMedia();
+    }
+  }
+  setInlineVisible(e) {
+    this.inlineVisible = e, this.updateInlineActivity();
+  }
+  stopInline() {
+    this.inline && this.finishClose(!1, !1);
   }
   isOpenFor(e) {
     return !!(this.open && this.config && this.config.live_entity === e.config.live_entity && this.config.recording_entity === e.config.recording_entity && this.mode === e.mode);
@@ -3377,43 +3185,46 @@ let f = class extends C {
     if (!this.open || !this.config || (e.has("hass") && this.detectDoorbellEvent(e.get("hass")), !e.has("hass"))) return;
     this.config.door_entity && this.doorActionDisabled() && this.cancelDoorHold();
     const t = this.activeEntity();
-    _(t) && this.mediaStatus !== "error" && (this.clearAutomaticLiveRecovery(), this.lifecycle.dispose(), this.session = this.lifecycle.current(), this.mediaStatus = "error", this.statusAnnouncement = s(this.hass, "viewer.entity_unavailable")), this.tryAutomaticLiveResume();
+    w(t) && this.mediaStatus !== "error" && (this.clearAutomaticLiveRecovery(), this.lifecycle.dispose(), this.releaseInlineLive(), this.session = this.lifecycle.current(), this.mediaStatus = "error", this.statusAnnouncement = n(this.hass, "viewer.entity_unavailable")), this.tryAutomaticLiveResume();
   }
   render() {
-    if (!this.open || !this.hass || !this.config) return c;
+    if (!this.open || !this.hass || !this.config) return l;
     const e = this.dialogTitle(), t = this.config.show_name, i = this.config.aspect_ratio, o = {
       "--ring-view-aspect-ratio": i === "auto" ? "16 / 9" : i.replace(":", " / "),
       "--ring-view-fit-mode": this.config.fit_mode
     };
     return h`
-      <div class="backdrop" @pointerdown=${this.handleBackdrop}></div>
+      ${this.inline ? l : h`<div class="backdrop" @pointerdown=${this.handleBackdrop}></div>`}
       <section
         class="dialog"
-        style=${dt(o)}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby=${t ? "ring-view-dialog-title" : c}
-        aria-label=${t ? c : s(this.hass, "viewer.camera_view")}
+        style=${pe(o)}
+        role=${this.inline ? "region" : "dialog"}
+        aria-modal=${this.inline ? l : "true"}
+        aria-labelledby=${t ? "ring-view-dialog-title" : l}
+        aria-label=${t ? l : n(this.hass, "viewer.camera_view")}
         @keydown=${this.handleKeyDown}
       >
         <div class="body">
           ${this.renderMedia()}
           ${this.renderRingAlert()}
           <header class="header">
-            ${t ? h`<h2 id="ring-view-dialog-title">${e}</h2>` : c}
+            ${t ? h`<h2 id="ring-view-dialog-title">${e}</h2>` : l}
             <div class="header-actions">
               <button
-                class="icon-button close"
+                class=${this.inline ? "icon-button expand" : "icon-button close"}
                 type="button"
-                aria-label=${s(this.hass, "viewer.close_aria")}
-                title=${ct(
+                aria-label=${n(
+      this.hass,
+      this.inline ? "viewer.expand_aria" : "viewer.close_aria"
+    )}
+                title=${this.inline ? n(this.hass, "viewer.expand_aria") : ct(
       this.hass,
       "ui.common.close",
       "common.close"
     )}
-                @click=${this.close}
+                @click=${this.inline ? this.expand : this.close}
               >
-                ${this.icon(bt)}
+                ${this.icon(this.inline ? At : wt)}
               </button>
             </div>
           </header>
@@ -3431,35 +3242,35 @@ let f = class extends C {
       <div
         class="mode-switch"
         role="tablist"
-        aria-label=${s(this.hass, "viewer.camera_view")}
+        aria-label=${n(this.hass, "viewer.camera_view")}
       >
         <button
           id="ring-view-tab-recording"
           class="mode-button recording"
           type="button"
           role="tab"
-          aria-label=${s(this.hass, "common.last_recording")}
-          title=${s(this.hass, "common.last_recording")}
+          aria-label=${n(this.hass, "common.last_recording")}
+          title=${n(this.hass, "common.last_recording")}
           aria-selected=${String(this.mode === "last_recording")}
           tabindex=${this.mode === "last_recording" ? "0" : "-1"}
           @click=${() => this.selectMode("last_recording")}
           @keydown=${this.handleTabKeyDown}
         >
-          ${We("last_recording")}
+          ${Ge("last_recording")}
         </button>
         <button
           id="ring-view-tab-live"
           class="mode-button live"
           type="button"
           role="tab"
-          aria-label=${s(this.hass, "common.live")}
-          title=${s(this.hass, "common.live")}
+          aria-label=${n(this.hass, "common.live")}
+          title=${n(this.hass, "common.live")}
           aria-selected=${String(this.mode === "live")}
           tabindex=${this.mode === "live" ? "0" : "-1"}
           @click=${() => this.selectMode("live")}
           @keydown=${this.handleTabKeyDown}
         >
-          ${We("live")}
+          ${Ge("live")}
         </button>
       </div>
     `;
@@ -3472,16 +3283,16 @@ let f = class extends C {
         ?disabled=${this.mode === "live"}
         @click=${() => this.selectMode("live")}
       >
-        ${this.icon(Qe)}
-        <span>${s(this.hass, "ring.alert")}</span>
-        ${this.mode === "live" ? c : h`<span class="ring-action">${s(this.hass, "ring.open_live")}</span>`}
+        ${this.icon(Xe)}
+        <span>${n(this.hass, "ring.alert")}</span>
+        ${this.mode === "live" ? l : h`<span class="ring-action">${n(this.hass, "ring.open_live")}</span>`}
       </button>
-    ` : c;
+    ` : l;
   }
   renderVisitorActions() {
     const e = this.shouldShowDoorControl(), t = this.shouldShowTalkControl();
-    if (!e && !t) return c;
-    const i = e ? this.doorActionDisabled() : !0, o = this.doorActionLabel(), r = this.doorActionIcon(), n = e ? this.doorContactState() : void 0, a = n === "open", l = n === "unknown", d = s(this.hass, "door.contact_unknown"), u = this.talkbackRequesting ? s(this.hass, "talkback.requesting_microphone") : this.talkbackTalking ? s(this.hass, "talkback.release_to_stop") : this.talkbackReady ? s(this.hass, "talkback.hold_to_talk") : s(this.hass, "talkback.connecting_short");
+    if (!e && !t) return l;
+    const i = e ? this.doorActionDisabled() : !0, o = this.doorActionLabel(), r = this.doorActionIcon(), s = e ? this.doorContactState() : void 0, a = s === "open", c = s === "unknown", d = n(this.hass, "door.contact_unknown"), p = this.talkbackRequesting ? n(this.hass, "talkback.requesting_microphone") : this.talkbackTalking ? n(this.hass, "talkback.release_to_stop") : this.talkbackReady ? n(this.hass, "talkback.hold_to_talk") : n(this.hass, "talkback.connecting_short");
     return h`
       <div class="visitor-controls">
         ${this.doorFeedback ? h`
@@ -3490,10 +3301,10 @@ let f = class extends C {
                 class="door-feedback error"
                 role="alert"
               >
-                ${this.icon(ne)}
+                ${this.icon(le)}
                 <span>${this.doorFeedback.message}</span>
               </div>
-            ` : c}
+            ` : l}
         <div
           class=${O({
       "visitor-action-dock": !0,
@@ -3501,7 +3312,7 @@ let f = class extends C {
       "talk-only": t && !e
     })}
           role="group"
-          aria-label=${s(this.hass, "door.actions")}
+          aria-label=${n(this.hass, "door.actions")}
         >
           ${t ? h`
                 <button
@@ -3511,7 +3322,7 @@ let f = class extends C {
       active: this.talkbackTalking
     })}
                   type="button"
-                  aria-label=${u}
+                  aria-label=${p}
                   aria-pressed=${String(this.talkbackTalking)}
                   ?disabled=${!this.talkbackReady}
                   @contextmenu=${(v) => v.preventDefault()}
@@ -3522,27 +3333,27 @@ let f = class extends C {
                   @keydown=${this.handleTalkKeyDown}
                   @keyup=${this.handleTalkKeyUp}
                 >
-                  ${this.icon(this.talkbackTalking ? Xe : et)}
-                  <span>${u}</span>
+                  ${this.icon(this.talkbackTalking ? tt : it)}
+                  <span>${p}</span>
                 </button>
-              ` : c}
-          ${e && t ? h`<span class="visitor-action-divider" aria-hidden="true"></span>` : c}
+              ` : l}
+          ${e && t ? h`<span class="visitor-action-divider" aria-hidden="true"></span>` : l}
           ${e ? h`
                 <button
                   class=${O({
       "visitor-action": !0,
       "door-action": !0,
       "contact-open": a,
-      "contact-unknown": l,
+      "contact-unknown": c,
       holding: !a && this.doorActionStatus === "holding",
       working: !a && this.doorActionStatus === "working",
       success: !a && this.doorActionStatus === "success",
       error: !a && this.doorActionStatus === "error"
     })}
                   type="button"
-                  aria-label=${l ? `${o}. ${d}` : o}
+                  aria-label=${c ? `${o}. ${d}` : o}
                   aria-busy=${String(this.doorActionStatus === "working")}
-                  aria-describedby=${this.doorFeedback ? "ring-view-door-feedback" : c}
+                  aria-describedby=${this.doorFeedback ? "ring-view-door-feedback" : l}
                   ?disabled=${i}
                   @contextmenu=${(v) => v.preventDefault()}
                   @click=${this.handleDoorClick}
@@ -3556,19 +3367,21 @@ let f = class extends C {
                   ${this.icon(r)}
                   <span class="door-action-copy">
                     <span>${o}</span>
-                    ${l ? h`<span class="door-contact-state">${d}</span>` : c}
+                    ${c ? h`<span class="door-contact-state">${d}</span>` : l}
                   </span>
                 </button>
-              ` : c}
+              ` : l}
         </div>
       </div>
     `;
   }
   shouldShowDoorControl() {
-    return !!(this.config?.door_entity && (this.mode === "live" || this.config.door_control_visibility === "all_views"));
+    return !!(this.config?.door_entity && (!this.inline || this.config.door_control_on_dashboard) && (!this.inline || this.config.door_control_visibility === "all_views" || ["pending", "retrying", "ready", "playback-blocked"].includes(
+      this.mediaStatus
+    )) && (this.mode === "live" || this.config.door_control_visibility === "all_views"));
   }
   shouldShowTalkControl() {
-    return !!(this.mode === "live" && this.config?.two_way_audio && this.hass && fe(this.hass, this.config.live_entity) && ["pending", "ready", "playback-blocked"].includes(this.mediaStatus));
+    return !!(this.mode === "live" && this.config?.two_way_audio && this.hass && be(this.hass, this.config.live_entity) && ["pending", "ready", "playback-blocked"].includes(this.mediaStatus));
   }
   doorEntity() {
     const e = this.config?.door_entity;
@@ -3582,27 +3395,27 @@ let f = class extends C {
   }
   doorActionDisabled() {
     const e = this.doorEntity();
-    return !this.config?.door_entity || this.doorContactState() === "open" || _(e) || e?.state === "jammed" || this.doorActionStatus === "working" || this.doorActionStatus === "success" ? !0 : this.config.door_action === "open" ? !J(e) || ["open", "opening"].includes(e?.state ?? "") : ["unlocked", "unlocking", "open", "opening"].includes(e?.state ?? "");
+    return !this.config?.door_entity || this.doorContactState() === "open" || w(e) || e?.state === "jammed" || this.doorActionStatus === "working" || this.doorActionStatus === "success" || this.inline && this.config.door_control_visibility === "live_only" && this.mode === "live" && this.mediaStatus !== "ready" ? !0 : this.config.door_action === "open" ? !ie(e) || ["open", "opening"].includes(e?.state ?? "") : ["unlocked", "unlocking", "open", "opening"].includes(e?.state ?? "");
   }
   doorActionLabel() {
     const e = this.doorEntity();
-    return this.doorContactState() === "open" ? s(this.hass, "door.contact_open") : _(e) ? s(this.hass, "door.unavailable") : e?.state === "jammed" ? s(this.hass, "door.jammed") : this.config?.door_action === "open" && !J(e) ? s(this.hass, "door.open_unsupported") : this.doorActionStatus === "working" || this.config?.door_action === "unlock" && e?.state === "unlocking" || this.config?.door_action === "open" && e?.state === "opening" ? s(
+    return this.doorContactState() === "open" ? n(this.hass, "door.contact_open") : w(e) ? n(this.hass, "door.unavailable") : e?.state === "jammed" ? n(this.hass, "door.jammed") : this.config?.door_action === "open" && !ie(e) ? n(this.hass, "door.open_unsupported") : this.inline && this.config?.door_control_visibility === "live_only" && this.mode === "live" && this.mediaStatus !== "ready" ? n(this.hass, "door.waiting_for_live") : this.doorActionStatus === "working" || this.config?.door_action === "unlock" && e?.state === "unlocking" || this.config?.door_action === "open" && e?.state === "opening" ? n(
       this.hass,
       this.config?.door_action === "open" ? "door.opening" : "door.unlocking"
-    ) : this.doorActionStatus === "success" ? s(
+    ) : this.doorActionStatus === "success" ? n(
       this.hass,
       this.config?.door_action === "open" ? "door.opened" : "door.unlocked"
-    ) : this.config?.door_action === "open" && e?.state === "open" ? s(this.hass, "door.opened") : this.config?.door_action === "unlock" && ["unlocked", "open"].includes(e?.state ?? "") ? s(this.hass, "door.unlocked") : this.config?.door_hold_to_activate ? s(
+    ) : this.config?.door_action === "open" && e?.state === "open" ? n(this.hass, "door.opened") : this.config?.door_action === "unlock" && ["unlocked", "open"].includes(e?.state ?? "") ? n(this.hass, "door.unlocked") : this.config?.door_hold_to_activate ? n(
       this.hass,
       this.config.door_action === "open" ? "door.hold_to_open" : "door.hold_to_unlock"
-    ) : s(
+    ) : n(
       this.hass,
       this.config?.door_action === "open" ? "door.open" : "door.unlock"
     );
   }
   doorActionIcon() {
     const e = this.doorEntity(), t = this.doorContactState();
-    return t === "open" ? Pe : t === "closed" ? _t : t === "unknown" || _(e) || e?.state === "jammed" || this.config?.door_action === "open" && !J(e) || this.doorActionStatus === "error" ? ne : this.doorActionStatus === "working" ? At : this.doorActionStatus === "success" ? mt : this.config?.door_action === "open" ? Pe : Je;
+    return t === "open" ? De : t === "closed" ? yt : t === "unknown" || w(e) || e?.state === "jammed" || this.config?.door_action === "open" && !ie(e) || this.doorActionStatus === "error" ? le : this.doorActionStatus === "working" ? St : this.doorActionStatus === "success" ? bt : this.config?.door_action === "open" ? De : et;
   }
   talkbackPlayer() {
     return this.shadowRoot?.querySelector("ring-view-ring-webrtc-player") ?? null;
@@ -3613,7 +3426,7 @@ let f = class extends C {
   beginDoorHold() {
     this.doorHoldTimer !== void 0 || this.doorActionDisabled() || (this.clearDoorFeedback(), this.doorActionStatus = "holding", this.doorHoldTimer = window.setTimeout(() => {
       this.doorHoldTimer = void 0, this.doorPointerId = void 0, this.doorKeyboardPressed = !1, this.executeDoorAction();
-    }, io));
+    }, Gi));
   }
   cancelDoorHold() {
     this.doorHoldTimer !== void 0 && (window.clearTimeout(this.doorHoldTimer), this.doorHoldTimer = void 0), this.doorPointerId = void 0, this.doorKeyboardPressed = !1, this.doorActionStatus === "holding" && (this.doorActionStatus = "idle");
@@ -3629,22 +3442,22 @@ let f = class extends C {
     try {
       if (!e.callService) throw new Error("Home Assistant service API unavailable");
       if (await e.callService("lock", i, { entity_id: t }), o !== this.doorActionToken || !this.open) return;
-      const r = s(
+      const r = n(
         this.hass,
         i === "open" ? "door.opened" : "door.unlocked"
       );
       this.doorActionStatus = "success", this.statusAnnouncement = r, this.doorFeedbackTimer = window.setTimeout(() => {
         o === this.doorActionToken && (this.doorFeedbackTimer = void 0, this.doorFeedback = void 0, this.doorActionStatus = "idle");
-      }, oo);
+      }, Yi);
     } catch {
       if (o !== this.doorActionToken || !this.open) return;
-      const r = s(
+      const r = n(
         this.hass,
         i === "open" ? "door.open_failed" : "door.unlock_failed"
       );
       this.doorActionStatus = "error", this.doorFeedback = { message: r }, this.statusAnnouncement = r, this.doorFeedbackTimer = window.setTimeout(() => {
         o === this.doorActionToken && (this.doorFeedbackTimer = void 0, this.doorFeedback = void 0, this.doorActionStatus = "idle");
-      }, ro);
+      }, Qi);
     }
   }
   clearDoorFeedback() {
@@ -3654,7 +3467,7 @@ let f = class extends C {
     this.cancelTalkPress(), this.cancelDoorHold(), this.clearDoorFeedback(), this.doorActionToken += 1, this.doorActionStatus = "idle", this.talkbackReady = !1, this.talkbackRequesting = !1, this.talkbackTalking = !1;
   }
   renderMedia() {
-    const e = this.activeEntity(), t = this.activeEntityId(), i = _(e), o = !i && !this.suspended && (this.mode === "live" || this.recordingStarted), r = lt(this.config.aspect_ratio), n = pt(this.hass, e, t), a = this.mode === "last_recording" && typeof e?.attributes.video_url == "string" ? e.attributes.video_url : void 0, l = o && ["pending", "ready", "playback-blocked"].includes(this.mediaStatus), d = !!(l && a && !this.recordingVideoFailed), u = !!(o && this.mode === "live" && this.config.two_way_audio && fe(this.hass, t));
+    const e = this.activeEntity(), t = this.activeEntityId(), i = w(e), o = !i && !this.suspended && (this.mode === "live" || this.recordingStarted), r = ht(this.config.aspect_ratio), s = vt(this.hass, e, t), a = this.mode === "last_recording" && typeof e?.attributes.video_url == "string" ? e.attributes.video_url : void 0, c = o && ["pending", "ready", "playback-blocked"].includes(this.mediaStatus), d = !!(c && a && !this.recordingVideoFailed), p = !!(o && this.mode === "live" && this.config.two_way_audio && be(this.hass, t));
     return h`
       <div
         class=${O({
@@ -3664,18 +3477,18 @@ let f = class extends C {
         role="tabpanel"
         aria-labelledby=${this.mode === "live" ? "ring-view-tab-live" : "ring-view-tab-recording"}
       >
-        <img class="poster" src=${n} alt="" aria-hidden="true" />
-        ${l && !d ? Ge(
+        <img class="poster" src=${s} alt="" aria-hidden="true" />
+        ${c && !d ? Ye(
       `${t}:${this.session}`,
       h`
-                ${u ? h`
+                ${p ? h`
                       <ring-view-ring-webrtc-player
                         class=${this.mediaStatus === "pending" ? "pending" : ""}
                         .hass=${this.hass}
                         .entityId=${t}
                         .muted=${this.liveMuted}
                         .fitMode=${this.config.fit_mode}
-                        .poster=${n}
+                        .poster=${s}
                         .externalControls=${!0}
                         @ring-webrtc-ready=${this.handleMediaReady}
                         @ring-webrtc-error=${this.handleRingWebRtcError}
@@ -3700,8 +3513,8 @@ let f = class extends C {
                       ></ring-view-native-camera-adapter>
                     `}
               `
-    ) : c}
-        ${d ? Ge(
+    ) : l}
+        ${d ? Ye(
       `${t}:${this.session}:recording-video`,
       h`
               <video
@@ -3710,7 +3523,7 @@ let f = class extends C {
         pending: this.mediaStatus === "pending"
       })}
                 src=${a}
-                poster=${n}
+                poster=${s}
                 playsinline
                 autoplay
                 preload="auto"
@@ -3720,7 +3533,7 @@ let f = class extends C {
                 @error=${this.handleRecordingVideoError}
               ></video>
             `
-    ) : c}
+    ) : l}
         ${this.renderStateLayer(i, d)}
       </div>
     `;
@@ -3731,34 +3544,54 @@ let f = class extends C {
       return h`
         <div class="state-layer" role="status">
           <div class="state-card">
-            <div class="state-title">${x(i, this.activeEntityId())}</div>
+            <div class="state-title">${C(i, this.activeEntityId())}</div>
             <div class="state-detail">
-              ${s(this.hass, "viewer.entity_unavailable")}
+              ${n(this.hass, "viewer.entity_unavailable")}
             </div>
             <div class="state-actions">
               <button class="action-button primary" type="button" @click=${this.retry}>
-                ${s(this.hass, "common.retry")}
+                ${n(this.hass, "common.retry")}
               </button>
-              ${this.renderAlternateModeButton()}
+              ${this.inline ? l : this.renderAlternateModeButton()}
             </div>
           </div>
         </div>
       `;
     }
-    return this.suspended ? h`
+    if (this.suspended)
+      return h`
         <div class="state-layer" role="status">
           <div class="state-card">
             <div class="state-title">
-              ${s(this.hass, "viewer.suspended")}
+              ${n(this.hass, "viewer.suspended")}
             </div>
           </div>
         </div>
-      ` : this.mode === "live" && this.mediaStatus === "awaiting-resume" ? h`
+      `;
+    if (this.inline && !this.inlineStarted) {
+      const i = this.mode === "live";
+      return h`
+        <div class="state-layer play-layer">
+          <button
+            class="action-button primary play-recording"
+            type="button"
+            @click=${i ? this.startInlineLive : this.startRecording}
+          >
+            ${this.icon(X)}
+            <span>${n(
+        this.hass,
+        i ? "viewer.start_live" : "viewer.play_recording"
+      )}</span>
+          </button>
+        </div>
+      `;
+    }
+    return this.mode === "live" && this.mediaStatus === "awaiting-resume" ? h`
         <div class="state-layer play-layer">
           <button class="action-button primary play-recording resume-live" type="button"
             @click=${this.resumeLive}>
-            ${this.icon(ce)}
-            <span>${s(this.hass, "viewer.resume_live")}</span>
+            ${this.icon(X)}
+            <span>${n(this.hass, "viewer.resume_live")}</span>
           </button>
         </div>
       ` : this.mode === "last_recording" && !this.recordingStarted ? h`
@@ -3766,11 +3599,11 @@ let f = class extends C {
           <button
             class="action-button primary play-recording"
             type="button"
-            aria-label=${s(this.hass, "viewer.play_recording")}
+            aria-label=${n(this.hass, "viewer.play_recording")}
             @click=${this.startRecording}
           >
-            ${this.icon(ce)}
-            <span>${s(this.hass, "viewer.play_recording")}</span>
+            ${this.icon(X)}
+            <span>${n(this.hass, "viewer.play_recording")}</span>
           </button>
         </div>
       ` : this.mediaStatus === "pending" || this.mediaStatus === "retrying" ? h`
@@ -3778,7 +3611,7 @@ let f = class extends C {
           <div class="state-card">
             <div class="spinner" aria-hidden="true"></div>
             <div class="state-title">
-              ${this.mediaStatus === "retrying" ? s(this.hass, "viewer.retrying_live") : this.mode === "live" ? s(this.hass, "viewer.connecting_live") : s(this.hass, "viewer.loading_recording")}
+              ${this.mediaStatus === "retrying" ? n(this.hass, "viewer.retrying_live") : this.mode === "live" ? n(this.hass, "viewer.connecting_live") : n(this.hass, "viewer.loading_recording")}
             </div>
           </div>
         </div>
@@ -3786,16 +3619,16 @@ let f = class extends C {
         <div class="state-layer" role="alert">
           <div class="state-card">
             <div class="state-title">
-              ${s(this.hass, "viewer.native_unavailable_title")}
+              ${n(this.hass, "viewer.native_unavailable_title")}
             </div>
             <div class="state-detail">
-              ${s(this.hass, "viewer.native_unavailable_detail")}
+              ${n(this.hass, "viewer.native_unavailable_detail")}
             </div>
             <div class="state-actions">
               <button class="action-button primary" type="button" @click=${this.openMoreInfo}>
-                ${s(this.hass, "viewer.open_ha_camera")}
+                ${n(this.hass, "viewer.open_ha_camera")}
               </button>
-              ${this.renderAlternateModeButton()}
+              ${this.inline ? l : this.renderAlternateModeButton()}
             </div>
           </div>
         </div>
@@ -3803,26 +3636,26 @@ let f = class extends C {
         <div class="state-layer" role="alert">
           <div class="state-card">
             <div class="state-title">
-              ${this.mode === "live" ? s(this.hass, "viewer.live_failed") : s(this.hass, "viewer.recording_unavailable")}
+              ${this.mode === "live" ? n(this.hass, "viewer.live_failed") : n(this.hass, "viewer.recording_unavailable")}
             </div>
             ${this.mode === "last_recording" ? h`<div class="state-detail">
-                  ${s(this.hass, "viewer.ring_protect")}
-                </div>` : c}
+                  ${n(this.hass, "viewer.ring_protect")}
+                </div>` : l}
             <div class="state-actions">
               <button class="action-button primary" type="button" @click=${this.retry}>
-                ${s(this.hass, "common.retry")}
+                ${n(this.hass, "common.retry")}
               </button>
-              ${this.renderAlternateModeButton()}
+              ${this.inline ? l : this.renderAlternateModeButton()}
             </div>
           </div>
         </div>
-      ` : c;
+      ` : l;
   }
   renderAlternateModeButton() {
     const e = this.mode === "live" ? "last_recording" : "live";
     return h`
       <button class="action-button" type="button" @click=${() => this.selectMode(e)}>
-        ${s(
+        ${n(
       this.hass,
       e === "live" ? "viewer.switch_live" : "viewer.switch_recording"
     )}
@@ -3830,10 +3663,16 @@ let f = class extends C {
     `;
   }
   selectMode(e) {
-    !this.config || e === this.mode || (this.resetVisitorActions(), this.clearAutomaticLiveRecovery(), this.lifecycle.dispose(), this.automaticLiveRetry = !0, this.mode = e, Ei(this.config, e), this.liveMuted = this.config.live_muted, this.recordingStarted = e === "live" || this.config.autoplay_recording, this.resetMediaAttempt(), this.statusAnnouncement = s(
-      this.hass,
-      e === "live" ? "viewer.mode_selected_live" : "viewer.mode_selected_recording"
-    ), this.syncUrl(), this.startMedia());
+    if (this.config) {
+      if (e === this.mode) {
+        this.inline && !this.inlineStarted && (this.inlineStarted = !0, this.recordingStarted = !0, this.resetMediaAttempt(), this.startMedia());
+        return;
+      }
+      this.resetVisitorActions(), this.clearAutomaticLiveRecovery(), this.lifecycle.dispose(), this.releaseInlineLive(), this.automaticLiveRetry = !0, this.mode = e, Pi(this.config, e), this.liveMuted = this.inline ? this.config.dashboard_live_muted : this.config.live_muted, this.inlineStarted = !0, this.recordingStarted = this.inline ? !0 : e === "live" || this.config.autoplay_recording, this.resetMediaAttempt(), this.statusAnnouncement = n(
+        this.hass,
+        e === "live" ? "viewer.mode_selected_live" : "viewer.mode_selected_recording"
+      ), this.syncUrl(), this.startMedia();
+    }
   }
   startMedia() {
     if (!this.open || this.suspended) {
@@ -3844,13 +3683,21 @@ let f = class extends C {
       this.mediaStatus = "idle";
       return;
     }
-    if (_(this.activeEntity())) {
-      this.mediaStatus = "error", this.statusAnnouncement = s(this.hass, "viewer.entity_unavailable");
+    if (this.inline && !this.inlineStarted) {
+      this.mediaStatus = "idle";
+      return;
+    }
+    if (w(this.activeEntity())) {
+      this.mediaStatus = "error", this.statusAnnouncement = n(this.hass, "viewer.entity_unavailable");
+      return;
+    }
+    if (this.inline && this.mode === "live" && !this.claimInlineLive()) {
+      this.waitForLiveResume();
       return;
     }
     this.mediaStatus = "pending", this.session = this.lifecycle.next(), this.lifecycle.scheduleTimeout(
       () => this.failMedia(),
-      eo * 1e3
+      Wi * 1e3
     );
   }
   resetMediaAttempt() {
@@ -3860,7 +3707,7 @@ let f = class extends C {
     return this.open && ["pending", "ready", "playback-blocked"].includes(this.mediaStatus) && (!e || e.currentTarget instanceof HTMLElement && e.currentTarget.isConnected);
   }
   liveAudioStatus() {
-    return this.liveMuted ? s(this.hass, "viewer.live_connected_muted") : this.liveHasAudio === !0 ? s(this.hass, "viewer.live_connected_audio") : this.liveHasAudio === !1 ? s(this.hass, "viewer.live_connected_no_audio") : s(this.hass, "viewer.live_detecting_audio");
+    return this.liveMuted ? n(this.hass, "viewer.live_connected_muted") : this.liveHasAudio === !0 ? n(this.hass, "viewer.live_connected_audio") : this.liveHasAudio === !1 ? n(this.hass, "viewer.live_connected_no_audio") : n(this.hass, "viewer.live_detecting_audio");
   }
   isCurrentRecording(e, t) {
     return this.acceptsMediaEvent() && this.mode === "last_recording" && t === this.lifecycle.current() && e.isConnected && e === this.renderRoot.querySelector(".video-fallback");
@@ -3874,7 +3721,7 @@ let f = class extends C {
         this.handleRecordingVideoError();
         return;
       }
-      this.recordingMuted = !0, e.muted = !0, this.statusAnnouncement = s(this.hass, "viewer.recording_audio_blocked");
+      this.recordingMuted = !0, e.muted = !0, this.statusAnnouncement = n(this.hass, "viewer.recording_audio_blocked");
       try {
         await e.play();
       } catch {
@@ -3885,7 +3732,7 @@ let f = class extends C {
     this.isCurrentRecording(e, t) && this.handleMediaReady();
   }
   waitForLiveResume() {
-    this.cancelTalkPress(), this.clearAutomaticLiveRecovery(), this.lifecycle.dispose(), this.session = this.lifecycle.current(), this.automaticLiveRetry = !1, this.mediaStatus = "awaiting-resume", this.talkbackReady = !1, this.talkbackRequesting = !1, this.talkbackTalking = !1, this.statusAnnouncement = s(this.hass, "viewer.resume_live");
+    this.cancelTalkPress(), this.clearAutomaticLiveRecovery(), this.lifecycle.dispose(), this.releaseInlineLive(), this.session = this.lifecycle.current(), this.automaticLiveRetry = !1, this.mediaStatus = "awaiting-resume", this.talkbackReady = !1, this.talkbackRequesting = !1, this.talkbackTalking = !1, this.statusAnnouncement = n(this.hass, "viewer.resume_live");
   }
   prepareAutomaticLiveResume() {
     this.waitForLiveResume(), this.automaticLiveRecovery = "waiting", this.tryAutomaticLiveResume();
@@ -3899,13 +3746,13 @@ let f = class extends C {
       return;
     }
     if (this.automaticLiveRetry && this.mode === "live" && this.retryCount < 1) {
-      this.retryCount += 1, this.scheduleLiveReconnect(to);
+      this.retryCount += 1, this.scheduleLiveReconnect(Zi);
       return;
     }
-    this.lifecycle.dispose(), this.session = this.lifecycle.current(), this.mediaStatus = "error", this.statusAnnouncement = this.mode === "live" ? s(this.hass, "viewer.live_failed") : s(this.hass, "viewer.recording_unavailable");
+    this.lifecycle.dispose(), this.releaseInlineLive(), this.session = this.lifecycle.current(), this.mediaStatus = "error", this.statusAnnouncement = this.mode === "live" ? n(this.hass, "viewer.live_failed") : n(this.hass, "viewer.recording_unavailable");
   }
   scheduleLiveReconnect(e) {
-    this.lifecycle.dispose(), this.session = this.lifecycle.current(), this.mediaStatus = "retrying", this.statusAnnouncement = s(this.hass, "viewer.retrying_live"), this.lifecycle.scheduleTimeout(() => this.startMedia(), e);
+    this.lifecycle.dispose(), this.session = this.lifecycle.current(), this.mediaStatus = "retrying", this.statusAnnouncement = n(this.hass, "viewer.retrying_live"), this.lifecycle.scheduleTimeout(() => this.startMedia(), e);
   }
   activeEntityId() {
     return this.mode === "live" ? this.config.live_entity : this.config.recording_entity;
@@ -3914,9 +3761,9 @@ let f = class extends C {
     return this.hass?.states[this.activeEntityId()];
   }
   dialogTitle() {
-    return this.config?.name ? this.config.name : x(
+    return this.config?.name ? this.config.name : C(
       this.hass?.states[this.config.recording_entity],
-      s(this.hass, "common.camera")
+      n(this.hass, "common.camera")
     );
   }
   focusableElements() {
@@ -3930,7 +3777,7 @@ let f = class extends C {
     ).filter((t) => t.offsetParent !== null);
   }
   focusInitialControl() {
-    this.renderRoot.querySelector(".close")?.focus();
+    this.inline || this.renderRoot.querySelector(".close")?.focus();
   }
   attachGlobalListeners() {
     document.addEventListener("visibilitychange", this.handleVisibilityChange), window.addEventListener("pagehide", this.handlePageHide), window.addEventListener("pageshow", this.handlePageShow), window.addEventListener("blur", this.handleWindowBlur);
@@ -3938,11 +3785,24 @@ let f = class extends C {
   detachGlobalListeners() {
     document.removeEventListener("visibilitychange", this.handleVisibilityChange), window.removeEventListener("pagehide", this.handlePageHide), window.removeEventListener("pageshow", this.handlePageShow), window.removeEventListener("blur", this.handleWindowBlur);
   }
+  updateInlineActivity() {
+    const e = !!(this.inlineVisible && document.visibilityState !== "hidden" && !this.pageUnloading);
+    if (e !== this.inlineActive && (this.inlineActive = e, !(!this.inline || !this.open))) {
+      if (!e) {
+        this.suspendInline();
+        return;
+      }
+      this.suspended = !1, this.inlineStarted && this.startMedia();
+    }
+  }
+  suspendInline() {
+    this.inlineActive = !1, !(!this.inline || !this.open) && (this.resetVisitorActions(), this.clearAutomaticLiveRecovery(), this.lifecycle.dispose(), this.releaseInlineLive(), this.session = this.lifecycle.current(), this.suspended = !0, this.mediaStatus = "idle");
+  }
   detectDoorbellEvent(e) {
     const t = this.config?.doorbell_entity;
     if (!t || !this.hass) return;
     const i = this.hass.states[t], o = e?.states[t]?.state ?? this.lastDoorbellState;
-    this.lastDoorbellState = i?.state, !(!i || o === void 0 || o === i.state || ["unknown", "unavailable"].includes(i.state) || i.attributes.event_type !== void 0 && i.attributes.event_type !== "ring") && this.setRingingUntil(Date.now() + ge);
+    this.lastDoorbellState = i?.state, !(!i || o === void 0 || o === i.state || ["unknown", "unavailable"].includes(i.state) || i.attributes.event_type !== void 0 && i.attributes.event_type !== "ring") && this.setRingingUntil(Date.now() + te);
   }
   setRingingUntil(e) {
     this.ringAlertTimer !== void 0 && (window.clearTimeout(this.ringAlertTimer), this.ringAlertTimer = void 0);
@@ -3956,111 +3816,575 @@ let f = class extends C {
     }, t);
   }
   syncUrl() {
-    if (!this.open || !this.config || !this.returnUrl) return;
-    const e = ui(this.returnUrl, {
+    if (this.inline || !this.open || !this.config || !this.returnUrl) return;
+    const e = fi(this.returnUrl, {
       liveEntity: this.config.live_entity,
       recordingEntity: this.config.recording_entity,
       mode: this.mode,
       ringingUntil: this.ringingUntil
     });
-    ve(e, e);
+    _e(e, e);
   }
   finishClose(e = !0, t = !0) {
     if (!this.open) return;
+    const i = this.inline;
     this.clearAutomaticLiveRecovery();
-    const i = this.opener, o = this.returnUrl, r = this.config;
-    this.renderRoot.querySelector("ring-view-ring-webrtc-player")?.stopTalking(), this.lifecycle.dispose(), this.session = this.lifecycle.current(), this.mediaStatus = "idle", this.open = !1, vi(this), this.suspended = !1, this.resetMediaAttempt(), this.automaticLiveRetry = !0, this.recordingStarted = !0, this.statusAnnouncement = "", this.resetVisitorActions(), this.setRingingUntil(), this.lastDoorbellState = void 0, this.detachGlobalListeners(), document.fullscreenElement && document.exitFullscreen().catch(() => {
-    }), t && o && r && pe(ue(), r) && ve(o, null), this.dispatchEvent(
+    const o = this.opener, r = this.returnUrl, s = this.config;
+    this.renderRoot.querySelector("ring-view-ring-webrtc-player")?.stopTalking(), this.lifecycle.dispose(), this.releaseInlineLive(), this.session = this.lifecycle.current(), this.mediaStatus = "idle", this.open = !1, _i(this), this.suspended = !1, this.resetMediaAttempt(), this.automaticLiveRetry = !0, this.recordingStarted = !0, this.statusAnnouncement = "", this.resetVisitorActions(), this.setRingingUntil(), this.lastDoorbellState = void 0, this.detachGlobalListeners(), document.fullscreenElement && document.exitFullscreen().catch(() => {
+    }), t && r && s && me(fe(), s) && _e(r, null), i || this.dispatchEvent(
       new CustomEvent("viewer-closed", { bubbles: !0, composed: !0 })
     ), t && this.dispatchEvent(
       new CustomEvent("dialog-closed", {
-        detail: { dialog: Te },
+        detail: { dialog: Me },
         bubbles: !0,
         composed: !0
       })
-    ), this.config = void 0, this.returnUrl = void 0, e && i?.isConnected && i.focus(), this.opener = void 0;
+    ), this.config = void 0, this.returnUrl = void 0, this.inlineStarted = !0, e && o?.isConnected && o.focus(), this.opener = void 0;
   }
   icon(e) {
     return h`<svg viewBox="0 0 24 24" aria-hidden="true"><path d=${e}></path></svg>`;
   }
+  claimInlineLive(e = !1) {
+    const t = this.config?.live_entity;
+    if (!this.inline || !t) return !0;
+    const i = J.get(t);
+    if (i && i !== this) {
+      if (!e) return !1;
+      i.pauseForInlineTakeover();
+    }
+    return J.set(t, this), !0;
+  }
+  releaseInlineLive() {
+    const e = this.config?.live_entity;
+    e && J.get(e) === this && J.delete(e);
+  }
+  pauseForInlineTakeover() {
+    !this.inline || !this.open || this.mode !== "live" || (this.resetVisitorActions(), this.clearAutomaticLiveRecovery(), this.lifecycle.dispose(), this.releaseInlineLive(), this.session = this.lifecycle.current(), this.automaticLiveRetry = !1, this.mediaStatus = "awaiting-resume", this.statusAnnouncement = n(this.hass, "viewer.resume_live"));
+  }
 };
-f.styles = yi;
+f.styles = Si;
 m([
-  b({ attribute: !1 })
+  _({ attribute: !1 })
 ], f.prototype, "hass", 2);
 m([
-  b({ attribute: !1 })
+  _({ attribute: !1 })
 ], f.prototype, "config", 2);
 m([
-  b({ type: Boolean, reflect: !0 })
+  _({ type: Boolean, reflect: !0 })
 ], f.prototype, "open", 2);
 m([
-  p()
+  _({ type: Boolean, reflect: !0 })
+], f.prototype, "inline", 2);
+m([
+  u()
 ], f.prototype, "ringing", 2);
 m([
-  p()
+  u()
 ], f.prototype, "mode", 2);
 m([
-  p()
+  u()
 ], f.prototype, "mediaStatus", 2);
 m([
-  p()
+  u()
 ], f.prototype, "session", 2);
 m([
-  p()
+  u()
 ], f.prototype, "suspended", 2);
 m([
-  p()
+  u()
 ], f.prototype, "recordingMuted", 2);
 m([
-  p()
+  u()
 ], f.prototype, "recordingStarted", 2);
 m([
-  p()
+  u()
 ], f.prototype, "liveMuted", 2);
 m([
-  p()
+  u()
 ], f.prototype, "liveHasAudio", 2);
 m([
-  p()
+  u()
 ], f.prototype, "recordingVideoFailed", 2);
 m([
-  p()
+  u()
 ], f.prototype, "retryCount", 2);
 m([
-  p()
+  u()
 ], f.prototype, "statusAnnouncement", 2);
 m([
-  p()
+  u()
 ], f.prototype, "talkbackReady", 2);
 m([
-  p()
+  u()
 ], f.prototype, "talkbackRequesting", 2);
 m([
-  p()
+  u()
 ], f.prototype, "talkbackTalking", 2);
 m([
-  p()
+  u()
 ], f.prototype, "doorActionStatus", 2);
 m([
-  p()
+  u()
 ], f.prototype, "doorFeedback", 2);
+m([
+  u()
+], f.prototype, "inlineStarted", 2);
 f = m([
-  Z(Te)
+  Z(Me)
 ], f);
-const no = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const J = /* @__PURE__ */ new Map(), Ji = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   get RingViewDialog() {
     return f;
   }
-}, Symbol.toStringTag, { value: "Module" }));
-var so = Object.defineProperty, ao = Object.getOwnPropertyDescriptor, G = (e, t, i, o) => {
-  for (var r = o > 1 ? void 0 : o ? ao(t, i) : t, n = e.length - 1, a; n >= 0; n--)
-    (a = e[n]) && (r = (o ? a(t, i, r) : a(r)) || r);
-  return o && r && so(t, i, r), r;
+}, Symbol.toStringTag, { value: "Module" })), Xi = [
+  "timestamp",
+  "capture_timestamp",
+  "captured_at",
+  "recorded_at",
+  "last_recording_at",
+  "recording_timestamp"
+];
+function eo(e) {
+  if (typeof e == "number")
+    return !Number.isFinite(e) || e <= 0 ? void 0 : e < 1e12 ? e * 1e3 : e;
+  if (typeof e != "string" || e.trim() === "") return;
+  const t = Number(e);
+  if (Number.isFinite(t) && t > 0)
+    return t < 1e12 ? t * 1e3 : t;
+  const i = Date.parse(e);
+  return Number.isFinite(i) && i > 0 ? i : void 0;
+}
+function we(e) {
+  if (e)
+    for (const t of Xi) {
+      const i = eo(e.attributes[t]);
+      if (i !== void 0) return i;
+    }
+}
+function to(e) {
+  if (e)
+    for (const t of ["last_video_id", "video_url", "entity_picture"]) {
+      const i = e.attributes[t];
+      if (typeof i == "string" && i !== "") return `${t}:${i}`;
+      if (typeof i == "number" && Number.isFinite(i)) return `${t}:${i}`;
+    }
+}
+function io(e, t, i) {
+  const o = t.recording_entity, r = t.snapshot_entity;
+  if (!r) return o;
+  const s = e.states[o], a = e.states[r], c = !w(s), d = !w(a);
+  if (c && !d) return o;
+  if (d && !c) return r;
+  if (c && d) {
+    const p = we(s), v = we(a);
+    if (p !== void 0 && v !== void 0)
+      return p !== v ? v > p ? r : o : t.preview_fallback === "snapshot" ? r : o;
+    if (i !== void 0)
+      return i === "snapshot" ? r : o;
+  }
+  return t.preview_fallback === "snapshot" ? r : o;
+}
+function oo(e, t, i, o) {
+  switch (t.preview_source) {
+    case "live":
+      return t.live_entity;
+    case "snapshot":
+      return t.snapshot_entity ?? t.recording_entity;
+    case "newest":
+      return io(e, t, o);
+    case "default":
+      return i === "live" ? t.live_entity : t.recording_entity;
+    default:
+      return t.recording_entity;
+  }
+}
+var ro = Object.defineProperty, no = Object.getOwnPropertyDescriptor, M = (e, t, i, o) => {
+  for (var r = o > 1 ? void 0 : o ? no(t, i) : t, s = e.length - 1, a; s >= 0; s--)
+    (a = e[s]) && (r = (o ? a(t, i, r) : a(r)) || r);
+  return o && r && ro(t, i, r), r;
 };
-function co(e, t) {
+const so = 1e4, ao = 640, lo = 16 / 9, Je = 16, co = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
+  Xt
+)}`;
+let x = class extends E {
+  constructor() {
+    super(...arguments), this.preview = !1, this.previewFailed = !1, this.ringAlertVisible = !1, this.previewIntersecting = !1, this.previewVisible = !1, this.previewRequestId = 0, this.lastRingAlertAt = 0, this.previewMarkersInitialized = !1, this.inlinePausedForViewer = !1, this.openViewer = () => {
+      if (this.preview || this.isInCardPicker()) return;
+      this.updateRingAlert();
+      const e = this.renderRoot.querySelector(".preview") ?? void 0;
+      ue(e ?? this, {
+        config: this.config,
+        mode: this.ringAlertVisible ? "live" : Q(this.config),
+        opener: e,
+        ringingUntil: this.ringAlertVisible ? this.lastRingAlertAt + te : void 0
+      });
+    }, this.openExpandedViewer = (e) => {
+      if (!this.config) return;
+      e.stopPropagation();
+      const t = e.currentTarget;
+      t.stopInline(), this.inlinePausedForViewer = !0, ue(t, {
+        config: this.config,
+        mode: e.detail.mode,
+        opener: t,
+        ringingUntil: e.detail.ringingUntil
+      });
+    }, this.handleViewerClosed = () => {
+      this.inlinePausedForViewer && (this.inlinePausedForViewer = !1, this.updateComplete.then(() => this.initializeInlineViewer()));
+    }, this.handleKeyDown = (e) => {
+      e.key !== "Enter" && e.key !== " " || (e.preventDefault(), this.openViewer());
+    }, this.handlePreviewError = () => {
+      this.previewFailed = !0;
+    }, this.handleDocumentVisibility = () => {
+      this.updatePreviewVisibility();
+    };
+  }
+  static async getConfigElement() {
+    return await Promise.resolve().then(() => fo), document.createElement("ring-view-editor");
+  }
+  static getStubConfig(e) {
+    const t = Object.keys(e?.states ?? {}).filter((r) => r.startsWith("camera.")), i = t.find(
+      (r) => (Number(e?.states[r]?.attributes.supported_features ?? 0) & 2) !== 0
+    ) ?? t.find((r) => /live(_view)?$/i.test(r)) ?? t[1] ?? "camera.live_view", o = t.find(
+      (r) => r !== i && (Number(e?.states[r]?.attributes.supported_features ?? 0) & 2) === 0
+    ) ?? t.find((r) => r !== i) ?? t[0] ?? "camera.latest_recording";
+    return {
+      type: Re,
+      recording_entity: o,
+      live_entity: i
+    };
+  }
+  setConfig(e) {
+    const t = ge(e);
+    (t.recording_entity !== this.config?.recording_entity || t.snapshot_entity !== this.config?.snapshot_entity) && (this.previewMarkersInitialized = !1, this.recordingMarker = void 0, this.snapshotTimestamp = void 0, this.latestObservedPreviewSource = void 0), this.config = t;
+  }
+  getCardSize() {
+    return 3;
+  }
+  getGridOptions() {
+    return {
+      columns: 12,
+      rows: 3,
+      min_columns: 6,
+      min_rows: 2,
+      ...this.config?.grid_options
+    };
+  }
+  connectedCallback() {
+    super.connectedCallback(), document.addEventListener("viewer-closed", this.handleViewerClosed), this.updateRingAlert(), this.updateComplete.then(() => {
+      this.isConnected && !this.isInCardPicker() && this.setupPreviewLifecycle();
+    });
+  }
+  disconnectedCallback() {
+    document.removeEventListener("viewer-closed", this.handleViewerClosed), this.teardownPreviewLifecycle(), this.clearRingAlertTimer(), this.restoreViewerTimer !== void 0 && (window.clearTimeout(this.restoreViewerTimer), this.restoreViewerTimer = void 0), super.disconnectedCallback();
+  }
+  shouldUpdate(e) {
+    for (const i of e.keys())
+      if (i !== "hass") return !0;
+    if (!e.has("hass") || !this.hass || !this.config) return !1;
+    const t = e.get("hass");
+    return t ? t.language !== this.hass.language || t.locale?.language !== this.hass.locale?.language || t.states[this.config.recording_entity] !== this.hass.states[this.config.recording_entity] || t.states[this.config.live_entity] !== this.hass.states[this.config.live_entity] || this.config.snapshot_entity !== void 0 && t.states[this.config.snapshot_entity] !== this.hass.states[this.config.snapshot_entity] || this.config.doorbell_entity !== void 0 && t.states[this.config.doorbell_entity] !== this.hass.states[this.config.doorbell_entity] || this.config.door_entity !== void 0 && t.states[this.config.door_entity] !== this.hass.states[this.config.door_entity] || this.config.door_contact_entity !== void 0 && t.states[this.config.door_contact_entity] !== this.hass.states[this.config.door_contact_entity] : !0;
+  }
+  willUpdate(e) {
+    if (!this.hass || !this.config || (this.observePreviewMedia(), this.detectDoorbellEvent(e.get("hass")), this.isInCardPicker())) return;
+    const t = this.previewEntityId(), i = vt(this.hass, this.hass.states[t], t);
+    (t !== this.activePreviewEntityId || i !== this.lastFallbackPoster) && (this.activePreviewEntityId = t, this.lastFallbackPoster = i, this.lastPoster = i, this.lastPreviewSize = void 0, this.previewRequestId += 1, this.previewFailed = !1);
+  }
+  updated(e) {
+    const t = e.has("config");
+    (t || e.has("preview")) && !this.isInCardPicker() && (this.teardownPreviewLifecycle(), this.setupPreviewLifecycle()), !this.isInCardPicker() && this.config?.dashboard_behavior === "open_viewer" && (e.has("hass") || t) && this.previewVisible && this.refreshPreview(!0), !this.isInCardPicker() && this.hass && this.config && this.scheduleViewerRestore(), !this.isInCardPicker() && !this.preview && this.config?.dashboard_behavior === "interactive" && this.initializeInlineViewer();
+  }
+  render() {
+    if (!this.hass || !this.config) return l;
+    const e = this.previewEntityId(), t = this.hass.states[e], i = this.config.name || C(
+      this.hass.states[this.config.recording_entity],
+      n(this.hass, "common.camera")
+    ), o = this.ringAlertVisible ? "live" : Q(this.config), r = this.isInCardPicker(), s = r || this.preview, a = r ? !1 : w(t), c = {
+      "--ring-view-aspect-ratio": gi(this.config.aspect_ratio),
+      "--ring-view-fit-mode": this.config.fit_mode
+    };
+    if (this.config.dashboard_behavior === "interactive" && !s)
+      return h`
+        <ha-card class="interactive">
+          <div class="inline-shell" style=${pe(c)}>
+            <ring-view-dialog
+              inline
+              .hass=${this.hass}
+              @ring-view-expand=${this.openExpandedViewer}
+            ></ring-view-dialog>
+          </div>
+        </ha-card>
+      `;
+    const d = !s;
+    return h`
+      <ha-card class=${s ? "safe-preview" : l}>
+        <div
+          class="preview"
+          style=${pe(c)}
+          role=${d ? "button" : "img"}
+          tabindex=${d ? "0" : l}
+          aria-label=${d ? n(this.hass, "card.open_viewer", {
+      name: i,
+      mode: Ai(o, this.hass)
+    }) : n(this.hass, "card.preview_alt", { name: i })}
+          title=${d ? n(
+      this.hass,
+      o === "live" ? "card.open_live" : "card.open_recording"
+    ) : l}
+          @click=${d ? this.openViewer : void 0}
+          @keydown=${d ? this.handleKeyDown : void 0}
+        >
+          ${!a && !this.previewFailed ? h`
+                <img
+                  src=${r ? co : this.lastPoster ?? ""}
+                  alt=${n(this.hass, "card.preview_alt", { name: i })}
+                  @error=${this.handlePreviewError}
+                />
+              ` : h`<div class="placeholder">
+                ${n(this.hass, "card.preview_unavailable")}
+              </div>`}
+          ${this.config.show_name ? h`<div class="name">${i}</div>` : l}
+          ${this.ringAlertVisible ? h`<div class="ring-alert" role="status">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d=${Xe}></path>
+                </svg>
+                <span>${n(this.hass, "ring.alert")}</span>
+              </div>` : l}
+        </div>
+      </ha-card>
+    `;
+  }
+  previewEntityId() {
+    return oo(
+      this.hass,
+      this.config,
+      Q(this.config),
+      this.latestObservedPreviewSource
+    );
+  }
+  observePreviewMedia() {
+    const e = to(
+      this.hass?.states[this.config.recording_entity]
+    ), t = we(
+      this.config.snapshot_entity ? this.hass?.states[this.config.snapshot_entity] : void 0
+    );
+    if (!this.previewMarkersInitialized) {
+      this.previewMarkersInitialized = !0, this.recordingMarker = e, this.snapshotTimestamp = t;
+      return;
+    }
+    const i = e !== void 0 && e !== this.recordingMarker, o = t !== void 0 && t !== this.snapshotTimestamp;
+    i !== o ? this.latestObservedPreviewSource = i ? "last_recording" : "snapshot" : i && (this.latestObservedPreviewSource = void 0), this.recordingMarker = e, this.snapshotTimestamp = t;
+  }
+  initializeInlineViewer() {
+    if (!this.hass || !this.config || this.inlinePausedForViewer) return;
+    const e = this.renderRoot.querySelector(
+      "ring-view-dialog[inline]"
+    );
+    e && (e.hass = this.hass, e.showInline({
+      config: this.config,
+      mode: this.ringAlertVisible ? "live" : Q(this.config),
+      start: this.ringAlertVisible ? "on_demand" : this.config.dashboard_start,
+      ringingUntil: this.ringAlertVisible ? this.lastRingAlertAt + te : void 0
+    }), e.setInlineVisible(this.previewVisible));
+  }
+  scheduleViewerRestore() {
+    if (this.restoreViewerTimer !== void 0 || !this.config) return;
+    const e = fe();
+    me(e, this.config) && (this.restoreViewerTimer = window.setTimeout(() => {
+      if (this.restoreViewerTimer = void 0, !this.isConnected || !this.hass || !this.config) return;
+      const t = fe();
+      if (!me(t, this.config)) return;
+      const i = this.renderRoot.querySelector(".preview") ?? void 0;
+      this.config.dashboard_behavior === "interactive" && (this.renderRoot.querySelector("ring-view-dialog[inline]")?.stopInline(), this.inlinePausedForViewer = !0), ue(i ?? this, {
+        config: this.config,
+        mode: t.mode,
+        opener: i,
+        restored: !0,
+        ringingUntil: t.ringingUntil !== void 0 && t.ringingUntil > Date.now() ? t.ringingUntil : void 0
+      });
+    }, 0));
+  }
+  detectDoorbellEvent(e) {
+    const t = this.config?.doorbell_entity;
+    if (!t || !e || !this.hass) return;
+    const i = e.states[t], o = this.hass.states[t];
+    if (!o || i?.state === o.state || ["unknown", "unavailable"].includes(o.state) || o.attributes.event_type !== void 0 && o.attributes.event_type !== "ring")
+      return;
+    const r = Date.now();
+    r - this.lastRingAlertAt < 5e3 || (this.lastRingAlertAt = r, this.updateRingAlert());
+  }
+  updateRingAlert() {
+    this.clearRingAlertTimer();
+    const e = this.lastRingAlertAt + te - Date.now();
+    this.ringAlertVisible = this.lastRingAlertAt > 0 && e > 0, this.ringAlertVisible && this.isConnected && (this.ringAlertTimer = window.setTimeout(() => this.updateRingAlert(), e));
+  }
+  clearRingAlertTimer() {
+    this.ringAlertTimer !== void 0 && (window.clearTimeout(this.ringAlertTimer), this.ringAlertTimer = void 0);
+  }
+  setupPreviewLifecycle() {
+    if (this.isInCardPicker() || this.previewIntersectionObserver || this.previewResizeObserver) return;
+    const e = this.renderRoot.querySelector(
+      ".preview, .inline-shell"
+    );
+    e && (typeof IntersectionObserver > "u" ? this.previewIntersecting = !0 : (this.previewIntersectionObserver = new IntersectionObserver((t) => {
+      const i = t[t.length - 1];
+      i && (this.previewIntersecting = i.isIntersecting || i.intersectionRatio > 0, this.updatePreviewVisibility());
+    }), this.previewIntersectionObserver.observe(e)), typeof ResizeObserver < "u" && (this.previewResizeObserver = new ResizeObserver(() => {
+      !this.previewVisible || this.previewResizeFrame !== void 0 || (this.previewResizeFrame = window.requestAnimationFrame(() => {
+        this.previewResizeFrame = void 0, this.refreshPreview(!1);
+      }));
+    }), this.previewResizeObserver.observe(e)), document.addEventListener("visibilitychange", this.handleDocumentVisibility), this.updatePreviewVisibility());
+  }
+  teardownPreviewLifecycle() {
+    this.renderRoot.querySelector("ring-view-dialog[inline]")?.setInlineVisible(!1), this.previewIntersectionObserver?.disconnect(), this.previewResizeObserver?.disconnect(), this.previewIntersectionObserver = void 0, this.previewResizeObserver = void 0, document.removeEventListener("visibilitychange", this.handleDocumentVisibility), this.stopPreviewRefreshTimer(), this.previewResizeFrame !== void 0 && (window.cancelAnimationFrame(this.previewResizeFrame), this.previewResizeFrame = void 0), this.previewVisible = !1, this.previewIntersecting = !1, this.previewRequestId += 1;
+  }
+  updatePreviewVisibility() {
+    if (this.isInCardPicker()) return;
+    const e = this.previewIntersecting && document.visibilityState !== "hidden";
+    if (e !== this.previewVisible) {
+      if (this.previewVisible = e, this.config?.dashboard_behavior === "interactive" && !this.preview) {
+        this.stopPreviewRefreshTimer(), this.renderRoot.querySelector("ring-view-dialog[inline]")?.setInlineVisible(e);
+        return;
+      }
+      if (e) {
+        this.refreshPreview(!0), this.previewRefreshTimer = window.setInterval(() => {
+          this.refreshPreview(!0);
+        }, so);
+        return;
+      }
+      this.stopPreviewRefreshTimer(), this.previewRequestId += 1;
+    }
+  }
+  stopPreviewRefreshTimer() {
+    this.previewRefreshTimer !== void 0 && (window.clearInterval(this.previewRefreshTimer), this.previewRefreshTimer = void 0);
+  }
+  async refreshPreview(e) {
+    if (this.isInCardPicker() || !this.previewVisible || !this.hass || !this.config) return;
+    const t = this.renderRoot.querySelector(".preview");
+    if (!t) return;
+    const i = Math.max(1, window.devicePixelRatio || 1), o = t.clientWidth || t.getBoundingClientRect().width, r = o > 0 ? o : ao, s = t.clientHeight || t.getBoundingClientRect().height, a = ht(this.config.aspect_ratio) ?? lo, c = s > 0 ? s : r / a, d = Math.ceil(r * i), p = Math.ceil(c * i);
+    if (!e && this.lastPreviewSize && Math.abs(d - this.lastPreviewSize.width) < Je && Math.abs(p - this.lastPreviewSize.height) < Je)
+      return;
+    this.lastPreviewSize = { width: d, height: p };
+    const v = this.previewEntityId(), g = this.hass, A = ++this.previewRequestId;
+    try {
+      const S = await yi(g, v, d, p);
+      if (A !== this.previewRequestId || !this.isConnected || !this.previewVisible || this.previewEntityId() !== v)
+        return;
+      this.lastPoster = S, this.previewFailed = !1;
+    } catch {
+    }
+  }
+  /**
+   * Home Assistant mounts picker previews inside `hui-card-picker`. Keep that
+   * catalog surface representative without exposing a user's camera image.
+   * The standard `preview` property is also used while editing dashboards, so
+   * the ancestor check intentionally distinguishes the picker from edit mode.
+   */
+  isInCardPicker() {
+    let e = this.parentNode ?? this.getRootNode();
+    for (; e; ) {
+      if (e instanceof Element && e.localName === "hui-card-picker") return !0;
+      e = e instanceof ShadowRoot ? e.host : e.parentNode;
+    }
+    return !1;
+  }
+};
+x.styles = $i;
+M([
+  _({ attribute: !1 })
+], x.prototype, "hass", 2);
+M([
+  _({ reflect: !0 })
+], x.prototype, "layout", 2);
+M([
+  _({ type: Boolean })
+], x.prototype, "preview", 2);
+M([
+  u()
+], x.prototype, "config", 2);
+M([
+  u()
+], x.prototype, "previewFailed", 2);
+M([
+  u()
+], x.prototype, "lastPoster", 2);
+M([
+  u()
+], x.prototype, "ringAlertVisible", 2);
+x = M([
+  Z(ve)
+], x);
+window.customCards = window.customCards || [];
+window.customCards.some((e) => e.type === ve) || window.customCards.push({
+  type: ve,
+  name: ri,
+  description: n(void 0, "card.description"),
+  preview: !0,
+  getEntitySuggestion: (e, t) => {
+    if (!t.startsWith("camera.")) return null;
+    const i = Object.keys(e.states).find(
+      (o) => o !== t && o.startsWith("camera.") && /live(_view)?$/i.test(o)
+    );
+    return i ? {
+      config: {
+        type: Re,
+        recording_entity: t,
+        live_entity: i
+      }
+    } : null;
+  }
+});
+var ho = Object.defineProperty, uo = Object.getOwnPropertyDescriptor, G = (e, t, i, o) => {
+  for (var r = o > 1 ? void 0 : o ? uo(t, i) : t, s = e.length - 1, a; s >= 0; s--)
+    (a = e[s]) && (r = (o ? a(t, i, r) : a(r)) || r);
+  return o && r && ho(t, i, r), r;
+};
+function po(e, t) {
   const i = [
+    {
+      name: "dashboard_behavior",
+      required: !0,
+      selector: {
+        select: {
+          mode: "dropdown",
+          options: [
+            {
+              value: "open_viewer",
+              label: n(e, "editor.dashboard_behavior_viewer")
+            },
+            {
+              value: "interactive",
+              label: n(e, "editor.dashboard_behavior_interactive")
+            }
+          ]
+        }
+      }
+    }
+  ];
+  t.dashboard_behavior === "interactive" ? i.push(
+    {
+      name: "dashboard_start",
+      required: !0,
+      selector: {
+        select: {
+          mode: "dropdown",
+          options: [
+            {
+              value: "on_demand",
+              label: n(e, "editor.dashboard_start_on_demand")
+            },
+            {
+              value: "last_recording",
+              label: n(e, "common.last_recording")
+            },
+            { value: "live", label: n(e, "common.live") }
+          ]
+        }
+      }
+    },
+    { name: "dashboard_live_muted", selector: { boolean: {} } }
+  ) : i.push(
     {
       name: "preview_source",
       required: !0,
@@ -4070,34 +4394,33 @@ function co(e, t) {
           options: [
             {
               value: "last_recording",
-              label: s(e, "editor.preview_recording")
+              label: n(e, "editor.preview_recording")
             },
             {
               value: "live",
-              label: s(e, "editor.preview_live")
+              label: n(e, "editor.preview_live")
             },
             {
               value: "default",
-              label: s(e, "editor.preview_default")
+              label: n(e, "editor.preview_default")
             },
             {
               value: "snapshot",
-              label: s(e, "editor.preview_snapshot")
+              label: n(e, "editor.preview_snapshot")
             },
             {
               value: "newest",
-              label: s(e, "editor.preview_newest")
+              label: n(e, "editor.preview_newest")
             }
           ]
         }
       }
     }
-  ];
-  ["snapshot", "newest"].includes(t.preview_source) && i.push({
+  ), t.dashboard_behavior === "open_viewer" && ["snapshot", "newest"].includes(t.preview_source) && i.push({
     name: "snapshot_entity",
     required: !0,
     selector: { entity: { domain: "camera" } }
-  }), t.preview_source === "newest" && i.push({
+  }), t.dashboard_behavior === "open_viewer" && t.preview_source === "newest" && i.push({
     name: "preview_fallback",
     required: !0,
     selector: {
@@ -4106,11 +4429,11 @@ function co(e, t) {
         options: [
           {
             value: "last_recording",
-            label: s(e, "editor.fallback_recording")
+            label: n(e, "editor.fallback_recording")
           },
           {
             value: "snapshot",
-            label: s(e, "editor.fallback_snapshot")
+            label: n(e, "editor.fallback_snapshot")
           }
         ]
       }
@@ -4136,11 +4459,11 @@ function co(e, t) {
           options: [
             {
               value: "unlock",
-              label: s(e, "editor.door_action_unlock")
+              label: n(e, "editor.door_action_unlock")
             },
             {
               value: "open",
-              label: s(e, "editor.door_action_open")
+              label: n(e, "editor.door_action_open")
             }
           ]
         }
@@ -4155,11 +4478,11 @@ function co(e, t) {
           options: [
             {
               value: "live_only",
-              label: s(e, "editor.door_visibility_live")
+              label: n(e, "editor.door_visibility_live")
             },
             {
               value: "all_views",
-              label: s(e, "editor.door_visibility_all")
+              label: n(e, "editor.door_visibility_all")
             }
           ]
         }
@@ -4167,6 +4490,9 @@ function co(e, t) {
     }
   ), o.push({
     name: "door_hold_to_activate",
+    selector: { boolean: {} }
+  }), t.dashboard_behavior === "interactive" && o.push({
+    name: "door_control_on_dashboard",
     selector: { boolean: {} }
   })), [
     {
@@ -4183,14 +4509,14 @@ function co(e, t) {
       name: "dashboard_preview",
       type: "expandable",
       flatten: !0,
-      iconPath: kt,
+      iconPath: _t,
       schema: i
     },
     {
       name: "viewer_behavior",
       type: "expandable",
       flatten: !0,
-      iconPath: St,
+      iconPath: Ct,
       schema: [
         {
           name: "default_mode",
@@ -4200,9 +4526,9 @@ function co(e, t) {
               options: [
                 {
                   value: "last_recording",
-                  label: s(e, "common.last_recording")
+                  label: n(e, "common.last_recording")
                 },
-                { value: "live", label: s(e, "common.live") }
+                { value: "live", label: n(e, "common.live") }
               ]
             }
           }
@@ -4217,7 +4543,7 @@ function co(e, t) {
       name: "doorbell_features",
       type: "expandable",
       flatten: !0,
-      iconPath: wt,
+      iconPath: kt,
       schema: [
         {
           name: "doorbell_entity",
@@ -4229,14 +4555,14 @@ function co(e, t) {
       name: "door_access",
       type: "expandable",
       flatten: !0,
-      iconPath: Je,
+      iconPath: et,
       schema: o
     },
     {
       name: "card_appearance",
       type: "expandable",
       flatten: !0,
-      iconPath: $t,
+      iconPath: xt,
       schema: [
         { name: "name", selector: { text: {} } },
         { name: "show_name", selector: { boolean: {} } },
@@ -4252,19 +4578,19 @@ function co(e, t) {
                   options: [
                     {
                       value: "16:9",
-                      label: s(e, "editor.aspect_widescreen")
+                      label: n(e, "editor.aspect_widescreen")
                     },
                     {
                       value: "4:3",
-                      label: s(e, "editor.aspect_standard")
+                      label: n(e, "editor.aspect_standard")
                     },
                     {
                       value: "1:1",
-                      label: s(e, "editor.aspect_square")
+                      label: n(e, "editor.aspect_square")
                     },
                     {
                       value: "auto",
-                      label: s(e, "editor.aspect_auto")
+                      label: n(e, "editor.aspect_auto")
                     }
                   ]
                 }
@@ -4278,11 +4604,11 @@ function co(e, t) {
                   options: [
                     {
                       value: "cover",
-                      label: s(e, "editor.fit_cover")
+                      label: n(e, "editor.fit_cover")
                     },
                     {
                       value: "contain",
-                      label: s(e, "editor.fit_contain")
+                      label: n(e, "editor.fit_contain")
                     }
                   ]
                 }
@@ -4294,11 +4620,14 @@ function co(e, t) {
     }
   ];
 }
-const lo = {
+const vo = {
   recording_entity: "editor.recording_entity",
   live_entity: "editor.live_entity",
   snapshot_entity: "editor.snapshot_entity",
   dashboard_preview: "editor.dashboard_preview",
+  dashboard_behavior: "editor.dashboard_behavior",
+  dashboard_start: "editor.dashboard_start",
+  dashboard_live_muted: "editor.dashboard_live_muted",
   viewer_behavior: "editor.viewer_behavior",
   default_mode: "editor.default_mode",
   remember_last_mode: "editor.remember_last_mode",
@@ -4313,6 +4642,7 @@ const lo = {
   door_action: "editor.door_action",
   door_control_visibility: "editor.door_control_visibility",
   door_hold_to_activate: "editor.door_hold_to_activate",
+  door_control_on_dashboard: "editor.door_control_on_dashboard",
   card_appearance: "editor.card_appearance",
   name: "editor.name",
   show_name: "editor.show_name",
@@ -4320,7 +4650,10 @@ const lo = {
   preview_fallback: "editor.preview_fallback",
   aspect_ratio: "editor.aspect_ratio",
   fit_mode: "editor.fit_mode"
-}, ho = {
+}, go = {
+  dashboard_behavior: "editor.helper_dashboard_behavior",
+  dashboard_start: "editor.helper_dashboard_start",
+  dashboard_live_muted: "editor.helper_dashboard_live_muted",
   default_mode: "editor.helper_default_mode",
   remember_last_mode: "editor.helper_remember_last_mode",
   autoplay_recording: "editor.helper_autoplay_recording",
@@ -4332,17 +4665,18 @@ const lo = {
   door_action: "editor.helper_door_action",
   door_control_visibility: "editor.helper_door_control_visibility",
   door_hold_to_activate: "editor.helper_door_hold_to_activate",
+  door_control_on_dashboard: "editor.helper_door_control_on_dashboard",
   show_name: "editor.helper_show_name",
   preview_source: "editor.helper_preview_source",
   snapshot_entity: "editor.helper_snapshot_entity",
   preview_fallback: "editor.helper_preview_fallback"
 };
-let M = class extends C {
+let P = class extends E {
   constructor() {
     super(...arguments), this.nativeChecked = !1, this.nativeAvailable = !1, this.computeLabel = (e) => {
-      const t = lo[e.name];
+      const t = vo[e.name];
       if (!t) return;
-      const i = s(this.hass, t);
+      const i = n(this.hass, t);
       if (!["name", "door_contact_entity"].includes(e.name)) return i;
       const o = ct(
         this.hass,
@@ -4351,11 +4685,11 @@ let M = class extends C {
       );
       return `${i} (${o})`;
     }, this.computeHelper = (e) => {
-      const t = ho[e.name];
-      return t ? s(this.hass, t) : void 0;
+      const t = go[e.name];
+      return t ? n(this.hass, t) : void 0;
     }, this.valueChanged = (e) => {
       if (!this.config) return;
-      const t = he({
+      const t = ge({
         ...this.config,
         ...e.detail.value
       });
@@ -4364,10 +4698,11 @@ let M = class extends C {
         "door_contact_entity",
         "door_action",
         "door_control_visibility",
-        "door_hold_to_activate"
+        "door_hold_to_activate",
+        "door_control_on_dashboard"
       ]), o = Object.fromEntries(
         Object.entries(t).filter(
-          ([r, n]) => n !== void 0 && (!!t.door_entity || !i.has(r))
+          ([r, s]) => s !== void 0 && (!!t.door_entity || !i.has(r))
         )
       );
       this.dispatchEvent(
@@ -4380,16 +4715,16 @@ let M = class extends C {
     };
   }
   setConfig(e) {
-    this.config = he(e);
+    this.config = ge(e);
   }
   connectedCallback() {
-    super.connectedCallback(), ft().then((e) => {
+    super.connectedCallback(), mt().then((e) => {
       this.isConnected && (this.nativeAvailable = e, this.nativeChecked = !0);
     });
   }
   render() {
-    if (!this.hass || !this.config) return c;
-    const e = xi(this.hass, this.config).filter(
+    if (!this.hass || !this.config) return l;
+    const e = Ti(this.hass, this.config).filter(
       (t) => t.kind !== "compatibility" || this.nativeChecked && !this.nativeAvailable
     );
     return h`
@@ -4397,7 +4732,7 @@ let M = class extends C {
             <div
               class="warnings"
               role="status"
-              aria-label=${s(this.hass, "editor.warnings")}
+              aria-label=${n(this.hass, "editor.warnings")}
             >
               ${e.map(
       (t) => h`
@@ -4405,11 +4740,11 @@ let M = class extends C {
                 `
     )}
             </div>
-          ` : c}
+          ` : l}
       <ha-form
         .hass=${this.hass}
         .data=${this.config}
-        .schema=${co(this.hass, this.config)}
+        .schema=${po(this.hass, this.config)}
         .computeLabel=${this.computeLabel}
         .computeHelper=${this.computeHelper}
         @value-changed=${this.valueChanged}
@@ -4417,28 +4752,28 @@ let M = class extends C {
     `;
   }
 };
-M.styles = ki;
+P.styles = xi;
 G([
-  b({ attribute: !1 })
-], M.prototype, "hass", 2);
+  _({ attribute: !1 })
+], P.prototype, "hass", 2);
 G([
-  p()
-], M.prototype, "config", 2);
+  u()
+], P.prototype, "config", 2);
 G([
-  p()
-], M.prototype, "nativeChecked", 2);
+  u()
+], P.prototype, "nativeChecked", 2);
 G([
-  p()
-], M.prototype, "nativeAvailable", 2);
-M = G([
+  u()
+], P.prototype, "nativeAvailable", 2);
+P = G([
   Z("ring-view-editor")
-], M);
-const uo = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+], P);
+const fo = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   get RingViewEditor() {
-    return M;
+    return P;
   }
 }, Symbol.toStringTag, { value: "Module" }));
 export {
-  E as RingView
+  x as RingView
 };

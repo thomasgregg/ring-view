@@ -18,6 +18,10 @@ describe("configuration", () => {
       door_action: "unlock",
       door_control_visibility: "live_only",
       door_hold_to_activate: true,
+      dashboard_behavior: "open_viewer",
+      dashboard_start: "on_demand",
+      dashboard_live_muted: true,
+      door_control_on_dashboard: false,
       show_name: false,
       preview_source: "last_recording",
       preview_fallback: "last_recording",
@@ -86,6 +90,20 @@ describe("configuration", () => {
         door_action: "lock",
       } as never),
     ).toThrow(/door_action/);
+    expect(() =>
+      validateConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        dashboard_behavior: "always_live",
+      } as never),
+    ).toThrow(/dashboard_behavior/);
+    expect(() =>
+      validateConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        dashboard_start: "viewer_default",
+      } as never),
+    ).toThrow(/dashboard_start/);
   });
 
   it("accepts the optional snapshot and freshest-preview settings", () => {
@@ -130,6 +148,24 @@ describe("configuration", () => {
       door_action: "open",
       door_control_visibility: "all_views",
       door_hold_to_activate: false,
+    });
+  });
+
+  it("normalizes an explicitly enabled interactive dashboard", () => {
+    expect(
+      normalizeConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        dashboard_behavior: "interactive",
+        dashboard_start: "live",
+        dashboard_live_muted: false,
+        door_control_on_dashboard: true,
+      }),
+    ).toMatchObject({
+      dashboard_behavior: "interactive",
+      dashboard_start: "live",
+      dashboard_live_muted: false,
+      door_control_on_dashboard: true,
     });
   });
 

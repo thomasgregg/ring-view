@@ -21,6 +21,28 @@ export const cardStyles = css`
     -webkit-tap-highlight-color: transparent;
   }
 
+  ha-card.interactive {
+    cursor: default;
+  }
+
+  ha-card.safe-preview {
+    cursor: default;
+  }
+
+  .inline-shell {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 120px;
+    aspect-ratio: var(--ring-view-aspect-ratio, 16 / 9);
+    overflow: hidden;
+    background: #000;
+  }
+
+  :host([layout="grid"]) .inline-shell {
+    aspect-ratio: auto;
+  }
+
   .preview {
     position: relative;
     display: block;
@@ -803,6 +825,61 @@ export const dialogStyles = css`
     .door-action.holding::before {
       width: 100%;
     }
+  }
+
+  :host([inline]) {
+    position: relative;
+    inset: auto;
+    z-index: auto;
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 120px;
+  }
+
+  :host([inline]) .dialog {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    transform: none;
+  }
+
+  :host([inline]) .body {
+    width: 100%;
+    height: 100%;
+  }
+
+  :host([inline]) .media-frame {
+    top: auto;
+    width: 100%;
+    height: 100%;
+    min-height: 120px;
+    max-height: none;
+    transform: none;
+  }
+
+  :host([inline]) .header {
+    min-height: 64px;
+    padding: 10px 10px 14px 16px;
+  }
+
+  :host([inline]) h2 {
+    max-width: 120px;
+  }
+
+  :host([inline]) .mode-switch {
+    top: 10px;
+  }
+
+  :host([inline]) .visitor-controls {
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
   }
 `;
 

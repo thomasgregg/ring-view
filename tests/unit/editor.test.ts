@@ -98,6 +98,9 @@ describe("visual editor", () => {
       autoplay_recording: true,
       live_muted: false,
       two_way_audio: false,
+      dashboard_behavior: "open_viewer",
+      dashboard_start: "on_demand",
+      dashboard_live_muted: true,
       preview_source: "last_recording",
       preview_fallback: "last_recording",
       aspect_ratio: "16:9",
@@ -207,6 +210,7 @@ describe("visual editor", () => {
         }));
 
     expect(previewFields()).toEqual([
+      { name: "dashboard_behavior", required: true },
       { name: "preview_source", required: true },
     ]);
 
@@ -225,6 +229,7 @@ describe("visual editor", () => {
     );
     await editor.updateComplete;
     expect(previewFields()).toEqual([
+      { name: "dashboard_behavior", required: true },
       { name: "preview_source", required: true },
       { name: "snapshot_entity", required: true },
     ]);
@@ -244,6 +249,7 @@ describe("visual editor", () => {
     );
     await editor.updateComplete;
     expect(previewFields()).toEqual([
+      { name: "dashboard_behavior", required: true },
       { name: "preview_source", required: true },
       { name: "snapshot_entity", required: true },
       { name: "preview_fallback", required: true },
@@ -285,7 +291,7 @@ describe("visual editor", () => {
       "Kameranamen anzeigen",
     );
     expect(form?.computeLabel?.({ name: "dashboard_preview" })).toBe(
-      "Dashboard-Vorschau",
+      "Dashboard-Karte",
     );
     expect(form?.computeLabel?.({ name: "door_access" })).toBe("Türzugang");
     expect(form?.computeLabel?.({ name: "door_contact_entity" })).toBe(
@@ -347,6 +353,7 @@ describe("visual editor", () => {
       (field) => field.name === "dashboard_preview",
     );
     expect(dashboardPreview?.schema?.map((field) => field.name)).toEqual([
+      "dashboard_behavior",
       "preview_source",
     ]);
     const previewSource = dashboardPreview?.schema?.find(
@@ -366,6 +373,44 @@ describe("visual editor", () => {
         ],
       },
     });
+  });
+
+  it("reveals only the controls relevant to an interactive dashboard", async () => {
+    const editor = document.createElement("ring-view-editor");
+    editor.hass = hass;
+    editor.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      door_entity: "lock.front_door",
+      dashboard_behavior: "interactive",
+    });
+    document.body.append(editor);
+    await editor.updateComplete;
+
+    const form = editor.shadowRoot?.querySelector("ha-form") as
+      | (HTMLElement & { schema?: ConfigFormSchema[] })
+      | null;
+    expect(
+      form?.schema
+        ?.find((field) => field.name === "dashboard_preview")
+        ?.schema?.map((field) => field.name),
+    ).toEqual([
+      "dashboard_behavior",
+      "dashboard_start",
+      "dashboard_live_muted",
+    ]);
+    expect(
+      form?.schema
+        ?.find((field) => field.name === "door_access")
+        ?.schema?.map((field) => field.name),
+    ).toEqual([
+      "door_entity",
+      "door_contact_entity",
+      "door_action",
+      "door_control_visibility",
+      "door_hold_to_activate",
+      "door_control_on_dashboard",
+    ]);
   });
 
   it("progressively reveals the logical door-access controls", async () => {

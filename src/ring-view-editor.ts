@@ -1,6 +1,6 @@
 import {
+  mdiCameraControl,
   mdiDoorbellVideo,
-  mdiImageOutline,
   mdiLockOpenVariantOutline,
   mdiPaletteOutline,
   mdiPlayCircleOutline,
@@ -29,31 +29,19 @@ function configSchema(
 ): ConfigFormSchema[] {
   const dashboardPreview: ConfigFormSchema[] = [
     {
-      name: "preview_source",
+      name: "dashboard_behavior",
       required: true,
       selector: {
         select: {
           mode: "dropdown",
           options: [
             {
-              value: "last_recording",
-              label: localize(hass, "editor.preview_recording"),
+              value: "open_viewer",
+              label: localize(hass, "editor.dashboard_behavior_viewer"),
             },
             {
-              value: "live",
-              label: localize(hass, "editor.preview_live"),
-            },
-            {
-              value: "default",
-              label: localize(hass, "editor.preview_default"),
-            },
-            {
-              value: "snapshot",
-              label: localize(hass, "editor.preview_snapshot"),
-            },
-            {
-              value: "newest",
-              label: localize(hass, "editor.preview_newest"),
+              value: "interactive",
+              label: localize(hass, "editor.dashboard_behavior_interactive"),
             },
           ],
         },
@@ -61,7 +49,70 @@ function configSchema(
     },
   ];
 
-  if (["snapshot", "newest"].includes(config.preview_source)) {
+  if (config.dashboard_behavior === "interactive") {
+    dashboardPreview.push(
+      {
+        name: "dashboard_start",
+        required: true,
+        selector: {
+          select: {
+            mode: "dropdown",
+            options: [
+              {
+                value: "on_demand",
+                label: localize(hass, "editor.dashboard_start_on_demand"),
+              },
+              {
+                value: "last_recording",
+                label: localize(hass, "common.last_recording"),
+              },
+              { value: "live", label: localize(hass, "common.live") },
+            ],
+          },
+        },
+      },
+      { name: "dashboard_live_muted", selector: { boolean: {} } },
+    );
+  } else {
+    dashboardPreview.push(
+      {
+        name: "preview_source",
+        required: true,
+        selector: {
+          select: {
+            mode: "dropdown",
+            options: [
+              {
+                value: "last_recording",
+                label: localize(hass, "editor.preview_recording"),
+              },
+              {
+                value: "live",
+                label: localize(hass, "editor.preview_live"),
+              },
+              {
+                value: "default",
+                label: localize(hass, "editor.preview_default"),
+              },
+              {
+                value: "snapshot",
+                label: localize(hass, "editor.preview_snapshot"),
+              },
+              {
+                value: "newest",
+                label: localize(hass, "editor.preview_newest"),
+              },
+            ],
+          },
+        },
+      },
+    );
+  }
+
+  if (
+    config.dashboard_behavior === "open_viewer"
+    && ["snapshot", "newest"].includes(config.preview_source)
+  ) {
     dashboardPreview.push({
       name: "snapshot_entity",
       required: true,
@@ -69,7 +120,10 @@ function configSchema(
     });
   }
 
-  if (config.preview_source === "newest") {
+  if (
+    config.dashboard_behavior === "open_viewer"
+    && config.preview_source === "newest"
+  ) {
     dashboardPreview.push({
       name: "preview_fallback",
       required: true,
@@ -147,6 +201,12 @@ function configSchema(
       name: "door_hold_to_activate",
       selector: { boolean: {} },
     });
+    if (config.dashboard_behavior === "interactive") {
+      doorAccess.push({
+        name: "door_control_on_dashboard",
+        selector: { boolean: {} },
+      });
+    }
   }
 
   return [
@@ -164,7 +224,7 @@ function configSchema(
       name: "dashboard_preview",
       type: "expandable",
       flatten: true,
-      iconPath: mdiImageOutline,
+      iconPath: mdiCameraControl,
       schema: dashboardPreview,
     },
     {
@@ -281,6 +341,9 @@ const LABELS: Record<string, TranslationKey> = {
   live_entity: "editor.live_entity",
   snapshot_entity: "editor.snapshot_entity",
   dashboard_preview: "editor.dashboard_preview",
+  dashboard_behavior: "editor.dashboard_behavior",
+  dashboard_start: "editor.dashboard_start",
+  dashboard_live_muted: "editor.dashboard_live_muted",
   viewer_behavior: "editor.viewer_behavior",
   default_mode: "editor.default_mode",
   remember_last_mode: "editor.remember_last_mode",
@@ -295,6 +358,7 @@ const LABELS: Record<string, TranslationKey> = {
   door_action: "editor.door_action",
   door_control_visibility: "editor.door_control_visibility",
   door_hold_to_activate: "editor.door_hold_to_activate",
+  door_control_on_dashboard: "editor.door_control_on_dashboard",
   card_appearance: "editor.card_appearance",
   name: "editor.name",
   show_name: "editor.show_name",
@@ -305,6 +369,9 @@ const LABELS: Record<string, TranslationKey> = {
 };
 
 const HELPERS: Record<string, TranslationKey> = {
+  dashboard_behavior: "editor.helper_dashboard_behavior",
+  dashboard_start: "editor.helper_dashboard_start",
+  dashboard_live_muted: "editor.helper_dashboard_live_muted",
   default_mode: "editor.helper_default_mode",
   remember_last_mode: "editor.helper_remember_last_mode",
   autoplay_recording: "editor.helper_autoplay_recording",
@@ -316,6 +383,7 @@ const HELPERS: Record<string, TranslationKey> = {
   door_action: "editor.helper_door_action",
   door_control_visibility: "editor.helper_door_control_visibility",
   door_hold_to_activate: "editor.helper_door_hold_to_activate",
+  door_control_on_dashboard: "editor.helper_door_control_on_dashboard",
   show_name: "editor.helper_show_name",
   preview_source: "editor.helper_preview_source",
   snapshot_entity: "editor.helper_snapshot_entity",
@@ -409,6 +477,7 @@ export class RingViewEditor extends LitElement {
       "door_action",
       "door_control_visibility",
       "door_hold_to_activate",
+      "door_control_on_dashboard",
     ]);
     const emitted = Object.fromEntries(
       Object.entries(next).filter(

@@ -16,6 +16,13 @@ door_action: unlock
 door_control_visibility: live_only
 door_hold_to_activate: true
 
+# Optional beta: put the camera controls directly on the dashboard.
+# Existing cards default to open_viewer and remain unchanged.
+dashboard_behavior: interactive
+dashboard_start: on_demand
+dashboard_live_muted: true
+door_control_on_dashboard: false
+
 show_name: false
 aspect_ratio: "16:9"
 fit_mode: cover
