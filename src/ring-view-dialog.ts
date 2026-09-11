@@ -3,6 +3,7 @@ import {
   mdiBellRingOutline,
   mdiCheckCircleOutline,
   mdiClose,
+  mdiDoorClosed,
   mdiDoorOpen,
   mdiLoading,
   mdiLockOpenVariantOutline,
@@ -557,7 +558,10 @@ export class RingViewDialog extends LitElement {
 
   private doorActionIcon(): string {
     const entity = this.doorEntity();
-    if (this.doorContactState() === "open") return mdiDoorOpen;
+    const contactState = this.doorContactState();
+    if (contactState === "open") return mdiDoorOpen;
+    if (contactState === "closed") return mdiDoorClosed;
+    if (contactState === "unknown") return mdiAlertCircleOutline;
     if (
       entityIsUnavailable(entity)
       || entity?.state === "jammed"

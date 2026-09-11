@@ -89,8 +89,9 @@ operate.
 | Unavailable | Disabled with **Door unavailable**. |
 | Jammed | Disabled with **Lock jammed**. |
 | Unsupported open action | Disabled with **Open unsupported** and a configuration warning. |
+| Contact reports closed | Keeps the configured action available and shows a closed-door icon representing the physical state. |
 | Contact reports open | Replaces the action with a disabled **Door open** state and an open-door icon. |
-| Contact is unknown or unavailable | Keeps the configured action available and adds a subtle **Status unknown** label. |
+| Contact is unknown or unavailable | Keeps the configured action available, shows a warning icon, and adds a subtle **Status unknown** label. |
 
 Success is intentionally shown in the control itself rather than in a second
 toast, keeping the interface calm and avoiding duplicate feedback.
@@ -148,7 +149,7 @@ way, and presents dependent choices only when they can affect the viewer.
 | Option | Default | Accepted values | Meaning |
 | --- | --- | --- | --- |
 | `door_entity` | Not set | `lock.*` entity ID | Enables door access for the selected lock. |
-| `door_contact_entity` | Not set | `binary_sensor.*` entity ID | Optionally replaces the door action with a disabled **Door open** state while the physical door is open. |
+| `door_contact_entity` | Not set | `binary_sensor.*` entity ID | Optionally makes the icon reflect the physical door state and replaces the action with a disabled **Door open** state while the door is open. |
 | `door_action` | `unlock` | `unlock`, `open` | Selects the Home Assistant lock service. |
 | `door_control_visibility` | `live_only` | `live_only`, `all_views` | Limits the control to Live or also shows it over recordings. |
 | `door_hold_to_activate` | `true` | `true`, `false` | Requires the 900 ms hold confirmation or enables one-tap operation. |
@@ -184,8 +185,9 @@ door_hold_to_activate: true
 
 - A card without `door_entity` is visually and behaviorally unchanged.
 - A card without `door_contact_entity` keeps the existing door-control behavior.
-- A configured contact reporting open disables the action and shows **Door open**; closed restores the configured action immediately.
-- An unknown or unavailable contact never blocks the configured action.
+- A configured contact reporting closed shows a closed-door icon and keeps the configured action available.
+- A configured contact reporting open shows an open-door icon, disables the action, and displays **Door open**.
+- An unknown or unavailable contact shows a warning icon and never blocks the configured action.
 - Talk and door access form one dock with a visible divider when both are shown.
 - A single remaining action renders as one centered pill without a divider.
 - A short hold never calls a lock service; a completed hold calls it once.

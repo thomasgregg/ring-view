@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { mdiDoorClosed, mdiDoorOpen } from "@mdi/js";
 import type { HomeAssistant } from "../../src/types";
 
 test.beforeEach(async ({ page }) => {
@@ -189,11 +190,14 @@ test("uses an optional contact sensor to turn the action into live door status",
   const door = page.getByRole("button", { name: "Door open" });
   await expect(door).toBeVisible();
   await expect(door).toBeDisabled();
+  await expect(door.locator("path")).toHaveAttribute("d", mdiDoorOpen);
 
   await page.evaluate(() => {
     window.demoSetEntityState("binary_sensor.front_door_contact", "off");
   });
-  await expect(page.getByRole("button", { name: "Hold to open" })).toBeEnabled();
+  const closedDoor = page.getByRole("button", { name: "Hold to open" });
+  await expect(closedDoor).toBeEnabled();
+  await expect(closedDoor.locator("path")).toHaveAttribute("d", mdiDoorClosed);
 });
 
 test("configures door visibility and collapses automatically without Talk", async ({ page }) => {

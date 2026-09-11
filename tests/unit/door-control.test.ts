@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { mdiAlertCircleOutline, mdiDoorClosed, mdiDoorOpen } from "@mdi/js";
 import "../../src/ring-view-dialog";
 import { normalizeConfig } from "../../src/config";
 import type {
@@ -138,6 +139,7 @@ describe("door control", () => {
     expect(button?.disabled).toBe(false);
     expect(button?.textContent).toContain("Hold to open");
     expect(button?.textContent).not.toContain("Door open");
+    expect(button?.querySelector("path")?.getAttribute("d")).toBe(mdiDoorOpen);
   });
 
   it("turns the configured action into Door open when the contact is open", async () => {
@@ -150,6 +152,7 @@ describe("door control", () => {
     expect(button?.disabled).toBe(true);
     expect(button?.textContent).toContain("Door open");
     expect(button?.classList.contains("contact-open")).toBe(true);
+    expect(button?.querySelector("path")?.getAttribute("d")).toBe(mdiDoorOpen);
     button?.click();
     await vi.advanceTimersByTimeAsync(1_000);
     expect(callService).not.toHaveBeenCalled();
@@ -164,6 +167,7 @@ describe("door control", () => {
     const button = dialog.shadowRoot?.querySelector<HTMLButtonElement>(".door-action");
     expect(button?.disabled).toBe(false);
     expect(button?.textContent).toContain("Hold to open");
+    expect(button?.querySelector("path")?.getAttribute("d")).toBe(mdiDoorClosed);
   });
 
   it("keeps the action available and marks an unknown contact state", async () => {
@@ -176,6 +180,8 @@ describe("door control", () => {
     expect(button?.disabled).toBe(false);
     expect(button?.textContent).toContain("Hold to unlock");
     expect(button?.textContent).toContain("Status unknown");
+    expect(button?.querySelector("path")?.getAttribute("d"))
+      .toBe(mdiAlertCircleOutline);
   });
 
   it("updates the action immediately when the contact opens", async () => {

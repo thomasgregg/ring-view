@@ -4,6 +4,15 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.6.0-beta.4] - 2026-09-11
+
+### Changed
+
+- When a door contact sensor is configured, make the door icon reflect the
+  physical state: closed door while closed, open door while open, and a warning
+  icon when the contact state is unknown. Without a contact sensor, the icon
+  continues to represent the configured door action.
+
 ## [0.6.0-beta.3] - 2026-09-11
 
 ### Added

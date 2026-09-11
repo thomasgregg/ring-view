@@ -37,7 +37,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `two_way_audio` | Yes — Viewer behavior | `false` | `true`, `false` | Uses one direct WebRTC session for live video, listening, and push-to-talk when `live_entity` is an official Ring `live_view` camera. |
 | `doorbell_entity` | Yes, Doorbell features | Not set | `event.*` entity ID | Displays a temporary ring alert when the selected doorbell event reports `ring`. |
 | `door_entity` | Yes — Door access | Not set | `lock.*` entity ID | Enables the door-access beta for the selected Home Assistant lock. |
-| `door_contact_entity` | Yes — Door access | Not set | `binary_sensor.*` entity ID | Optionally reports whether the physical door is open. An open contact replaces and disables the door action until the door closes. |
+| `door_contact_entity` | Yes — Door access | Not set | `binary_sensor.*` entity ID | Optionally makes the icon reflect the physical door state. An open contact replaces and disables the door action until the door closes. |
 | `door_action` | Yes — Door access | `unlock` | `unlock`, `open` | Calls `lock.unlock`, or `lock.open` for locks that advertise latch-opening support. |
 | `door_control_visibility` | Yes — Door access | `live_only` | `live_only`, `all_views` | Shows the door action only in Live by default, or also over recordings. |
 | `door_hold_to_activate` | Yes — Door access | `true` | `true`, `false` | Requires a 900 ms press-and-hold confirmation. Disable for one-tap operation. |
