@@ -16,7 +16,7 @@ door_action: unlock
 door_control_visibility: live_only
 door_hold_to_activate: true
 
-# Optional beta: put the camera controls directly on the dashboard.
+# Optional: put the camera controls directly on the dashboard.
 # Existing cards default to open_viewer and remain unchanged.
 dashboard_behavior: interactive
 dashboard_start: on_demand

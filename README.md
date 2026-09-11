@@ -22,7 +22,7 @@ See what happened, check what is happening, and answer the door—all without le
 - [What Ring View can do](#what-you-can-do)
 - [Install and get started](#get-started)
   - [Configure visually](#configure-visually)
-  - [Choose the dashboard card behavior](#choose-how-the-dashboard-card-works-beta)
+  - [Choose the dashboard card behavior](#choose-how-the-dashboard-card-works)
   - [Add Talk or door access](#add-talk-or-door-access)
 - [Built-in Ring integration and optional patch](#built-in-ring-integration-or-the-temporary-patch)
 - [Doorbell notifications](#make-your-doorbell-do-more)
@@ -76,7 +76,7 @@ dashboard behavior, Talk, doorbell features, door access and appearance.
 Tap the card to open the viewer. The history icon selects the latest recording;
 the red dot selects Live.
 
-### Choose how the dashboard card works (beta)
+### Choose how the dashboard card works
 
 In the visual editor, open **Dashboard card → Dashboard behavior**:
 
@@ -110,9 +110,6 @@ or closed. Door actions are Live-only, fullscreen-only and hold-to-activate by
 default.
 
 [Door states and safety options](docs/door-access.md) · [All settings and examples](docs/configuration.md) · [Talkback help](docs/playback-and-troubleshooting.md)
-
-The interactive dashboard is a prerelease feature. To return completely to the
-stable experience, redownload `v0.6.3` in HACS.
 
 ## Built-in Ring integration or the temporary patch?
 

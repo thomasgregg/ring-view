@@ -116,7 +116,7 @@ Open **Dashboard card** and choose one of two intentionally distinct surfaces:
 | Behavior | Dashboard | Fullscreen |
 | --- | --- | --- |
 | **Open fullscreen viewer** (default) | One passive still image; tapping opens the viewer. | Recording, Live, Talk, and configured door access. |
-| **Control camera in card** (beta) | Recording/Live tabs, media controls, optional Talk and optional door access, plus fullscreen. | The same full viewer, opened with the currently selected mode. |
+| **Control camera in card** | Recording/Live tabs, media controls, optional Talk and optional door access, plus fullscreen. | The same full viewer, opened with the currently selected mode. |
 
 The interactive fields appear only after that mode is selected. **No — wait for
 a tap** is the safest startup and does not mount a player until Recording or

@@ -9,10 +9,9 @@ The card does not modify entities or Home Assistant backend state, so rollback a
 3. Refresh Home Assistant with cache bypass, or restart the Companion app.
 4. Confirm the resource still points to `/hacsfiles/ring-view/ring-view.js`.
 
-For the `0.7.0-beta.x` interactive-dashboard trial, select `v0.6.3` as the
-previously working release. The beta defaults to the stable passive behavior,
-and `v0.6.3` simply ignores the four new top-level dashboard options if they are
-still present in YAML. No entity or backend state is changed.
+When rolling back from `v0.7.0`, select `v0.6.3` as the previously working
+release. Version `v0.6.3` simply ignores the four interactive-dashboard options
+if they are still present in YAML. No entity or backend state is changed.
 
 ## Manual installation
 

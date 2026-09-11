@@ -4,6 +4,51 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-11
+
+### Added
+
+- Add **Control camera in card**, an optional interactive dashboard mode with
+  Recording and Live tabs, playback, Talk, configured door access, and an
+  explicit fullscreen button.
+- Add independent dashboard startup choices to wait for a tap, play the last
+  recording, or start Live muted.
+- Add a separate **Door control location** choice for keeping door access in the
+  fullscreen viewer or also placing it on the dashboard.
+
+### Changed
+
+- Start an on-demand recording by tapping or keyboard-activating the camera
+  image, keeping the preview free of a large central Play button.
+- Use action-specific **Open when ready** and **Unlock when ready** labels while
+  an inline Live connection is starting.
+- Keep the Talk and door dock at a consistent, touch-friendly size across card
+  widths, with a compact loading layout at the minimum supported 12-column by
+  3-row Sections size.
+
+### Safety and lifecycle
+
+- Keep the passive fullscreen-opening card as the default behavior and make all
+  dashboard controls explicitly opt-in.
+- Require a ready Live picture before enabling Live-only door actions, keep edit
+  previews non-interactive, and prevent duplicate cards from opening competing
+  Live sessions for the same camera.
+- Stop inline media before opening fullscreen and suspend it while the card is
+  not visible.
+
+### Documentation
+
+- Reorganize the README around a short setup path, the two dashboard behaviors,
+  common configurations, and current visual-editor screenshots.
+- Expand the configuration and door-access guides with option comparisons,
+  safety guidance, examples, and visitor-control state explanations.
+
+### Tests
+
+- Cover interactive startup, door readiness and placement, fixed control sizing,
+  minimum card geometry, inline/fullscreen handoff, duplicate Live sessions,
+  and desktop and iPhone layouts.
+
 ## [0.7.0-beta.8] - 2026-09-11
 
 ### Documentation
