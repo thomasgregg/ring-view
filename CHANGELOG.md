@@ -4,6 +4,18 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-09-12
+
+### Added
+
+- Add the Ring View project camera-lens icon using its blue,
+  charcoal, and white visual identity, with vector and web-ready PNG assets.
+
+### Maintenance
+
+- Verify the active HACS Default submission against the current dashboard
+  plugin requirements and confirm that all applicable checks remain green.
+
 ## [0.8.0] - 2026-09-12
 
 ### Added

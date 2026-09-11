@@ -1,5 +1,10 @@
 # README image assets
 
+`ring-view-icon.svg` is the editable source for the Ring View project icon.
+`ring-view-icon.png` and `ring-view-icon@2x.png` are transparent 256 px and
+512 px exports for repository and web use. The palette is blue `#1C90CB`,
+charcoal `#3F3F3F`, and white.
+
 The first README image, `ring-view-modes-rounded.png`, uses a real camera
 capture obtained through Home Assistant on **7 September 2026**. No AI image
 generation, scene reconstruction, or enhancement was used.
