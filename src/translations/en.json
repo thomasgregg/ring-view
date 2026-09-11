@@ -166,7 +166,10 @@
   "door.open_unsupported": "Open unsupported",
   "door.contact_open": "Door open",
   "door.contact_unknown": "Status unknown",
-  "door.waiting_for_live": "Waiting for Live…",
+  "door.open_when_ready": "Open when ready",
+  "door.unlock_when_ready": "Unlock when ready",
+  "door.open_when_ready_aria": "Open door available after live video connects",
+  "door.unlock_when_ready_aria": "Unlock available after live video connects",
   "door.unlock_failed": "Couldn’t unlock the door.",
   "door.open_failed": "Couldn’t open the door."
 }

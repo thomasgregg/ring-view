@@ -160,9 +160,12 @@ test("keeps an interactive dashboard idle until the user chooses media", async (
   await expect.poll(() => page.evaluate(() => window.demoActiveStreams ?? 0)).toBe(1);
 
   await page.getByRole("tab", { name: "Live" }).click();
-  const door = page.getByRole("button", { name: "Waiting for Live…" });
+  const door = page.getByRole("button", {
+    name: "Unlock available after live video connects",
+  });
   await expect(door).toBeVisible();
   await expect(door).toBeDisabled();
+  await expect(door).toContainText("Unlock when ready");
   await expect(page.getByRole("img", { name: "Synthetic demo camera media" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Hold to unlock" })).toBeEnabled();
 });
@@ -238,8 +241,12 @@ test("keeps inline connection status clear of fixed visitor controls", async ({
 
   const state = card.locator(".state-layer.with-visitor-controls .state-card");
   const dock = card.locator(".visitor-action-dock");
+  const door = card.getByRole("button", {
+    name: "Open door available after live video connects",
+  });
   await expect(state).toBeVisible();
   await expect(dock).toBeVisible();
+  await expect(door).toContainText("Open when ready");
 
   const [stateBox, dockBox] = await Promise.all([
     state.boundingBox(),

@@ -18,7 +18,7 @@ let ot = class {
     return this.cssText;
   }
 };
-const Et = (e) => new ot(typeof e == "string" ? e : e + "", void 0, ke), j = (e, ...t) => {
+const Et = (e) => new ot(typeof e == "string" ? e : e + "", void 0, ke), W = (e, ...t) => {
   const i = e.length === 1 ? e[0] : t.reduce((o, r, s) => o + ((a) => {
     if (a._$cssResult$ === !0) return a.cssText;
     if (typeof a == "number") return a;
@@ -260,10 +260,10 @@ const qt = (e, t) => {
   let r, s = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", a = z;
   for (let c = 0; c < i; c++) {
     const d = e[c];
-    let p, v, g = -1, A = 0;
-    for (; A < d.length && (a.lastIndex = A, v = a.exec(d), v !== null); ) A = a.lastIndex, a === z ? v[1] === "!--" ? a = qe : v[1] !== void 0 ? a = Ne : v[2] !== void 0 ? (st.test(v[2]) && (r = RegExp("</" + v[2], "g")), a = D) : v[3] !== void 0 && (a = D) : a === D ? v[0] === ">" ? (a = r ?? z, g = -1) : v[1] === void 0 ? g = -2 : (g = a.lastIndex - v[2].length, p = v[1], a = v[3] === void 0 ? D : v[3] === '"' ? Fe : Be) : a === Fe || a === Be ? a = D : a === qe || a === Ne ? a = z : (a = D, r = void 0);
+    let p, g, v = -1, A = 0;
+    for (; A < d.length && (a.lastIndex = A, g = a.exec(d), g !== null); ) A = a.lastIndex, a === z ? g[1] === "!--" ? a = qe : g[1] !== void 0 ? a = Ne : g[2] !== void 0 ? (st.test(g[2]) && (r = RegExp("</" + g[2], "g")), a = D) : g[3] !== void 0 && (a = D) : a === D ? g[0] === ">" ? (a = r ?? z, v = -1) : g[1] === void 0 ? v = -2 : (v = a.lastIndex - g[2].length, p = g[1], a = g[3] === void 0 ? D : g[3] === '"' ? Fe : Be) : a === Fe || a === Be ? a = D : a === qe || a === Ne ? a = z : (a = D, r = void 0);
     const S = a === D && e[c + 1].startsWith("/>") ? " " : "";
-    s += a === z ? d + Ht : g >= 0 ? (o.push(p), d.slice(0, g) + rt + d.slice(g) + T + S) : d + T + (g === -2 ? c : S);
+    s += a === z ? d + Ht : v >= 0 ? (o.push(p), d.slice(0, v) + rt + d.slice(v) + T + S) : d + T + (v === -2 ? c : S);
   }
   return [at(e, s + (e[i] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), o];
 };
@@ -272,29 +272,29 @@ class F {
     let r;
     this.parts = [];
     let s = 0, a = 0;
-    const c = t.length - 1, d = this.parts, [p, v] = qt(t, i);
+    const c = t.length - 1, d = this.parts, [p, g] = qt(t, i);
     if (this.el = F.createElement(p, o), V.currentNode = this.el.content, i === 2 || i === 3) {
-      const g = this.el.content.firstChild;
-      g.replaceWith(...g.childNodes);
+      const v = this.el.content.firstChild;
+      v.replaceWith(...v.childNodes);
     }
     for (; (r = V.nextNode()) !== null && d.length < c; ) {
       if (r.nodeType === 1) {
-        if (r.hasAttributes()) for (const g of r.getAttributeNames()) if (g.endsWith(rt)) {
-          const A = v[a++], S = r.getAttribute(g).split(T), Y = /([.?@])?(.*)/.exec(A);
-          d.push({ type: 1, index: s, name: Y[2], strings: S, ctor: Y[1] === "." ? Bt : Y[1] === "?" ? Ft : Y[1] === "@" ? Kt : ae }), r.removeAttribute(g);
-        } else g.startsWith(T) && (d.push({ type: 6, index: s }), r.removeAttribute(g));
+        if (r.hasAttributes()) for (const v of r.getAttributeNames()) if (v.endsWith(rt)) {
+          const A = g[a++], S = r.getAttribute(v).split(T), Y = /([.?@])?(.*)/.exec(A);
+          d.push({ type: 1, index: s, name: Y[2], strings: S, ctor: Y[1] === "." ? Bt : Y[1] === "?" ? Ft : Y[1] === "@" ? Kt : ae }), r.removeAttribute(v);
+        } else v.startsWith(T) && (d.push({ type: 6, index: s }), r.removeAttribute(v));
         if (st.test(r.tagName)) {
-          const g = r.textContent.split(T), A = g.length - 1;
+          const v = r.textContent.split(T), A = v.length - 1;
           if (A > 0) {
             r.textContent = oe ? oe.emptyScript : "";
-            for (let S = 0; S < A; S++) r.append(g[S], N()), V.nextNode(), d.push({ type: 2, index: ++s });
-            r.append(g[A], N());
+            for (let S = 0; S < A; S++) r.append(v[S], N()), V.nextNode(), d.push({ type: 2, index: ++s });
+            r.append(v[A], N());
           }
         }
       } else if (r.nodeType === 8) if (r.data === nt) d.push({ type: 2, index: s });
       else {
-        let g = -1;
-        for (; (g = r.data.indexOf(T, g + 1)) !== -1; ) d.push({ type: 7, index: s }), g += T.length - 1;
+        let v = -1;
+        for (; (v = r.data.indexOf(T, v + 1)) !== -1; ) d.push({ type: 7, index: s }), v += T.length - 1;
       }
       s++;
     }
@@ -327,7 +327,7 @@ class Nt {
     for (; d !== void 0; ) {
       if (a === d.index) {
         let p;
-        d.type === 2 ? p = new W(s, s.nextSibling, this, t) : d.type === 1 ? p = new d.ctor(s, d.name, d.strings, this, t) : d.type === 6 && (p = new jt(s, this, t)), this._$AV.push(p), d = o[++c];
+        d.type === 2 ? p = new j(s, s.nextSibling, this, t) : d.type === 1 ? p = new d.ctor(s, d.name, d.strings, this, t) : d.type === 6 && (p = new Wt(s, this, t)), this._$AV.push(p), d = o[++c];
       }
       a !== d?.index && (s = V.nextNode(), a++);
     }
@@ -338,7 +338,7 @@ class Nt {
     for (const o of this._$AV) o !== void 0 && (o.strings !== void 0 ? (o._$AI(t, o, i), i += o.strings.length - 2) : o._$AI(t[i])), i++;
   }
 }
-class W {
+class j {
   get _$AU() {
     return this._$AM?._$AU ?? this._$Cv;
   }
@@ -384,7 +384,7 @@ class W {
     Se(this._$AH) || (this._$AH = [], this._$AR());
     const i = this._$AH;
     let o, r = 0;
-    for (const s of t) r === i.length ? i.push(o = new W(this.O(N()), this.O(N()), this, this.options)) : o = i[r], o._$AI(s), r++;
+    for (const s of t) r === i.length ? i.push(o = new j(this.O(N()), this.O(N()), this, this.options)) : o = i[r], o._$AI(s), r++;
     r < i.length && (this._$AR(o && o._$AB.nextSibling, r), i.length = r);
   }
   _$AR(t = this._$AA.nextSibling, i) {
@@ -451,7 +451,7 @@ class Kt extends ae {
     typeof this._$AH == "function" ? this._$AH.call(this.options?.host ?? this.element, t) : this._$AH.handleEvent(t);
   }
 }
-class jt {
+class Wt {
   constructor(t, i, o) {
     this.element = t, this.type = 6, this._$AN = void 0, this._$AM = i, this.options = o;
   }
@@ -462,14 +462,14 @@ class jt {
     U(this, t);
   }
 }
-const Wt = $e.litHtmlPolyfillSupport;
-Wt?.(F, W), ($e.litHtmlVersions ??= []).push("3.3.3");
+const jt = $e.litHtmlPolyfillSupport;
+jt?.(F, j), ($e.litHtmlVersions ??= []).push("3.3.3");
 const Zt = (e, t, i) => {
   const o = i?.renderBefore ?? t;
   let r = o._$litPart$;
   if (r === void 0) {
     const s = i?.renderBefore ?? null;
-    o._$litPart$ = r = new W(t.insertBefore(N(), s), s, void 0, i ?? {});
+    o._$litPart$ = r = new j(t.insertBefore(N(), s), s, void 0, i ?? {});
   }
   return r._$AI(e), r;
 };
@@ -776,7 +776,10 @@ const Xt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "door.open_unsupported": "Öffnen nicht unterstützt",
   "door.contact_open": "Tür offen",
   "door.contact_unknown": "Status unbekannt",
-  "door.waiting_for_live": "Warten auf Live…",
+  "door.open_when_ready": "Öffnen, wenn bereit",
+  "door.unlock_when_ready": "Entriegeln, wenn bereit",
+  "door.open_when_ready_aria": "Tür kann geöffnet werden, sobald das Live-Video verbunden ist",
+  "door.unlock_when_ready_aria": "Tür kann entriegelt werden, sobald das Live-Video verbunden ist",
   "door.unlock_failed": "Die Tür konnte nicht entriegelt werden.",
   "door.open_failed": "Die Tür konnte nicht geöffnet werden."
 }, ti = {
@@ -947,10 +950,13 @@ const Xt = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "door.open_unsupported": "Open unsupported",
   "door.contact_open": "Door open",
   "door.contact_unknown": "Status unknown",
-  "door.waiting_for_live": "Waiting for Live…",
+  "door.open_when_ready": "Open when ready",
+  "door.unlock_when_ready": "Unlock when ready",
+  "door.open_when_ready_aria": "Open door available after live video connects",
+  "door.unlock_when_ready_aria": "Unlock available after live video connects",
   "door.unlock_failed": "Couldn’t unlock the door.",
   "door.open_failed": "Couldn’t open the door."
-}, je = {
+}, We = {
   de: ei,
   en: ti
 };
@@ -962,7 +968,7 @@ function oi(e) {
   return ii(e).trim().toLowerCase().split(/[-_]/)[0] === "de" ? "de" : "en";
 }
 function n(e, t, i = {}) {
-  return (je[oi(e)][t] ?? je.en[t]).replace(
+  return (We[oi(e)][t] ?? We.en[t]).replace(
     /\{([a-z_]+)\}/gi,
     (r, s) => s in i ? String(i[s]) : r
   );
@@ -1151,7 +1157,7 @@ function he(e, t) {
     })
   );
 }
-const yi = 9e3, We = /* @__PURE__ */ new WeakMap();
+const yi = 9e3, je = /* @__PURE__ */ new WeakMap();
 function vt(e, t, i) {
   const o = t?.attributes.entity_picture;
   return typeof o == "string" && o.length > 0 ? e.hassUrl(o) : e.hassUrl(`/api/camera_proxy/${encodeURIComponent(i)}`);
@@ -1164,8 +1170,8 @@ function Ze(e) {
   return Math.max(1, Math.ceil(Number.isFinite(e) ? e : 1));
 }
 async function Ai(e, t) {
-  let i = We.get(e);
-  i || (i = /* @__PURE__ */ new Map(), We.set(e, i));
+  let i = je.get(e);
+  i || (i = /* @__PURE__ */ new Map(), je.set(e, i));
   const o = Date.now(), r = i.get(t);
   if (r && r.expiresAt > o) return r.promise;
   const s = e.callWS({
@@ -1199,7 +1205,7 @@ function $i(e, t) {
     e === "live" ? "common.live" : "common.last_recording"
   );
 }
-const Si = j`
+const Si = W`
   :host {
     display: block;
     min-width: 0;
@@ -1342,7 +1348,7 @@ const Si = j`
       display: none;
     }
   }
-`, xi = j`
+`, xi = W`
   :host {
     position: fixed;
     inset: 0;
@@ -2120,7 +2126,7 @@ const Si = j`
   :host([inline]) .state-layer.with-visitor-controls .spinner {
     flex: 0 0 auto;
   }
-`, Ci = j`
+`, Ci = W`
   :host {
     display: block;
     min-width: 0;
@@ -2439,7 +2445,7 @@ let $ = class extends E {
     );
   }
 };
-$.styles = j`
+$.styles = W`
     :host {
       display: block;
       width: 100%;
@@ -2865,7 +2871,7 @@ let y = class extends E {
     return h`<svg viewBox="0 0 24 24" aria-hidden="true"><path d=${e}></path></svg>`;
   }
 };
-y.styles = j`
+y.styles = W`
     :host {
       position: absolute;
       inset: 0;
@@ -3057,10 +3063,10 @@ class Ki {
     this.clearTimeout(), this.generation += 1;
   }
 }
-var ji = Object.defineProperty, Wi = Object.getOwnPropertyDescriptor, m = (e, t, i, o) => {
-  for (var r = o > 1 ? void 0 : o ? Wi(t, i) : t, s = e.length - 1, a; s >= 0; s--)
+var Wi = Object.defineProperty, ji = Object.getOwnPropertyDescriptor, m = (e, t, i, o) => {
+  for (var r = o > 1 ? void 0 : o ? ji(t, i) : t, s = e.length - 1, a; s >= 0; s--)
     (a = e[s]) && (r = (o ? a(t, i, r) : a(r)) || r);
-  return o && r && ji(t, i, r), r;
+  return o && r && Wi(t, i, r), r;
 };
 const Zi = 20, Gi = 2500, Yi = 900, Qi = 2e3, Ji = 3e3;
 let f = class extends E {
@@ -3345,7 +3351,7 @@ let f = class extends E {
   renderVisitorActions() {
     const e = this.shouldShowDoorControl(), t = this.shouldShowTalkControl();
     if (!e && !t) return l;
-    const i = e ? this.doorActionDisabled() : !0, o = this.doorActionLabel(), r = this.doorActionIcon(), s = e ? this.doorContactState() : void 0, a = s === "open", c = s === "unknown", d = n(this.hass, "door.contact_unknown"), p = this.talkbackRequesting ? n(this.hass, "talkback.requesting_microphone") : this.talkbackTalking ? n(this.hass, "talkback.release_to_stop") : this.talkbackReady ? n(this.hass, "talkback.hold_to_talk") : n(this.hass, "talkback.connecting_short");
+    const i = e ? this.doorActionDisabled() : !0, o = this.doorActionLabel(), r = this.doorActionAriaLabel(o), s = this.doorActionIcon(), a = e ? this.doorContactState() : void 0, c = a === "open", d = a === "unknown", p = n(this.hass, "door.contact_unknown"), g = this.talkbackRequesting ? n(this.hass, "talkback.requesting_microphone") : this.talkbackTalking ? n(this.hass, "talkback.release_to_stop") : this.talkbackReady ? n(this.hass, "talkback.hold_to_talk") : n(this.hass, "talkback.connecting_short");
     return h`
       <div class="visitor-controls">
         ${this.doorFeedback ? h`
@@ -3375,7 +3381,7 @@ let f = class extends E {
       active: this.talkbackTalking
     })}
                   type="button"
-                  aria-label=${p}
+                  aria-label=${g}
                   aria-pressed=${String(this.talkbackTalking)}
                   ?disabled=${!this.talkbackReady}
                   @contextmenu=${(v) => v.preventDefault()}
@@ -3387,7 +3393,7 @@ let f = class extends E {
                   @keyup=${this.handleTalkKeyUp}
                 >
                   ${this.icon(this.talkbackTalking ? tt : it)}
-                  <span>${p}</span>
+                  <span>${g}</span>
                 </button>
               ` : l}
           ${e && t ? h`<span class="visitor-action-divider" aria-hidden="true"></span>` : l}
@@ -3396,15 +3402,15 @@ let f = class extends E {
                   class=${I({
       "visitor-action": !0,
       "door-action": !0,
-      "contact-open": a,
-      "contact-unknown": c,
-      holding: !a && this.doorActionStatus === "holding",
-      working: !a && this.doorActionStatus === "working",
-      success: !a && this.doorActionStatus === "success",
-      error: !a && this.doorActionStatus === "error"
+      "contact-open": c,
+      "contact-unknown": d,
+      holding: !c && this.doorActionStatus === "holding",
+      working: !c && this.doorActionStatus === "working",
+      success: !c && this.doorActionStatus === "success",
+      error: !c && this.doorActionStatus === "error"
     })}
                   type="button"
-                  aria-label=${c ? `${o}. ${d}` : o}
+                  aria-label=${d ? `${r}. ${p}` : r}
                   aria-busy=${String(this.doorActionStatus === "working")}
                   aria-describedby=${this.doorFeedback ? "ring-view-door-feedback" : l}
                   ?disabled=${i}
@@ -3417,10 +3423,10 @@ let f = class extends E {
                   @keydown=${this.handleDoorKeyDown}
                   @keyup=${this.handleDoorKeyUp}
                 >
-                  ${this.icon(r)}
+                  ${this.icon(s)}
                   <span class="door-action-copy">
                     <span>${o}</span>
-                    ${c ? h`<span class="door-contact-state">${d}</span>` : l}
+                    ${d ? h`<span class="door-contact-state">${p}</span>` : l}
                   </span>
                 </button>
               ` : l}
@@ -3448,11 +3454,14 @@ let f = class extends E {
   }
   doorActionDisabled() {
     const e = this.doorEntity();
-    return !this.config?.door_entity || this.doorContactState() === "open" || w(e) || e?.state === "jammed" || this.doorActionStatus === "working" || this.doorActionStatus === "success" || this.inline && this.config.door_control_visibility === "live_only" && this.mode === "live" && this.mediaStatus !== "ready" ? !0 : this.config.door_action === "open" ? !te(e) || ["open", "opening"].includes(e?.state ?? "") : ["unlocked", "unlocking", "open", "opening"].includes(e?.state ?? "");
+    return !this.config?.door_entity || this.doorContactState() === "open" || w(e) || e?.state === "jammed" || this.doorActionStatus === "working" || this.doorActionStatus === "success" || this.doorWaitingForLiveVideo() ? !0 : this.config.door_action === "open" ? !te(e) || ["open", "opening"].includes(e?.state ?? "") : ["unlocked", "unlocking", "open", "opening"].includes(e?.state ?? "");
   }
   doorActionLabel() {
     const e = this.doorEntity();
-    return this.doorContactState() === "open" ? n(this.hass, "door.contact_open") : w(e) ? n(this.hass, "door.unavailable") : e?.state === "jammed" ? n(this.hass, "door.jammed") : this.config?.door_action === "open" && !te(e) ? n(this.hass, "door.open_unsupported") : this.inline && this.config?.door_control_visibility === "live_only" && this.mode === "live" && this.mediaStatus !== "ready" ? n(this.hass, "door.waiting_for_live") : this.doorActionStatus === "working" || this.config?.door_action === "unlock" && e?.state === "unlocking" || this.config?.door_action === "open" && e?.state === "opening" ? n(
+    return this.doorContactState() === "open" ? n(this.hass, "door.contact_open") : w(e) ? n(this.hass, "door.unavailable") : e?.state === "jammed" ? n(this.hass, "door.jammed") : this.config?.door_action === "open" && !te(e) ? n(this.hass, "door.open_unsupported") : this.doorWaitingForLiveVideo() ? n(
+      this.hass,
+      this.config?.door_action === "open" ? "door.open_when_ready" : "door.unlock_when_ready"
+    ) : this.doorActionStatus === "working" || this.config?.door_action === "unlock" && e?.state === "unlocking" || this.config?.door_action === "open" && e?.state === "opening" ? n(
       this.hass,
       this.config?.door_action === "open" ? "door.opening" : "door.unlocking"
     ) : this.doorActionStatus === "success" ? n(
@@ -3465,6 +3474,15 @@ let f = class extends E {
       this.hass,
       this.config?.door_action === "open" ? "door.open" : "door.unlock"
     );
+  }
+  doorActionAriaLabel(e) {
+    return this.doorWaitingForLiveVideo() ? n(
+      this.hass,
+      this.config?.door_action === "open" ? "door.open_when_ready_aria" : "door.unlock_when_ready_aria"
+    ) : e;
+  }
+  doorWaitingForLiveVideo() {
+    return !!(this.inline && this.config?.door_control_visibility === "live_only" && this.mode === "live" && this.mediaStatus !== "ready");
   }
   doorActionIcon() {
     const e = this.doorEntity(), t = this.doorContactState();
@@ -4042,9 +4060,9 @@ function oo(e, t, i) {
   if (c && !d) return o;
   if (d && !c) return r;
   if (c && d) {
-    const p = we(s), v = we(a);
-    if (p !== void 0 && v !== void 0)
-      return p !== v ? v > p ? r : o : t.preview_fallback === "snapshot" ? r : o;
+    const p = we(s), g = we(a);
+    if (p !== void 0 && g !== void 0)
+      return p !== g ? g > p ? r : o : t.preview_fallback === "snapshot" ? r : o;
     if (i !== void 0)
       return i === "snapshot" ? r : o;
   }
@@ -4334,10 +4352,10 @@ let x = class extends E {
     if (!e && this.lastPreviewSize && Math.abs(d - this.lastPreviewSize.width) < Je && Math.abs(p - this.lastPreviewSize.height) < Je)
       return;
     this.lastPreviewSize = { width: d, height: p };
-    const v = this.previewEntityId(), g = this.hass, A = ++this.previewRequestId;
+    const g = this.previewEntityId(), v = this.hass, A = ++this.previewRequestId;
     try {
-      const S = await ki(g, v, d, p);
-      if (A !== this.previewRequestId || !this.isConnected || !this.previewVisible || this.previewEntityId() !== v)
+      const S = await ki(v, g, d, p);
+      if (A !== this.previewRequestId || !this.isConnected || !this.previewVisible || this.previewEntityId() !== g)
         return;
       this.lastPoster = S, this.previewFailed = !1;
     } catch {

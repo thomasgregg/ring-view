@@ -406,6 +406,7 @@ export class RingViewDialog extends LitElement {
 
     const doorDisabled = showDoor ? this.doorActionDisabled() : true;
     const doorLabel = this.doorActionLabel();
+    const doorAriaLabel = this.doorActionAriaLabel(doorLabel);
     const doorIcon = this.doorActionIcon();
     const doorContactState = showDoor ? this.doorContactState() : undefined;
     const contactOpen = doorContactState === "open";
@@ -485,8 +486,8 @@ export class RingViewDialog extends LitElement {
                   })}
                   type="button"
                   aria-label=${contactUnknown
-                    ? `${doorLabel}. ${contactUnknownLabel}`
-                    : doorLabel}
+                    ? `${doorAriaLabel}. ${contactUnknownLabel}`
+                    : doorAriaLabel}
                   aria-busy=${String(this.doorActionStatus === "working")}
                   aria-describedby=${this.doorFeedback
                     ? "ring-view-door-feedback"
@@ -573,12 +574,7 @@ export class RingViewDialog extends LitElement {
     ) {
       return true;
     }
-    if (
-      this.inline
-      && this.config.door_control_visibility === "live_only"
-      && this.mode === "live"
-      && this.mediaStatus !== "ready"
-    ) {
+    if (this.doorWaitingForLiveVideo()) {
       return true;
     }
     if (this.config.door_action === "open") {
@@ -597,13 +593,13 @@ export class RingViewDialog extends LitElement {
     if (this.config?.door_action === "open" && !supportsLockOpen(entity)) {
       return localize(this.hass, "door.open_unsupported");
     }
-    if (
-      this.inline
-      && this.config?.door_control_visibility === "live_only"
-      && this.mode === "live"
-      && this.mediaStatus !== "ready"
-    ) {
-      return localize(this.hass, "door.waiting_for_live");
+    if (this.doorWaitingForLiveVideo()) {
+      return localize(
+        this.hass,
+        this.config?.door_action === "open"
+          ? "door.open_when_ready"
+          : "door.unlock_when_ready",
+      );
     }
     if (
       this.doorActionStatus === "working"
@@ -641,6 +637,25 @@ export class RingViewDialog extends LitElement {
     return localize(
       this.hass,
       this.config?.door_action === "open" ? "door.open" : "door.unlock",
+    );
+  }
+
+  private doorActionAriaLabel(visualLabel: string): string {
+    if (!this.doorWaitingForLiveVideo()) return visualLabel;
+    return localize(
+      this.hass,
+      this.config?.door_action === "open"
+        ? "door.open_when_ready_aria"
+        : "door.unlock_when_ready_aria",
+    );
+  }
+
+  private doorWaitingForLiveVideo(): boolean {
+    return Boolean(
+      this.inline
+      && this.config?.door_control_visibility === "live_only"
+      && this.mode === "live"
+      && this.mediaStatus !== "ready"
     );
   }
 

@@ -4,6 +4,24 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.7.0-beta.5] - 2026-09-11
+
+### Changed
+
+- Replace the ambiguous inline **Waiting for Live…** door label with the shorter,
+  action-specific **Open when ready** or **Unlock when ready**.
+- Keep a more explicit accessible name explaining that the action becomes
+  available after the live video connects.
+
+### Documentation
+
+- Update the configuration guide to describe the new ready-state labels.
+
+### Tests
+
+- Cover both the visible label and detailed accessible name for Open and Unlock
+  on desktop and iPhone profiles.
+
 ## [0.7.0-beta.4] - 2026-09-11
 
 ### Fixed

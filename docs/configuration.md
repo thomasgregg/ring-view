@@ -129,9 +129,9 @@ expose Talk or door actions.
 
 **Door control location** makes the placement explicit: **Fullscreen viewer
 only** or **Dashboard and fullscreen**. With Live-only visibility, the action
-reads **Waiting for Live…** and stays disabled until the current Live player is
-ready. It hides if Live fails, leaving the compact Retry state and the existing
-mode tabs.
+reads **Open when ready** or **Unlock when ready** and stays disabled until the
+current Live player has connected. It hides if Live fails, leaving the compact
+Retry state and the existing mode tabs.
 
 ## Door access
 

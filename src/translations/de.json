@@ -166,7 +166,10 @@
   "door.open_unsupported": "Öffnen nicht unterstützt",
   "door.contact_open": "Tür offen",
   "door.contact_unknown": "Status unbekannt",
-  "door.waiting_for_live": "Warten auf Live…",
+  "door.open_when_ready": "Öffnen, wenn bereit",
+  "door.unlock_when_ready": "Entriegeln, wenn bereit",
+  "door.open_when_ready_aria": "Tür kann geöffnet werden, sobald das Live-Video verbunden ist",
+  "door.unlock_when_ready_aria": "Tür kann entriegelt werden, sobald das Live-Video verbunden ist",
   "door.unlock_failed": "Die Tür konnte nicht entriegelt werden.",
   "door.open_failed": "Die Tür konnte nicht geöffnet werden."
 }
