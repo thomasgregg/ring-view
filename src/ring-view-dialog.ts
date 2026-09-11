@@ -1,4 +1,15 @@
-import { mdiBellRingOutline, mdiClose, mdiPlay } from "@mdi/js";
+import {
+  mdiAlertCircleOutline,
+  mdiBellRingOutline,
+  mdiCheckCircleOutline,
+  mdiClose,
+  mdiDoorOpen,
+  mdiLoading,
+  mdiLockOpenVariantOutline,
+  mdiMicrophone,
+  mdiMicrophoneOff,
+  mdiPlay,
+} from "@mdi/js";
 import { LitElement, html, nothing, type PropertyValues, type TemplateResult } from "lit";
 import { classMap } from "lit/directives/class-map.js";
 import { keyed } from "lit/directives/keyed.js";
@@ -19,7 +30,10 @@ import type {
   NativeAdapterFailure,
   NativeMediaCapabilities,
 } from "./media/native-camera-adapter";
-import type { RingViewRingWebRtcPlayer } from "./media/ring-webrtc-player";
+import type {
+  RingTalkbackState,
+  RingViewRingWebRtcPlayer,
+} from "./media/ring-webrtc-player";
 import { posterUrl } from "./media/poster-provider";
 import { renderModeIcon } from "./mode-icon";
 import { dialogStyles } from "./styles";
@@ -32,6 +46,7 @@ import type {
 import {
   entityIsUnavailable,
   friendlyName,
+  supportsLockOpen,
   supportsRingTalkback,
 } from "./utilities/entity-validation";
 import { saveMode } from "./utilities/mode-storage";
@@ -54,8 +69,12 @@ type MediaStatus =
   | "ready"
   | "error"
   | "compatibility";
+type DoorActionStatus = "idle" | "holding" | "working" | "success" | "error";
 const LIVE_TIMEOUT_SECONDS = 20;
 const LIVE_RETRY_DELAY_MS = 2_500;
+const DOOR_HOLD_DURATION_MS = 900;
+const DOOR_SUCCESS_DURATION_MS = 2_000;
+const DOOR_ERROR_DURATION_MS = 3_000;
 
 @customElement(RING_VIEW_DIALOG_TAG)
 export class RingViewDialog extends LitElement {
@@ -77,6 +96,11 @@ export class RingViewDialog extends LitElement {
   @state() private recordingVideoFailed = false;
   @state() private retryCount = 0;
   @state() private statusAnnouncement = "";
+  @state() private talkbackReady = false;
+  @state() private talkbackRequesting = false;
+  @state() private talkbackTalking = false;
+  @state() private doorActionStatus: DoorActionStatus = "idle";
+  @state() private doorFeedback?: { message: string };
 
   private lifecycle = new StreamLifecycle();
   private opener?: HTMLElement;
@@ -91,6 +115,13 @@ export class RingViewDialog extends LitElement {
   private automaticLiveRecovery?: "waiting" | "attempting";
   private recoveryConnection?: HomeAssistant["connection"];
   private pageUnloading = false;
+  private talkPointerId?: number;
+  private talkKeyboardPressed = false;
+  private doorPointerId?: number;
+  private doorKeyboardPressed = false;
+  private doorHoldTimer?: number;
+  private doorFeedbackTimer?: number;
+  private doorActionToken = 0;
 
   public showDialog(params: RingViewDialogParams): void {
     if (!this.hass) return;
@@ -119,6 +150,7 @@ export class RingViewDialog extends LitElement {
     this.pageUnloading = false;
     this.suspended = false;
     this.statusAnnouncement = "";
+    this.resetVisitorActions();
     this.lastDoorbellState = this.config.doorbell_entity
       ? this.hass.states[this.config.doorbell_entity]?.state
       : undefined;
@@ -176,6 +208,9 @@ export class RingViewDialog extends LitElement {
       this.detectDoorbellEvent(changed.get("hass") as HomeAssistant | undefined);
     }
     if (!changed.has("hass")) return;
+    if (this.config.door_entity && this.doorActionDisabled()) {
+      this.cancelDoorHold();
+    }
     const entity = this.activeEntity();
     if (entityIsUnavailable(entity) && this.mediaStatus !== "error") {
       this.clearAutomaticLiveRecovery();
@@ -235,6 +270,7 @@ export class RingViewDialog extends LitElement {
             </div>
           </header>
           ${this.renderModeSwitch()}
+          ${this.renderVisitorActions()}
         </div>
         <div class="sr-only" aria-live="polite" aria-atomic="true">
           ${this.statusAnnouncement}
@@ -300,6 +336,439 @@ export class RingViewDialog extends LitElement {
     `;
   }
 
+  private renderVisitorActions(): TemplateResult | typeof nothing {
+    const showDoor = this.shouldShowDoorControl();
+    const showTalk = this.shouldShowTalkControl(showDoor);
+    if (!showDoor && !showTalk) return nothing;
+
+    const doorDisabled = showDoor ? this.doorActionDisabled() : true;
+    const doorLabel = this.doorActionLabel();
+    const doorIcon = this.doorActionIcon();
+    const talkLabel = this.talkbackRequesting
+      ? localize(this.hass, "talkback.requesting_microphone")
+      : this.talkbackTalking
+        ? localize(this.hass, "talkback.release_to_stop")
+        : this.talkbackReady
+          ? localize(this.hass, "talkback.hold_to_talk")
+          : localize(this.hass, "talkback.connecting_short");
+
+    return html`
+      <div class="visitor-controls">
+        ${this.doorFeedback
+          ? html`
+              <div
+                id="ring-view-door-feedback"
+                class="door-feedback error"
+                role="alert"
+              >
+                ${this.icon(mdiAlertCircleOutline)}
+                <span>${this.doorFeedback.message}</span>
+              </div>
+            `
+          : nothing}
+        <div
+          class=${classMap({
+            "visitor-action-dock": true,
+            "door-only": showDoor && !showTalk,
+            "talk-only": showTalk && !showDoor,
+          })}
+          role="group"
+          aria-label=${localize(this.hass, "door.actions")}
+        >
+          ${showTalk
+            ? html`
+                <button
+                  class=${classMap({
+                    "visitor-action": true,
+                    "talk-action": true,
+                    active: this.talkbackTalking,
+                  })}
+                  type="button"
+                  aria-label=${talkLabel}
+                  aria-pressed=${String(this.talkbackTalking)}
+                  ?disabled=${!this.talkbackReady}
+                  @contextmenu=${(event: Event) => event.preventDefault()}
+                  @pointerdown=${this.handleTalkPointerDown}
+                  @pointerup=${this.handleTalkPointerEnd}
+                  @pointercancel=${this.handleTalkPointerEnd}
+                  @lostpointercapture=${this.handleTalkPointerEnd}
+                  @keydown=${this.handleTalkKeyDown}
+                  @keyup=${this.handleTalkKeyUp}
+                >
+                  ${this.icon(this.talkbackTalking ? mdiMicrophone : mdiMicrophoneOff)}
+                  <span>${talkLabel}</span>
+                </button>
+              `
+            : nothing}
+          ${showDoor && showTalk
+            ? html`<span class="visitor-action-divider" aria-hidden="true"></span>`
+            : nothing}
+          ${showDoor
+            ? html`
+                <button
+                  class=${classMap({
+                    "visitor-action": true,
+                    "door-action": true,
+                    holding: this.doorActionStatus === "holding",
+                    working: this.doorActionStatus === "working",
+                    success: this.doorActionStatus === "success",
+                    error: this.doorActionStatus === "error",
+                  })}
+                  type="button"
+                  aria-label=${doorLabel}
+                  aria-busy=${String(this.doorActionStatus === "working")}
+                  aria-describedby=${this.doorFeedback
+                    ? "ring-view-door-feedback"
+                    : nothing}
+                  ?disabled=${doorDisabled}
+                  @contextmenu=${(event: Event) => event.preventDefault()}
+                  @click=${this.handleDoorClick}
+                  @pointerdown=${this.handleDoorPointerDown}
+                  @pointerup=${this.handleDoorPointerEnd}
+                  @pointercancel=${this.handleDoorPointerEnd}
+                  @lostpointercapture=${this.handleDoorPointerEnd}
+                  @keydown=${this.handleDoorKeyDown}
+                  @keyup=${this.handleDoorKeyUp}
+                >
+                  ${this.icon(doorIcon)}
+                  <span>${doorLabel}</span>
+                </button>
+              `
+            : nothing}
+        </div>
+      </div>
+    `;
+  }
+
+  private shouldShowDoorControl(): boolean {
+    return Boolean(
+      this.config?.door_entity
+      && (
+        this.mode === "live"
+        || this.config.door_control_visibility === "all_views"
+      ),
+    );
+  }
+
+  private shouldShowTalkControl(showDoor: boolean): boolean {
+    if (
+      this.mode !== "live"
+      || !this.config?.two_way_audio
+      || !this.hass
+      || !supportsRingTalkback(this.hass, this.config.live_entity)
+      || !["pending", "ready", "playback-blocked"].includes(this.mediaStatus)
+    ) {
+      return false;
+    }
+    return !(
+      showDoor
+      && this.config.door_control_layout === "replace_talk"
+    );
+  }
+
+  private doorEntity(): HassEntity | undefined {
+    const entityId = this.config?.door_entity;
+    return entityId ? this.hass?.states[entityId] : undefined;
+  }
+
+  private doorActionDisabled(): boolean {
+    const entity = this.doorEntity();
+    if (
+      !this.config?.door_entity
+      || entityIsUnavailable(entity)
+      || entity?.state === "jammed"
+      || this.doorActionStatus === "working"
+      || this.doorActionStatus === "success"
+    ) {
+      return true;
+    }
+    if (this.config.door_action === "open") {
+      return !supportsLockOpen(entity) || ["open", "opening"].includes(entity?.state ?? "");
+    }
+    return ["unlocked", "unlocking", "open", "opening"].includes(entity?.state ?? "");
+  }
+
+  private doorActionLabel(): string {
+    const entity = this.doorEntity();
+    if (entityIsUnavailable(entity)) return localize(this.hass, "door.unavailable");
+    if (entity?.state === "jammed") return localize(this.hass, "door.jammed");
+    if (this.config?.door_action === "open" && !supportsLockOpen(entity)) {
+      return localize(this.hass, "door.open_unsupported");
+    }
+    if (
+      this.doorActionStatus === "working"
+      || (this.config?.door_action === "unlock" && entity?.state === "unlocking")
+      || (this.config?.door_action === "open" && entity?.state === "opening")
+    ) {
+      return localize(
+        this.hass,
+        this.config?.door_action === "open" ? "door.opening" : "door.unlocking",
+      );
+    }
+    if (this.doorActionStatus === "success") {
+      return localize(
+        this.hass,
+        this.config?.door_action === "open" ? "door.opened" : "door.unlocked",
+      );
+    }
+    if (this.config?.door_action === "open" && entity?.state === "open") {
+      return localize(this.hass, "door.opened");
+    }
+    if (
+      this.config?.door_action === "unlock"
+      && ["unlocked", "open"].includes(entity?.state ?? "")
+    ) {
+      return localize(this.hass, "door.unlocked");
+    }
+    if (this.config?.door_hold_to_activate) {
+      return localize(
+        this.hass,
+        this.config.door_action === "open"
+          ? "door.hold_to_open"
+          : "door.hold_to_unlock",
+      );
+    }
+    return localize(
+      this.hass,
+      this.config?.door_action === "open" ? "door.open" : "door.unlock",
+    );
+  }
+
+  private doorActionIcon(): string {
+    const entity = this.doorEntity();
+    if (
+      entityIsUnavailable(entity)
+      || entity?.state === "jammed"
+      || (this.config?.door_action === "open" && !supportsLockOpen(entity))
+      || this.doorActionStatus === "error"
+    ) {
+      return mdiAlertCircleOutline;
+    }
+    if (this.doorActionStatus === "working") return mdiLoading;
+    if (this.doorActionStatus === "success") return mdiCheckCircleOutline;
+    return this.config?.door_action === "open"
+      ? mdiDoorOpen
+      : mdiLockOpenVariantOutline;
+  }
+
+  private handleTalkbackState = (
+    event: CustomEvent<RingTalkbackState>,
+  ): void => {
+    if (
+      event.currentTarget
+      !== this.renderRoot.querySelector("ring-view-ring-webrtc-player")
+    ) {
+      return;
+    }
+    if (!event.detail.ready) {
+      this.cancelTalkPress(event.currentTarget as RingViewRingWebRtcPlayer);
+    }
+    this.talkbackReady = event.detail.ready;
+    this.talkbackRequesting = event.detail.requesting;
+    this.talkbackTalking = event.detail.talking;
+  };
+
+  private talkbackPlayer(): RingViewRingWebRtcPlayer | null {
+    return this.shadowRoot?.querySelector("ring-view-ring-webrtc-player") ?? null;
+  }
+
+  private cancelTalkPress(
+    player: RingViewRingWebRtcPlayer | null = this.talkbackPlayer(),
+  ): void {
+    this.talkPointerId = undefined;
+    this.talkKeyboardPressed = false;
+    player?.stopTalking();
+  }
+
+  private handleTalkPointerDown = (event: PointerEvent): void => {
+    if (
+      event.button !== 0
+      || !event.isPrimary
+      || this.talkPointerId !== undefined
+      || !this.talkbackReady
+    ) {
+      return;
+    }
+    event.preventDefault();
+    (event.currentTarget as HTMLElement | null)?.setPointerCapture?.(event.pointerId);
+    this.talkPointerId = event.pointerId;
+    this.talkbackPlayer()?.startTalking();
+  };
+
+  private handleTalkPointerEnd = (event: PointerEvent): void => {
+    if (this.talkPointerId !== event.pointerId) return;
+    this.talkPointerId = undefined;
+    this.talkbackPlayer()?.stopTalking();
+  };
+
+  private handleTalkKeyDown = (event: KeyboardEvent): void => {
+    if (
+      ![" ", "Enter"].includes(event.key)
+      || event.repeat
+      || this.talkKeyboardPressed
+      || !this.talkbackReady
+    ) {
+      return;
+    }
+    event.preventDefault();
+    this.talkKeyboardPressed = true;
+    this.talkbackPlayer()?.startTalking();
+  };
+
+  private handleTalkKeyUp = (event: KeyboardEvent): void => {
+    if (![" ", "Enter"].includes(event.key) || !this.talkKeyboardPressed) return;
+    event.preventDefault();
+    this.talkKeyboardPressed = false;
+    this.talkbackPlayer()?.stopTalking();
+  };
+
+  private handleDoorPointerDown = (event: PointerEvent): void => {
+    if (
+      !this.config?.door_hold_to_activate
+      || event.button !== 0
+      || !event.isPrimary
+      || this.doorPointerId !== undefined
+      || this.doorActionDisabled()
+    ) {
+      return;
+    }
+    event.preventDefault();
+    (event.currentTarget as HTMLElement | null)?.setPointerCapture?.(event.pointerId);
+    this.doorPointerId = event.pointerId;
+    this.beginDoorHold();
+  };
+
+  private handleDoorPointerEnd = (event: PointerEvent): void => {
+    if (this.doorPointerId !== event.pointerId) return;
+    this.doorPointerId = undefined;
+    this.cancelDoorHold();
+  };
+
+  private handleDoorKeyDown = (event: KeyboardEvent): void => {
+    if (
+      !this.config?.door_hold_to_activate
+      || ![" ", "Enter"].includes(event.key)
+      || event.repeat
+      || this.doorKeyboardPressed
+      || this.doorActionDisabled()
+    ) {
+      return;
+    }
+    event.preventDefault();
+    this.doorKeyboardPressed = true;
+    this.beginDoorHold();
+  };
+
+  private handleDoorKeyUp = (event: KeyboardEvent): void => {
+    if (![" ", "Enter"].includes(event.key) || !this.doorKeyboardPressed) return;
+    event.preventDefault();
+    this.doorKeyboardPressed = false;
+    this.cancelDoorHold();
+  };
+
+  private handleDoorClick = (): void => {
+    if (this.config?.door_hold_to_activate || this.doorActionDisabled()) return;
+    void this.executeDoorAction();
+  };
+
+  private beginDoorHold(): void {
+    if (this.doorHoldTimer !== undefined || this.doorActionDisabled()) return;
+    this.clearDoorFeedback();
+    this.doorActionStatus = "holding";
+    this.doorHoldTimer = window.setTimeout(() => {
+      this.doorHoldTimer = undefined;
+      this.doorPointerId = undefined;
+      this.doorKeyboardPressed = false;
+      void this.executeDoorAction();
+    }, DOOR_HOLD_DURATION_MS);
+  }
+
+  private cancelDoorHold(): void {
+    if (this.doorHoldTimer !== undefined) {
+      window.clearTimeout(this.doorHoldTimer);
+      this.doorHoldTimer = undefined;
+    }
+    this.doorPointerId = undefined;
+    this.doorKeyboardPressed = false;
+    if (this.doorActionStatus === "holding") this.doorActionStatus = "idle";
+  }
+
+  private async executeDoorAction(): Promise<void> {
+    const hass = this.hass;
+    const entityId = this.config?.door_entity;
+    const action = this.config?.door_action;
+    if (
+      !hass
+      || !entityId
+      || !action
+      || this.doorActionDisabled()
+      || document.hidden
+    ) {
+      this.cancelDoorHold();
+      return;
+    }
+
+    this.cancelDoorHold();
+    this.clearDoorFeedback();
+    this.doorActionStatus = "working";
+    const token = ++this.doorActionToken;
+
+    try {
+      if (!hass.callService) throw new Error("Home Assistant service API unavailable");
+      await hass.callService("lock", action, { entity_id: entityId });
+      if (token !== this.doorActionToken || !this.open) return;
+      const message = localize(
+        this.hass,
+        action === "open" ? "door.opened" : "door.unlocked",
+      );
+      this.doorActionStatus = "success";
+      this.statusAnnouncement = message;
+      this.doorFeedbackTimer = window.setTimeout(() => {
+        if (token !== this.doorActionToken) return;
+        this.doorFeedbackTimer = undefined;
+        this.doorFeedback = undefined;
+        this.doorActionStatus = "idle";
+      }, DOOR_SUCCESS_DURATION_MS);
+    } catch {
+      if (token !== this.doorActionToken || !this.open) return;
+      const message = localize(
+        this.hass,
+        action === "open" ? "door.open_failed" : "door.unlock_failed",
+      );
+      this.doorActionStatus = "error";
+      this.doorFeedback = { message };
+      this.statusAnnouncement = message;
+      this.doorFeedbackTimer = window.setTimeout(() => {
+        if (token !== this.doorActionToken) return;
+        this.doorFeedbackTimer = undefined;
+        this.doorFeedback = undefined;
+        this.doorActionStatus = "idle";
+      }, DOOR_ERROR_DURATION_MS);
+    }
+  }
+
+  private clearDoorFeedback(): void {
+    if (this.doorFeedbackTimer !== undefined) {
+      window.clearTimeout(this.doorFeedbackTimer);
+      this.doorFeedbackTimer = undefined;
+    }
+    this.doorFeedback = undefined;
+    if (["success", "error"].includes(this.doorActionStatus)) {
+      this.doorActionStatus = "idle";
+    }
+  }
+
+  private resetVisitorActions(): void {
+    this.cancelTalkPress();
+    this.cancelDoorHold();
+    this.clearDoorFeedback();
+    this.doorActionToken += 1;
+    this.doorActionStatus = "idle";
+    this.talkbackReady = false;
+    this.talkbackRequesting = false;
+    this.talkbackTalking = false;
+  }
+
   private renderMedia(): TemplateResult {
     const entity = this.activeEntity();
     const entityId = this.activeEntityId();
@@ -351,11 +820,13 @@ export class RingViewDialog extends LitElement {
                         .muted=${this.liveMuted}
                         .fitMode=${this.config!.fit_mode}
                         .poster=${poster}
+                        .externalControls=${true}
                         @ring-webrtc-ready=${this.handleMediaReady}
                         @ring-webrtc-error=${this.handleRingWebRtcError}
                         @ring-webrtc-resume=${this.handleLiveResumeRequired}
                         @ring-webrtc-playback-blocked=${this.handlePlaybackBlocked}
                         @ring-webrtc-capabilities=${this.handleMediaCapabilities}
+                        @ring-talkback-state=${this.handleTalkbackState}
                       ></ring-view-ring-webrtc-player>
                     `
                   : html`
@@ -544,6 +1015,7 @@ export class RingViewDialog extends LitElement {
 
   private selectMode(mode: CameraMode): void {
     if (!this.config || mode === this.mode) return;
+    this.resetVisitorActions();
     this.clearAutomaticLiveRecovery();
     this.lifecycle.dispose();
     this.automaticLiveRetry = true;
@@ -585,10 +1057,14 @@ export class RingViewDialog extends LitElement {
   }
 
   private resetMediaAttempt(): void {
+    this.cancelTalkPress();
     this.retryCount = 0;
     this.recordingMuted = false;
     this.liveHasAudio = undefined;
     this.recordingVideoFailed = false;
+    this.talkbackReady = false;
+    this.talkbackRequesting = false;
+    this.talkbackTalking = false;
   }
 
   private acceptsMediaEvent(event?: Event): boolean {
@@ -719,11 +1195,15 @@ export class RingViewDialog extends LitElement {
   };
 
   private waitForLiveResume(): void {
+    this.cancelTalkPress();
     this.clearAutomaticLiveRecovery();
     this.lifecycle.dispose();
     this.session = this.lifecycle.current();
     this.automaticLiveRetry = false;
     this.mediaStatus = "awaiting-resume";
+    this.talkbackReady = false;
+    this.talkbackRequesting = false;
+    this.talkbackTalking = false;
     this.statusAnnouncement = localize(this.hass, "viewer.resume_live");
   }
 
@@ -789,6 +1269,7 @@ export class RingViewDialog extends LitElement {
   };
 
   private failMedia(): void {
+    this.cancelTalkPress();
     if (this.automaticLiveRecovery === "attempting") {
       // Keep v0.5.8's proven manual path if this one attempt cannot recover.
       // Autoplay rejection uses playback-blocked instead and retains the peer.
@@ -921,16 +1402,24 @@ export class RingViewDialog extends LitElement {
     document.addEventListener("visibilitychange", this.handleVisibilityChange);
     window.addEventListener("pagehide", this.handlePageHide);
     window.addEventListener("pageshow", this.handlePageShow);
+    window.addEventListener("blur", this.handleWindowBlur);
   }
 
   private detachGlobalListeners(): void {
     document.removeEventListener("visibilitychange", this.handleVisibilityChange);
     window.removeEventListener("pagehide", this.handlePageHide);
     window.removeEventListener("pageshow", this.handlePageShow);
+    window.removeEventListener("blur", this.handleWindowBlur);
   }
+
+  private handleWindowBlur = (): void => {
+    this.cancelDoorHold();
+    this.cancelTalkPress();
+  };
 
   private handlePageHide = (): void => {
     this.pageUnloading = true;
+    this.resetVisitorActions();
     if (!this.open || this.mode !== "live") return;
     this.renderRoot.querySelector<RingViewRingWebRtcPlayer>("ring-view-ring-webrtc-player")?.stopTalking();
     this.waitForLiveResume();
@@ -946,6 +1435,7 @@ export class RingViewDialog extends LitElement {
 
   private handleVisibilityChange = (): void => {
     if (!this.open) return;
+    if (document.hidden) this.cancelDoorHold();
     if (this.automaticLiveRecovery === "waiting") {
       this.tryAutomaticLiveResume();
       return;
@@ -1045,6 +1535,7 @@ export class RingViewDialog extends LitElement {
     this.automaticLiveRetry = true;
     this.recordingStarted = true;
     this.statusAnnouncement = "";
+    this.resetVisitorActions();
     this.setRingingUntil();
     this.lastDoorbellState = undefined;
     this.detachGlobalListeners();

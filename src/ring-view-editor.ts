@@ -1,6 +1,7 @@
 import {
   mdiDoorbellVideo,
   mdiImageOutline,
+  mdiLockOpenVariantOutline,
   mdiPaletteOutline,
   mdiPlayCircleOutline,
 } from "@mdi/js";
@@ -90,6 +91,81 @@ function configSchema(
     });
   }
 
+  const doorAccess: ConfigFormSchema[] = [
+    {
+      name: "door_entity",
+      selector: { entity: { domain: "lock" } },
+    },
+  ];
+
+  if (config.door_entity) {
+    doorAccess.push(
+      {
+        name: "door_action",
+        required: true,
+        selector: {
+          select: {
+            mode: "dropdown",
+            options: [
+              {
+                value: "unlock",
+                label: localize(hass, "editor.door_action_unlock"),
+              },
+              {
+                value: "open",
+                label: localize(hass, "editor.door_action_open"),
+              },
+            ],
+          },
+        },
+      },
+      {
+        name: "door_control_visibility",
+        required: true,
+        selector: {
+          select: {
+            mode: "dropdown",
+            options: [
+              {
+                value: "live_only",
+                label: localize(hass, "editor.door_visibility_live"),
+              },
+              {
+                value: "all_views",
+                label: localize(hass, "editor.door_visibility_all"),
+              },
+            ],
+          },
+        },
+      },
+    );
+    if (config.two_way_audio) {
+      doorAccess.push({
+        name: "door_control_layout",
+        required: true,
+        selector: {
+          select: {
+            mode: "dropdown",
+            options: [
+              {
+                value: "alongside_talk",
+                label: localize(hass, "editor.door_layout_both"),
+              },
+              {
+                value: "replace_talk",
+                label: localize(hass, "editor.door_layout_replace"),
+              },
+            ],
+          },
+        },
+      });
+    }
+    doorAccess.push({
+      name: "door_hold_to_activate",
+      selector: { boolean: {} },
+    });
+  }
+
   return [
     {
       name: "recording_entity",
@@ -146,6 +222,13 @@ function configSchema(
           selector: { entity: { domain: "event", device_class: "doorbell" } },
         },
       ],
+    },
+    {
+      name: "door_access",
+      type: "expandable",
+      flatten: true,
+      iconPath: mdiLockOpenVariantOutline,
+      schema: doorAccess,
     },
     {
       name: "card_appearance",
@@ -223,6 +306,12 @@ const LABELS: Record<string, TranslationKey> = {
   doorbell_features: "editor.doorbell_features",
   two_way_audio: "editor.two_way_audio",
   doorbell_entity: "editor.doorbell_entity",
+  door_access: "editor.door_access",
+  door_entity: "editor.door_entity",
+  door_action: "editor.door_action",
+  door_control_visibility: "editor.door_control_visibility",
+  door_control_layout: "editor.door_control_layout",
+  door_hold_to_activate: "editor.door_hold_to_activate",
   card_appearance: "editor.card_appearance",
   name: "editor.name",
   show_name: "editor.show_name",
@@ -239,6 +328,11 @@ const HELPERS: Record<string, TranslationKey> = {
   live_muted: "editor.helper_live_muted",
   two_way_audio: "editor.helper_two_way_audio",
   doorbell_entity: "editor.helper_doorbell_entity",
+  door_entity: "editor.helper_door_entity",
+  door_action: "editor.helper_door_action",
+  door_control_visibility: "editor.helper_door_control_visibility",
+  door_control_layout: "editor.helper_door_control_layout",
+  door_hold_to_activate: "editor.helper_door_hold_to_activate",
   show_name: "editor.helper_show_name",
   preview_source: "editor.helper_preview_source",
   snapshot_entity: "editor.helper_snapshot_entity",
@@ -327,8 +421,18 @@ export class RingViewEditor extends LitElement {
       ...event.detail.value,
     });
     this.config = next;
+    const inactiveDoorOptions = new Set([
+      "door_action",
+      "door_control_layout",
+      "door_control_visibility",
+      "door_hold_to_activate",
+    ]);
     const emitted = Object.fromEntries(
-      Object.entries(next).filter(([, value]) => value !== undefined),
+      Object.entries(next).filter(
+        ([key, value]) =>
+          value !== undefined
+          && (Boolean(next.door_entity) || !inactiveDoorOptions.has(key)),
+      ),
     ) as unknown as RingViewConfig;
     this.dispatchEvent(
       new CustomEvent("config-changed", {

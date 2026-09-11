@@ -11,6 +11,10 @@ const DEFAULTS = {
   autoplay_recording: true,
   live_muted: false,
   two_way_audio: false,
+  door_action: "unlock",
+  door_control_layout: "alongside_talk",
+  door_control_visibility: "live_only",
+  door_hold_to_activate: true,
   show_name: false,
   preview_source: "last_recording",
   preview_fallback: "last_recording",
@@ -29,6 +33,9 @@ const PREVIEW_SOURCES = new Set([
 const PREVIEW_FALLBACKS = new Set(["last_recording", "snapshot"]);
 const ASPECT_RATIOS = new Set(["auto", "16:9", "4:3", "1:1"]);
 const FIT_MODES = new Set(["cover", "contain"]);
+const DOOR_ACTIONS = new Set(["unlock", "open"]);
+const DOOR_CONTROL_LAYOUTS = new Set(["alongside_talk", "replace_talk"]);
+const DOOR_CONTROL_VISIBILITIES = new Set(["live_only", "all_views"]);
 
 function assertCameraEntity(
   value: unknown,
@@ -79,6 +86,29 @@ export function validateConfig(config: RingViewConfig): void {
   ) {
     throw new Error(localize(undefined, "config.doorbell_entity"));
   }
+  if (
+    config.door_entity !== undefined
+    && config.door_entity !== ""
+    && (typeof config.door_entity !== "string"
+      || !config.door_entity.startsWith("lock."))
+  ) {
+    throw new Error(localize(undefined, "config.door_entity"));
+  }
+  if (config.door_action && !DOOR_ACTIONS.has(config.door_action)) {
+    throw new Error(localize(undefined, "config.door_action"));
+  }
+  if (
+    config.door_control_layout
+    && !DOOR_CONTROL_LAYOUTS.has(config.door_control_layout)
+  ) {
+    throw new Error(localize(undefined, "config.door_control_layout"));
+  }
+  if (
+    config.door_control_visibility
+    && !DOOR_CONTROL_VISIBILITIES.has(config.door_control_visibility)
+  ) {
+    throw new Error(localize(undefined, "config.door_control_visibility"));
+  }
 }
 
 export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
@@ -97,6 +127,14 @@ export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
     live_muted: config.live_muted ?? DEFAULTS.live_muted,
     two_way_audio: config.two_way_audio ?? DEFAULTS.two_way_audio,
     doorbell_entity: config.doorbell_entity || undefined,
+    door_entity: config.door_entity || undefined,
+    door_action: config.door_action ?? DEFAULTS.door_action,
+    door_control_layout:
+      config.door_control_layout ?? DEFAULTS.door_control_layout,
+    door_control_visibility:
+      config.door_control_visibility ?? DEFAULTS.door_control_visibility,
+    door_hold_to_activate:
+      config.door_hold_to_activate ?? DEFAULTS.door_hold_to_activate,
     show_name: config.show_name ?? DEFAULTS.show_name,
     preview_source: config.preview_source ?? DEFAULTS.preview_source,
     preview_fallback: config.preview_fallback ?? DEFAULTS.preview_fallback,

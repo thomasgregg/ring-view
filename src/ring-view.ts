@@ -163,7 +163,10 @@ export class RingView extends LitElement {
           this.hass.states[this.config.snapshot_entity]) ||
       (this.config.doorbell_entity !== undefined &&
         previous.states[this.config.doorbell_entity] !==
-          this.hass.states[this.config.doorbell_entity])
+          this.hass.states[this.config.doorbell_entity]) ||
+      (this.config.door_entity !== undefined &&
+        previous.states[this.config.door_entity] !==
+          this.hass.states[this.config.door_entity])
     );
   }
 

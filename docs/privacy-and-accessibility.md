@@ -15,6 +15,13 @@ The card supports keyboard activation, Escape to close, focus trapping and resto
 - Camera tokens, authenticated URLs, and `video_url` values are never copied into configuration, browser storage, or logs.
 - Microphone access is requested only after the user presses **Hold to talk**.
   The track remains muted whenever the button is not actively held.
+- Door access calls only the standard Home Assistant service for the configured
+  `lock.*` entity. Ring View stores no lock credentials, access codes, or vendor
+  tokens. Home Assistant remains responsible for service authorization.
+- Door access requires a 900 ms hold by default. The hold is cancelled when the
+  viewer closes, changes view, loses focus, or becomes hidden. A user who disables
+  this confirmation accepts one-tap operation for everyone allowed to use that
+  dashboard and entity.
 - The optional remembered view stores only the selected mode for that entity pair in the local browser.
 
 ## A note on privacy & legality

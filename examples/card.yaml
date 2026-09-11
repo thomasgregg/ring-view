@@ -8,6 +8,14 @@ default_mode: last_recording
 live_muted: true
 two_way_audio: true
 doorbell_entity: event.front_door_ding
+
+# Optional door-access beta
+door_entity: lock.front_door
+door_action: unlock
+door_control_visibility: live_only
+door_control_layout: alongside_talk
+door_hold_to_activate: true
+
 show_name: false
 aspect_ratio: "16:9"
 fit_mode: cover

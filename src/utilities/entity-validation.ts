@@ -2,6 +2,7 @@ import { localize } from "../localize";
 import type { HassEntity, HomeAssistant, NormalizedConfig } from "../types";
 
 export const CAMERA_STREAM_FEATURE = 2;
+export const LOCK_OPEN_FEATURE = 1;
 
 export function entityIsUnavailable(entity?: HassEntity): boolean {
   return !entity || entity.state === "unavailable" || entity.state === "unknown";
@@ -22,6 +23,11 @@ export function supportsRingTalkback(
   );
 }
 
+export function supportsLockOpen(entity?: HassEntity): boolean {
+  const features = Number(entity?.attributes.supported_features ?? 0);
+  return (features & LOCK_OPEN_FEATURE) !== 0;
+}
+
 export function recordingHasMedia(entity?: HassEntity): boolean {
   return Boolean(
     entity?.attributes.video_url || entity?.attributes.entity_picture,
@@ -34,6 +40,7 @@ export interface EntityWarning {
     | "live"
     | "snapshot"
     | "doorbell"
+    | "door"
     | "talkback"
     | "compatibility";
   message: string;
@@ -120,6 +127,23 @@ export function validateEntities(
       warnings.push({
         kind: "doorbell",
         message: localize(hass, "warning.doorbell_event"),
+      });
+    }
+  }
+
+  if (config.door_entity) {
+    const door = hass.states[config.door_entity];
+    if (entityIsUnavailable(door)) {
+      warnings.push({
+        kind: "door",
+        message: localize(hass, "warning.unavailable", {
+          name: friendlyName(door, config.door_entity),
+        }),
+      });
+    } else if (config.door_action === "open" && !supportsLockOpen(door)) {
+      warnings.push({
+        kind: "door",
+        message: localize(hass, "warning.door_open_unsupported"),
       });
     }
   }

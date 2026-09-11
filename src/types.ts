@@ -8,6 +8,9 @@ export type PreviewSource =
 export type PreviewFallback = "last_recording" | "snapshot";
 export type AspectRatio = "auto" | "16:9" | "4:3" | "1:1";
 export type FitMode = "cover" | "contain";
+export type DoorAction = "unlock" | "open";
+export type DoorControlLayout = "alongside_talk" | "replace_talk";
+export type DoorControlVisibility = "live_only" | "all_views";
 
 export interface HassEntity {
   entity_id: string;
@@ -49,6 +52,12 @@ export interface HomeAssistant {
   callWS<T>(message: Record<string, unknown>): Promise<T>;
   localize?(key: string, values?: Record<string, unknown>): string;
   formatEntityName?(stateObj: HassEntity, name?: string): string;
+  callService?(
+    domain: string,
+    service: string,
+    serviceData?: Record<string, unknown>,
+    target?: Record<string, unknown>,
+  ): Promise<unknown>;
 }
 
 export interface GridOptions {
@@ -72,6 +81,11 @@ export interface RingViewConfig {
   live_muted?: boolean;
   two_way_audio?: boolean;
   doorbell_entity?: string;
+  door_entity?: string;
+  door_action?: DoorAction;
+  door_control_layout?: DoorControlLayout;
+  door_control_visibility?: DoorControlVisibility;
+  door_hold_to_activate?: boolean;
   show_name?: boolean;
   preview_source?: PreviewSource;
   preview_fallback?: PreviewFallback;
@@ -83,11 +97,12 @@ export interface RingViewConfig {
 export interface NormalizedConfig extends Required<
   Omit<
     RingViewConfig,
-    "name" | "grid_options" | "doorbell_entity" | "snapshot_entity"
+    "name" | "grid_options" | "doorbell_entity" | "door_entity" | "snapshot_entity"
   >
 > {
   name?: string;
   doorbell_entity?: string;
+  door_entity?: string;
   snapshot_entity?: string;
   grid_options?: GridOptions;
 }

@@ -14,6 +14,12 @@ type MicrophoneState =
   | "failed"
   | "unsupported";
 
+export interface RingTalkbackState {
+  ready: boolean;
+  requesting: boolean;
+  talking: boolean;
+}
+
 type SignalMessage =
   | { type: "session"; session_id: string }
   | { type: "answer"; answer: string }
@@ -173,6 +179,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
   @property({ type: Boolean }) public muted = false;
   @property({ attribute: false }) public fitMode: FitMode = "cover";
   @property({ attribute: false }) public poster?: string;
+  @property({ type: Boolean }) public externalControls = false;
 
   @state() private microphoneState: MicrophoneState = "not-requested";
   @state() private connectionState: RTCPeerConnectionState | "starting" = "starting";
@@ -198,6 +205,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
   private startQueued = false;
   private activePointerId?: number;
   private keyboardPressed = false;
+  private externalPressed = false;
   private pressToken = 0;
   private statusMessageTimeout?: number;
 
@@ -233,6 +241,17 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     if (this.signalingConnection && this.hass?.connection !== this.signalingConnection) {
       this.requestLiveResume();
       return;
+    }
+
+    const changedKeys = changed as unknown as Map<PropertyKey, unknown>;
+    if (
+      changedKeys.has("microphoneState")
+      || changedKeys.has("connectionState")
+      || changedKeys.has("readyDispatched")
+      || changedKeys.has("playbackBlocked")
+      || changed.has("externalControls")
+    ) {
+      this.dispatchTalkbackState();
     }
 
     const entityChanged = changed.has("entityId") && this.startedEntityId !== this.entityId;
@@ -282,7 +301,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
           <span>${localize(this.hass, "viewer.resume_live")}</span>
         </button>
       ` : nothing}
-      ${connected && this.readyDispatched && !this.playbackBlocked ? html`<div class="talkback-controls">
+      ${!this.externalControls && connected && this.readyDispatched && !this.playbackBlocked ? html`<div class="talkback-controls">
         <button
           class=${classMap({ "talk-button": true, active: talking })}
           type="button"
@@ -309,12 +328,29 @@ export class RingViewRingWebRtcPlayer extends LitElement {
   }
 
   public stopTalking = (): void => {
+    const wasExternalPressed = this.externalPressed;
+    this.externalPressed = false;
+    if (wasExternalPressed) this.pressToken += 1;
     const track = this.localStream?.getAudioTracks()[0];
     if (track) track.enabled = false;
     if (this.microphoneState === "active") {
       this.microphoneState = "ready";
       this.showStatusMessage("");
     }
+  };
+
+  public startTalking = (): void => {
+    if (
+      this.externalPressed
+      || this.connectionState !== "connected"
+      || !this.readyDispatched
+      || this.playbackBlocked
+    ) {
+      return;
+    }
+    this.externalPressed = true;
+    const token = ++this.pressToken;
+    void this.startTalkingForPress(token);
   };
 
   private async restartSession(): Promise<void> {
@@ -538,12 +574,13 @@ export class RingViewRingWebRtcPlayer extends LitElement {
   }
 
   private isTalkPressed(): boolean {
-    return this.activePointerId !== undefined || this.keyboardPressed;
+    return this.activePointerId !== undefined || this.keyboardPressed || this.externalPressed;
   }
 
   private cancelActivePress(): void {
     this.activePointerId = undefined;
     this.keyboardPressed = false;
+    this.externalPressed = false;
     this.pressToken += 1;
     this.stopTalking();
   }
@@ -756,6 +793,24 @@ export class RingViewRingWebRtcPlayer extends LitElement {
       this.statusMessageTimeout = undefined;
       this.statusMessage = "";
     }, STATUS_MESSAGE_DURATION_MS);
+  }
+
+  private dispatchTalkbackState(): void {
+    const detail: RingTalkbackState = {
+      ready:
+        this.connectionState === "connected"
+        && this.readyDispatched
+        && !this.playbackBlocked,
+      requesting: this.microphoneState === "requesting",
+      talking: this.microphoneState === "active",
+    };
+    this.dispatchEvent(
+      new CustomEvent<RingTalkbackState>("ring-talkback-state", {
+        detail,
+        bubbles: true,
+        composed: true,
+      }),
+    );
   }
 
   private clearStatusMessageTimeout(): void {

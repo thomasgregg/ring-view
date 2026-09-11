@@ -5,7 +5,7 @@
 [![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://www.hacs.xyz/)
 [![License: MIT](https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/license-mit.svg)](https://github.com/thomasgregg/ring-view/blob/main/LICENSE)
 
-## Your Ring camera. One card. Recording, Live, and talkback.
+## Your Ring camera. One card. Recording, Live, talkback, and door access.
 
 See what happened, check what is happening, and answer the door—all without leaving the same viewer. Ring View brings Ring's separate recording and live camera entities together in one Home Assistant dashboard card.
 
@@ -21,6 +21,7 @@ See what happened, check what is happening, and answer the door—all without le
 
 - **Go from recording to Live in one tap.** Switch views inside the same viewer, with familiar playback and sound controls.
 - **Listen and talk to visitors.** Optional **Hold to talk** adds push-to-talk to the official Ring live camera, using the same connection as the video.
+- **Operate the door while you watch.** The door-access beta adds a configurable Home Assistant lock action, with a safe hold gesture and a shared Talk/door control dock.
 - **Keep your dashboard quiet.** A lightweight still image previews the camera; no live player runs in the dashboard.
 - **Show the freshest view.** Optionally combine the latest recording with a Ring-MQTT snapshot camera for the dashboard preview.
 - **Know when someone rings.** A temporary doorbell alert highlights the card. Tap it to open Live.
@@ -32,7 +33,7 @@ A native picture entity card is a good fit for one camera entity. Ring View is f
 
 ## Get started
 
-You need Home Assistant **2026.7 or newer**, the official [Ring integration](https://www.home-assistant.io/integrations/ring/), and its **last recording** and **live view** camera entities. Recording access requires a suitable Ring subscription. Enable the last-recording entity in the Ring device's entity list if it is disabled.
+You need Home Assistant **2026.7 or newer**, the official [Ring integration](https://www.home-assistant.io/integrations/ring/), and its **last recording** and **live view** camera entities. Recording access requires a suitable Ring subscription. The last-recording entity is disabled by default. If the two camera entries look identical or their IDs do not use the example `_last_recording` and `_live_view` suffixes, follow [Choosing camera entities](docs/configuration.md#choosing-camera-entities).
 
 [![Open Ring View in HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=thomasgregg&repository=ring-view&category=plugin)
 
@@ -50,7 +51,9 @@ recording_entity: camera.front_door_last_recording
 live_entity: camera.front_door_live_view
 ```
 
-Tap the card to open the viewer. The history icon selects the latest recording; the red dot selects Live. Enable **Doorbell features → Two-way audio** to add **Hold to talk**. Microphone access needs an HTTPS Home Assistant connection and your permission.
+Tap the card to open the viewer. The history icon selects the latest recording; the red dot selects Live. Enable **Viewer behavior → Two-way audio** to add **Hold to talk**. Microphone access needs an HTTPS Home Assistant connection and your permission.
+
+In `0.6.0-beta.1`, selecting **Door access → Door lock** adds an optional **Unlock** or **Open door** action. It defaults to Live view and a 900 ms hold confirmation. When Talk is also enabled, both actions form one control dock with a subtle divider; either action can also be shown alone. See the [door-access beta specification](docs/door-access-beta.md) for the design, safety behavior, and complete configuration contract.
 
 [All settings and visual editor](docs/configuration.md) · [Talkback and playback help](docs/playback-and-troubleshooting.md)
 
@@ -86,6 +89,7 @@ Use the same Ring event in your own Home Assistant automations for porch lights,
 ## Guides and support
 
 - [Configuration, visual editor, layouts, and snapshot previews](docs/configuration.md)
+- [Door-access beta design and behavior](docs/door-access-beta.md)
 - [Playback, talkback, iPhone rotation, and troubleshooting](docs/playback-and-troubleshooting.md)
 - [Optional temporary backend patch](docs/backend-patch.md)
 - [Doorbell notifications and automation blueprint](docs/notifications.md)

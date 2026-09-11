@@ -140,6 +140,60 @@ test("falls back to native live playback without talkback for a generic camera",
   await expect(page.getByRole("img", { name: "Synthetic demo camera media" })).toBeVisible();
 });
 
+test("merges Talk and door access into one divided action dock", async ({ page }) => {
+  await page.goto(
+    "/demo/?mode=live&two_way_audio=1&door=1&door_action=open",
+  );
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+
+  const dock = page.locator(".visitor-action-dock");
+  await expect(dock).toBeVisible();
+  await expect(dock.getByRole("button", { name: "Connecting…" })).toBeDisabled();
+  await expect(dock.getByRole("button", { name: "Hold to open" })).toBeVisible();
+  await expect(dock.locator(".visitor-action-divider")).toBeVisible();
+});
+
+test("requires a complete hold before opening the configured door", async ({ page }) => {
+  await page.goto("/demo/?mode=live&door=1&door_action=open");
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  const door = page.getByRole("button", { name: "Hold to open" });
+  const box = await door.boundingBox();
+  if (!box) throw new Error("Door control was not visible");
+
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.waitForTimeout(350);
+  await page.mouse.up();
+  expect(await page.evaluate(() => window.demoDoorCalls ?? [])).toHaveLength(0);
+
+  await page.mouse.down();
+  await page.waitForTimeout(950);
+  await page.mouse.up();
+  await expect.poll(() => page.evaluate(() => window.demoDoorCalls?.length ?? 0)).toBe(1);
+  expect(await page.evaluate(() => window.demoDoorCalls?.[0])).toEqual({
+    domain: "lock",
+    service: "open",
+    serviceData: { entity_id: "lock.front_door" },
+  });
+  await expect(page.getByRole("button", { name: "Door opened" })).toBeVisible();
+});
+
+test("configures door visibility and replacement of Talk independently", async ({ page }) => {
+  await page.goto("/demo/?door=1");
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  await expect(page.locator(".door-action")).toHaveCount(0);
+  await page.getByRole("tab", { name: "Live" }).click();
+  await expect(page.locator(".door-action")).toBeVisible();
+
+  await page.goto(
+    "/demo/?door=1&door_visibility=all&two_way_audio=1&door_layout=replace",
+  );
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  await expect(page.locator(".door-action")).toBeVisible();
+  await expect(page.locator(".talk-action")).toHaveCount(0);
+  await expect(page.locator(".visitor-action-divider")).toHaveCount(0);
+});
+
 test("opens, switches recording → live → recording, and tears down", async ({ page }) => {
   await expect(page.getByRole("button", { name: /Open Entrance viewer/ })).toBeVisible();
   await page.getByRole("button", { name: /Open Entrance viewer/ }).click();

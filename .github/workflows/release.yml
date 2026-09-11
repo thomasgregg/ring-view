@@ -29,3 +29,4 @@ jobs:
         with:
           files: dist/ring-view.js
           body_path: release-notes.md
+          prerelease: ${{ contains(github.ref_name, '-') }}

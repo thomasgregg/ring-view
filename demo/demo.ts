@@ -114,6 +114,14 @@ const snapshot: HassEntity = {
     timestamp: Date.parse("2026-09-06T12:01:00Z") / 1_000,
   },
 };
+const door: HassEntity = {
+  entity_id: "lock.front_door",
+  state: query.get("door_state") || "locked",
+  attributes: {
+    friendly_name: "Front Door",
+    supported_features: 1,
+  },
+};
 recording.attributes.recorded_at = "2026-09-06T12:00:00Z";
 
 let ringSubscriptions = 0;
@@ -135,14 +143,25 @@ let hass: HomeAssistant = {
       entity_id: snapshot.entity_id,
       platform: "mqtt",
     },
+    [door.entity_id]: {
+      entity_id: door.entity_id,
+      platform: "demo",
+    },
   },
   states: {
     [recording.entity_id]: recording,
     [live.entity_id]: live,
     [snapshot.entity_id]: snapshot,
+    [door.entity_id]: door,
   },
   hassUrl: (path = "") => path,
   callWS: async () => ({}) as never,
+  callService: async (domain, service, serviceData = {}) => {
+    window.demoDoorCalls = [
+      ...(window.demoDoorCalls ?? []),
+      { domain, service, serviceData },
+    ];
+  },
   connection: {
     subscribeMessage: async <T>(callback: (message: T) => void) => {
       if (!emulateRingTeardownRace) return () => undefined;
@@ -215,6 +234,13 @@ card.setConfig({
   preview_source: previewSource,
   preview_fallback: query.get("fallback") === "snapshot" ? "snapshot" : "last_recording",
   two_way_audio: query.get("two_way_audio") === "1",
+  door_entity: query.get("door") === "1" ? door.entity_id : undefined,
+  door_action: query.get("door_action") === "open" ? "open" : "unlock",
+  door_control_layout:
+    query.get("door_layout") === "replace" ? "replace_talk" : "alongside_talk",
+  door_control_visibility:
+    query.get("door_visibility") === "all" ? "all_views" : "live_only",
+  door_hold_to_activate: query.get("door_hold") !== "0",
 });
 card.hass = hass;
 document.querySelector("#card-root")!.append(card);
@@ -235,6 +261,11 @@ declare global {
     demoActiveStreams?: number;
     demoPeakStreams?: number;
     demoRingSubscriptions?: number;
+    demoDoorCalls?: Array<{
+      domain: string;
+      service: string;
+      serviceData: Record<string, unknown>;
+    }>;
     demoSetEntityState: (entityId: string, state: string) => void;
   }
 }

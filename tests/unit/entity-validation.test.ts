@@ -4,6 +4,7 @@ import type { HassEntity, HomeAssistant } from "../../src/types";
 import {
   entityIsUnavailable,
   recordingHasMedia,
+  supportsLockOpen,
   supportsRingTalkback,
   supportsStream,
   validateEntities,
@@ -53,6 +54,11 @@ describe("entity validation", () => {
   it("detects missing and unavailable entities", () => {
     expect(entityIsUnavailable(undefined)).toBe(true);
     expect(entityIsUnavailable({ ...entity("camera.one"), state: "unavailable" })).toBe(true);
+  });
+
+  it("detects whether a lock supports opening its latch", () => {
+    expect(supportsLockOpen(entity("lock.front_door", { supported_features: 1 }))).toBe(true);
+    expect(supportsLockOpen(entity("lock.front_door", { supported_features: 0 }))).toBe(false);
   });
 
   it("returns capability warnings without including the recording URL", () => {
@@ -191,5 +197,32 @@ describe("entity validation", () => {
         config,
       ).map((warning) => warning.kind),
     ).not.toContain("talkback");
+  });
+
+  it("warns when Open is selected for a lock without latch support", () => {
+    const config = normalizeConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      door_entity: "lock.front_door",
+      door_action: "open",
+    });
+    const warnings = validateEntities(
+      {
+        states: {
+          "camera.recording": entity("camera.recording", { entity_picture: "/recording.jpg" }),
+          "camera.live": entity("camera.live", { supported_features: 2 }),
+          "lock.front_door": {
+            ...entity("lock.front_door", { supported_features: 0 }),
+            state: "locked",
+          },
+        },
+        hassUrl: (path = "") => path,
+        callWS: async () => ({}) as never,
+      },
+      config,
+    );
+    expect(warnings.find((warning) => warning.kind === "door")?.message).toContain(
+      "does not advertise support for opening",
+    );
   });
 });

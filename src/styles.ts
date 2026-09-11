@@ -375,6 +375,169 @@ export const dialogStyles = css`
     font-size: 12px;
   }
 
+  .visitor-controls {
+    position: absolute;
+    z-index: 7;
+    inset: auto 16px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+  }
+
+  .visitor-action-dock {
+    display: flex;
+    max-width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 3px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: 999px;
+    color: #fff;
+    background: rgba(18, 18, 18, 0.8);
+    box-shadow: 0 5px 22px rgba(0, 0, 0, 0.38);
+    backdrop-filter: blur(14px) saturate(1.2);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    pointer-events: auto;
+  }
+
+  .visitor-action {
+    position: relative;
+    min-height: 44px;
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 9px 15px;
+    overflow: hidden;
+    border: 0;
+    border-radius: 999px;
+    color: #fff;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    cursor: pointer;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .visitor-action:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .visitor-action:disabled {
+    color: rgba(255, 255, 255, 0.68);
+    cursor: default;
+  }
+
+  .visitor-action svg {
+    width: 21px;
+    height: 21px;
+    flex: 0 0 auto;
+  }
+
+  .visitor-action-divider {
+    width: 1px;
+    height: 26px;
+    flex: 0 0 auto;
+    margin: 0 2px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.38);
+    box-shadow: 1px 0 rgba(0, 0, 0, 0.32);
+    pointer-events: none;
+  }
+
+  .talk-action.active {
+    background: var(--error-color, #db4437);
+    transform: scale(0.98);
+  }
+
+  .door-action svg {
+    color: var(--warning-color, #f2b544);
+  }
+
+  .door-action::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0;
+    background: color-mix(
+      in srgb,
+      var(--warning-color, #f2b544) 28%,
+      transparent
+    );
+    pointer-events: none;
+  }
+
+  .door-action > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .door-action.holding::before {
+    width: 100%;
+    animation: door-hold 900ms linear forwards;
+  }
+
+  .door-action.working {
+    background: rgba(10, 10, 10, 0.94);
+  }
+
+  .door-action.working svg {
+    animation: spin 0.85s linear infinite;
+  }
+
+  .door-action.success {
+    background: rgba(32, 112, 68, 0.92);
+  }
+
+  .door-action.success svg {
+    color: #fff;
+  }
+
+  .door-action.error {
+    background: color-mix(
+      in srgb,
+      var(--error-color, #db4437) 24%,
+      transparent
+    );
+  }
+
+  .door-feedback {
+    min-height: 30px;
+    display: inline-flex;
+    max-width: min(480px, calc(100% - 16px));
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    color: rgba(255, 255, 255, 0.94);
+    background: rgba(0, 0, 0, 0.68);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.32);
+    font-size: 12px;
+    line-height: 18px;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .door-feedback svg {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+  }
+
+  .door-feedback.error svg {
+    color: #ff8a80;
+  }
+
   .state-layer {
     position: absolute;
     inset: 0;
@@ -473,6 +636,15 @@ export const dialogStyles = css`
     }
   }
 
+  @keyframes door-hold {
+    from {
+      width: 0;
+    }
+    to {
+      width: 100%;
+    }
+  }
+
   @media (max-width: 600px) {
     .dialog {
       inset: 0;
@@ -505,6 +677,18 @@ export const dialogStyles = css`
 
     .mode-switch {
       top: calc(10px + env(safe-area-inset-top));
+    }
+
+    .visitor-controls {
+      right: max(8px, env(safe-area-inset-right));
+      bottom: max(8px, env(safe-area-inset-bottom));
+      left: max(8px, env(safe-area-inset-left));
+    }
+
+    .visitor-action {
+      gap: 7px;
+      padding-inline: 11px;
+      font-size: 13px;
     }
   }
 
@@ -546,12 +730,39 @@ export const dialogStyles = css`
     .mode-switch {
       top: calc(10px + env(safe-area-inset-top));
     }
+
+    .visitor-controls {
+      right: max(8px, env(safe-area-inset-right));
+      bottom: max(8px, env(safe-area-inset-bottom));
+      left: max(8px, env(safe-area-inset-left));
+    }
+  }
+
+  @media (max-width: 340px) {
+    .visitor-action {
+      gap: 6px;
+      padding-inline: 8px;
+      font-size: 12px;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .spinner {
       animation: none;
       border-color: rgba(255, 255, 255, 0.7);
+    }
+
+    .talk-action.active {
+      transform: none;
+    }
+
+    .door-action.holding::before,
+    .door-action.working svg {
+      animation: none;
+    }
+
+    .door-action.holding::before {
+      width: 100%;
     }
   }
 `;

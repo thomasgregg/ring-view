@@ -15,6 +15,10 @@ describe("configuration", () => {
       autoplay_recording: true,
       live_muted: false,
       two_way_audio: false,
+      door_action: "unlock",
+      door_control_layout: "alongside_talk",
+      door_control_visibility: "live_only",
+      door_hold_to_activate: true,
       show_name: false,
       preview_source: "last_recording",
       preview_fallback: "last_recording",
@@ -62,6 +66,20 @@ describe("configuration", () => {
         preview_fallback: "live",
       } as never),
     ).toThrow(/preview_fallback/);
+    expect(() =>
+      validateConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        door_entity: "button.front_door",
+      }),
+    ).toThrow(/door_entity/);
+    expect(() =>
+      validateConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        door_action: "lock",
+      } as never),
+    ).toThrow(/door_action/);
   });
 
   it("accepts the optional snapshot and freshest-preview settings", () => {
@@ -87,6 +105,26 @@ describe("configuration", () => {
       grid_options: { columns: 9, rows: 4 },
     });
     expect(config.grid_options).toEqual({ columns: 9, rows: 4 });
+  });
+
+  it("normalizes the optional door-access settings", () => {
+    expect(
+      normalizeConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        door_entity: "lock.front_door",
+        door_action: "open",
+        door_control_layout: "replace_talk",
+        door_control_visibility: "all_views",
+        door_hold_to_activate: false,
+      }),
+    ).toMatchObject({
+      door_entity: "lock.front_door",
+      door_action: "open",
+      door_control_layout: "replace_talk",
+      door_control_visibility: "all_views",
+      door_hold_to_activate: false,
+    });
   });
 
   it("drops the removed nested configuration instead of preserving it", () => {

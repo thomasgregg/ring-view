@@ -4,6 +4,37 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.6.0-beta.1] - 2026-09-11
+
+### Added
+
+- Add opt-in door access for a Home Assistant `lock.*` entity, with configurable
+  `unlock` or supported `open` actions, Live-only or all-view visibility, and a
+  safe 900 ms hold confirmation enabled by default.
+- Add a unified visitor-action dock: Talk and door access share one glass control
+  with a short divider, while door-only and replace-Talk layouts collapse to a
+  balanced single-action pill.
+- Add a progressively disclosed **Door access** section to the visual editor,
+  lock capability and availability warnings, and English and German feedback.
+- Document the complete beta interaction, configuration, accessibility, safety,
+  and Home Assistant service contract.
+
+### Changed
+
+- Surface Ring talkback state to the parent viewer so Talk can participate in the
+  shared action dock without changing the underlying WebRTC or microphone safety
+  behavior.
+- Mark hyphenated release tags such as `v0.6.0-beta.1` as GitHub prereleases so
+  beta builds are not presented as stable releases.
+- Clarify how to distinguish the official Ring Last recording and Live view
+  entities when their names or entity-ID suffixes are not reliable.
+
+### Tests
+
+- Cover door defaults and validation, lock capabilities, visual-editor disclosure,
+  hold cancellation, single service execution, failure states, visibility, and
+  merged/replacement layouts on desktop and phone.
+
 ## [0.5.11] - 2026-09-07
 
 ### Changed

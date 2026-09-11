@@ -25,11 +25,16 @@ const hass: HomeAssistant = {
     },
     "camera.live": { entity_id: "camera.live", platform: "ring" },
     "camera.snapshot": { entity_id: "camera.snapshot", platform: "mqtt" },
+    "lock.front_door": { entity_id: "lock.front_door", platform: "nuki" },
   },
   states: {
     "camera.recording": entity("camera.recording", 0),
     "camera.live": entity("camera.live", 2),
     "camera.snapshot": entity("camera.snapshot", 0),
+    "lock.front_door": {
+      ...entity("lock.front_door", 1),
+      state: "locked",
+    },
   },
   hassUrl: (path = "") => path,
   callWS: async () => ({}) as never,
@@ -133,7 +138,7 @@ describe("visual editor", () => {
     );
   });
 
-  it("groups related settings in four compact native expandable sections", async () => {
+  it("groups related settings in five compact native expandable sections", async () => {
     const editor = document.createElement("ring-view-editor");
     editor.hass = hass;
     editor.setConfig({
@@ -163,6 +168,7 @@ describe("visual editor", () => {
       { name: "dashboard_preview", flatten: true, icon: true },
       { name: "viewer_behavior", flatten: true, icon: true },
       { name: "doorbell_features", flatten: true, icon: true },
+      { name: "door_access", flatten: true, icon: true },
       { name: "card_appearance", flatten: true, icon: true },
     ]);
   });
@@ -269,6 +275,7 @@ describe("visual editor", () => {
     expect(form?.computeLabel?.({ name: "dashboard_preview" })).toBe(
       "Dashboard-Vorschau",
     );
+    expect(form?.computeLabel?.({ name: "door_access" })).toBe("Türzugang");
     expect(form?.computeHelper?.({ name: "live_muted" })).toContain(
       "mit Ton zu starten",
     );
@@ -297,6 +304,12 @@ describe("visual editor", () => {
     );
     expect(doorbellFeatures?.schema?.map((field) => field.name)).toEqual([
       "doorbell_entity",
+    ]);
+    const doorAccess = form?.schema?.find(
+      (field) => field.name === "door_access",
+    );
+    expect(doorAccess?.schema?.map((field) => field.name)).toEqual([
+      "door_entity",
     ]);
     expect(defaultMode?.selector).toMatchObject({
       select: {
@@ -338,5 +351,49 @@ describe("visual editor", () => {
         ],
       },
     });
+  });
+
+  it("progressively reveals the logical door-access controls", async () => {
+    const editor = document.createElement("ring-view-editor");
+    editor.hass = hass;
+    editor.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      door_entity: "lock.front_door",
+      two_way_audio: true,
+    });
+    document.body.append(editor);
+    await editor.updateComplete;
+
+    const form = editor.shadowRoot?.querySelector("ha-form") as
+      | (HTMLElement & { schema?: ConfigFormSchema[] })
+      | null;
+    const names = () => form?.schema
+      ?.find((field) => field.name === "door_access")
+      ?.schema?.map((field) => field.name);
+    expect(names()).toEqual([
+      "door_entity",
+      "door_action",
+      "door_control_visibility",
+      "door_control_layout",
+      "door_hold_to_activate",
+    ]);
+
+    form?.dispatchEvent(
+      new CustomEvent("value-changed", {
+        detail: {
+          value: {
+            recording_entity: "camera.recording",
+            live_entity: "camera.live",
+            door_entity: "",
+            two_way_audio: true,
+          },
+        },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+    await editor.updateComplete;
+    expect(names()).toEqual(["door_entity"]);
   });
 });

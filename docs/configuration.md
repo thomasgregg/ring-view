@@ -34,8 +34,13 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `remember_last_mode` | Yes — Config tab | `false` | `true`, `false` | Remembers the most recent view in the current browser and uses it instead of `default_mode`. |
 | `autoplay_recording` | Yes — Config tab | `true` | `true`, `false` | Starts the latest recording immediately; when disabled, the viewer waits for Play. |
 | `live_muted` | Yes — Config tab | `false` | `true`, `false` | Starts Live muted. Browser autoplay rules can still require muted playback. |
-| `two_way_audio` | Yes, Doorbell features | `false` | `true`, `false` | Uses one direct WebRTC session for live video, listening, and push-to-talk when `live_entity` is an official Ring `live_view` camera. |
+| `two_way_audio` | Yes — Viewer behavior | `false` | `true`, `false` | Uses one direct WebRTC session for live video, listening, and push-to-talk when `live_entity` is an official Ring `live_view` camera. |
 | `doorbell_entity` | Yes, Doorbell features | Not set | `event.*` entity ID | Displays a temporary ring alert when the selected doorbell event reports `ring`. |
+| `door_entity` | Yes — Door access | Not set | `lock.*` entity ID | Enables the door-access beta for the selected Home Assistant lock. |
+| `door_action` | Yes — Door access | `unlock` | `unlock`, `open` | Calls `lock.unlock`, or `lock.open` for locks that advertise latch-opening support. |
+| `door_control_visibility` | Yes — Door access | `live_only` | `live_only`, `all_views` | Shows the door action only in Live by default, or also over recordings. |
+| `door_control_layout` | Yes — Door access | `alongside_talk` | `alongside_talk`, `replace_talk` | Shares one dock with Talk or replaces Talk when both controls are available. |
+| `door_hold_to_activate` | Yes — Door access | `true` | `true`, `false` | Requires a 900 ms press-and-hold confirmation. Disable for one-tap operation. |
 | `show_name` | Yes — Config tab | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer. |
 | `preview_source` | Yes — Dashboard preview | `last_recording` | `last_recording`, `live`, `default`, `snapshot`, `newest` | Chooses the entity used for the dashboard still. `default` follows the view that will open; `newest` compares the optional snapshot with the latest recording. |
 | `preview_fallback` | Yes — Dashboard preview | `last_recording` | `last_recording`, `snapshot` | Chooses the still used by `newest` when capture times or update order cannot be compared. Only shown for `newest`. |
@@ -74,6 +79,12 @@ live_muted: false
 two_way_audio: true
 doorbell_entity: event.front_door_ding
 
+door_entity: lock.front_door
+door_action: open
+door_control_visibility: live_only
+door_control_layout: alongside_talk
+door_hold_to_activate: true
+
 show_name: true
 preview_source: newest
 preview_fallback: last_recording
@@ -88,6 +99,32 @@ grid_options:
 ```
 
 Ring View 0.2 and newer use this flat configuration only. Earlier nested `preview`, `appearance`, `viewer`, and `performance` structures are not supported.
+
+## Door access beta
+
+Open **Door access** and select a Home Assistant lock to enable the feature. The
+remaining settings appear only after a lock is selected; the Talk layout appears
+only when two-way audio is enabled. Removing the lock returns the card to its
+previous behavior and removes the inactive door settings from the saved visual
+configuration.
+
+**Unlock** uses the standard `lock.unlock` service. **Open door** uses
+`lock.open`, intended for locks such as compatible Nuki devices that can release
+the latch. Ring View disables Open when the selected entity does not advertise
+that capability.
+
+**Require hold to activate** is the default confirmation. It is not a pop-up:
+hold the action for 900 ms while a visible progress fill completes, or release
+early to cancel. Turning it off makes the action respond to a single deliberate
+tap, click, Space, or Enter activation.
+
+**Live view only** is the recommended default. **Live and recordings** is
+available for users who intentionally want door access while viewing historical
+footage. When Talk and door access are both visible, they share one dock with a
+short divider. The dock collapses cleanly when one action is hidden or configured
+to replace the other.
+
+[Full door-access beta specification](door-access-beta.md)
 
 ## Freshest snapshot preview
 
@@ -108,7 +145,13 @@ treated as media capture times.
 
 ## Choosing camera entities
 
-Use the official Ring integration's last-recording and live-view entities. Their names depend on your device; enable the last-recording entity in the device's entity list if necessary.
+Use the official Ring integration's last-recording and live-view entities. With a suitable Ring subscription, Home Assistant provides both but [disables Last recording by default](https://www.home-assistant.io/integrations/ring/#camera).
+
+1. Open **Settings → Devices & services → Ring**, then open your Ring device and its entity list.
+2. Show disabled entities. Before enabling it, the disabled camera entry is **Last recording**; enable it if you have the required Ring subscription. The camera enabled by default is **Live view**.
+3. Open each entry and copy its exact entity ID into the corresponding Ring View field.
+
+The `_last_recording` and `_live_view` suffixes in this guide are examples, not requirements. Home Assistant entity IDs can be changed and may be assigned differently. In one [field report covering fresh 2K and 4K Ring doorbell installations](https://community.home-assistant.io/t/ring-doorbell-live-stream/855118/8), both camera entries appeared alike and neither entity ID used the expected suffix. Identify the entities by their roles and default enabled state rather than relying on their displayed names or ID suffixes.
 
 For **two-way audio**, `live_entity` must be the official Ring `live_view` camera. A Ring-MQTT or Generic Camera RTSP entity does not expose the microphone return path Ring View needs. Ring-MQTT can still supply the optional `snapshot_entity` alongside the official Ring live camera.
 
