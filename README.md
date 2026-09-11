@@ -17,6 +17,17 @@ See what happened, check what is happening, and answer the door—all without le
   <sub>Switch between the latest recording and Live, then listen and use push-to-talk in the same session.</sub>
 </p>
 
+## Contents
+
+- [What Ring View can do](#what-you-can-do)
+- [Install and get started](#get-started)
+  - [Configure visually](#configure-visually)
+  - [Choose the dashboard card behavior](#choose-how-the-dashboard-card-works-beta)
+  - [Add Talk or door access](#add-talk-or-door-access)
+- [Built-in Ring integration and optional patch](#built-in-ring-integration-or-the-temporary-patch)
+- [Doorbell notifications](#make-your-doorbell-do-more)
+- [Guides and support](#guides-and-support)
+
 ## What you can do
 
 - **Go from recording to Live in one tap.** Switch views inside the same viewer, with familiar playback and sound controls.

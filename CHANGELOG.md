@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.7.0-beta.8] - 2026-09-11
+
+### Documentation
+
+- Add a compact README contents section linking directly to setup, dashboard
+  behavior, Talk, door access, backend guidance, and notifications.
+
 ## [0.7.0-beta.7] - 2026-09-11
 
 ### Documentation
