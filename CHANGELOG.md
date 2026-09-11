@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+### Maintenance
+
+- Move the compatibility, testing, and rollback guides into `docs/`, and keep
+  generated Playwright output out of version control.
+
 ## [0.7.0] - 2026-09-11
 
 ### Added

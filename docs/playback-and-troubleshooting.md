@@ -107,6 +107,6 @@ long recovery took. Note Low Power Mode and whether your connection uses HTTPS.
 
 Do not post camera tokens, signed media URLs, Ring credentials, or raw debug
 logs that may contain them. Automated browser coverage does not replace a
-physical-device test; see [testing scope](../TESTING.md).
+physical-device test; see [testing scope](testing.md).
 
-[Configuration](configuration.md) · [Compatibility details](../COMPATIBILITY.md) · [Security and privacy](privacy-and-accessibility.md)
+[Configuration](configuration.md) · [Compatibility details](compatibility.md) · [Security and privacy](privacy-and-accessibility.md)

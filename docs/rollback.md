@@ -1,4 +1,4 @@
-# Rollback procedure
+# Rollback
 
 The card does not modify entities or Home Assistant backend state, so rollback affects only the frontend resource and dashboard YAML.
 

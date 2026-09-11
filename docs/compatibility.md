@@ -1,4 +1,4 @@
-# Compatibility policy
+# Compatibility
 
 ## Supported Home Assistant versions
 

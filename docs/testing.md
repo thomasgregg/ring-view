@@ -1,4 +1,4 @@
-# Development and testing
+# Testing and development
 
 Node.js 20 or newer is required. Install the project dependencies with
 `npm install`.

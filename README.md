@@ -148,7 +148,7 @@ Use the same Ring event in your own Home Assistant automations for porch lights,
 - [Optional temporary backend patch](docs/backend-patch.md)
 - [Doorbell notifications and automation blueprint](docs/notifications.md)
 - [Security, privacy, and accessibility](docs/privacy-and-accessibility.md)
-- [Compatibility](COMPATIBILITY.md) · [Testing and development](TESTING.md) · [Rollback](ROLLBACK.md) · [Changelog](CHANGELOG.md)
+- [Compatibility](docs/compatibility.md) · [Testing and development](docs/testing.md) · [Rollback](docs/rollback.md) · [Changelog](CHANGELOG.md)
 
 Ring View communicates through Home Assistant, not directly with Ring, and includes no telemetry or analytics. Microphone access is requested only when you press **Hold to talk**.
 
