@@ -26,6 +26,10 @@ const hass: HomeAssistant = {
     "camera.live": { entity_id: "camera.live", platform: "ring" },
     "camera.snapshot": { entity_id: "camera.snapshot", platform: "mqtt" },
     "lock.front_door": { entity_id: "lock.front_door", platform: "nuki" },
+    "binary_sensor.front_door_contact": {
+      entity_id: "binary_sensor.front_door_contact",
+      platform: "nuki",
+    },
   },
   states: {
     "camera.recording": entity("camera.recording", 0),
@@ -34,6 +38,14 @@ const hass: HomeAssistant = {
     "lock.front_door": {
       ...entity("lock.front_door", 1),
       state: "locked",
+    },
+    "binary_sensor.front_door_contact": {
+      ...entity("binary_sensor.front_door_contact", 0),
+      state: "off",
+      attributes: {
+        friendly_name: "Front Door Contact",
+        device_class: "door",
+      },
     },
   },
   hassUrl: (path = "") => path,
@@ -276,6 +288,9 @@ describe("visual editor", () => {
       "Dashboard-Vorschau",
     );
     expect(form?.computeLabel?.({ name: "door_access" })).toBe("Türzugang");
+    expect(form?.computeLabel?.({ name: "door_contact_entity" })).toBe(
+      "Türkontaktsensor (optional)",
+    );
     expect(form?.computeHelper?.({ name: "live_muted" })).toContain(
       "mit Ton zu starten",
     );
@@ -373,10 +388,18 @@ describe("visual editor", () => {
       ?.schema?.map((field) => field.name);
     expect(names()).toEqual([
       "door_entity",
+      "door_contact_entity",
       "door_action",
       "door_control_visibility",
       "door_hold_to_activate",
     ]);
+    const contactField = form?.schema
+      ?.find((field) => field.name === "door_access")
+      ?.schema?.find((field) => field.name === "door_contact_entity");
+    expect(contactField?.required).not.toBe(true);
+    expect(contactField?.selector).toEqual({
+      entity: { domain: "binary_sensor" },
+    });
 
     form?.dispatchEvent(
       new CustomEvent("value-changed", {

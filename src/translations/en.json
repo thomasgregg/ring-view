@@ -19,6 +19,7 @@
   "editor.doorbell_entity": "Doorbell event",
   "editor.door_access": "Door access",
   "editor.door_entity": "Door lock",
+  "editor.door_contact_entity": "Door contact sensor",
   "editor.door_action": "Action when pressed",
   "editor.door_action_unlock": "Unlock",
   "editor.door_action_open": "Open door",
@@ -40,6 +41,7 @@
   "editor.helper_two_way_audio": "Requires the official Ring Live view camera and uses one WebRTC session for video, listening, and push-to-talk.",
   "editor.helper_doorbell_entity": "Shows an incoming-ring alert without starting or replacing the camera stream.",
   "editor.helper_door_entity": "Choose a Home Assistant lock to add a door action. Leave empty to disable door access.",
+  "editor.helper_door_contact_entity": "When this optional sensor reports open, the door action changes to a non-interactive Door open status.",
   "editor.helper_door_action": "Open releases the latch on supported locks. Unlock only releases the lock.",
   "editor.helper_door_control_visibility": "Live only is the safer default. Live and recordings keeps the control active over historical footage.",
   "editor.helper_door_hold_to_activate": "Release before one second to cancel. Turning this off makes a single tap operate the door.",
@@ -87,6 +89,7 @@
   "config.fit_mode": "fit_mode is invalid.",
   "config.doorbell_entity": "doorbell_entity must be an event entity.",
   "config.door_entity": "door_entity must be a lock entity.",
+  "config.door_contact_entity": "door_contact_entity must be a binary sensor entity.",
   "config.door_action": "door_action must be unlock or open.",
   "config.door_control_visibility": "door_control_visibility must be live_only or all_views.",
   "ring.alert": "Someone is at the door",
@@ -143,6 +146,8 @@
   "door.unavailable": "Door unavailable",
   "door.jammed": "Lock jammed",
   "door.open_unsupported": "Open unsupported",
+  "door.contact_open": "Door open",
+  "door.contact_unknown": "Status unknown",
   "door.unlock_failed": "Couldn’t unlock the door.",
   "door.open_failed": "Couldn’t open the door."
 }

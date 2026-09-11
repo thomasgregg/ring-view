@@ -101,6 +101,10 @@ function configSchema(
   if (config.door_entity) {
     doorAccess.push(
       {
+        name: "door_contact_entity",
+        selector: { entity: { domain: "binary_sensor" } },
+      },
+      {
         name: "door_action",
         required: true,
         selector: {
@@ -287,6 +291,7 @@ const LABELS: Record<string, TranslationKey> = {
   doorbell_entity: "editor.doorbell_entity",
   door_access: "editor.door_access",
   door_entity: "editor.door_entity",
+  door_contact_entity: "editor.door_contact_entity",
   door_action: "editor.door_action",
   door_control_visibility: "editor.door_control_visibility",
   door_hold_to_activate: "editor.door_hold_to_activate",
@@ -307,6 +312,7 @@ const HELPERS: Record<string, TranslationKey> = {
   two_way_audio: "editor.helper_two_way_audio",
   doorbell_entity: "editor.helper_doorbell_entity",
   door_entity: "editor.helper_door_entity",
+  door_contact_entity: "editor.helper_door_contact_entity",
   door_action: "editor.helper_door_action",
   door_control_visibility: "editor.helper_door_control_visibility",
   door_hold_to_activate: "editor.helper_door_hold_to_activate",
@@ -377,7 +383,7 @@ export class RingViewEditor extends LitElement {
     const key = LABELS[schema.name];
     if (!key) return undefined;
     const label = localize(this.hass, key);
-    if (schema.name !== "name") return label;
+    if (!["name", "door_contact_entity"].includes(schema.name)) return label;
     const optional = localizeHaOrFallback(
       this.hass,
       "ui.panel.lovelace.editor.card.config.optional",
@@ -399,6 +405,7 @@ export class RingViewEditor extends LitElement {
     });
     this.config = next;
     const inactiveDoorOptions = new Set([
+      "door_contact_entity",
       "door_action",
       "door_control_visibility",
       "door_hold_to_activate",

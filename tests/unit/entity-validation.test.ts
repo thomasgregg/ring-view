@@ -225,4 +225,43 @@ describe("entity validation", () => {
       "does not advertise support for opening",
     );
   });
+
+  it("validates a configured door contact independently from the lock", () => {
+    const config = normalizeConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      door_entity: "lock.front_door",
+      door_contact_entity: "binary_sensor.front_door_contact",
+    });
+    const baseStates = {
+      "camera.recording": entity("camera.recording", { entity_picture: "/recording.jpg" }),
+      "camera.live": entity("camera.live", { supported_features: 2 }),
+      "lock.front_door": {
+        ...entity("lock.front_door", { supported_features: 1 }),
+        state: "locked",
+      },
+    };
+    const hass: HomeAssistant = {
+      states: {
+        ...baseStates,
+        "binary_sensor.front_door_contact": {
+          ...entity("binary_sensor.front_door_contact", { device_class: "door" }),
+          state: "off",
+        },
+      },
+      hassUrl: (path = "") => path,
+      callWS: async () => ({}) as never,
+    };
+    expect(validateEntities(hass, config).map((warning) => warning.kind)).not.toContain(
+      "door_contact",
+    );
+
+    hass.states["binary_sensor.front_door_contact"] = {
+      ...hass.states["binary_sensor.front_door_contact"]!,
+      state: "unavailable",
+    };
+    expect(validateEntities(hass, config).map((warning) => warning.kind)).toContain(
+      "door_contact",
+    );
+  });
 });

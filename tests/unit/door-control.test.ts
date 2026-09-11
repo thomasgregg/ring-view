@@ -29,6 +29,8 @@ async function mount({
   hold = true,
   doorState = "locked",
   features = 1,
+  configureContact = false,
+  contactState = "off",
 }: {
   mode?: CameraMode;
   visibility?: DoorControlVisibility;
@@ -36,6 +38,8 @@ async function mount({
   hold?: boolean;
   doorState?: string;
   features?: number;
+  configureContact?: boolean;
+  contactState?: string;
 } = {}) {
   const callService = vi.fn(async () => undefined);
   const hass: HomeAssistant = {
@@ -55,6 +59,11 @@ async function mount({
         state: doorState,
         attributes: { friendly_name: "Front Door", supported_features: features },
       },
+      "binary_sensor.front_door_contact": {
+        entity_id: "binary_sensor.front_door_contact",
+        state: contactState,
+        attributes: { friendly_name: "Front Door Contact", device_class: "door" },
+      },
     },
     hassUrl: (path = "") => path,
     callWS: async () => ({}) as never,
@@ -69,6 +78,9 @@ async function mount({
       recording_entity: "camera.recording",
       live_entity: "camera.live",
       door_entity: "lock.front_door",
+      door_contact_entity: configureContact
+        ? "binary_sensor.front_door_contact"
+        : undefined,
       door_action: action,
       door_control_visibility: visibility,
       door_hold_to_activate: hold,
@@ -118,6 +130,73 @@ describe("door control", () => {
     expect(callService).toHaveBeenCalledWith("lock", "unlock", {
       entity_id: "lock.front_door",
     });
+  });
+
+  it("ignores an unconfigured contact sensor", async () => {
+    const { dialog } = await mount({ action: "open", contactState: "on" });
+    const button = dialog.shadowRoot?.querySelector<HTMLButtonElement>(".door-action");
+    expect(button?.disabled).toBe(false);
+    expect(button?.textContent).toContain("Hold to open");
+    expect(button?.textContent).not.toContain("Door open");
+  });
+
+  it("turns the configured action into Door open when the contact is open", async () => {
+    const { dialog, callService } = await mount({
+      action: "open",
+      configureContact: true,
+      contactState: "on",
+    });
+    const button = dialog.shadowRoot?.querySelector<HTMLButtonElement>(".door-action");
+    expect(button?.disabled).toBe(true);
+    expect(button?.textContent).toContain("Door open");
+    expect(button?.classList.contains("contact-open")).toBe(true);
+    button?.click();
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(callService).not.toHaveBeenCalled();
+  });
+
+  it("keeps the configured action available while the contact is closed", async () => {
+    const { dialog } = await mount({
+      action: "open",
+      configureContact: true,
+      contactState: "off",
+    });
+    const button = dialog.shadowRoot?.querySelector<HTMLButtonElement>(".door-action");
+    expect(button?.disabled).toBe(false);
+    expect(button?.textContent).toContain("Hold to open");
+  });
+
+  it("keeps the action available and marks an unknown contact state", async () => {
+    const { dialog } = await mount({
+      action: "unlock",
+      configureContact: true,
+      contactState: "unavailable",
+    });
+    const button = dialog.shadowRoot?.querySelector<HTMLButtonElement>(".door-action");
+    expect(button?.disabled).toBe(false);
+    expect(button?.textContent).toContain("Hold to unlock");
+    expect(button?.textContent).toContain("Status unknown");
+  });
+
+  it("updates the action immediately when the contact opens", async () => {
+    const { dialog, hass } = await mount({
+      action: "open",
+      configureContact: true,
+      contactState: "off",
+    });
+    const entityId = "binary_sensor.front_door_contact";
+    dialog.hass = {
+      ...hass,
+      states: {
+        ...hass.states,
+        [entityId]: { ...hass.states[entityId]!, state: "on" },
+      },
+    };
+    await dialog.updateComplete;
+
+    const button = dialog.shadowRoot?.querySelector<HTMLButtonElement>(".door-action");
+    expect(button?.disabled).toBe(true);
+    expect(button?.textContent).toContain("Door open");
   });
 
   it("shows a concise service error and keeps the action retryable", async () => {

@@ -19,6 +19,7 @@
   "editor.doorbell_entity": "Türklingelereignis",
   "editor.door_access": "Türzugang",
   "editor.door_entity": "Türschloss",
+  "editor.door_contact_entity": "Türkontaktsensor",
   "editor.door_action": "Aktion beim Drücken",
   "editor.door_action_unlock": "Entriegeln",
   "editor.door_action_open": "Tür öffnen",
@@ -40,6 +41,7 @@
   "editor.helper_two_way_audio": "Erfordert die offizielle Ring-Live-Ansicht-Kamera und verwendet eine WebRTC-Sitzung für Video, Zuhören und Push-to-Talk.",
   "editor.helper_doorbell_entity": "Zeigt einen Klingelhinweis, ohne den Kamerastream zu starten oder zu ersetzen.",
   "editor.helper_door_entity": "Wähle ein Home-Assistant-Schloss für eine Türaktion. Leer lassen, um den Türzugang zu deaktivieren.",
+  "editor.helper_door_contact_entity": "Wenn dieser optionale Sensor „offen“ meldet, wird die Türaktion zum nicht bedienbaren Status „Tür offen“.",
   "editor.helper_door_action": "Öffnen gibt bei unterstützten Schlössern die Falle frei. Entriegeln löst nur das Schloss.",
   "editor.helper_door_control_visibility": "Nur Live ist die sicherere Voreinstellung. Live und Aufnahmen hält das Bedienelement auch über historischem Material aktiv.",
   "editor.helper_door_hold_to_activate": "Vor Ablauf einer Sekunde loslassen, um abzubrechen. Wenn deaktiviert, betätigt ein einzelnes Tippen die Tür.",
@@ -87,6 +89,7 @@
   "config.fit_mode": "fit_mode ist ungültig.",
   "config.doorbell_entity": "doorbell_entity muss eine Ereignis-Entität sein.",
   "config.door_entity": "door_entity muss eine Schloss-Entität sein.",
+  "config.door_contact_entity": "door_contact_entity muss eine Binärsensor-Entität sein.",
   "config.door_action": "door_action muss unlock oder open sein.",
   "config.door_control_visibility": "door_control_visibility muss live_only oder all_views sein.",
   "ring.alert": "Jemand ist an der Tür",
@@ -143,6 +146,8 @@
   "door.unavailable": "Tür nicht verfügbar",
   "door.jammed": "Türschloss blockiert",
   "door.open_unsupported": "Öffnen nicht unterstützt",
+  "door.contact_open": "Tür offen",
+  "door.contact_unknown": "Status unbekannt",
   "door.unlock_failed": "Die Tür konnte nicht entriegelt werden.",
   "door.open_failed": "Die Tür konnte nicht geöffnet werden."
 }

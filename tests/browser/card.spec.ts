@@ -178,6 +178,24 @@ test("requires a complete hold before opening the configured door", async ({ pag
   await expect(page.getByRole("button", { name: "Door opened" })).toBeVisible();
 });
 
+test("uses an optional contact sensor to turn the action into live door status", async ({
+  page,
+}) => {
+  await page.goto(
+    "/demo/?mode=live&door=1&door_action=open&door_contact=1&door_contact_state=on",
+  );
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+
+  const door = page.getByRole("button", { name: "Door open" });
+  await expect(door).toBeVisible();
+  await expect(door).toBeDisabled();
+
+  await page.evaluate(() => {
+    window.demoSetEntityState("binary_sensor.front_door_contact", "off");
+  });
+  await expect(page.getByRole("button", { name: "Hold to open" })).toBeEnabled();
+});
+
 test("configures door visibility and collapses automatically without Talk", async ({ page }) => {
   await page.goto("/demo/?door=1");
   await page.getByRole("button", { name: /Open Entrance viewer/ }).click();

@@ -81,6 +81,7 @@ export interface RingViewConfig {
   two_way_audio?: boolean;
   doorbell_entity?: string;
   door_entity?: string;
+  door_contact_entity?: string;
   door_action?: DoorAction;
   door_control_visibility?: DoorControlVisibility;
   door_hold_to_activate?: boolean;
@@ -95,12 +96,18 @@ export interface RingViewConfig {
 export interface NormalizedConfig extends Required<
   Omit<
     RingViewConfig,
-    "name" | "grid_options" | "doorbell_entity" | "door_entity" | "snapshot_entity"
+    | "name"
+    | "grid_options"
+    | "doorbell_entity"
+    | "door_entity"
+    | "door_contact_entity"
+    | "snapshot_entity"
   >
 > {
   name?: string;
   doorbell_entity?: string;
   door_entity?: string;
+  door_contact_entity?: string;
   snapshot_entity?: string;
   grid_options?: GridOptions;
 }

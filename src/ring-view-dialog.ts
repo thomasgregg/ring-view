@@ -70,6 +70,7 @@ type MediaStatus =
   | "error"
   | "compatibility";
 type DoorActionStatus = "idle" | "holding" | "working" | "success" | "error";
+type DoorContactState = "open" | "closed" | "unknown";
 const LIVE_TIMEOUT_SECONDS = 20;
 const LIVE_RETRY_DELAY_MS = 2_500;
 const DOOR_HOLD_DURATION_MS = 900;
@@ -344,6 +345,10 @@ export class RingViewDialog extends LitElement {
     const doorDisabled = showDoor ? this.doorActionDisabled() : true;
     const doorLabel = this.doorActionLabel();
     const doorIcon = this.doorActionIcon();
+    const doorContactState = showDoor ? this.doorContactState() : undefined;
+    const contactOpen = doorContactState === "open";
+    const contactUnknown = doorContactState === "unknown";
+    const contactUnknownLabel = localize(this.hass, "door.contact_unknown");
     const talkLabel = this.talkbackRequesting
       ? localize(this.hass, "talkback.requesting_microphone")
       : this.talkbackTalking
@@ -409,13 +414,17 @@ export class RingViewDialog extends LitElement {
                   class=${classMap({
                     "visitor-action": true,
                     "door-action": true,
-                    holding: this.doorActionStatus === "holding",
-                    working: this.doorActionStatus === "working",
-                    success: this.doorActionStatus === "success",
-                    error: this.doorActionStatus === "error",
+                    "contact-open": contactOpen,
+                    "contact-unknown": contactUnknown,
+                    holding: !contactOpen && this.doorActionStatus === "holding",
+                    working: !contactOpen && this.doorActionStatus === "working",
+                    success: !contactOpen && this.doorActionStatus === "success",
+                    error: !contactOpen && this.doorActionStatus === "error",
                   })}
                   type="button"
-                  aria-label=${doorLabel}
+                  aria-label=${contactUnknown
+                    ? `${doorLabel}. ${contactUnknownLabel}`
+                    : doorLabel}
                   aria-busy=${String(this.doorActionStatus === "working")}
                   aria-describedby=${this.doorFeedback
                     ? "ring-view-door-feedback"
@@ -431,7 +440,12 @@ export class RingViewDialog extends LitElement {
                   @keyup=${this.handleDoorKeyUp}
                 >
                   ${this.icon(doorIcon)}
-                  <span>${doorLabel}</span>
+                  <span class="door-action-copy">
+                    <span>${doorLabel}</span>
+                    ${contactUnknown
+                      ? html`<span class="door-contact-state">${contactUnknownLabel}</span>`
+                      : nothing}
+                  </span>
                 </button>
               `
             : nothing}
@@ -465,10 +479,20 @@ export class RingViewDialog extends LitElement {
     return entityId ? this.hass?.states[entityId] : undefined;
   }
 
+  private doorContactState(): DoorContactState | undefined {
+    const entityId = this.config?.door_contact_entity;
+    if (!entityId) return undefined;
+    const state = this.hass?.states[entityId]?.state;
+    if (state === "on" || state === "open") return "open";
+    if (state === "off" || state === "closed") return "closed";
+    return "unknown";
+  }
+
   private doorActionDisabled(): boolean {
     const entity = this.doorEntity();
     if (
       !this.config?.door_entity
+      || this.doorContactState() === "open"
       || entityIsUnavailable(entity)
       || entity?.state === "jammed"
       || this.doorActionStatus === "working"
@@ -484,6 +508,9 @@ export class RingViewDialog extends LitElement {
 
   private doorActionLabel(): string {
     const entity = this.doorEntity();
+    if (this.doorContactState() === "open") {
+      return localize(this.hass, "door.contact_open");
+    }
     if (entityIsUnavailable(entity)) return localize(this.hass, "door.unavailable");
     if (entity?.state === "jammed") return localize(this.hass, "door.jammed");
     if (this.config?.door_action === "open" && !supportsLockOpen(entity)) {
@@ -530,6 +557,7 @@ export class RingViewDialog extends LitElement {
 
   private doorActionIcon(): string {
     const entity = this.doorEntity();
+    if (this.doorContactState() === "open") return mdiDoorOpen;
     if (
       entityIsUnavailable(entity)
       || entity?.state === "jammed"

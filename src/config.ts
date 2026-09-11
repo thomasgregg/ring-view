@@ -92,6 +92,14 @@ export function validateConfig(config: RingViewConfig): void {
   ) {
     throw new Error(localize(undefined, "config.door_entity"));
   }
+  if (
+    config.door_contact_entity !== undefined
+    && config.door_contact_entity !== ""
+    && (typeof config.door_contact_entity !== "string"
+      || !config.door_contact_entity.startsWith("binary_sensor."))
+  ) {
+    throw new Error(localize(undefined, "config.door_contact_entity"));
+  }
   if (config.door_action && !DOOR_ACTIONS.has(config.door_action)) {
     throw new Error(localize(undefined, "config.door_action"));
   }
@@ -120,6 +128,7 @@ export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
     two_way_audio: config.two_way_audio ?? DEFAULTS.two_way_audio,
     doorbell_entity: config.doorbell_entity || undefined,
     door_entity: config.door_entity || undefined,
+    door_contact_entity: config.door_contact_entity || undefined,
     door_action: config.door_action ?? DEFAULTS.door_action,
     door_control_visibility:
       config.door_control_visibility ?? DEFAULTS.door_control_visibility,

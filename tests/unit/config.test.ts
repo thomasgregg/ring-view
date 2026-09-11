@@ -76,6 +76,13 @@ describe("configuration", () => {
       validateConfig({
         recording_entity: "camera.recording",
         live_entity: "camera.live",
+        door_contact_entity: "sensor.front_door_contact",
+      }),
+    ).toThrow(/door_contact_entity/);
+    expect(() =>
+      validateConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
         door_action: "lock",
       } as never),
     ).toThrow(/door_action/);
@@ -112,12 +119,14 @@ describe("configuration", () => {
         recording_entity: "camera.recording",
         live_entity: "camera.live",
         door_entity: "lock.front_door",
+        door_contact_entity: "binary_sensor.front_door_contact",
         door_action: "open",
         door_control_visibility: "all_views",
         door_hold_to_activate: false,
       }),
     ).toMatchObject({
       door_entity: "lock.front_door",
+      door_contact_entity: "binary_sensor.front_door_contact",
       door_action: "open",
       door_control_visibility: "all_views",
       door_hold_to_activate: false,

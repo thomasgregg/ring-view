@@ -37,6 +37,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `two_way_audio` | Yes — Viewer behavior | `false` | `true`, `false` | Uses one direct WebRTC session for live video, listening, and push-to-talk when `live_entity` is an official Ring `live_view` camera. |
 | `doorbell_entity` | Yes, Doorbell features | Not set | `event.*` entity ID | Displays a temporary ring alert when the selected doorbell event reports `ring`. |
 | `door_entity` | Yes — Door access | Not set | `lock.*` entity ID | Enables the door-access beta for the selected Home Assistant lock. |
+| `door_contact_entity` | Yes — Door access | Not set | `binary_sensor.*` entity ID | Optionally reports whether the physical door is open. An open contact replaces and disables the door action until the door closes. |
 | `door_action` | Yes — Door access | `unlock` | `unlock`, `open` | Calls `lock.unlock`, or `lock.open` for locks that advertise latch-opening support. |
 | `door_control_visibility` | Yes — Door access | `live_only` | `live_only`, `all_views` | Shows the door action only in Live by default, or also over recordings. |
 | `door_hold_to_activate` | Yes — Door access | `true` | `true`, `false` | Requires a 900 ms press-and-hold confirmation. Disable for one-tap operation. |
@@ -79,6 +80,7 @@ two_way_audio: true
 doorbell_entity: event.front_door_ding
 
 door_entity: lock.front_door
+door_contact_entity: binary_sensor.front_door_contact
 door_action: open
 door_control_visibility: live_only
 door_hold_to_activate: true
@@ -104,6 +106,14 @@ Open **Door access** and select a Home Assistant lock to enable the feature. The
 remaining settings appear only after a lock is selected. Removing the lock
 returns the card to its previous behavior and removes the inactive door settings
 from the saved visual configuration.
+
+**Door contact sensor** is optional. When configured, `on` means the physical
+door is open and `off` means it is closed, following Home Assistant's binary
+sensor convention. While open, the door segment reads **Door open** and cannot
+be activated. A closed contact leaves the configured Unlock or Open action
+unchanged. If the contact is unknown or unavailable, the action remains usable
+and shows **Status unknown**; only a positive open state blocks it. Without a
+contact sensor, the control behaves exactly as before.
 
 **Unlock** uses the standard `lock.unlock` service. **Open door** uses
 `lock.open`, intended for locks such as compatible Nuki devices that can release

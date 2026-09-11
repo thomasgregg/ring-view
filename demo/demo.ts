@@ -122,6 +122,14 @@ const door: HassEntity = {
     supported_features: 1,
   },
 };
+const doorContact: HassEntity = {
+  entity_id: "binary_sensor.front_door_contact",
+  state: query.get("door_contact_state") || "off",
+  attributes: {
+    friendly_name: "Front Door Contact",
+    device_class: "door",
+  },
+};
 recording.attributes.recorded_at = "2026-09-06T12:00:00Z";
 
 let ringSubscriptions = 0;
@@ -147,12 +155,17 @@ let hass: HomeAssistant = {
       entity_id: door.entity_id,
       platform: "demo",
     },
+    [doorContact.entity_id]: {
+      entity_id: doorContact.entity_id,
+      platform: "demo",
+    },
   },
   states: {
     [recording.entity_id]: recording,
     [live.entity_id]: live,
     [snapshot.entity_id]: snapshot,
     [door.entity_id]: door,
+    [doorContact.entity_id]: doorContact,
   },
   hassUrl: (path = "") => path,
   callWS: async () => ({}) as never,
@@ -235,6 +248,8 @@ card.setConfig({
   preview_fallback: query.get("fallback") === "snapshot" ? "snapshot" : "last_recording",
   two_way_audio: query.get("two_way_audio") === "1",
   door_entity: query.get("door") === "1" ? door.entity_id : undefined,
+  door_contact_entity:
+    query.get("door_contact") === "1" ? doorContact.entity_id : undefined,
   door_action: query.get("door_action") === "open" ? "open" : "unlock",
   door_control_visibility:
     query.get("door_visibility") === "all" ? "all_views" : "live_only",

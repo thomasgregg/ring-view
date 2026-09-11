@@ -41,6 +41,7 @@ export interface EntityWarning {
     | "snapshot"
     | "doorbell"
     | "door"
+    | "door_contact"
     | "talkback"
     | "compatibility";
   message: string;
@@ -144,6 +145,18 @@ export function validateEntities(
       warnings.push({
         kind: "door",
         message: localize(hass, "warning.door_open_unsupported"),
+      });
+    }
+  }
+
+  if (config.door_contact_entity) {
+    const contact = hass.states[config.door_contact_entity];
+    if (entityIsUnavailable(contact)) {
+      warnings.push({
+        kind: "door_contact",
+        message: localize(hass, "warning.unavailable", {
+          name: friendlyName(contact, config.door_contact_entity),
+        }),
       });
     }
   }

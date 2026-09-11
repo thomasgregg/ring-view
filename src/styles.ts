@@ -464,6 +464,33 @@ export const dialogStyles = css`
     color: var(--warning-color, #f2b544);
   }
 
+  .door-action-copy {
+    display: inline-flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .door-contact-state {
+    color: rgba(255, 255, 255, 0.58);
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 12px;
+  }
+
+  .door-action.contact-open {
+    color: #fff;
+    background: color-mix(
+      in srgb,
+      var(--warning-color, #f2b544) 16%,
+      transparent
+    );
+  }
+
+  .door-action.contact-open:disabled {
+    color: #fff;
+  }
+
   .door-action::before {
     content: "";
     position: absolute;
