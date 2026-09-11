@@ -4,6 +4,33 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-12
+
+### Added
+
+- Add an optional last-activity timestamp entity under **Card appearance**,
+  showing a compact localized relative time below the camera name or by itself
+  at the top left when the name is hidden.
+- Accept ISO, Home Assistant input-datetime, and Unix-second or millisecond
+  timestamp states, with an exact hover time and fuller screen-reader label.
+
+### Fixed
+
+- Let direct-recording controls fade after a paused or finished video becomes
+  idle, while preserving tap-to-resume, tap-to-replay, and keyboard playback.
+- Restore an interactive card immediately after returning to its Home Assistant
+  dashboard view instead of waiting for the camera entity's next state update.
+
+### Tests
+
+- Cover timestamp parsing, localization, invalid and unavailable values, editor
+  placement, name and no-name layouts, responsive widths, and separation from
+  every header control on desktop and phone.
+- Cover paused and ended recording-control cleanup, interaction delays, stale
+  timers, replay-from-start, and desktop and phone playback behavior.
+- Cover disconnecting and reinserting the same interactive card without any
+  intervening Home Assistant camera-state update.
+
 ## [0.7.2] - 2026-09-11
 
 ### Fixed

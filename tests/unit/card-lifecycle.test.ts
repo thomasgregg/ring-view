@@ -92,6 +92,38 @@ describe("card stream lifecycle", () => {
     }
   });
 
+  it("restores an interactive card immediately when the same element reconnects", async () => {
+    const card = document.createElement("ring-view");
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      dashboard_behavior: "interactive",
+      dashboard_start: "last_recording",
+    });
+    card.hass = hass;
+    const recordingState = card.hass.states["camera.recording"];
+    document.body.append(card);
+    await card.updateComplete;
+    await flush();
+
+    const viewer = card.shadowRoot?.querySelector<RingViewDialog>("ring-view-dialog[inline]");
+    expect(viewer?.open).toBe(true);
+    expect(viewer?.config?.recording_entity).toBe("camera.recording");
+    expect(TestCameraStream.active).toBe(1);
+
+    card.remove();
+    await flush();
+    expect(viewer?.open).toBe(false);
+    expect(TestCameraStream.active).toBe(0);
+
+    document.body.append(card);
+    await flush();
+    expect(card.hass.states["camera.recording"]).toBe(recordingState);
+    expect(viewer?.open).toBe(true);
+    expect(viewer?.config?.recording_entity).toBe("camera.recording");
+    expect(TestCameraStream.active).toBe(1);
+  });
+
   it("shows the freshest configured still without adding a third viewer tab", async () => {
     const snapshot = {
       ...camera("camera.snapshot", 0),

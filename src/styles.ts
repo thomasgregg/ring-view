@@ -93,10 +93,20 @@ export const cardStyles = css`
     font-size: 14px;
   }
 
-  .name {
+  .header-copy {
     position: absolute;
     inset: 12px auto auto 16px;
+    display: grid;
+    min-width: 0;
     max-width: calc(100% - 76px);
+    overflow: hidden;
+    --ring-view-activity-color: rgba(255, 255, 255, 0.84);
+    --ring-view-activity-font-size: 12px;
+    --ring-view-activity-line-height: 16px;
+  }
+
+  .name {
+    min-width: 0;
     padding: 0;
     overflow: hidden;
     color: var(--ha-picture-card-text-color, #fff);
@@ -198,9 +208,20 @@ export const dialogStyles = css`
     pointer-events: none;
   }
 
-  h2 {
+  .header-copy {
     grid-column: 1;
     grid-row: 1;
+    display: grid;
+    align-content: center;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    --ring-view-activity-color: rgba(255, 255, 255, 0.84);
+    --ring-view-activity-font-size: 13px;
+    --ring-view-activity-line-height: 18px;
+  }
+
+  h2 {
     min-width: 0;
     margin: 0;
     max-width: 100%;
@@ -364,6 +385,15 @@ export const dialogStyles = css`
 
   .video-fallback.pending {
     opacity: 0;
+  }
+
+  .video-fallback.controls-hidden {
+    cursor: pointer;
+  }
+
+  .video-fallback.controls-hidden:focus-visible {
+    outline: 3px solid var(--primary-color, #03a9f4);
+    outline-offset: -3px;
   }
 
   .inline-start-surface {
@@ -892,6 +922,11 @@ export const dialogStyles = css`
   :host([inline]) h2 {
     font-size: var(--ha-font-size-l, 16px);
     line-height: 20px;
+  }
+
+  :host([inline]) .header-copy {
+    --ring-view-activity-font-size: 12px;
+    --ring-view-activity-line-height: 16px;
   }
 
   :host([inline]) .visitor-controls {

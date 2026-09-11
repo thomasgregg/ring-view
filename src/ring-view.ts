@@ -3,6 +3,7 @@ import { LitElement, html, nothing, type PropertyValues } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import { customElement, property, state } from "lit/decorators.js";
 import pickerPreviewSvg from "../demo/camera-preview.svg?raw";
+import "./activity-time";
 import {
   aspectRatioNumber,
   aspectRatioCss,
@@ -24,6 +25,10 @@ import { entityIsUnavailable, friendlyName } from "./utilities/entity-validation
 import { loadMode } from "./utilities/mode-storage";
 import "./ring-view-dialog";
 import type { RingViewDialog } from "./ring-view-dialog";
+import {
+  activityTimestamp,
+  formatActivityTime,
+} from "./utilities/activity-time";
 import {
   decodeRingViewUrl,
   ringViewUrlMatchesConfig,
@@ -145,7 +150,13 @@ export class RingView extends LitElement {
     document.addEventListener("viewer-closed", this.handleViewerClosed);
     this.updateRingAlert();
     void this.updateComplete.then(() => {
-      if (this.isConnected && !this.isInCardPicker()) this.setupPreviewLifecycle();
+      if (!this.isConnected || this.isInCardPicker()) return;
+      this.setupPreviewLifecycle();
+      // Home Assistant can detach and later reinsert the same card while
+      // switching dashboard views. No Lit update is guaranteed on reconnect,
+      // so restore the inline viewer here instead of waiting for the camera's
+      // next entity-state update to call updated().
+      this.initializeInlineViewer();
     });
   }
 
@@ -176,6 +187,9 @@ export class RingView extends LitElement {
       (this.config.snapshot_entity !== undefined &&
         previous.states[this.config.snapshot_entity] !==
           this.hass.states[this.config.snapshot_entity]) ||
+      (this.config.last_activity_entity !== undefined &&
+        previous.states[this.config.last_activity_entity] !==
+          this.hass.states[this.config.last_activity_entity]) ||
       (this.config.doorbell_entity !== undefined &&
         previous.states[this.config.doorbell_entity] !==
           this.hass.states[this.config.doorbell_entity]) ||
@@ -268,6 +282,23 @@ export class RingView extends LitElement {
     }
 
     const previewInteractive = !safePreview;
+    const activityAt = activityTimestamp(
+      this.config.last_activity_entity
+        ? this.hass.states[this.config.last_activity_entity]
+        : undefined,
+    );
+    const activity = activityAt === undefined
+      ? undefined
+      : formatActivityTime(this.hass, activityAt);
+    const previewLabel = previewInteractive
+      ? localize(this.hass, "card.open_viewer", {
+          name,
+          mode: modeLabel(openingMode, this.hass),
+        })
+      : localize(this.hass, "card.preview_alt", { name });
+    const accessiblePreviewLabel = activity
+      ? `${previewLabel}. ${activity.accessible}.`
+      : previewLabel;
     return html`
       <ha-card class=${safePreview ? "safe-preview" : nothing}>
         <div
@@ -275,12 +306,7 @@ export class RingView extends LitElement {
           style=${styleMap(style)}
           role=${previewInteractive ? "button" : "img"}
           tabindex=${previewInteractive ? "0" : nothing}
-          aria-label=${previewInteractive
-            ? localize(this.hass, "card.open_viewer", {
-                name,
-                mode: modeLabel(openingMode, this.hass),
-              })
-            : localize(this.hass, "card.preview_alt", { name })}
+          aria-label=${accessiblePreviewLabel}
           title=${previewInteractive
             ? localize(
                 this.hass,
@@ -301,7 +327,25 @@ export class RingView extends LitElement {
             : html`<div class="placeholder">
                 ${localize(this.hass, "card.preview_unavailable")}
               </div>`}
-          ${this.config.show_name ? html`<div class="name">${name}</div>` : nothing}
+          ${this.config.show_name || activity
+            ? html`
+                <div class="header-copy">
+                  ${this.config.show_name
+                    ? html`<div class="name">${name}</div>`
+                    : nothing}
+                  ${activity
+                    ? html`
+                        <ring-view-activity-time
+                          aria-hidden="true"
+                          .hass=${this.hass}
+                          .entityId=${this.config.last_activity_entity}
+                          @ring-view-activity-tick=${this.refreshActivityLabel}
+                        ></ring-view-activity-time>
+                      `
+                    : nothing}
+                </div>
+              `
+            : nothing}
           ${this.ringAlertVisible
             ? html`<div class="ring-alert" role="status">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -323,6 +367,10 @@ export class RingView extends LitElement {
       this.latestObservedPreviewSource,
     );
   }
+
+  private refreshActivityLabel = (): void => {
+    this.requestUpdate();
+  };
 
   private observePreviewMedia(): void {
     const recordingMarker = recordingMediaMarker(

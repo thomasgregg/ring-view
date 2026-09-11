@@ -30,6 +30,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `live_entity` | Yes — Config tab | Required | `camera.*` entity ID | Camera entity that starts the Ring live view. |
 | `snapshot_entity` | Yes — Dashboard preview | Not set | `camera.*` entity ID | Device snapshot camera, such as the snapshot entity created by Ring-MQTT. Shown when the selected image source needs it. |
 | `name` | Yes — Config tab | Entity name | Text | Optional label used instead of the recording entity's friendly name. |
+| `last_activity_entity` | Yes — Card appearance | Not set | `sensor.*`, `event.*`, or `input_datetime.*` entity ID | Shows the selected entity state's date and time as a localized relative timestamp at the top left. |
 | `default_mode` | Yes — Config tab | `last_recording` | `last_recording`, `live` | View selected when the viewer opens. |
 | `remember_last_mode` | Yes — Config tab | `false` | `true`, `false` | Remembers the most recent view in the current browser and uses it instead of `default_mode`. |
 | `autoplay_recording` | Yes — Config tab | `true` | `true`, `false` | Starts the latest recording immediately; when disabled, the viewer waits for Play. |
@@ -74,6 +75,7 @@ recording_entity: camera.front_door_last_recording
 live_entity: camera.front_door_live_view
 snapshot_entity: camera.front_door_snapshot
 name: Entrance
+last_activity_entity: sensor.front_door_last_activity
 
 default_mode: last_recording
 remember_last_mode: false
@@ -108,6 +110,26 @@ grid_options:
 ```
 
 Ring View 0.2 and newer use this flat configuration only. Earlier nested `preview`, `appearance`, `viewer`, and `performance` structures are not supported.
+
+### Last activity timestamp
+
+Open **Card appearance** and choose **Last activity timestamp** to show compact
+relative text such as **2 min. ago**. When the camera name is visible, the time
+appears directly below it. When the name is hidden, the time takes the same
+top-left position without leaving an empty line. The option works in the
+dashboard card and fullscreen viewer.
+
+The selected entity's state must contain a complete date and time. Ring View
+accepts ISO 8601 values, Home Assistant input-datetime values such as
+`2026-09-12 10:15:30`, and Unix timestamps in seconds or milliseconds. Sensor,
+event, and input-datetime entities are offered in the editor so the timestamp
+can represent a Ding, motion, recording, or a template sensor that chooses the
+newest relevant event.
+
+Hovering the relative time shows the exact localized date and time. Assistive
+technology receives the fuller label **Last activity, 2 minutes ago**. Unknown,
+unavailable, or invalid values are not displayed; the visual editor shows a
+configuration warning instead.
 
 ## Dashboard card behavior
 

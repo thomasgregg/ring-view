@@ -35,6 +35,7 @@ See what happened, check what is happening, and answer the door—all without le
 - **Operate the door while you watch.** Door access adds a configurable Home Assistant lock action, with a safe hold gesture, optional physical-door status, and a shared Talk/door control dock.
 - **Choose a calm or hands-on dashboard.** Keep the lightweight still-image card, or opt into direct Recording, Live, Talk, and door controls for a wall tablet.
 - **Show the freshest view.** Optionally combine the latest recording with a Ring-MQTT snapshot camera for the dashboard preview.
+- **See when something last happened.** Optionally show a localized relative time from a timestamp sensor, event entity, or date-and-time helper.
 - **Know when someone rings.** A temporary doorbell alert highlights the card. Tap it to open Live.
 - **Take the doorbell beyond the dashboard.** The included notification blueprint sends a phone alert, then adds a preview when the recording is ready.
 - **Make it yours without YAML.** Choose cameras, opening behavior, layout, and doorbell features in the visual editor.

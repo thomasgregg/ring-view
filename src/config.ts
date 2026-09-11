@@ -67,6 +67,14 @@ export function validateConfig(config: RingViewConfig): void {
   if (config.snapshot_entity !== undefined && config.snapshot_entity !== "") {
     assertCameraEntity(config.snapshot_entity, "config.snapshot_entity");
   }
+  if (
+    config.last_activity_entity !== undefined
+    && config.last_activity_entity !== ""
+    && (typeof config.last_activity_entity !== "string"
+      || !/^[a-z0-9_]+\.[a-z0-9_]+$/i.test(config.last_activity_entity))
+  ) {
+    throw new Error(localize(undefined, "config.last_activity_entity"));
+  }
 
   if (config.default_mode && !CAMERA_MODES.has(config.default_mode)) {
     throw new Error(localize(undefined, "config.default_mode"));
@@ -143,6 +151,7 @@ export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
     recording_entity: config.recording_entity,
     live_entity: config.live_entity,
     snapshot_entity: config.snapshot_entity || undefined,
+    last_activity_entity: config.last_activity_entity || undefined,
     name: config.name,
     default_mode: config.default_mode ?? DEFAULTS.default_mode,
     remember_last_mode:

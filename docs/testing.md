@@ -28,12 +28,15 @@ npm run test:browser
 npm run build
 ```
 
-The unit suite covers configuration defaults and validation, snapshot timestamp parsing and freshest-preview fallbacks, native editor structure and progressive dashboard fields, entity and talkback capability states, unsupported-camera fallback, doorbell alerts, timeout invalidation, passive-dashboard privacy, single-renderer switching, close teardown, disconnect teardown, single-offer two-way audio, press-to-talk muting, interrupted microphone permission, and insecure-connection guidance.
+The unit suite covers configuration defaults and validation, snapshot timestamp parsing and freshest-preview fallbacks, last-activity timestamp formats and localization, native editor structure and progressive dashboard fields, entity and talkback capability states, unsupported-camera fallback, doorbell alerts, timeout invalidation, passive-dashboard privacy, single-renderer switching, close teardown, disconnect teardown, single-offer two-way audio, press-to-talk muting, interrupted microphone permission, and insecure-connection guidance.
 
 The browser suite additionally covers the unobstructed on-demand image start
 surface, automatic starts, door-location and Live-readiness gating, fixed inline
 action sizing across card widths, inert edit previews, duplicate inline cards, and inline-to-fullscreen
-handoff without overlapping streams. Existing opening, switching, recovery,
+handoff without overlapping streams. It also checks activity placement with and
+without a camera name, long and localized relative times, invalid-to-valid
+entity changes, and separation from every header control at responsive widths.
+Existing opening, switching, recovery,
 accessibility, layout, and stream-count checks remain.
 
 The lifecycle regressions additionally cover repeated recording background/resume,
@@ -83,6 +86,10 @@ Verify each item on current stable Home Assistant and, where practical, the prev
 21. Trigger a doorbell alert and move the dashboard card while it is visible.
     The alert still expires twelve seconds after the ring, not twelve seconds
     after the move. Returning after expiry must not force the next opening to Live.
+22. Configure a last-activity timestamp, then check the card and fullscreen
+    viewer with the camera name both enabled and disabled. Confirm the relative
+    time updates, the exact hover time is correct, and neither line reaches the
+    mode or close/fullscreen controls at the narrowest supported card width.
 
 ## Visual matrix
 

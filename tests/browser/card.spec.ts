@@ -132,6 +132,69 @@ test("progressively reveals related dashboard preview settings", async ({ page }
   });
 });
 
+test("places the optional last activity source beside the name appearance controls", async ({
+  page,
+}) => {
+  await expect(page.locator("ring-view")).toBeAttached();
+  const appearance = await page.evaluate(async () => {
+    type FormSchema = {
+      name: string;
+      schema?: FormSchema[];
+      selector?: Record<string, unknown>;
+    };
+    type Editor = HTMLElement & {
+      hass: HomeAssistant;
+      setConfig: (config: Record<string, unknown>) => void;
+      updateComplete: Promise<unknown>;
+    };
+    const demoCard = document.querySelector("ring-view") as HTMLElement & {
+      hass: HomeAssistant;
+    };
+    const cardClass = customElements.get("ring-view") as CustomElementConstructor & {
+      getConfigElement: () => Promise<Editor>;
+    };
+    const editor = await cardClass.getConfigElement();
+    editor.hass = demoCard.hass;
+    editor.setConfig({
+      recording_entity: "camera.latest_recording",
+      live_entity: "camera.live_view",
+    });
+    document.body.replaceChildren(editor);
+    await editor.updateComplete;
+    const form = editor.shadowRoot?.querySelector("ha-form") as HTMLElement & {
+      schema: FormSchema[];
+      computeLabel: (schema: FormSchema) => string;
+      computeHelper: (schema: FormSchema) => string;
+    };
+    const section = form.schema.find((field) => field.name === "card_appearance");
+    const activity = section?.schema?.find(
+      (field) => field.name === "last_activity_entity",
+    );
+    return {
+      fields: section?.schema?.map((field) => field.name),
+      selector: activity?.selector,
+      label: activity ? form.computeLabel(activity) : undefined,
+      helper: activity ? form.computeHelper(activity) : undefined,
+    };
+  });
+
+  expect(appearance).toEqual({
+    fields: ["name", "show_name", "last_activity_entity", ""],
+    selector: {
+      entity: {
+        filter: [
+          { domain: "sensor" },
+          { domain: "event" },
+          { domain: "input_datetime" },
+        ],
+      },
+    },
+    label: "Last activity timestamp (optional)",
+    helper:
+      "Shows relative time at the top left, below the camera name when it is visible. Choose a timestamp sensor, event entity, or Date and/or time helper whose state contains both a date and time.",
+  });
+});
+
 test("keeps an interactive dashboard idle until the user chooses media", async ({
   page,
 }) => {
@@ -278,6 +341,41 @@ test("stops inline media before expanding and resumes it after fullscreen closes
   expect(await page.evaluate(() => window.demoPeakStreams ?? 0)).toBe(1);
 });
 
+test("restores an interactive card immediately after its dashboard view reconnects", async ({
+  page,
+}) => {
+  await page.goto("/demo/?dashboard=interactive&dashboard_start=recording");
+  const inlineViewer = page.locator("ring-view ring-view-dialog[inline]");
+  await expect(inlineViewer.getByRole("region", { name: "Camera view" })).toBeVisible();
+  await expect(inlineViewer.getByRole("img", { name: "Synthetic demo camera media" })).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.demoActiveStreams ?? 0)).toBe(1);
+
+  await page.evaluate(() => {
+    const viewState = window as Window & { detachedRingView?: HTMLElement };
+    viewState.detachedRingView = document.querySelector("ring-view") ?? undefined;
+    viewState.detachedRingView?.remove();
+  });
+  await expect.poll(() => page.evaluate(() => window.demoActiveStreams ?? 0)).toBe(0);
+
+  await page.evaluate(() => {
+    const viewState = window as Window & { detachedRingView?: HTMLElement };
+    const root = document.querySelector("#card-root");
+    if (!root || !viewState.detachedRingView) throw new Error("Detached card unavailable");
+    root.append(viewState.detachedRingView);
+  });
+
+  await expect(inlineViewer.getByRole("region", { name: "Camera view" })).toBeVisible({
+    timeout: 1_000,
+  });
+  await expect(inlineViewer.getByRole("img", { name: "Synthetic demo camera media" })).toBeVisible({
+    timeout: 1_000,
+  });
+  await expect.poll(
+    () => page.evaluate(() => window.demoActiveStreams ?? 0),
+    { timeout: 1_000 },
+  ).toBe(1);
+});
+
 test("keeps one Live session when duplicate interactive cards share a camera", async ({
   page,
 }) => {
@@ -370,6 +468,66 @@ test("shows only the Ring View loader while a direct recording is pending", asyn
   await expect(recording).toHaveCSS("opacity", "0");
   await expect(page.locator(".state-layer .spinner")).toBeVisible();
   await expect(page.getByText("Loading last recording…")).toBeVisible();
+});
+
+test("dismisses idle direct-recording controls and resumes or replays from the video", async ({
+  page,
+}) => {
+  await page.route("**/pending-recording.mp4", async () => undefined);
+  await page.goto("/demo/?recording_video=pending");
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+
+  const recording = page.locator("video.video-fallback");
+  await recording.evaluate((element) => {
+    const video = element as HTMLVideoElement;
+    let currentTime = 0;
+    Object.defineProperty(video, "currentTime", {
+      configurable: true,
+      get: () => currentTime,
+      set: (value: number) => { currentTime = value; },
+    });
+    video.play = () => {
+      video.dataset.playCount = String(Number(video.dataset.playCount ?? "0") + 1);
+      video.dispatchEvent(new Event("play"));
+      return Promise.resolve();
+    };
+    video.pause = () => video.dispatchEvent(new Event("pause"));
+    video.dispatchEvent(new Event("canplay"));
+  });
+  await expect(recording).not.toHaveClass(/pending/);
+
+  await recording.evaluate((element) => (element as HTMLVideoElement).pause());
+  await expect.poll(
+    () => recording.evaluate((element) => (element as HTMLVideoElement).controls),
+    { timeout: 5_000 },
+  ).toBe(false);
+  await expect(recording).toHaveClass(/controls-hidden/);
+  await expect(recording).toHaveAttribute("aria-label", "Play last recording");
+
+  await recording.click({ position: { x: 30, y: 30 } });
+  await expect.poll(
+    () => recording.evaluate((element) => (element as HTMLVideoElement).controls),
+  ).toBe(true);
+  await expect(recording).toHaveAttribute("data-play-count", "2");
+
+  await recording.evaluate((element) => {
+    const video = element as HTMLVideoElement;
+    video.currentTime = 24;
+    video.dispatchEvent(new Event("ended"));
+  });
+  await expect.poll(
+    () => recording.evaluate((element) => (element as HTMLVideoElement).controls),
+    { timeout: 5_000 },
+  ).toBe(false);
+  await recording.focus();
+  await page.keyboard.press("Space");
+  await expect(recording).toHaveAttribute("data-play-count", "3");
+  await expect.poll(
+    () => recording.evaluate((element) => (element as HTMLVideoElement).currentTime),
+  ).toBe(0);
+  await expect.poll(
+    () => recording.evaluate((element) => (element as HTMLVideoElement).controls),
+  ).toBe(true);
 });
 
 test("merges Talk and door access into one divided action dock", async ({ page }) => {
@@ -944,6 +1102,217 @@ test("keeps a long inline camera name clear of header controls at every card wid
       expect(isTruncated).toBe(true);
     }
   }
+});
+
+test("shows accessible activity time below the name without overlapping controls", async ({
+  page,
+}) => {
+  const cameraName = "Thomas Gregg Front Door Camera With A Long Name";
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(
+    `/demo/?name=1&activity=1&activity_age=125&camera_name=${encodeURIComponent(cameraName)}`,
+  );
+  const root = page.locator("#card-root");
+  await root.evaluate((element) => {
+    element.style.width = "340px";
+  });
+  const preview = page.locator("ring-view .preview");
+  const name = page.locator("ring-view .name");
+  const activity = page.locator(
+    "ring-view > ha-card ring-view-activity-time span",
+  );
+  await expect(activity).toHaveText(/2 min.*ago/i);
+  await expect(activity).toHaveAttribute(
+    "aria-label",
+    "Last activity, 2 minutes ago",
+  );
+  await expect(activity).toHaveAttribute("title", /^Last activity: /);
+  await expect(preview).toHaveAttribute(
+    "aria-label",
+    /Last activity, 2 minutes ago/,
+  );
+  const [previewBox, nameBox, activityBox] = await Promise.all([
+    preview.boundingBox(),
+    name.boundingBox(),
+    activity.boundingBox(),
+  ]);
+  if (!previewBox || !nameBox || !activityBox) {
+    throw new Error("Card activity geometry unavailable");
+  }
+  expect(nameBox.y + nameBox.height).toBeLessThanOrEqual(activityBox.y);
+  expect(activityBox.x).toBe(nameBox.x);
+  expect(activityBox.x + activityBox.width).toBeLessThanOrEqual(
+    previewBox.x + previewBox.width - 12,
+  );
+
+  await preview.click();
+  const dialog = page.locator("ring-view-dialog[open]:not([inline])");
+  const heading = dialog.getByRole("heading", { name: cameraName });
+  const dialogActivity = dialog.locator("ring-view-activity-time span");
+  const modeSwitch = dialog.getByRole("tablist", { name: "Camera view" });
+  const close = dialog.getByRole("button", { name: "Close camera viewer" });
+  const [headingBox, dialogActivityBox, modeBox, closeBox] = await Promise.all([
+    heading.boundingBox(),
+    dialogActivity.boundingBox(),
+    modeSwitch.boundingBox(),
+    close.boundingBox(),
+  ]);
+  if (!headingBox || !dialogActivityBox || !modeBox || !closeBox) {
+    throw new Error("Viewer activity geometry unavailable");
+  }
+  expect(headingBox.y + headingBox.height).toBeLessThanOrEqual(
+    dialogActivityBox.y,
+  );
+  expect(dialogActivityBox.x + dialogActivityBox.width).toBeLessThanOrEqual(
+    modeBox.x - 8,
+  );
+  expect(modeBox.x + modeBox.width).toBeLessThanOrEqual(closeBox.x - 8);
+});
+
+test("uses the top-left activity position when the camera name is hidden", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/demo/?activity=1&activity_age=125");
+  const root = page.locator("#card-root");
+  await root.evaluate((element) => {
+    element.style.width = "320px";
+  });
+  const preview = page.locator("ring-view .preview");
+  const activity = page.locator(
+    "ring-view > ha-card ring-view-activity-time span",
+  );
+  await expect(page.locator("ring-view .name")).toHaveCount(0);
+  await expect(activity).toBeVisible();
+  const [previewBox, activityBox] = await Promise.all([
+    preview.boundingBox(),
+    activity.boundingBox(),
+  ]);
+  if (!previewBox || !activityBox) {
+    throw new Error("Nameless card activity geometry unavailable");
+  }
+  expect(activityBox.x - previewBox.x).toBe(16);
+  expect(activityBox.y - previewBox.y).toBe(12);
+
+  await preview.click();
+  const dialog = page.locator("ring-view-dialog[open]:not([inline])");
+  const dialogActivity = dialog.locator("ring-view-activity-time span");
+  const modeSwitch = dialog.getByRole("tablist", { name: "Camera view" });
+  await expect(dialog.locator("h2")).toHaveCount(0);
+  await expect(dialogActivity).toHaveCSS("font-size", "13px");
+  const [dialogBox, dialogActivityBox, modeBox] = await Promise.all([
+    dialog.locator(".dialog").boundingBox(),
+    dialogActivity.boundingBox(),
+    modeSwitch.boundingBox(),
+  ]);
+  if (!dialogBox || !dialogActivityBox || !modeBox) {
+    throw new Error("Nameless viewer activity geometry unavailable");
+  }
+  expect(dialogActivityBox.x).toBeGreaterThanOrEqual(dialogBox.x + 16);
+  expect(dialogActivityBox.x + dialogActivityBox.width).toBeLessThanOrEqual(
+    modeBox.x - 8,
+  );
+});
+
+test("keeps name, activity, modes, and fullscreen action separate at responsive widths", async ({
+  page,
+}) => {
+  const cameraName = "Thomas Gregg Front Door Camera With A Long Name";
+  await page.goto(
+    `/demo/?dashboard=interactive&name=1&activity=1&activity_age=9000&camera_name=${encodeURIComponent(cameraName)}`,
+  );
+  const root = page.locator("#card-root");
+  const card = page.locator("ring-view");
+  const heading = card.getByRole("heading", { name: cameraName });
+  const activity = card.locator("ring-view-activity-time span");
+  const modeSwitch = card.getByRole("tablist", { name: "Camera view" });
+  const expand = card.getByRole("button", {
+    name: "Open fullscreen camera viewer",
+  });
+  await expect(activity).toHaveText(/2 hr.*ago/i);
+  await expect(activity).toHaveCSS("font-size", "12px");
+
+  for (const width of [320, 340, 360, 480, 720]) {
+    await root.evaluate((element, value) => {
+      element.style.width = `${value}px`;
+    }, width);
+    await page.evaluate(() => new Promise(requestAnimationFrame));
+    const [cardBox, headingBox, activityBox, modeBox, expandBox] =
+      await Promise.all([
+        card.boundingBox(),
+        heading.boundingBox(),
+        activity.boundingBox(),
+        modeSwitch.boundingBox(),
+        expand.boundingBox(),
+      ]);
+    if (!cardBox || !headingBox || !activityBox || !modeBox || !expandBox) {
+      throw new Error(`Responsive activity geometry unavailable at ${width}px`);
+    }
+    expect(headingBox.y + headingBox.height).toBeLessThanOrEqual(activityBox.y);
+    expect(headingBox.x + headingBox.width).toBeLessThanOrEqual(modeBox.x - 8);
+    expect(activityBox.x + activityBox.width).toBeLessThanOrEqual(modeBox.x - 8);
+    expect(modeBox.x + modeBox.width).toBeLessThanOrEqual(expandBox.x - 8);
+    expect(expandBox.x + expandBox.width).toBeLessThanOrEqual(
+      cardBox.x + cardBox.width,
+    );
+  }
+});
+
+test("hides invalid activity values and reacts when the entity becomes valid", async ({
+  page,
+}) => {
+  await page.goto(
+    `/demo/?activity=1&activity_value=${encodeURIComponent("not a timestamp")}`,
+  );
+  const preview = page.locator("ring-view .preview");
+  const activity = page.locator(
+    "ring-view > ha-card ring-view-activity-time span",
+  );
+  await expect(activity).toHaveCount(0);
+  await expect(preview).not.toHaveAttribute("aria-label", /Last activity/);
+
+  const unixSeconds = String(Math.floor(Date.now() / 1_000) - 125);
+  await page.evaluate(
+    (value) => window.demoSetEntityState("sensor.front_door_last_activity", value),
+    unixSeconds,
+  );
+  await expect(activity).toHaveText(/2 min.*ago/i);
+  await expect(preview).toHaveAttribute("aria-label", /Last activity/);
+
+  await page.evaluate(() =>
+    window.demoSetEntityState("sensor.front_door_last_activity", "unavailable"),
+  );
+  await expect(activity).toHaveCount(0);
+  await expect(preview).not.toHaveAttribute("aria-label", /Last activity/);
+});
+
+test("localizes activity text without letting a longer format reach the controls", async ({
+  page,
+}) => {
+  await page.goto(
+    "/demo/?dashboard=interactive&activity=1&activity_age=9000&lang=de-DE",
+  );
+  const root = page.locator("#card-root");
+  await root.evaluate((element) => {
+    element.style.width = "320px";
+  });
+  const card = page.locator("ring-view");
+  const activity = card.locator("ring-view-activity-time span");
+  const modes = card.getByRole("tablist", { name: "Kameraansicht" });
+  await expect(activity).toHaveText(/vor 2 Std/i);
+  await expect(activity).toHaveAttribute(
+    "aria-label",
+    "Letzte Aktivität, vor 2 Stunden",
+  );
+  await expect(activity).toHaveAttribute("title", /^Letzte Aktivität: /);
+  const [activityBox, modeBox] = await Promise.all([
+    activity.boundingBox(),
+    modes.boundingBox(),
+  ]);
+  if (!activityBox || !modeBox) {
+    throw new Error("Localized activity geometry unavailable");
+  }
+  expect(activityBox.x + activityBox.width).toBeLessThanOrEqual(modeBox.x - 8);
 });
 
 test("hides the camera name from both views when disabled", async ({ page }) => {

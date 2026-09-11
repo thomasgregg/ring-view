@@ -1,5 +1,6 @@
 import { localize } from "../localize";
 import type { HassEntity, HomeAssistant, NormalizedConfig } from "../types";
+import { activityTimestamp } from "./activity-time";
 
 export const CAMERA_STREAM_FEATURE = 2;
 export const LOCK_OPEN_FEATURE = 1;
@@ -39,6 +40,7 @@ export interface EntityWarning {
     | "recording"
     | "live"
     | "snapshot"
+    | "last_activity"
     | "doorbell"
     | "door"
     | "door_contact"
@@ -110,6 +112,23 @@ export function validateEntities(
       kind: "snapshot",
       message: localize(hass, "warning.snapshot_required"),
     });
+  }
+
+  if (config.last_activity_entity) {
+    const activity = hass.states[config.last_activity_entity];
+    if (entityIsUnavailable(activity)) {
+      warnings.push({
+        kind: "last_activity",
+        message: localize(hass, "warning.unavailable", {
+          name: friendlyName(activity, config.last_activity_entity),
+        }),
+      });
+    } else if (activityTimestamp(activity) === undefined) {
+      warnings.push({
+        kind: "last_activity",
+        message: localize(hass, "warning.activity_timestamp"),
+      });
+    }
   }
 
   if (config.doorbell_entity) {

@@ -76,6 +76,7 @@ export interface RingViewConfig {
   recording_entity: string;
   live_entity: string;
   snapshot_entity?: string;
+  last_activity_entity?: string;
   name?: string;
   default_mode?: CameraMode;
   remember_last_mode?: boolean;
@@ -109,6 +110,7 @@ export interface NormalizedConfig extends Required<
     | "door_entity"
     | "door_contact_entity"
     | "snapshot_entity"
+    | "last_activity_entity"
   >
 > {
   name?: string;
@@ -116,6 +118,7 @@ export interface NormalizedConfig extends Required<
   door_entity?: string;
   door_contact_entity?: string;
   snapshot_entity?: string;
+  last_activity_entity?: string;
   grid_options?: GridOptions;
 }
 

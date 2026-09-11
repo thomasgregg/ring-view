@@ -114,6 +114,16 @@ const snapshot: HassEntity = {
     timestamp: Date.parse("2026-09-06T12:01:00Z") / 1_000,
   },
 };
+const activityAgeSeconds = Number(query.get("activity_age") ?? 125);
+const activity: HassEntity = {
+  entity_id: "sensor.front_door_last_activity",
+  state: query.get("activity_value")
+    ?? new Date(Date.now() - activityAgeSeconds * 1_000).toISOString(),
+  attributes: {
+    friendly_name: "Front Door Last Activity",
+    device_class: "timestamp",
+  },
+};
 const door: HassEntity = {
   entity_id: "lock.front_door",
   state: query.get("door_state") || "locked",
@@ -154,6 +164,10 @@ let hass: HomeAssistant = {
       entity_id: snapshot.entity_id,
       platform: "mqtt",
     },
+    [activity.entity_id]: {
+      entity_id: activity.entity_id,
+      platform: "demo",
+    },
     [door.entity_id]: {
       entity_id: door.entity_id,
       platform: "demo",
@@ -167,6 +181,7 @@ let hass: HomeAssistant = {
     [recording.entity_id]: recording,
     [live.entity_id]: live,
     [snapshot.entity_id]: snapshot,
+    [activity.entity_id]: activity,
     [door.entity_id]: door,
     [doorContact.entity_id]: doorContact,
   },
@@ -242,6 +257,8 @@ card.setConfig({
   recording_entity: recording.entity_id,
   live_entity: live.entity_id,
   snapshot_entity: snapshot.entity_id,
+  last_activity_entity:
+    query.get("activity") === "1" ? activity.entity_id : undefined,
   name: query.get("camera_name") || "Entrance",
   default_mode: query.get("mode") === "live" ? "live" : "last_recording",
   remember_last_mode: query.get("remember") === "1",

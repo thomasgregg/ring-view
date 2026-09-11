@@ -264,4 +264,51 @@ describe("entity validation", () => {
       "door_contact",
     );
   });
+
+  it("validates the configured last activity timestamp without exposing its value", () => {
+    const config = normalizeConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      last_activity_entity: "sensor.front_door_last_activity",
+    });
+    const baseStates = {
+      "camera.recording": entity("camera.recording", {
+        entity_picture: "/recording.jpg",
+      }),
+      "camera.live": entity("camera.live", { supported_features: 2 }),
+    };
+    const activity = {
+      ...entity("sensor.front_door_last_activity", {
+        device_class: "timestamp",
+      }),
+      state: "2026-09-12T10:15:30Z",
+    };
+    const hass: HomeAssistant = {
+      states: {
+        ...baseStates,
+        [activity.entity_id]: activity,
+      },
+      hassUrl: (path = "") => path,
+      callWS: async () => ({}) as never,
+    };
+    expect(validateEntities(hass, config).map((warning) => warning.kind)).not.toContain(
+      "last_activity",
+    );
+
+    hass.states[activity.entity_id] = {
+      ...activity,
+      state: "motion detected at the front door",
+    };
+    const invalidWarnings = validateEntities(hass, config);
+    expect(invalidWarnings.find((warning) => warning.kind === "last_activity")?.message)
+      .toContain("does not currently provide a valid date and time");
+    expect(JSON.stringify(invalidWarnings)).not.toContain(
+      "motion detected at the front door",
+    );
+
+    hass.states[activity.entity_id] = { ...activity, state: "unavailable" };
+    expect(validateEntities(hass, config).map((warning) => warning.kind)).toContain(
+      "last_activity",
+    );
+  });
 });

@@ -25,6 +25,10 @@ const hass: HomeAssistant = {
     },
     "camera.live": { entity_id: "camera.live", platform: "ring" },
     "camera.snapshot": { entity_id: "camera.snapshot", platform: "mqtt" },
+    "sensor.front_door_last_activity": {
+      entity_id: "sensor.front_door_last_activity",
+      platform: "template",
+    },
     "lock.front_door": { entity_id: "lock.front_door", platform: "nuki" },
     "binary_sensor.front_door_contact": {
       entity_id: "binary_sensor.front_door_contact",
@@ -35,6 +39,14 @@ const hass: HomeAssistant = {
     "camera.recording": entity("camera.recording", 0),
     "camera.live": entity("camera.live", 2),
     "camera.snapshot": entity("camera.snapshot", 0),
+    "sensor.front_door_last_activity": {
+      ...entity("sensor.front_door_last_activity", 0),
+      state: "2026-09-12T10:15:30Z",
+      attributes: {
+        friendly_name: "Front Door Last Activity",
+        device_class: "timestamp",
+      },
+    },
     "lock.front_door": {
       ...entity("lock.front_door", 1),
       state: "locked",
@@ -76,6 +88,7 @@ describe("visual editor", () => {
             live_entity: "camera.live",
             show_name: true,
             name: "Entrance",
+            last_activity_entity: "sensor.front_door_last_activity",
           },
         },
         bubbles: true,
@@ -93,6 +106,7 @@ describe("visual editor", () => {
       live_entity: "camera.live",
       name: "Entrance",
       show_name: true,
+      last_activity_entity: "sensor.front_door_last_activity",
       default_mode: "last_recording",
       remember_last_mode: false,
       autoplay_recording: true,
@@ -290,6 +304,9 @@ describe("visual editor", () => {
     expect(form?.computeLabel?.({ name: "show_name" })).toBe(
       "Kameranamen anzeigen",
     );
+    expect(form?.computeLabel?.({ name: "last_activity_entity" })).toBe(
+      "Zeitstempel der letzten Aktivität (optional)",
+    );
     expect(form?.computeLabel?.({ name: "dashboard_preview" })).toBe(
       "Dashboard-Karte",
     );
@@ -299,6 +316,9 @@ describe("visual editor", () => {
     );
     expect(form?.computeHelper?.({ name: "live_muted" })).toContain(
       "mit Ton zu starten",
+    );
+    expect(form?.computeHelper?.({ name: "last_activity_entity" })).toContain(
+      "bei sichtbarem Kameranamen darunter",
     );
 
     const viewerBehavior = form?.schema?.find(
@@ -347,8 +367,22 @@ describe("visual editor", () => {
     expect(cardAppearance?.schema?.map((field) => field.name)).toEqual([
       "name",
       "show_name",
+      "last_activity_entity",
       "",
     ]);
+    expect(
+      cardAppearance?.schema?.find(
+        (field) => field.name === "last_activity_entity",
+      )?.selector,
+    ).toEqual({
+      entity: {
+        filter: [
+          { domain: "sensor" },
+          { domain: "event" },
+          { domain: "input_datetime" },
+        ],
+      },
+    });
     const dashboardPreview = form?.schema?.find(
       (field) => field.name === "dashboard_preview",
     );

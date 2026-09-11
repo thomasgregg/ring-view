@@ -129,6 +129,30 @@ describe("configuration", () => {
     });
   });
 
+  it("normalizes an optional last activity timestamp entity", () => {
+    expect(
+      normalizeConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        last_activity_entity: "sensor.front_door_last_activity",
+      }).last_activity_entity,
+    ).toBe("sensor.front_door_last_activity");
+    expect(
+      normalizeConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        last_activity_entity: "",
+      }).last_activity_entity,
+    ).toBeUndefined();
+    expect(() =>
+      validateConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        last_activity_entity: "not-an-entity",
+      }),
+    ).toThrow(/last_activity_entity/);
+  });
+
   it("preserves explicit grid sizing", () => {
     const config = normalizeConfig({
       recording_entity: "camera.recording",

@@ -17,6 +17,7 @@ import { classMap } from "lit/directives/class-map.js";
 import { keyed } from "lit/directives/keyed.js";
 import { styleMap } from "lit/directives/style-map.js";
 import { customElement, property, state } from "lit/decorators.js";
+import "./activity-time";
 import { aspectRatioNumber } from "./config";
 import {
   RING_ALERT_DURATION_MS,
@@ -46,6 +47,7 @@ import type {
   HomeAssistant,
   NormalizedConfig,
 } from "./types";
+import { activityTimestamp } from "./utilities/activity-time";
 import {
   entityIsUnavailable,
   friendlyName,
@@ -76,6 +78,7 @@ type DoorActionStatus = "idle" | "holding" | "working" | "success" | "error";
 type DoorContactState = "open" | "closed" | "unknown";
 const LIVE_TIMEOUT_SECONDS = 20;
 const LIVE_RETRY_DELAY_MS = 2_500;
+const RECORDING_CONTROLS_HIDE_DELAY_MS = 2_500;
 const DOOR_HOLD_DURATION_MS = 900;
 const DOOR_SUCCESS_DURATION_MS = 2_000;
 const DOOR_ERROR_DURATION_MS = 3_000;
@@ -96,6 +99,8 @@ export class RingViewDialog extends LitElement {
   @state() private suspended = false;
   @state() private recordingMuted = false;
   @state() private recordingStarted = true;
+  @state() private recordingControlsVisible = true;
+  @state() private recordingEnded = false;
   @state() private liveMuted = true;
   @state() private liveHasAudio?: boolean;
   @state() private recordingVideoFailed = false;
@@ -117,6 +122,8 @@ export class RingViewDialog extends LitElement {
   // Playback belongs to an element, not the dialog: every replacement video
   // needs its own attempt, while repeated canplay events must not replay it.
   private readonly recordingPlayback = new WeakSet<HTMLVideoElement>();
+  private recordingControlsTimer?: number;
+  private recordingPaused = false;
   private automaticLiveRetry = true;
   private automaticLiveRecovery?: "waiting" | "attempting";
   private recoveryConnection?: HomeAssistant["connection"];
@@ -282,6 +289,11 @@ export class RingViewDialog extends LitElement {
     if (!this.open || !this.hass || !this.config) return nothing;
     const title = this.dialogTitle();
     const showTitle = this.config.show_name;
+    const showActivity = activityTimestamp(
+      this.config.last_activity_entity
+        ? this.hass.states[this.config.last_activity_entity]
+        : undefined,
+    ) !== undefined;
     const ratio = this.config.aspect_ratio;
     const style = {
       "--ring-view-aspect-ratio":
@@ -308,8 +320,22 @@ export class RingViewDialog extends LitElement {
           ${this.renderMedia()}
           ${this.renderRingAlert()}
           <header class="header">
-            ${showTitle
-              ? html`<h2 id="ring-view-dialog-title">${title}</h2>`
+            ${showTitle || showActivity
+              ? html`
+                  <div class="header-copy">
+                    ${showTitle
+                      ? html`<h2 id="ring-view-dialog-title">${title}</h2>`
+                      : nothing}
+                    ${showActivity
+                      ? html`
+                          <ring-view-activity-time
+                            .hass=${this.hass}
+                            .entityId=${this.config.last_activity_entity}
+                          ></ring-view-activity-time>
+                        `
+                      : nothing}
+                  </div>
+                `
               : nothing}
             <div class="header-actions">
               <button
@@ -1007,16 +1033,29 @@ export class RingViewDialog extends LitElement {
                 class=${classMap({
                   "video-fallback": true,
                   pending: this.mediaStatus === "pending",
+                  "controls-hidden": !this.recordingControlsVisible,
                 })}
                 src=${fallbackUrl}
                 poster=${poster}
                 playsinline
                 autoplay
                 preload="auto"
-                controls
+                .controls=${this.recordingControlsVisible}
                 .muted=${this.recordingMuted}
+                tabindex="0"
+                aria-label=${this.recordingControlsVisible
+                  ? nothing
+                  : localize(this.hass, "viewer.play_recording")}
                 @canplay=${this.handleRecordingCanPlay}
                 @error=${this.handleRecordingVideoError}
+                @play=${this.handleRecordingPlay}
+                @pause=${this.handleRecordingPause}
+                @ended=${this.handleRecordingEnded}
+                @click=${this.handleRecordingSurfaceClick}
+                @keydown=${this.handleRecordingSurfaceKeyDown}
+                @pointerdown=${this.handleRecordingControlsInteraction}
+                @pointermove=${this.handleRecordingControlsInteraction}
+                @focus=${this.handleRecordingControlsInteraction}
               ></video>
             `,
             )
@@ -1236,6 +1275,7 @@ export class RingViewDialog extends LitElement {
       this.waitForLiveResume();
       return;
     }
+    if (this.mode === "last_recording") this.resetRecordingControls();
     this.mediaStatus = "pending";
     this.session = this.lifecycle.next();
     this.lifecycle.scheduleTimeout(
@@ -1246,6 +1286,7 @@ export class RingViewDialog extends LitElement {
 
   private resetMediaAttempt(): void {
     this.cancelTalkPress();
+    this.resetRecordingControls();
     this.retryCount = 0;
     this.recordingMuted = false;
     this.liveHasAudio = undefined;
@@ -1327,6 +1368,118 @@ export class RingViewDialog extends LitElement {
     this.recordingPlayback.add(video);
     void this.playRecording(video, session);
   };
+
+  private handleRecordingPlay = (event: Event): void => {
+    const video = event.currentTarget;
+    if (!(video instanceof HTMLVideoElement) || !this.isCurrentRecording(video, this.session)) {
+      return;
+    }
+    this.clearRecordingControlsTimer();
+    this.recordingEnded = false;
+    this.recordingPaused = false;
+    this.recordingControlsVisible = true;
+    video.controls = true;
+  };
+
+  private handleRecordingPause = (event: Event): void => {
+    const video = event.currentTarget;
+    if (!(video instanceof HTMLVideoElement) || !this.isCurrentRecording(video, this.session)) {
+      return;
+    }
+    this.recordingPaused = true;
+    if (!video.ended) this.recordingEnded = false;
+    this.scheduleRecordingControlsHide(video, this.session);
+  };
+
+  private handleRecordingEnded = (event: Event): void => {
+    const video = event.currentTarget;
+    if (!(video instanceof HTMLVideoElement) || !this.isCurrentRecording(video, this.session)) {
+      return;
+    }
+    this.recordingPaused = true;
+    this.recordingEnded = true;
+    this.scheduleRecordingControlsHide(video, this.session);
+  };
+
+  private handleRecordingSurfaceClick = (event: MouseEvent): void => {
+    const video = event.currentTarget;
+    if (!(video instanceof HTMLVideoElement) || video.controls) return;
+    event.preventDefault();
+    event.stopPropagation();
+    this.resumeRecordingFromSurface(video);
+  };
+
+  private handleRecordingSurfaceKeyDown = (event: KeyboardEvent): void => {
+    const video = event.currentTarget;
+    if (!(video instanceof HTMLVideoElement)) return;
+    if (video.controls) {
+      this.handleRecordingControlsInteraction(event);
+      return;
+    }
+    if (!["Enter", " "].includes(event.key)) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    this.resumeRecordingFromSurface(video);
+  };
+
+  private handleRecordingControlsInteraction = (event: Event): void => {
+    const video = event.currentTarget;
+    if (
+      !(video instanceof HTMLVideoElement)
+      || !video.controls
+      || !this.recordingPaused
+      || !this.isCurrentRecording(video, this.session)
+    ) {
+      return;
+    }
+    this.scheduleRecordingControlsHide(video, this.session);
+  };
+
+  private resumeRecordingFromSurface(video: HTMLVideoElement): void {
+    if (!this.isCurrentRecording(video, this.session)) return;
+    this.clearRecordingControlsTimer();
+    if (this.recordingEnded || video.ended) {
+      try {
+        video.currentTime = 0;
+      } catch {
+        // A newly refreshed temporary URL may not be seekable yet; play() can
+        // still restart it once the browser has loaded enough media.
+      }
+    }
+    this.recordingEnded = false;
+    this.recordingPaused = false;
+    this.recordingControlsVisible = true;
+    video.controls = true;
+    void video.play().catch(() => undefined);
+  }
+
+  private scheduleRecordingControlsHide(
+    video: HTMLVideoElement,
+    session: number,
+  ): void {
+    this.clearRecordingControlsTimer();
+    this.recordingControlsTimer = window.setTimeout(() => {
+      this.recordingControlsTimer = undefined;
+      if (!this.isCurrentRecording(video, session)) return;
+      video.controls = false;
+      this.recordingControlsVisible = false;
+    }, RECORDING_CONTROLS_HIDE_DELAY_MS);
+  }
+
+  private resetRecordingControls(): void {
+    this.clearRecordingControlsTimer();
+    this.recordingControlsVisible = true;
+    this.recordingEnded = false;
+    this.recordingPaused = false;
+  }
+
+  private clearRecordingControlsTimer(): void {
+    if (this.recordingControlsTimer === undefined) return;
+    window.clearTimeout(this.recordingControlsTimer);
+    this.recordingControlsTimer = undefined;
+  }
 
   private isCurrentRecording(video: HTMLVideoElement, session: number): boolean {
     return this.acceptsMediaEvent()

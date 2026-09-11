@@ -297,6 +297,18 @@ function configSchema(
         { name: "name", selector: { text: {} } },
         { name: "show_name", selector: { boolean: {} } },
         {
+          name: "last_activity_entity",
+          selector: {
+            entity: {
+              filter: [
+                { domain: "sensor" },
+                { domain: "event" },
+                { domain: "input_datetime" },
+              ],
+            },
+          },
+        },
+        {
           name: "",
           type: "grid",
           schema: [
@@ -377,6 +389,7 @@ const LABELS: Record<string, TranslationKey> = {
   card_appearance: "editor.card_appearance",
   name: "editor.name",
   show_name: "editor.show_name",
+  last_activity_entity: "editor.last_activity_entity",
   preview_source: "editor.preview_source",
   preview_fallback: "editor.preview_fallback",
   aspect_ratio: "editor.aspect_ratio",
@@ -400,6 +413,7 @@ const HELPERS: Record<string, TranslationKey> = {
   door_hold_to_activate: "editor.helper_door_hold_to_activate",
   door_control_location: "editor.helper_door_control_location",
   show_name: "editor.helper_show_name",
+  last_activity_entity: "editor.helper_last_activity_entity",
   preview_source: "editor.helper_preview_source",
   snapshot_entity: "editor.helper_snapshot_entity",
   preview_fallback: "editor.helper_preview_fallback",
@@ -466,7 +480,11 @@ export class RingViewEditor extends LitElement {
     const key = LABELS[schema.name];
     if (!key) return undefined;
     const label = localize(this.hass, key);
-    if (!["name", "door_contact_entity"].includes(schema.name)) return label;
+    if (
+      !["name", "door_contact_entity", "last_activity_entity"].includes(
+        schema.name,
+      )
+    ) return label;
     const optional = localizeHaOrFallback(
       this.hass,
       "ui.panel.lovelace.editor.card.config.optional",
