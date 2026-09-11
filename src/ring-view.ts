@@ -122,12 +122,21 @@ export class RingView extends LitElement {
   }
 
   public getGridOptions(): GridOptions {
+    const configured = this.config?.grid_options;
     return {
-      columns: 12,
-      rows: 3,
-      min_columns: 6,
-      min_rows: 2,
-      ...this.config?.grid_options,
+      ...configured,
+      columns: configured?.columns === "full"
+        ? "full"
+        : Math.max(12, configured?.columns ?? 12),
+      rows: Math.max(3, configured?.rows ?? 3),
+      min_columns: 12,
+      min_rows: 3,
+      ...(configured?.max_columns !== undefined
+        ? { max_columns: Math.max(12, configured.max_columns) }
+        : {}),
+      ...(configured?.max_rows !== undefined
+        ? { max_rows: Math.max(3, configured.max_rows) }
+        : {}),
     };
   }
 

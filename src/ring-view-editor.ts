@@ -203,8 +203,23 @@ function configSchema(
     });
     if (config.dashboard_behavior === "interactive") {
       doorAccess.push({
-        name: "door_control_on_dashboard",
-        selector: { boolean: {} },
+        name: "door_control_location",
+        required: true,
+        selector: {
+          select: {
+            mode: "dropdown",
+            options: [
+              {
+                value: "viewer_only",
+                label: localize(hass, "editor.door_location_viewer"),
+              },
+              {
+                value: "dashboard_and_viewer",
+                label: localize(hass, "editor.door_location_dashboard"),
+              },
+            ],
+          },
+        },
       });
     }
   }
@@ -358,7 +373,7 @@ const LABELS: Record<string, TranslationKey> = {
   door_action: "editor.door_action",
   door_control_visibility: "editor.door_control_visibility",
   door_hold_to_activate: "editor.door_hold_to_activate",
-  door_control_on_dashboard: "editor.door_control_on_dashboard",
+  door_control_location: "editor.door_control_location",
   card_appearance: "editor.card_appearance",
   name: "editor.name",
   show_name: "editor.show_name",
@@ -383,7 +398,7 @@ const HELPERS: Record<string, TranslationKey> = {
   door_action: "editor.helper_door_action",
   door_control_visibility: "editor.helper_door_control_visibility",
   door_hold_to_activate: "editor.helper_door_hold_to_activate",
-  door_control_on_dashboard: "editor.helper_door_control_on_dashboard",
+  door_control_location: "editor.helper_door_control_location",
   show_name: "editor.helper_show_name",
   preview_source: "editor.helper_preview_source",
   snapshot_entity: "editor.helper_snapshot_entity",
@@ -477,7 +492,7 @@ export class RingViewEditor extends LitElement {
       "door_action",
       "door_control_visibility",
       "door_hold_to_activate",
-      "door_control_on_dashboard",
+      "door_control_location",
     ]);
     const emitted = Object.fromEntries(
       Object.entries(next).filter(

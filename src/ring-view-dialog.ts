@@ -519,7 +519,10 @@ export class RingViewDialog extends LitElement {
   private shouldShowDoorControl(): boolean {
     return Boolean(
       this.config?.door_entity
-      && (!this.inline || this.config.door_control_on_dashboard)
+      && (
+        !this.inline
+        || this.config.door_control_location === "dashboard_and_viewer"
+      )
       && (
         !this.inline
         || this.config.door_control_visibility === "all_views"
@@ -918,6 +921,29 @@ export class RingViewDialog extends LitElement {
         }
       >
         <img class="poster" src=${poster} alt="" aria-hidden="true" />
+        ${this.inline && !this.inlineStarted
+          ? html`
+              <button
+                class="inline-start-surface"
+                type="button"
+                aria-label=${localize(
+                  this.hass,
+                  this.mode === "live"
+                    ? "viewer.start_live"
+                    : "viewer.play_recording",
+                )}
+                title=${localize(
+                  this.hass,
+                  this.mode === "live"
+                    ? "viewer.start_live"
+                    : "viewer.play_recording",
+                )}
+                @click=${this.mode === "live"
+                  ? this.startInlineLive
+                  : this.startRecording}
+              ></button>
+            `
+          : nothing}
         ${renderActiveMedia && !useRecordingVideo
           ? keyed(
               `${entityId}:${this.session}`,
@@ -1021,24 +1047,7 @@ export class RingViewDialog extends LitElement {
       `;
     }
 
-    if (this.inline && !this.inlineStarted) {
-      const isLive = this.mode === "live";
-      return html`
-        <div class="state-layer play-layer">
-          <button
-            class="action-button primary play-recording"
-            type="button"
-            @click=${isLive ? this.startInlineLive : this.startRecording}
-          >
-            ${this.icon(mdiPlay)}
-            <span>${localize(
-              this.hass,
-              isLive ? "viewer.start_live" : "viewer.play_recording",
-            )}</span>
-          </button>
-        </div>
-      `;
-    }
+    if (this.inline && !this.inlineStarted) return nothing;
 
     if (this.mode === "live" && this.mediaStatus === "awaiting-resume") {
       return html`

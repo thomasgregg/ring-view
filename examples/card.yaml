@@ -21,7 +21,7 @@ door_hold_to_activate: true
 dashboard_behavior: interactive
 dashboard_start: on_demand
 dashboard_live_muted: true
-door_control_on_dashboard: false
+door_control_location: viewer_only
 
 show_name: false
 aspect_ratio: "16:9"

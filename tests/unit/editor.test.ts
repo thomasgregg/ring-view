@@ -409,7 +409,7 @@ describe("visual editor", () => {
       "door_action",
       "door_control_visibility",
       "door_hold_to_activate",
-      "door_control_on_dashboard",
+      "door_control_location",
     ]);
   });
 

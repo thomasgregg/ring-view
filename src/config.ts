@@ -13,11 +13,11 @@ const DEFAULTS = {
   two_way_audio: false,
   door_action: "unlock",
   door_control_visibility: "live_only",
+  door_control_location: "viewer_only",
   door_hold_to_activate: true,
   dashboard_behavior: "open_viewer",
   dashboard_start: "on_demand",
   dashboard_live_muted: true,
-  door_control_on_dashboard: false,
   show_name: false,
   preview_source: "last_recording",
   preview_fallback: "last_recording",
@@ -38,6 +38,10 @@ const ASPECT_RATIOS = new Set(["auto", "16:9", "4:3", "1:1"]);
 const FIT_MODES = new Set(["cover", "contain"]);
 const DOOR_ACTIONS = new Set(["unlock", "open"]);
 const DOOR_CONTROL_VISIBILITIES = new Set(["live_only", "all_views"]);
+const DOOR_CONTROL_LOCATIONS = new Set([
+  "viewer_only",
+  "dashboard_and_viewer",
+]);
 const DASHBOARD_BEHAVIORS = new Set(["open_viewer", "interactive"]);
 const DASHBOARD_STARTS = new Set(["on_demand", "last_recording", "live"]);
 
@@ -116,6 +120,12 @@ export function validateConfig(config: RingViewConfig): void {
     throw new Error(localize(undefined, "config.door_control_visibility"));
   }
   if (
+    config.door_control_location
+    && !DOOR_CONTROL_LOCATIONS.has(config.door_control_location)
+  ) {
+    throw new Error(localize(undefined, "config.door_control_location"));
+  }
+  if (
     config.dashboard_behavior
     && !DASHBOARD_BEHAVIORS.has(config.dashboard_behavior)
   ) {
@@ -147,6 +157,8 @@ export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
     door_action: config.door_action ?? DEFAULTS.door_action,
     door_control_visibility:
       config.door_control_visibility ?? DEFAULTS.door_control_visibility,
+    door_control_location:
+      config.door_control_location ?? DEFAULTS.door_control_location,
     door_hold_to_activate:
       config.door_hold_to_activate ?? DEFAULTS.door_hold_to_activate,
     dashboard_behavior:
@@ -154,8 +166,6 @@ export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
     dashboard_start: config.dashboard_start ?? DEFAULTS.dashboard_start,
     dashboard_live_muted:
       config.dashboard_live_muted ?? DEFAULTS.dashboard_live_muted,
-    door_control_on_dashboard:
-      config.door_control_on_dashboard ?? DEFAULTS.door_control_on_dashboard,
     show_name: config.show_name ?? DEFAULTS.show_name,
     preview_source: config.preview_source ?? DEFAULTS.preview_source,
     preview_fallback: config.preview_fallback ?? DEFAULTS.preview_fallback,

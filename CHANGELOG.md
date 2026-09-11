@@ -4,6 +4,26 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.7.0-beta.2] - 2026-09-11
+
+### Changed
+
+- Replace the dashboard-door checkbox with a clearer **Door control location**
+  choice: fullscreen viewer only, or dashboard and fullscreen.
+- Scale the inline Talk/door dock fluidly with card width while preserving a
+  44 px minimum touch target and compact icon-only fallback for unusually
+  narrow embeds.
+- Make 12 columns by 3 rows the minimum Sections layout size in both dashboard
+  modes.
+- Keep the on-demand recording image unobstructed and start playback by tapping,
+  clicking, or keyboard-activating the image instead of showing a central Play
+  button.
+
+### Tests
+
+- Cover location validation and editor disclosure, enforced grid minimums,
+  image-surface playback, and responsive action-dock geometry.
+
 ## [0.7.0-beta.1] - 2026-09-11
 
 ### Added

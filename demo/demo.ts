@@ -266,7 +266,10 @@ card.setConfig({
         ? "live"
         : "on_demand",
   dashboard_live_muted: query.get("dashboard_muted") !== "0",
-  door_control_on_dashboard: query.get("dashboard_door") === "1",
+  door_control_location:
+    query.get("dashboard_door") === "1"
+      ? "dashboard_and_viewer"
+      : "viewer_only",
 });
 card.hass = hass;
 document.querySelector("#card-root")!.append(card);

@@ -65,6 +65,33 @@ describe("card stream lifecycle", () => {
     expect(TestCameraStream.active).toBe(0);
   });
 
+  it("enforces a 12-column by 3-row minimum in both dashboard modes", () => {
+    for (const dashboardBehavior of ["open_viewer", "interactive"] as const) {
+      const card = document.createElement("ring-view");
+      card.setConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        dashboard_behavior: dashboardBehavior,
+        grid_options: {
+          columns: 6,
+          rows: 2,
+          min_columns: 4,
+          min_rows: 1,
+          max_columns: 6,
+          max_rows: 2,
+        },
+      });
+      expect(card.getGridOptions()).toMatchObject({
+        columns: 12,
+        rows: 3,
+        min_columns: 12,
+        min_rows: 3,
+        max_columns: 12,
+        max_rows: 3,
+      });
+    }
+  });
+
   it("shows the freshest configured still without adding a third viewer tab", async () => {
     const snapshot = {
       ...camera("camera.snapshot", 0),

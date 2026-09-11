@@ -55,7 +55,7 @@ Tap the card to open the viewer. The history icon selects the latest recording; 
 
 ### Dashboard behavior beta
 
-`0.7.0-beta.1` adds an optional interactive dashboard surface. Existing cards
+`0.7.0-beta.2` adds an optional interactive dashboard surface. Existing cards
 stay on **Open fullscreen viewer**, so installing the beta alone changes no card
 behavior. In **Dashboard card → Dashboard behavior**, choose **Control camera in
 card** to expose the same Recording/Live controls directly in Lovelace.
@@ -65,13 +65,15 @@ card** to expose the same Recording/Live controls directly in Lovelace.
 | Dashboard behavior | Open fullscreen viewer | Keeps the existing passive still-image card, or enables direct controls. |
 | Start media automatically | No — wait for a tap | Shows a still until Recording or Live is chosen; optional Recording and Live startup are available. |
 | Start dashboard Live muted | On | Prevents unexpected sound on wall tablets and improves browser autoplay compatibility. |
-| Allow door control on dashboard | Off | Separately opts the high-impact door action into the dashboard surface. |
+| Door control location | Fullscreen viewer only | Keeps the door action behind the viewer, or places it on both the interactive dashboard card and fullscreen viewer. |
 
 The inline card has a dedicated fullscreen button. It stops its own player
 before opening fullscreen and resumes only after the viewer closes. A Live-only
 door action stays disabled until Live has a ready picture. Hidden cards suspend
 their media, and duplicate cards sharing a camera never run overlapping inline
-Live sessions.
+Live sessions. In the on-demand recording state, the still image itself is the
+Play surface—there is no large button covering the camera view. Both dashboard
+modes require at least a 12-column by 3-row Sections card.
 
 This is a prerelease feature. To return completely to today’s stable behavior,
 redownload `v0.6.3` in HACS; no dashboard configuration conversion is required.
@@ -96,7 +98,7 @@ The door contact is optional. When one is configured, its icon represents the ph
 | Action when pressed | `door_action` | `unlock` | Chooses `lock.unlock` or supported `lock.open` latch release. |
 | Show control in | `door_control_visibility` | Live only | Keeps the action in Live, or explicitly also shows it over recordings. |
 | Require hold to activate | `door_hold_to_activate` | On | Requires a 900 ms hold; turning it off enables one-tap operation. |
-| Allow door control on dashboard | `door_control_on_dashboard` | Off | Exposes the action on an interactive dashboard card only after explicit opt-in. |
+| Door control location | `door_control_location` | `viewer_only` | Chooses `viewer_only` or `dashboard_and_viewer` for an interactive card. |
 
 See the [door-access guide](docs/door-access.md) for complete state, safety, service, and configuration details.
 

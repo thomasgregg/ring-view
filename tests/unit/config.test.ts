@@ -17,11 +17,11 @@ describe("configuration", () => {
       two_way_audio: false,
       door_action: "unlock",
       door_control_visibility: "live_only",
+      door_control_location: "viewer_only",
       door_hold_to_activate: true,
       dashboard_behavior: "open_viewer",
       dashboard_start: "on_demand",
       dashboard_live_muted: true,
-      door_control_on_dashboard: false,
       show_name: false,
       preview_source: "last_recording",
       preview_fallback: "last_recording",
@@ -104,6 +104,13 @@ describe("configuration", () => {
         dashboard_start: "viewer_default",
       } as never),
     ).toThrow(/dashboard_start/);
+    expect(() =>
+      validateConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        door_control_location: "dashboard_only",
+      } as never),
+    ).toThrow(/door_control_location/);
   });
 
   it("accepts the optional snapshot and freshest-preview settings", () => {
@@ -159,13 +166,13 @@ describe("configuration", () => {
         dashboard_behavior: "interactive",
         dashboard_start: "live",
         dashboard_live_muted: false,
-        door_control_on_dashboard: true,
+        door_control_location: "dashboard_and_viewer",
       }),
     ).toMatchObject({
       dashboard_behavior: "interactive",
       dashboard_start: "live",
       dashboard_live_muted: false,
-      door_control_on_dashboard: true,
+      door_control_location: "dashboard_and_viewer",
     });
   });
 

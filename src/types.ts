@@ -10,6 +10,7 @@ export type AspectRatio = "auto" | "16:9" | "4:3" | "1:1";
 export type FitMode = "cover" | "contain";
 export type DoorAction = "unlock" | "open";
 export type DoorControlVisibility = "live_only" | "all_views";
+export type DoorControlLocation = "viewer_only" | "dashboard_and_viewer";
 export type DashboardBehavior = "open_viewer" | "interactive";
 export type DashboardStart = "on_demand" | "last_recording" | "live";
 
@@ -86,11 +87,11 @@ export interface RingViewConfig {
   door_contact_entity?: string;
   door_action?: DoorAction;
   door_control_visibility?: DoorControlVisibility;
+  door_control_location?: DoorControlLocation;
   door_hold_to_activate?: boolean;
   dashboard_behavior?: DashboardBehavior;
   dashboard_start?: DashboardStart;
   dashboard_live_muted?: boolean;
-  door_control_on_dashboard?: boolean;
   show_name?: boolean;
   preview_source?: PreviewSource;
   preview_fallback?: PreviewFallback;

@@ -146,7 +146,18 @@ test("keeps an interactive dashboard idle until the user chooses media", async (
     "true",
   );
   await expect(page.getByRole("button", { name: "Play last recording" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Play last recording" })).toHaveCSS(
+    "background-color",
+    "rgba(0, 0, 0, 0)",
+  );
+  await expect(page.locator("ring-view ring-view-dialog .play-recording")).toHaveCount(0);
   expect(await page.evaluate(() => window.demoActiveStreams ?? 0)).toBe(0);
+
+  const mediaFrame = page.locator("ring-view ring-view-dialog .media-frame");
+  const frameBox = await mediaFrame.boundingBox();
+  if (!frameBox) throw new Error("Inline media surface was not visible");
+  await page.mouse.click(frameBox.x + 18, frameBox.y + frameBox.height - 18);
+  await expect.poll(() => page.evaluate(() => window.demoActiveStreams ?? 0)).toBe(1);
 
   await page.getByRole("tab", { name: "Live" }).click();
   const door = page.getByRole("button", { name: "Waiting for Live…" });
@@ -156,7 +167,7 @@ test("keeps an interactive dashboard idle until the user chooses media", async (
   await expect(page.getByRole("button", { name: "Hold to unlock" })).toBeEnabled();
 });
 
-test("requires a separate opt-in before showing door access on the dashboard", async ({
+test("keeps viewer-only door access out of the dashboard", async ({
   page,
 }) => {
   await page.goto(
@@ -165,6 +176,51 @@ test("requires a separate opt-in before showing door access on the dashboard", a
 
   await expect(page.getByRole("img", { name: "Synthetic demo camera media" })).toBeVisible();
   await expect(page.locator("ring-view ring-view-dialog .door-action")).toHaveCount(0);
+});
+
+test("scales the inline action dock with the card while keeping touch targets", async ({
+  page,
+}) => {
+  await page.goto(
+    "/demo/?dashboard=interactive&dashboard_start=live&two_way_audio=1&door=1&dashboard_door=1&door_action=open",
+  );
+
+  const root = page.locator("#card-root");
+  const dock = page.locator("ring-view ring-view-dialog .visitor-action-dock");
+  const talk = dock.locator(".talk-action");
+  await expect(dock).toBeVisible();
+
+  const measureAt = async (width: number) => {
+    await root.evaluate((element, value) => {
+      (element as HTMLElement).style.width = `${value}px`;
+    }, width);
+    await page.evaluate(() => new Promise(requestAnimationFrame));
+    return talk.evaluate((element) => {
+      const style = getComputedStyle(element);
+      const box = element.getBoundingClientRect();
+      const icon = element.querySelector("svg")?.getBoundingClientRect();
+      return {
+        font: Number.parseFloat(style.fontSize),
+        height: box.height,
+        icon: icon?.width ?? 0,
+      };
+    });
+  };
+
+  const compact = await measureAt(360);
+  const roomy = await measureAt(720);
+  expect(compact.height).toBeGreaterThanOrEqual(44);
+  expect(roomy.font).toBeGreaterThan(compact.font);
+  expect(roomy.height).toBeGreaterThan(compact.height);
+  expect(roomy.icon).toBeGreaterThan(compact.icon);
+
+  const [cardBox, dockBox] = await Promise.all([
+    page.locator("ring-view").boundingBox(),
+    dock.boundingBox(),
+  ]);
+  if (!cardBox || !dockBox) throw new Error("Inline dock geometry unavailable");
+  expect(dockBox.x).toBeGreaterThanOrEqual(cardBox.x);
+  expect(dockBox.x + dockBox.width).toBeLessThanOrEqual(cardBox.x + cardBox.width);
 });
 
 test("stops inline media before expanding and resumes it after fullscreen closes", async ({
@@ -245,7 +301,7 @@ test("never connects or exposes actions in the Home Assistant edit preview", asy
       dashboard_start: "live",
       two_way_audio: true,
       door_entity: "lock.front_door",
-      door_control_on_dashboard: true,
+      door_control_location: "dashboard_and_viewer",
     });
   });
 

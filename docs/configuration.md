@@ -44,7 +44,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `door_action` | Yes — Door access | `unlock` | `unlock`, `open` | Calls `lock.unlock`, or `lock.open` for locks that advertise latch-opening support. |
 | `door_control_visibility` | Yes — Door access | `live_only` | `live_only`, `all_views` | Shows the door action only in Live by default, or also over recordings. |
 | `door_hold_to_activate` | Yes — Door access | `true` | `true`, `false` | Requires a 900 ms press-and-hold confirmation. Disable for one-tap operation. |
-| `door_control_on_dashboard` | Yes — Door access, interactive only | `false` | `true`, `false` | Separately allows the configured door action to appear on the interactive dashboard card. |
+| `door_control_location` | Yes — Door access, interactive only | `viewer_only` | `viewer_only`, `dashboard_and_viewer` | Keeps the door action in fullscreen only, or places it on both the interactive dashboard card and fullscreen viewer. |
 | `show_name` | Yes — Config tab | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer. |
 | `preview_source` | Yes — Dashboard preview | `last_recording` | `last_recording`, `live`, `default`, `snapshot`, `newest` | Chooses the entity used for the dashboard still. `default` follows the view that will open; `newest` compares the optional snapshot with the latest recording. |
 | `preview_fallback` | Yes — Dashboard preview | `last_recording` | `last_recording`, `snapshot` | Chooses the still used by `newest` when capture times or update order cannot be compared. Only shown for `newest`. |
@@ -60,8 +60,8 @@ These are standard Home Assistant card layout fields rather than Ring View behav
 | --- | --- | --- |
 | `columns` | `12` | Preferred number of grid columns, or `full`. |
 | `rows` | `3` | Preferred number of grid rows. |
-| `min_columns` | `6` | Minimum supported width in grid columns. |
-| `min_rows` | `2` | Minimum supported height in grid rows. |
+| `min_columns` | `12` | Minimum supported width in grid columns in both dashboard modes. |
+| `min_rows` | `3` | Minimum supported height in grid rows in both dashboard modes. |
 | `max_columns` | Not set | Optional maximum width. |
 | `max_rows` | Not set | Optional maximum height. |
 
@@ -92,7 +92,7 @@ door_contact_entity: binary_sensor.front_door_contact
 door_action: open
 door_control_visibility: live_only
 door_hold_to_activate: true
-door_control_on_dashboard: false
+door_control_location: viewer_only
 
 show_name: true
 preview_source: newest
@@ -103,8 +103,8 @@ fit_mode: cover
 grid_options:
   columns: 12
   rows: 3
-  min_columns: 6
-  min_rows: 2
+  min_columns: 12
+  min_rows: 3
 ```
 
 Ring View 0.2 and newer use this flat configuration only. Earlier nested `preview`, `appearance`, `viewer`, and `performance` structures are not supported.
@@ -120,15 +120,18 @@ Open **Dashboard card** and choose one of two intentionally distinct surfaces:
 
 The interactive fields appear only after that mode is selected. **No — wait for
 a tap** is the safest startup and does not mount a player until Recording or
-Live is chosen. Automatic Live starts only while the card is visible and is
-muted by default. Home Assistant edit and card-picker previews never connect to
-the camera and never expose Talk or door actions.
+Live is chosen. While Recording is selected, tap or click the camera image to
+play it; the large central Play button is intentionally omitted so the image
+stays unobstructed. The image surface is also keyboard accessible. Automatic
+Live starts only while the card is visible and is muted by default. Home
+Assistant edit and card-picker previews never connect to the camera and never
+expose Talk or door actions.
 
-Door access has its own additional switch because enabling an inline camera does
-not imply permission to operate a lock from the dashboard. With Live-only
-visibility, the action reads **Waiting for Live…** and stays disabled until the
-current Live player is ready. It hides if Live fails, leaving the compact Retry
-state and the existing mode tabs.
+**Door control location** makes the placement explicit: **Fullscreen viewer
+only** or **Dashboard and fullscreen**. With Live-only visibility, the action
+reads **Waiting for Live…** and stays disabled until the current Live player is
+ready. It hides if Live fails, leaving the compact Retry state and the existing
+mode tabs.
 
 ## Door access
 
