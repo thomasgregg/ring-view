@@ -4,6 +4,27 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.6.0-beta.3] - 2026-09-11
+
+### Added
+
+- Add an optional **Door contact sensor** to Door access. When the configured
+  binary sensor reports open, the existing door action becomes a clear,
+  disabled **Door open** state until the door closes.
+- Add English and German labels, validation, documentation, and editor guidance
+  for the optional contact sensor.
+
+### Changed
+
+- Keep the configured Unlock or Open action available when the contact is
+  unknown or unavailable, with a subtle **Status unknown** indication. Cards
+  without a contact sensor retain their existing behavior.
+
+### Tests
+
+- Cover optional configuration, open, closed, unknown, unavailable, and live
+  state changes in unit tests and desktop/phone browser tests.
+
 ## [0.6.0-beta.2] - 2026-09-11
 
 ### Changed
