@@ -1,12 +1,12 @@
-# Door access beta specification
+# Door access guide
 
 [← Ring View](../README.md) · [Configuration reference](configuration.md)
 
-## Status and intent
+## Overview
 
-Door access is available as an opt-in beta in `0.6.0-beta.2`. It lets a Ring
-View camera viewer operate a Home Assistant `lock.*` entity—for example, a Nuki
-lock—without leaving the camera view.
+Door access is an opt-in feature in `0.6.0`. It lets a Ring View camera viewer
+operate a Home Assistant `lock.*` entity—for example, a Nuki lock—without
+leaving the camera view.
 
 The feature is deliberately disabled until a lock entity is selected. Existing
 cards keep their current layout and behavior.
@@ -77,21 +77,45 @@ The hold is cancelled if the viewer closes, its view changes, the page becomes
 hidden, focus is lost, the pointer is cancelled, or the lock becomes unsafe to
 operate.
 
-### States and feedback
+### Door-contact display logic
 
-| State | Door control behavior |
-| --- | --- |
-| Ready | Shows **Hold to unlock/open** when confirmation is enabled; otherwise **Unlock/Open door**. |
-| Holding | Warm progress fill advances from left to right. Releasing cancels. |
-| Working | Shows **Unlocking…** or **Opening…** with a loading indicator and blocks repeat calls. |
-| Success | Brief green state reading **Unlocked** or **Door opened**, also announced to assistive technology. |
-| Error | Returns to an actionable control and shows a concise error message above the dock. |
-| Unavailable | Disabled with **Door unavailable**. |
-| Jammed | Disabled with **Lock jammed**. |
-| Unsupported open action | Disabled with **Open unsupported** and a configuration warning. |
-| Contact reports closed | Keeps the configured action available and shows a closed-door icon representing the physical state. |
-| Contact reports open | Replaces the action with a disabled **Door open** state and an open-door icon. |
-| Contact is unknown or unavailable | Keeps the configured action available, shows a warning icon, and adds a subtle **Status unknown** label. |
+The optional contact sensor decides what the icon means. With a contact, the
+icon shows the physical door state. Without one, it shows the configured action.
+
+| Contact configured | Sensor state | Icon | Primary text | Can operate? |
+| --- | --- | --- | --- | --- |
+| No | — | Unlock icon for `unlock`; open-door icon for `open` | **Hold to unlock/open** or **Unlock/Open door** | Yes, when the lock is safe and available. |
+| Yes | Closed (`off` or `closed`) | Closed door | The configured action text | Yes, when the lock is safe and available. |
+| Yes | Open (`on` or `open`) | Open door | **Door open** | No; the action is replaced by physical-door status. |
+| Yes | Unknown, unavailable, or missing | Warning | Configured action plus **Status unknown** | Yes, unless the lock itself is unsafe or unavailable. |
+
+The contact reports only whether the door leaf is physically open. It does not
+say whether a closed door is locked or unlocked; the action text continues to
+make that distinction.
+
+The physical-state icon takes priority for as long as a contact is configured.
+Progress is therefore communicated by the text, color, and hold fill without
+temporarily suggesting that the door has physically moved.
+
+| Action phase | Without a contact sensor | With a contact sensor |
+| --- | --- | --- |
+| Ready or holding | Configured unlock/open action icon | Current closed/open/warning physical-state icon |
+| Working | Loading icon | Current physical-state icon until the sensor changes |
+| Success | Check icon | Current physical-state icon until the sensor changes |
+| Error | Warning icon | Current physical-state icon; the error text appears above the dock |
+
+### Action states and feedback
+
+| State | Text and feedback | Can operate? |
+| --- | --- | --- |
+| Ready | **Hold to unlock/open** when confirmation is enabled; otherwise **Unlock/Open door**. | Yes. |
+| Holding | Warm progress fill advances from left to right. Releasing cancels. | In progress; no service call until complete. |
+| Working | **Unlocking…** or **Opening…** and repeat calls are blocked. | No. |
+| Success | Brief green **Unlocked** or **Door opened** state, also announced to assistive technology. | No until the success feedback clears. |
+| Error | Returns to the configured action and shows a concise error above the dock. | Yes; retry is available. |
+| Lock unavailable | Disabled with **Door unavailable**. | No. |
+| Lock jammed | Disabled with **Lock jammed**. | No. |
+| Unsupported open action | Disabled with **Open unsupported** and a configuration warning. | No. |
 
 Success is intentionally shown in the control itself rather than in a second
 toast, keeping the interface calm and avoiding duplicate feedback.
@@ -144,15 +168,15 @@ The **Door access** section uses progressive disclosure:
 This places the highest-impact choice first, keeps inactive settings out of the
 way, and presents dependent choices only when they can affect the viewer.
 
-## Configuration contract
+## Configuration options
 
-| Option | Default | Accepted values | Meaning |
-| --- | --- | --- | --- |
-| `door_entity` | Not set | `lock.*` entity ID | Enables door access for the selected lock. |
-| `door_contact_entity` | Not set | `binary_sensor.*` entity ID | Optionally makes the icon reflect the physical door state and replaces the action with a disabled **Door open** state while the door is open. |
-| `door_action` | `unlock` | `unlock`, `open` | Selects the Home Assistant lock service. |
-| `door_control_visibility` | `live_only` | `live_only`, `all_views` | Limits the control to Live or also shows it over recordings. |
-| `door_hold_to_activate` | `true` | `true`, `false` | Requires the 900 ms hold confirmation or enables one-tap operation. |
+| Visual editor setting | YAML option | Default | Accepted values | Meaning |
+| --- | --- | --- | --- | --- |
+| Door lock | `door_entity` | Not set | `lock.*` entity ID | Enables door access for the selected lock. Removing it hides the control and its dependent editor settings. |
+| Door contact sensor | `door_contact_entity` | Not set | `binary_sensor.*` entity ID | Makes the icon show the physical state and replaces the action with disabled **Door open** while open. |
+| Action when pressed | `door_action` | `unlock` | `unlock`, `open` | Calls `lock.unlock`, or `lock.open` to release the latch when supported. |
+| Show control in | `door_control_visibility` | `live_only` | `live_only`, `all_views` | Keeps the control in Live only, or explicitly also shows it over recordings. |
+| Require hold to activate | `door_hold_to_activate` | `true` | `true`, `false` | Requires the 900 ms hold confirmation; `false` enables one-tap operation. |
 
 Example:
 
@@ -181,7 +205,7 @@ door_hold_to_activate: true
 - Focus is returned safely when the viewer closes, and no door call is allowed
   to continue from a stale or hidden viewer.
 
-## Beta acceptance criteria
+## Behavior guarantees
 
 - A card without `door_entity` is visually and behaviorally unchanged.
 - A card without `door_contact_entity` keeps the existing door-control behavior.

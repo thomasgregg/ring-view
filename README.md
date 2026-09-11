@@ -21,7 +21,7 @@ See what happened, check what is happening, and answer the door—all without le
 
 - **Go from recording to Live in one tap.** Switch views inside the same viewer, with familiar playback and sound controls.
 - **Listen and talk to visitors.** Optional **Hold to talk** adds push-to-talk to the official Ring live camera, using the same connection as the video.
-- **Operate the door while you watch.** The door-access beta adds a configurable Home Assistant lock action, with a safe hold gesture and a shared Talk/door control dock.
+- **Operate the door while you watch.** Door access adds a configurable Home Assistant lock action, with a safe hold gesture, optional physical-door status, and a shared Talk/door control dock.
 - **Keep your dashboard quiet.** A lightweight still image previews the camera; no live player runs in the dashboard.
 - **Show the freshest view.** Optionally combine the latest recording with a Ring-MQTT snapshot camera for the dashboard preview.
 - **Know when someone rings.** A temporary doorbell alert highlights the card. Tap it to open Live.
@@ -53,7 +53,28 @@ live_entity: camera.front_door_live_view
 
 Tap the card to open the viewer. The history icon selects the latest recording; the red dot selects Live. Enable **Viewer behavior → Two-way audio** to add **Hold to talk**. Microphone access needs an HTTPS Home Assistant connection and your permission.
 
-In the `0.6.0` beta, selecting **Door access → Door lock** adds an optional **Unlock** or **Open door** action. It defaults to Live view and a 900 ms hold confirmation. An optional binary door-contact sensor can turn that action into a clear, disabled **Door open** state whenever the physical door is open. When Talk is available, both actions form one control dock with a subtle divider; when Talk is disabled or unsupported, the dock automatically collapses to the door-only pill. See the [door-access beta specification](docs/door-access-beta.md) for the design, safety behavior, and complete configuration contract.
+In `0.6.0`, selecting **Door access → Door lock** adds an optional **Unlock** or **Open door** action. It defaults to Live view and a 900 ms hold confirmation. When Talk is available, both actions form one control dock with a subtle divider; when Talk is disabled or unsupported, the dock automatically collapses to the door-only pill.
+
+### Door access at a glance
+
+The door contact is optional. When one is configured, its icon represents the physical door; without one, the icon represents the action the button will perform.
+
+| Door contact | Reported state | Icon | Control behavior |
+| --- | --- | --- | --- |
+| Not configured | — | Unlock or open-action icon | The configured **Unlock/Open door** action remains available. |
+| Configured | Closed (`off`) | Closed door | The configured action remains available; the text says what holding or tapping will do. |
+| Configured | Open (`on`) | Open door | The control becomes the disabled **Door open** status. |
+| Configured | Unknown or unavailable | Warning | The action remains available with **Status unknown**, unless the lock itself is unsafe or unavailable. |
+
+| Visual setting | YAML option | Default | Purpose |
+| --- | --- | --- | --- |
+| Door lock | `door_entity` | Not set | Selects the Home Assistant `lock.*` entity and enables door access. |
+| Door contact sensor | `door_contact_entity` | Not set | Optionally displays the real open/closed state from a `binary_sensor.*`. |
+| Action when pressed | `door_action` | `unlock` | Chooses `lock.unlock` or supported `lock.open` latch release. |
+| Show control in | `door_control_visibility` | Live only | Keeps the action in Live, or explicitly also shows it over recordings. |
+| Require hold to activate | `door_hold_to_activate` | On | Requires a 900 ms hold; turning it off enables one-tap operation. |
+
+See the [door-access guide](docs/door-access.md) for complete state, safety, service, and configuration details.
 
 [All settings and visual editor](docs/configuration.md) · [Talkback and playback help](docs/playback-and-troubleshooting.md)
 
@@ -89,7 +110,7 @@ Use the same Ring event in your own Home Assistant automations for porch lights,
 ## Guides and support
 
 - [Configuration, visual editor, layouts, and snapshot previews](docs/configuration.md)
-- [Door-access beta design and behavior](docs/door-access-beta.md)
+- [Door-access design, states, and configuration](docs/door-access.md)
 - [Playback, talkback, iPhone rotation, and troubleshooting](docs/playback-and-troubleshooting.md)
 - [Optional temporary backend patch](docs/backend-patch.md)
 - [Doorbell notifications and automation blueprint](docs/notifications.md)

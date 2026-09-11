@@ -4,6 +4,34 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-11
+
+### Added
+
+- Add opt-in door access for a Home Assistant `lock.*` entity, with safe hold
+  confirmation, `unlock` or supported latch-opening actions, and configurable
+  Live-only or all-view visibility.
+- Add an optional binary door-contact sensor. When configured, the icon reflects
+  the physical closed, open, or unknown state; an open door replaces the action
+  with a disabled **Door open** status.
+- Add a unified visitor-action dock that places Talk and door access in one
+  balanced control with a subtle divider and automatic single-action fallback.
+
+### Changed
+
+- Promote door access from beta to a stable feature after the `0.6.0` beta
+  series, preserving its opt-in configuration and safety defaults.
+- Remove the redundant Talk-layout option: Talk and door access merge whenever
+  both are available, and the layout collapses automatically otherwise.
+- Expand the README and door-access guide with state/icon and configuration
+  tables that explain the optional contact sensor and every safety state.
+
+### Tests
+
+- Cover configuration, lock capabilities, physical contact states, state/icon
+  transitions, confirmation, service errors, responsive layout, and Talk/door
+  integration in 115 unit and 72 desktop/phone browser tests.
+
 ## [0.6.0-beta.4] - 2026-09-11
 
 ### Changed

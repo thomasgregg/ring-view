@@ -9,8 +9,9 @@ live_muted: true
 two_way_audio: true
 doorbell_entity: event.front_door_ding
 
-# Optional door-access beta
+# Optional door access
 door_entity: lock.front_door
+door_contact_entity: binary_sensor.front_door_contact
 door_action: unlock
 door_control_visibility: live_only
 door_hold_to_activate: true
