@@ -17,10 +17,10 @@ Every Ring View setting is available through Home Assistant's visual card config
 
 <p align="center">
   <a href="https://github.com/thomasgregg/ring-view/blob/main/docs/images/configuration-editor-wide.png">
-    <img src="https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/configuration-editor-wide.png" alt="Ring View visual configuration editor with camera, two-way audio, and doorbell event settings" width="100%">
+    <img src="https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/configuration-editor-wide.png" alt="Ring View visual configuration editor with the interactive dashboard settings expanded" width="860">
   </a>
   <br>
-  <sub>Configure the cameras, viewer behavior, two-way audio, doorbell alerts, and appearance without writing YAML.</sub>
+  <sub>Choose a simple preview or expose camera controls directly on the dashboard.</sub>
 </p>
 
 | Option | UI configuration | Default | Accepted values | Purpose |

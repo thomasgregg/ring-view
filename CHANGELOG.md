@@ -4,6 +4,15 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.7.0-beta.7] - 2026-09-11
+
+### Documentation
+
+- Remove secondary marketing copy that did not help users understand the card.
+- Add current visual-editor screenshots to the setup and configuration guides,
+  with transparent surroundings that preserve the dialog's clean rounded
+  corners on light and dark pages.
+
 ## [0.7.0-beta.6] - 2026-09-11
 
 ### Documentation

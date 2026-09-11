@@ -14,7 +14,7 @@ See what happened, check what is happening, and answer the door—all without le
     <img src="https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/ring-view-modes-rounded.png" alt="Ring View viewer showing the latest recording, live view, and Hold to talk controls" width="100%">
   </a>
   <br>
-  <sub>Switch between the latest recording and Live, then listen and use push-to-talk in the same session.<br>Real daylight camera capture from Home Assistant; original labels and arrows preserved.</sub>
+  <sub>Switch between the latest recording and Live, then listen and use push-to-talk in the same session.</sub>
 </p>
 
 ## What you can do
@@ -28,8 +28,6 @@ See what happened, check what is happening, and answer the door—all without le
 - **Take the doorbell beyond the dashboard.** The included notification blueprint sends a phone alert, then adds a preview when the recording is ready.
 - **Make it yours without YAML.** Choose cameras, opening behavior, layout, and doorbell features in the visual editor.
 - **Use it across your home.** Responsive phone, tablet, and desktop layouts; Home Assistant themes; English and German; keyboard and screen-reader support.
-
-A native picture entity card is a good fit for one camera entity. Ring View is for making the Ring recording/live pair feel like one camera.
 
 ## Get started
 
@@ -51,7 +49,21 @@ recording_entity: camera.front_door_last_recording
 live_entity: camera.front_door_live_view
 ```
 
-Tap the card to open the viewer. The history icon selects the latest recording; the red dot selects Live. Enable **Viewer behavior → Two-way audio** to add **Hold to talk**. Microphone access needs an HTTPS Home Assistant connection and your permission.
+### Configure visually
+
+YAML is optional. The visual editor lets you select the cameras and configure
+dashboard behavior, Talk, doorbell features, door access and appearance.
+
+<p align="center">
+  <a href="https://github.com/thomasgregg/ring-view/blob/main/docs/images/configuration-editor.png">
+    <img src="https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/configuration-editor.png" alt="Ring View visual configuration editor with camera selection, optional features and a dashboard preview" width="760">
+  </a>
+  <br>
+  <sub>Everything can be configured from the Home Assistant card editor.</sub>
+</p>
+
+Tap the card to open the viewer. The history icon selects the latest recording;
+the red dot selects Live.
 
 ### Choose how the dashboard card works (beta)
 

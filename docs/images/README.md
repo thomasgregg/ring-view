@@ -17,4 +17,12 @@ or arrows. Keep its size and placement unchanged when reusing it.
 
 The first image is an annotated camera capture, not an unmodified screenshot:
 its control artwork is deliberately preserved from the previous README at
-the owner's request. Other image assets remain unchanged.
+the owner's request.
+
+`configuration-editor.png` and `configuration-editor-wide.png` were recaptured
+from the current Home Assistant visual editor on **11 September 2026**. The
+first shows the complete editor structure with Dashboard card and Door access;
+the second expands the interactive dashboard settings. Both are tightly framed
+around the real dialog, with the surrounding dashboard removed to transparent
+pixels so the rounded corners and subtle shadow render cleanly on light and
+dark pages. No dashboard configuration was changed while capturing them.
