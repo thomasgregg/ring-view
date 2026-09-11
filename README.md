@@ -1,8 +1,4 @@
-# Ring View
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/ring-view-icon.png" alt="Ring View camera lens icon" width="112" height="112">
-</p>
+# <img src="https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/ring-view-icon.png" alt="" width="56" height="56" align="middle"> Ring View
 
 [![Latest release](https://img.shields.io/github/v/release/thomasgregg/ring-view?display_name=tag&sort=semver)](https://github.com/thomasgregg/ring-view/releases/latest)
 [![Validate](https://github.com/thomasgregg/ring-view/actions/workflows/validate.yml/badge.svg)](https://github.com/thomasgregg/ring-view/actions/workflows/validate.yml)
