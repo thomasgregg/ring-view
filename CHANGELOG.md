@@ -4,6 +4,17 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.7.0-beta.6] - 2026-09-11
+
+### Documentation
+
+- Simplify the README setup flow around the two dashboard behaviors and three
+  common starting points.
+- Replace the detailed door-access tables in the README with a short explanation
+  of the optional lock action and physical-door contact sensor.
+- Move the detailed setting comparison, common configurations, safety guidance,
+  and complete YAML examples to the configuration and door-access guides.
+
 ## [0.7.0-beta.5] - 2026-09-11
 
 ### Changed

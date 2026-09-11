@@ -127,6 +127,78 @@ Live starts only while the card is visible and is muted by default. Home
 Assistant edit and card-picker previews never connect to the camera and never
 expose Talk or door actions.
 
+### Settings that control different parts of the experience
+
+| Visual editor setting | It controls | It does not control |
+| --- | --- | --- |
+| **Dashboard behavior** | Whether the dashboard is a still image or an interactive camera. | Which media starts. |
+| **Start media automatically** | What an interactive card starts: nothing, Recording or Live. | What opens in fullscreen. |
+| **Open viewer on** | Whether fullscreen initially shows Recording or Live. | The interactive dashboard startup. |
+| **Show control in** | Whether the door action appears only in Live or also over recordings. | Whether it appears on the dashboard. |
+| **Door control location** | Fullscreen only, or dashboard and fullscreen. | Whether Talk is supported. |
+
+Talk is always Live-only and requires **Enable two-way audio** plus the official
+Ring Live view camera. If Talk and door access are both available, they form one
+segmented dock. If either is unavailable, the dock automatically becomes one
+fully rounded control.
+
+### Common configurations
+
+| Use case | Dashboard behavior | Startup | Door location | Suggested safety |
+| --- | --- | --- | --- | --- |
+| Normal phone or desktop dashboard | Open fullscreen viewer | Not applicable | Fullscreen only | Live-only door action with hold enabled. |
+| Shared family dashboard | Open fullscreen viewer | Not applicable | Fullscreen only | Keep the door action out of the dashboard. |
+| Wall tablet, start only when needed | Control camera in card | No, wait for a tap | Dashboard and fullscreen | Live-only, muted Live, hold enabled. |
+| Always-on entrance monitor | Control camera in card | Live | Your choice | Start muted; add dashboard door access only on a trusted tablet. |
+
+#### Wall tablet with on-demand media, Talk and a latch action
+
+```yaml
+type: custom:ring-view
+recording_entity: camera.front_door_last_recording
+live_entity: camera.front_door_live_view
+
+dashboard_behavior: interactive
+dashboard_start: on_demand
+dashboard_live_muted: true
+two_way_audio: true
+
+door_entity: lock.front_door
+door_contact_entity: binary_sensor.front_door_contact
+door_action: open
+door_control_visibility: live_only
+door_control_location: dashboard_and_viewer
+door_hold_to_activate: true
+```
+
+#### Muted Live monitor with Talk
+
+```yaml
+type: custom:ring-view
+recording_entity: camera.front_door_last_recording
+live_entity: camera.front_door_live_view
+
+dashboard_behavior: interactive
+dashboard_start: live
+dashboard_live_muted: true
+two_way_audio: true
+```
+
+#### Door access kept inside the fullscreen viewer
+
+```yaml
+type: custom:ring-view
+recording_entity: camera.front_door_last_recording
+live_entity: camera.front_door_live_view
+
+door_entity: lock.front_door
+door_contact_entity: binary_sensor.front_door_contact
+door_action: unlock
+door_control_visibility: live_only
+door_control_location: viewer_only
+door_hold_to_activate: true
+```
+
 **Door control location** makes the placement explicit: **Fullscreen viewer
 only** or **Dashboard and fullscreen**. With Live-only visibility, the action
 reads **Open when ready** or **Unlock when ready** and stays disabled until the
