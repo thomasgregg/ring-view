@@ -1571,6 +1571,14 @@ const wi = j`
     -webkit-tap-highlight-color: transparent;
   }
 
+  .visitor-action-dock:not(.door-only):not(.talk-only) .talk-action {
+    border-radius: 999px 0 0 999px;
+  }
+
+  .visitor-action-dock:not(.door-only):not(.talk-only) .door-action {
+    border-radius: 0 999px 999px 0;
+  }
+
   .visitor-action:hover:not(:disabled) {
     background: rgba(255, 255, 255, 0.1);
   }
@@ -1590,7 +1598,7 @@ const wi = j`
     width: 1px;
     height: 26px;
     flex: 0 0 auto;
-    margin: 0 2px;
+    margin: 0 6px;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.38);
     box-shadow: 1px 0 rgba(0, 0, 0, 0.32);

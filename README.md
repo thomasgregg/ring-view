@@ -53,7 +53,7 @@ live_entity: camera.front_door_live_view
 
 Tap the card to open the viewer. The history icon selects the latest recording; the red dot selects Live. Enable **Viewer behavior → Two-way audio** to add **Hold to talk**. Microphone access needs an HTTPS Home Assistant connection and your permission.
 
-In `0.6.0`, selecting **Door access → Door lock** adds an optional **Unlock** or **Open door** action. It defaults to Live view and a 900 ms hold confirmation. When Talk is available, both actions form one control dock with a subtle divider; when Talk is disabled or unsupported, the dock automatically collapses to the door-only pill.
+Selecting **Door access → Door lock** adds an optional **Unlock** or **Open door** action. It defaults to Live view and a 900 ms hold confirmation. When Talk is available, both actions form one segmented control with a subtle divider and flat inner edges; when Talk is disabled or unsupported, the dock automatically collapses to a fully rounded door-only pill.
 
 ### Door access at a glance
 

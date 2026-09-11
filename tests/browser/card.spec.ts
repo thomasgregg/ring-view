@@ -148,10 +148,21 @@ test("merges Talk and door access into one divided action dock", async ({ page }
   await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
 
   const dock = page.locator(".visitor-action-dock");
+  const talk = dock.getByRole("button", { name: "Connecting…" });
+  const door = dock.getByRole("button", { name: "Hold to open" });
   await expect(dock).toBeVisible();
-  await expect(dock.getByRole("button", { name: "Connecting…" })).toBeDisabled();
-  await expect(dock.getByRole("button", { name: "Hold to open" })).toBeVisible();
-  await expect(dock.locator(".visitor-action-divider")).toBeVisible();
+  await expect(talk).toBeDisabled();
+  await expect(door).toBeVisible();
+  const divider = dock.locator(".visitor-action-divider");
+  await expect(divider).toBeVisible();
+  await expect(divider).toHaveCSS("margin-left", "6px");
+  await expect(divider).toHaveCSS("margin-right", "6px");
+  await expect(talk).toHaveCSS("border-top-left-radius", "999px");
+  await expect(talk).toHaveCSS("border-top-right-radius", "0px");
+  await expect(talk).toHaveCSS("border-bottom-right-radius", "0px");
+  await expect(door).toHaveCSS("border-top-left-radius", "0px");
+  await expect(door).toHaveCSS("border-bottom-left-radius", "0px");
+  await expect(door).toHaveCSS("border-top-right-radius", "999px");
 });
 
 test("requires a complete hold before opening the configured door", async ({ page }) => {
@@ -214,6 +225,10 @@ test("configures door visibility and collapses automatically without Talk", asyn
   await expect(page.locator(".door-action")).toBeVisible();
   await expect(page.locator(".talk-action")).toHaveCount(0);
   await expect(page.locator(".visitor-action-divider")).toHaveCount(0);
+  await expect(page.locator(".door-action"))
+    .toHaveCSS("border-top-left-radius", "999px");
+  await expect(page.locator(".door-action"))
+    .toHaveCSS("border-top-right-radius", "999px");
 });
 
 test("opens, switches recording → live → recording, and tears down", async ({ page }) => {

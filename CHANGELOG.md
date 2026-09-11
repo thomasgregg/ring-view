@@ -4,6 +4,19 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-09-11
+
+### Changed
+
+- Make the combined Talk/door dock a true segmented control: the sides next to
+  the divider are flat while only the two exterior ends remain rounded. A
+  balanced gap keeps the divider clear, while a single remaining action
+  continues to render as a fully rounded pill.
+
+### Tests
+
+- Verify the combined and single-action corner geometry on desktop and phone.
+
 ## [0.6.0] - 2026-09-11
 
 ### Added

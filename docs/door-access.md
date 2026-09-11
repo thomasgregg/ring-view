@@ -35,12 +35,15 @@ at the bottom of the viewer:
 - Both actions use the same height, corner radius, typography, and translucent
   surface, so they read as one visitor interaction.
 - A short, low-contrast vertical bar separates the communication action from the
-  physical-access action. It is visible without making the dock look like two
-  unrelated buttons.
+  physical-access action. Balanced spacing on both sides gives the divider room
+  to breathe without making the dock look like two unrelated buttons.
+- In the combined dock, only the two outer ends are rounded. The sides facing
+  the divider are flat, so hover, hold, active, and success fills read as two
+  segments of one control instead of nested pills.
 - Talk remains neutral and becomes red while active. Door access uses a warm
   accent for its icon and hold progress, then briefly becomes green on success.
 - If only one action is shown, the dock collapses to a balanced single-action
-  pill. There is no empty segment or divider.
+  pill with both ends fully rounded. There is no empty segment or divider.
 - The dock respects phone safe areas and stays reachable in portrait and
   landscape layouts.
 
