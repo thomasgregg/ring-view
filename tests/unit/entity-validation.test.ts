@@ -21,6 +21,12 @@ describe("entity validation", () => {
     expect(supportsStream(entity("camera.live", { supported_features: 2 }))).toBe(true);
     expect(supportsStream(entity("camera.recording", { supported_features: 0 }))).toBe(false);
     expect(recordingHasMedia(entity("camera.recording", { video_url: "secret" }))).toBe(true);
+    expect(recordingHasMedia(entity("select.events", {
+      recordingUrl: "https://example.test/event.mp4",
+    }))).toBe(true);
+    expect(recordingHasMedia(entity("select.events", {
+      recordingUrl: "<Recording Not Found>",
+    }))).toBe(false);
   });
 
   it("accepts talkback only for a streaming camera from the official Ring platform", () => {

@@ -6,6 +6,10 @@ import type {
   PreviewFallback,
 } from "../types";
 import { entityIsUnavailable } from "./entity-validation";
+import {
+  recordingPosterEntityId,
+  recordingSourceMarker,
+} from "./recording-source";
 
 const CAPTURE_TIMESTAMP_ATTRIBUTES = [
   "timestamp",
@@ -41,13 +45,14 @@ export function captureTimestamp(entity?: HassEntity): number | undefined {
 }
 
 export function recordingMediaMarker(entity?: HassEntity): string | undefined {
-  if (!entity) return undefined;
-  for (const attribute of ["last_video_id", "video_url", "entity_picture"] as const) {
-    const value = entity.attributes[attribute];
-    if (typeof value === "string" && value !== "") return `${attribute}:${value}`;
-    if (typeof value === "number" && Number.isFinite(value)) return `${attribute}:${value}`;
-  }
-  return undefined;
+  return recordingSourceMarker(entity);
+}
+
+function previewRecordingEntityId(
+  hass: HomeAssistant,
+  config: NormalizedConfig,
+): string {
+  return recordingPosterEntityId(hass, config);
 }
 
 function freshestEntityId(
@@ -57,13 +62,15 @@ function freshestEntityId(
 ): string {
   const recordingId = config.recording_entity;
   const snapshotId = config.snapshot_entity;
-  if (!snapshotId) return recordingId;
+  if (!snapshotId) return previewRecordingEntityId(hass, config);
 
   const recording = hass.states[recordingId];
   const snapshot = hass.states[snapshotId];
   const recordingAvailable = !entityIsUnavailable(recording);
   const snapshotAvailable = !entityIsUnavailable(snapshot);
-  if (recordingAvailable && !snapshotAvailable) return recordingId;
+  if (recordingAvailable && !snapshotAvailable) {
+    return previewRecordingEntityId(hass, config);
+  }
   if (snapshotAvailable && !recordingAvailable) return snapshotId;
 
   if (recordingAvailable && snapshotAvailable) {
@@ -74,16 +81,24 @@ function freshestEntityId(
       && snapshotTimestamp !== undefined
     ) {
       if (recordingTimestamp !== snapshotTimestamp) {
-        return snapshotTimestamp > recordingTimestamp ? snapshotId : recordingId;
+        return snapshotTimestamp > recordingTimestamp
+          ? snapshotId
+          : previewRecordingEntityId(hass, config);
       }
-      return config.preview_fallback === "snapshot" ? snapshotId : recordingId;
+      return config.preview_fallback === "snapshot"
+        ? snapshotId
+        : previewRecordingEntityId(hass, config);
     }
     if (latestObservedSource !== undefined) {
-      return latestObservedSource === "snapshot" ? snapshotId : recordingId;
+      return latestObservedSource === "snapshot"
+        ? snapshotId
+        : previewRecordingEntityId(hass, config);
     }
   }
 
-  return config.preview_fallback === "snapshot" ? snapshotId : recordingId;
+  return config.preview_fallback === "snapshot"
+    ? snapshotId
+    : previewRecordingEntityId(hass, config);
 }
 
 export function selectPreviewEntityId(
@@ -96,12 +111,14 @@ export function selectPreviewEntityId(
     case "live":
       return config.live_entity;
     case "snapshot":
-      return config.snapshot_entity ?? config.recording_entity;
+      return config.snapshot_entity ?? previewRecordingEntityId(hass, config);
     case "newest":
       return freshestEntityId(hass, config, latestObservedSource);
     case "default":
-      return openingMode === "live" ? config.live_entity : config.recording_entity;
+      return openingMode === "live"
+        ? config.live_entity
+        : previewRecordingEntityId(hass, config);
     default:
-      return config.recording_entity;
+      return previewRecordingEntityId(hass, config);
   }
 }

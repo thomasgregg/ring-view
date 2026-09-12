@@ -2,6 +2,7 @@ import { localize } from "../localize";
 import type { HassEntity, HomeAssistant, NormalizedConfig } from "../types";
 import { resolveActivityTimestamp } from "./activity-time";
 import { resolveEntitySource } from "./entity-sources";
+import { recordingUrl } from "./recording-source";
 
 export const CAMERA_STREAM_FEATURE = 2;
 export const LOCK_OPEN_FEATURE = 1;
@@ -32,7 +33,7 @@ export function supportsLockOpen(entity?: HassEntity): boolean {
 
 export function recordingHasMedia(entity?: HassEntity): boolean {
   return Boolean(
-    entity?.attributes.video_url || entity?.attributes.entity_picture,
+    recordingUrl(entity) || entity?.attributes.entity_picture,
   );
 }
 

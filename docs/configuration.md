@@ -26,7 +26,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | Option | UI configuration | Default | Accepted values | Purpose |
 | --- | --- | --- | --- | --- |
 | `type` | No — added automatically | Required | `custom:ring-view` | Identifies the custom card. Added automatically by the card picker. |
-| `recording_entity` | Yes — Config tab | Required | `camera.*` entity ID | Camera entity containing the latest recording. |
+| `recording_entity` | Yes — Config tab | Required | `camera.*` or `select.*` entity ID | Official Ring Last recording camera, or the Ring-MQTT Event Select entity whose current option identifies the recording to play. |
 | `live_entity` | Yes — Config tab | Required | `camera.*` entity ID | Camera entity that starts the Ring live view. |
 | `snapshot_entity` | Yes — Dashboard card | Not set | `camera.*` entity ID | Device snapshot camera, such as the snapshot entity created by Ring-MQTT. Used by snapshot previews and preferred for manual snapshots when configured and available. |
 | `name` | Yes — Card appearance | Entity name | Text | Optional label used instead of the recording entity's friendly name. |
@@ -381,13 +381,31 @@ treated as media capture times.
 
 ## Choosing camera entities
 
-Use the official Ring integration's last-recording and live-view entities. With a suitable Ring subscription, Home Assistant provides both but [disables Last recording by default](https://www.home-assistant.io/integrations/ring/#camera).
+For the official Ring integration, use its last-recording and live-view entities. With a suitable Ring subscription, Home Assistant provides both but [disables Last recording by default](https://www.home-assistant.io/integrations/ring/#camera).
 
 1. Open **Settings → Devices & services → Ring**, then open your Ring device and its entity list.
 2. Show disabled entities. Before enabling it, the disabled camera entry is **Last recording**; enable it if you have the required Ring subscription. The camera enabled by default is **Live view**.
 3. Open each entry and copy its exact entity ID into the corresponding Ring View field.
 
 The `_last_recording` and `_live_view` suffixes in this guide are examples, not requirements. Home Assistant entity IDs can be changed and may be assigned differently. In one [field report covering fresh 2K and 4K Ring doorbell installations](https://community.home-assistant.io/t/ring-doorbell-live-stream/855118/8), both camera entries appeared alike and neither entity ID used the expected suffix. Identify the entities by their roles and default enabled state rather than relying on their displayed names or ID suffixes.
+
+For Ring-MQTT recording playback, choose the device's **Event Select** entity as
+`recording_entity`. Its current option—such as **Ding 1**, **Motion 1**, or a
+transcoded variant—determines which event Ring View plays. Ring View reads the
+published `recordingUrl` directly. If the signed URL is missing, is within 30
+seconds of expiry, or fails once in the browser, Ring View re-selects the
+current option and waits up to 15 seconds for Ring-MQTT to publish a different,
+playable URL. The wait is driven by Home Assistant state updates; it does not
+poll. Closing the viewer, changing modes, hiding the page, or suspending an
+inline card cancels the wait and cannot start a late recording.
+
+Ring-MQTT can report **Recording Not Found** or **Transcoding in Progress**
+instead of a URL. Ring View treats both as unavailable media and shows Retry
+after the refresh wait. If the original event format is not playable in the
+browser, select that event's **(Transcoded)** option in Home Assistant and try
+again. Configure the Ring-MQTT snapshot camera as `snapshot_entity`; it supplies
+the still image used behind the Last recording view because Event Select is not
+a camera entity.
 
 For **two-way audio**, `live_entity` must be the official Ring `live_view` camera. A Ring-MQTT or Generic Camera RTSP entity does not expose the microphone return path Ring View needs. Ring-MQTT can still supply the optional `snapshot_entity` alongside the official Ring live camera.
 

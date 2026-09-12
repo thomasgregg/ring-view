@@ -70,6 +70,13 @@ import {
   snapshotCaptureMarker,
 } from "./utilities/snapshot";
 import {
+  isRingMqttEventSelect,
+  recordingPosterEntityId,
+  recordingSourceMarker,
+  recordingUrl,
+  recordingUrlIsReady,
+} from "./utilities/recording-source";
+import {
   createRingViewUrl,
   currentUrl,
   decodeRingViewUrl,
@@ -106,8 +113,10 @@ const DOOR_ERROR_DURATION_MS = 3_000;
 const SNAPSHOT_SUCCESS_DURATION_MS = 2_000;
 const SNAPSHOT_ERROR_DURATION_MS = 3_000;
 const SNAPSHOT_REFRESH_TIMEOUT_MS = 15_000;
+const RECORDING_REFRESH_TIMEOUT_MS = 15_000;
 
 type SnapshotUpdateResult = "updated" | "timeout" | "cancelled";
+type RecordingUpdateResult = "updated" | "timeout" | "failed" | "cancelled";
 
 function snapshotErrorKey(error: unknown): TranslationKey {
   const message = error instanceof Error
@@ -155,6 +164,8 @@ export class RingViewDialog extends LitElement {
   @state() private liveMuted = true;
   @state() private liveHasAudio?: boolean;
   @state() private recordingVideoFailed = false;
+  @state() private recordingPreparationActive = false;
+  @state() private recordingFailureDetail?: string;
   @state() private retryCount = 0;
   @state() private statusAnnouncement = "";
   @state() private talkbackReady = false;
@@ -195,6 +206,14 @@ export class RingViewDialog extends LitElement {
     baseline?: number;
     timer: number;
     resolve: (result: SnapshotUpdateResult) => void;
+  };
+  private recordingRefreshAttempted = false;
+  private recordingRefreshToken = 0;
+  private pendingRecordingUpdate?: {
+    entityId: string;
+    baseline?: string;
+    timer: number;
+    resolve: (result: RecordingUpdateResult) => void;
   };
   private inlineVisible = false;
   private inlineActive = false;
@@ -331,6 +350,7 @@ export class RingViewDialog extends LitElement {
     if (!this.open || !this.config) return;
     if (changed.has("hass")) {
       this.observePendingSnapshotUpdate();
+      this.observePendingRecordingUpdate();
       this.detectDoorbellEvent(changed.get("hass") as HomeAssistant | undefined);
     }
     if (!changed.has("hass")) return;
@@ -1196,16 +1216,30 @@ export class RingViewDialog extends LitElement {
       !this.suspended &&
       (this.mode === "live" || this.recordingStarted);
     const ratio = aspectRatioNumber(this.config!.aspect_ratio);
-    const poster = posterUrl(this.hass!, entity, entityId);
-    const fallbackUrl =
-      this.mode === "last_recording" && typeof entity?.attributes.video_url === "string"
-        ? entity.attributes.video_url
-        : undefined;
+    const posterEntityId = this.mode === "last_recording"
+      ? recordingPosterEntityId(this.hass!, this.config!)
+      : entityId;
+    const poster = posterUrl(
+      this.hass!,
+      this.hass!.states[posterEntityId],
+      posterEntityId,
+    );
+    const fallbackUrl = this.mode === "last_recording"
+      ? recordingUrl(entity)
+      : undefined;
+    const recordingSelect = this.mode === "last_recording"
+      && entityId.startsWith("select.");
     const renderActiveMedia =
       canRender && ["pending", "ready", "playback-blocked"].includes(this.mediaStatus);
     const useRecordingVideo = Boolean(
-      renderActiveMedia && fallbackUrl && !this.recordingVideoFailed,
+      renderActiveMedia
+      && fallbackUrl
+      && !this.recordingVideoFailed
+      && !this.recordingPreparationActive,
     );
+    const useNativeMedia = renderActiveMedia
+      && !useRecordingVideo
+      && !recordingSelect;
     const useTalkbackPlayer = Boolean(
       canRender
       && this.mode === "live"
@@ -1252,7 +1286,7 @@ export class RingViewDialog extends LitElement {
               ></button>
             `
           : nothing}
-        ${renderActiveMedia && !useRecordingVideo
+        ${useNativeMedia
           ? keyed(
               `${entityId}:${this.session}`,
               html`
@@ -1460,6 +1494,8 @@ export class RingViewDialog extends LitElement {
     }
 
     if (this.mediaStatus === "error") {
+      const recordingDetail = this.recordingFailureDetail
+        ?? localize(this.hass, "viewer.ring_protect");
       return html`
         <div class="state-layer" role="alert">
           <div class="state-card">
@@ -1470,7 +1506,7 @@ export class RingViewDialog extends LitElement {
             </div>
             ${this.mode === "last_recording"
               ? html`<div class="state-detail">
-                  ${localize(this.hass, "viewer.ring_protect")}
+                  ${recordingDetail}
                 </div>`
               : nothing}
             <div class="state-actions">
@@ -1579,11 +1615,38 @@ export class RingViewDialog extends LitElement {
       this.statusAnnouncement = localize(this.hass, "viewer.entity_unavailable");
       return;
     }
+    if (
+      this.mode === "last_recording"
+      && this.hass
+      && isRingMqttEventSelect(this.hass, this.activeEntityId())
+      && (
+        !recordingUrlIsReady(this.activeEntity())
+        || this.recordingVideoFailed
+      )
+    ) {
+      if (this.recordingRefreshAttempted) {
+        this.failRecordingPreparation("viewer.recording_playback_failed");
+        return;
+      }
+      this.recordingRefreshAttempted = true;
+      void this.refreshRingMqttRecording();
+      return;
+    }
+    if (
+      this.mode === "last_recording"
+      && this.activeEntityId().startsWith("select.")
+      && !recordingUrlIsReady(this.activeEntity())
+    ) {
+      this.failRecordingPreparation("viewer.recording_source_unsupported");
+      return;
+    }
     if (this.inline && this.mode === "live" && !this.claimInlineLive()) {
       this.waitForLiveResume();
       return;
     }
     if (this.mode === "last_recording") this.resetRecordingControls();
+    this.recordingPreparationActive = false;
+    this.recordingFailureDetail = undefined;
     this.mediaStatus = "pending";
     this.session = this.lifecycle.next();
     this.lifecycle.scheduleTimeout(
@@ -1593,6 +1656,7 @@ export class RingViewDialog extends LitElement {
   }
 
   private resetMediaAttempt(): void {
+    this.cancelRecordingPreparation(true);
     this.cancelTalkPress();
     this.resetRecordingControls();
     this.retryCount = 0;
@@ -1602,6 +1666,131 @@ export class RingViewDialog extends LitElement {
     this.talkbackReady = false;
     this.talkbackRequesting = false;
     this.talkbackTalking = false;
+  }
+
+  private async refreshRingMqttRecording(): Promise<void> {
+    const hass = this.hass;
+    const entityId = this.activeEntityId();
+    const entity = this.activeEntity();
+    const option = entity?.state.trim();
+    if (
+      !hass
+      || !this.config
+      || !option
+      || option === "unknown"
+      || option === "unavailable"
+    ) {
+      this.failRecordingPreparation("viewer.recording_selection_missing");
+      return;
+    }
+    if (hass.connection?.connected === false || !hass.callService) {
+      this.failRecordingPreparation("viewer.recording_refresh_failed");
+      return;
+    }
+
+    this.finishPendingRecordingUpdate("cancelled");
+    const token = ++this.recordingRefreshToken;
+    this.recordingPreparationActive = true;
+    this.recordingVideoFailed = false;
+    this.recordingFailureDetail = undefined;
+    this.lifecycle.dispose();
+    this.session = this.lifecycle.current();
+    this.mediaStatus = "pending";
+    this.statusAnnouncement = localize(this.hass, "viewer.refreshing_recording");
+    const update = this.waitForRecordingUpdate(
+      entityId,
+      recordingSourceMarker(entity),
+    );
+
+    void Promise.resolve()
+      .then(() => hass.callService!(
+        "select",
+        "select_option",
+        { option },
+        { entity_id: entityId },
+      ))
+      .catch(() => {
+        if (token === this.recordingRefreshToken && this.open) {
+          this.finishPendingRecordingUpdate("failed");
+        }
+      });
+
+    const result = await update;
+    if (
+      token !== this.recordingRefreshToken
+      || !this.open
+      || this.mode !== "last_recording"
+      || this.activeEntityId() !== entityId
+    ) {
+      return;
+    }
+    this.recordingPreparationActive = false;
+    if (result === "cancelled") return;
+    if (result === "failed") {
+      this.failRecordingPreparation("viewer.recording_refresh_failed");
+      return;
+    }
+    if (result === "timeout") {
+      this.failRecordingPreparation("viewer.recording_refresh_timeout");
+      return;
+    }
+    this.recordingVideoFailed = false;
+    this.startMedia();
+  }
+
+  private waitForRecordingUpdate(
+    entityId: string,
+    baseline?: string,
+  ): Promise<RecordingUpdateResult> {
+    this.finishPendingRecordingUpdate("cancelled");
+    return new Promise((resolve) => {
+      const timer = window.setTimeout(() => {
+        this.finishPendingRecordingUpdate("timeout");
+      }, RECORDING_REFRESH_TIMEOUT_MS);
+      this.pendingRecordingUpdate = { entityId, baseline, timer, resolve };
+    });
+  }
+
+  private observePendingRecordingUpdate(): void {
+    const pending = this.pendingRecordingUpdate;
+    if (!pending || !this.hass) return;
+    const entity = this.hass.states[pending.entityId];
+    const marker = recordingSourceMarker(entity);
+    if (
+      marker !== undefined
+      && marker !== pending.baseline
+      && recordingUrlIsReady(entity)
+    ) {
+      this.finishPendingRecordingUpdate("updated");
+    }
+  }
+
+  private finishPendingRecordingUpdate(result: RecordingUpdateResult): void {
+    const pending = this.pendingRecordingUpdate;
+    if (!pending) return;
+    this.pendingRecordingUpdate = undefined;
+    window.clearTimeout(pending.timer);
+    pending.resolve(result);
+  }
+
+  private cancelRecordingPreparation(resetAttempt = false): void {
+    this.recordingRefreshToken += 1;
+    this.finishPendingRecordingUpdate("cancelled");
+    this.recordingPreparationActive = false;
+    if (!resetAttempt) return;
+    this.recordingRefreshAttempted = false;
+    this.recordingVideoFailed = false;
+    this.recordingFailureDetail = undefined;
+  }
+
+  private failRecordingPreparation(detailKey: TranslationKey): void {
+    this.finishPendingRecordingUpdate("cancelled");
+    this.recordingPreparationActive = false;
+    this.lifecycle.dispose();
+    this.session = this.lifecycle.current();
+    this.mediaStatus = "error";
+    this.recordingFailureDetail = localize(this.hass, detailKey);
+    this.statusAnnouncement = this.recordingFailureDetail;
   }
 
   private acceptsMediaEvent(event?: Event): boolean {
@@ -1655,6 +1844,19 @@ export class RingViewDialog extends LitElement {
 
   private handleRecordingVideoError = (event?: Event): void => {
     if (this.mode !== "last_recording" || !this.acceptsMediaEvent(event)) return;
+    if (
+      this.hass
+      && isRingMqttEventSelect(this.hass, this.activeEntityId())
+    ) {
+      this.recordingVideoFailed = true;
+      this.statusAnnouncement = localize(this.hass, "viewer.refreshing_recording");
+      this.startMedia();
+      return;
+    }
+    if (this.activeEntityId().startsWith("select.")) {
+      this.failRecordingPreparation("viewer.recording_playback_failed");
+      return;
+    }
     // The Ring URL is temporary and can expire between state refreshes. Fall
     // back to Home Assistant's authenticated MJPEG renderer for this attempt.
     this.recordingVideoFailed = true;
@@ -2113,6 +2315,7 @@ export class RingViewDialog extends LitElement {
 
   private handlePageHide = (): void => {
     this.pageUnloading = true;
+    this.cancelRecordingPreparation(true);
     this.resetVisitorActions();
     this.resetSnapshotAction();
     if (this.inline) {
@@ -2161,6 +2364,7 @@ export class RingViewDialog extends LitElement {
       return;
     }
     if (document.hidden) {
+      this.cancelRecordingPreparation(true);
       this.lifecycle.dispose();
       this.session = this.lifecycle.current();
       this.suspended = true;
@@ -2193,6 +2397,7 @@ export class RingViewDialog extends LitElement {
     if (!this.inline || !this.open) return;
     this.resetVisitorActions();
     this.clearAutomaticLiveRecovery();
+    this.cancelRecordingPreparation(true);
     this.lifecycle.dispose();
     this.releaseInlineLive();
     this.session = this.lifecycle.current();

@@ -230,7 +230,11 @@ function configSchema(
     {
       name: "recording_entity",
       required: true,
-      selector: { entity: { domain: "camera" } },
+      selector: {
+        entity: {
+          filter: [{ domain: "camera" }, { domain: "select" }],
+        },
+      },
     },
     {
       name: "live_entity",
@@ -426,6 +430,7 @@ const LABELS: Record<string, TranslationKey> = {
 };
 
 const HELPERS: Record<string, TranslationKey> = {
+  recording_entity: "editor.helper_recording_entity",
   dashboard_behavior: "editor.helper_dashboard_behavior",
   dashboard_start: "editor.helper_dashboard_start",
   dashboard_live_muted: "editor.helper_dashboard_live_muted",

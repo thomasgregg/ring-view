@@ -164,4 +164,29 @@ describe("preview selection", () => {
       ),
     ).toBe(live.entity_id);
   });
+
+  it("uses the configured snapshot as the still image for an Event Select recording", () => {
+    const mqttRecording = entity("select.front_door_event_select", {
+      eventId: "event-1",
+      recordingUrl: "https://example.test/event.mp4",
+    }, "Ding 1");
+    const mqttConfig = normalizeConfig({
+      recording_entity: mqttRecording.entity_id,
+      live_entity: live.entity_id,
+      snapshot_entity: snapshot.entity_id,
+      preview_source: "last_recording",
+    });
+    const homeAssistant = hassWith(mqttRecording, snapshot);
+
+    expect(
+      selectPreviewEntityId(homeAssistant, mqttConfig, "last_recording"),
+    ).toBe(snapshot.entity_id);
+    expect(
+      selectPreviewEntityId(
+        homeAssistant,
+        { ...mqttConfig, preview_source: "default" },
+        "last_recording",
+      ),
+    ).toBe(snapshot.entity_id);
+  });
 });
