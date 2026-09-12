@@ -51,6 +51,7 @@ const DOOR_CONTROL_LOCATIONS = new Set([
 ]);
 const DASHBOARD_BEHAVIORS = new Set(["open_viewer", "interactive"]);
 const DASHBOARD_STARTS = new Set(["on_demand", "last_recording", "live"]);
+const DOORBELL_ENTITY_DOMAINS = ["event.", "binary_sensor."];
 
 function assertCameraEntity(
   value: unknown,
@@ -113,7 +114,8 @@ export function validateConfig(config: RingViewConfig): void {
     config.doorbell_entity !== undefined
     && config.doorbell_entity !== ""
     && (typeof config.doorbell_entity !== "string"
-      || !config.doorbell_entity.startsWith("event."))
+      || !DOORBELL_ENTITY_DOMAINS.some((domain) =>
+        config.doorbell_entity!.startsWith(domain)))
   ) {
     throw new Error(localize(undefined, "config.doorbell_entity"));
   }

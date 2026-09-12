@@ -319,6 +319,50 @@ describe("card stream lifecycle", () => {
     expect(TestCameraStream.active).toBe(1);
   });
 
+  it("shows a Ring-MQTT Ding only for an off-to-on transition", async () => {
+    const doorbell: HassEntity = {
+      entity_id: "binary_sensor.front_door_ding",
+      state: "on",
+      attributes: { device_class: "occupancy" },
+    };
+    const card = document.createElement("ring-view");
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      doorbell_entity: doorbell.entity_id,
+    });
+    card.hass = { ...hass, states: { ...hass.states, [doorbell.entity_id]: doorbell } };
+    document.body.append(card);
+    await card.updateComplete;
+    expect(card.shadowRoot?.querySelector(".ring-alert")).toBeNull();
+
+    card.hass = {
+      ...card.hass,
+      states: {
+        ...card.hass.states,
+        [doorbell.entity_id]: { ...doorbell, state: "off" },
+      },
+    };
+    await card.updateComplete;
+    expect(card.shadowRoot?.querySelector(".ring-alert")).toBeNull();
+
+    card.hass = {
+      ...card.hass,
+      states: {
+        ...card.hass.states,
+        [doorbell.entity_id]: {
+          ...doorbell,
+          state: "on",
+          attributes: { ...doorbell.attributes, lastDingTime: "2026-09-12T14:19:13Z" },
+        },
+      },
+    };
+    await card.updateComplete;
+    expect(card.shadowRoot?.querySelector(".ring-alert")?.textContent).toContain(
+      "Someone is at the door",
+    );
+  });
+
   it("keeps the card and viewer name hidden while preserving a dialog label", async () => {
     const card = await mount();
     expect(card.shadowRoot?.querySelector(".name")).toBeNull();

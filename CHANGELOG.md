@@ -4,6 +4,19 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-09-12
+
+### Added
+
+- Accept either an official Ring Ding event or a Ring-MQTT Ding binary sensor
+  for the card's doorbell alert, inferring the correct transition behavior from
+  the selected entity domain.
+
+### Tests
+
+- Cover official event semantics and Ring-MQTT `off` to `on` transitions,
+  including initial, retained, reset, unavailable, and unsupported states.
+
 ## [0.9.0] - 2026-09-12
 
 ### Added

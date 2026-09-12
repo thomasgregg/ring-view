@@ -4,10 +4,12 @@
 
 ## Alerts inside the card
 
-In the visual editor, open **Doorbell features** and select your Ring Ding
-event entity, for example `event.front_door_ding`.
+In the visual editor, open **Doorbell features** and select either your official
+Ring Ding event entity, for example `event.front_door_ding`, or a Ring-MQTT Ding
+binary sensor such as `binary_sensor.front_door_ding`.
 
-A fresh `ring` event displays **Someone is at the door** for twelve seconds.
+A fresh `ring` event or an `off` to `on` Ding transition displays **Someone is
+at the door** for twelve seconds.
 Tapping the card during that alert opens Live. An already active Live session
 is left untouched. The alert expires from the original event time; rebuilding
 the card does not restart its twelve-second lifetime.

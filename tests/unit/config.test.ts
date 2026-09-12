@@ -54,7 +54,7 @@ describe("configuration", () => {
       validateConfig({
         recording_entity: "camera.recording",
         live_entity: "camera.live",
-        doorbell_entity: "binary_sensor.doorbell",
+        doorbell_entity: "sensor.doorbell",
       }),
     ).toThrow(/doorbell_entity/);
     expect(() =>
@@ -114,6 +114,19 @@ describe("configuration", () => {
       } as never),
     ).toThrow(/door_control_location/);
   });
+
+  it.each(["event.front_door_ding", "binary_sensor.front_door_ding"])(
+    "accepts %s as a doorbell entity",
+    (doorbellEntity) => {
+      expect(
+        normalizeConfig({
+          recording_entity: "camera.recording",
+          live_entity: "camera.live",
+          doorbell_entity: doorbellEntity,
+        }).doorbell_entity,
+      ).toBe(doorbellEntity);
+    },
+  );
 
   it("accepts the optional snapshot and freshest-preview settings", () => {
     expect(

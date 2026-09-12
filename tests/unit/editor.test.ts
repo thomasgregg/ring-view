@@ -402,6 +402,14 @@ describe("visual editor", () => {
     expect(doorbellFeatures?.schema?.map((field) => field.name)).toEqual([
       "doorbell_entity",
     ]);
+    expect(doorbellFeatures?.schema?.[0]?.selector).toEqual({
+      entity: {
+        filter: [
+          { domain: "event", device_class: "doorbell" },
+          { domain: "binary_sensor" },
+        ],
+      },
+    });
     const doorAccess = form?.schema?.find(
       (field) => field.name === "door_access",
     );

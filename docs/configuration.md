@@ -39,7 +39,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `dashboard_start` | Yes — Dashboard card, interactive only | `on_demand` | `on_demand`, `last_recording`, `live` | Waits for a tap, starts the recording, or starts Live when an interactive card becomes visible. |
 | `dashboard_live_muted` | Yes — Dashboard card, interactive only | `true` | `true`, `false` | Controls audio when Live starts inside the dashboard. Muted is recommended for tablets and autoplay. |
 | `two_way_audio` | Yes — Fullscreen viewer | `false` | `true`, `false` | Uses one direct WebRTC session for live video, listening, and push-to-talk when `live_entity` is an official Ring `live_view` camera. |
-| `doorbell_entity` | Yes — Doorbell features | Not set | `event.*` entity ID | Displays a temporary ring alert when the selected doorbell event reports `ring`. |
+| `doorbell_entity` | Yes — Doorbell features | Not set | `event.*` or `binary_sensor.*` entity ID | Displays a temporary ring alert when an official Ring event reports `ring`, or when a Ring-MQTT Ding sensor changes from `off` to `on`. |
 | `door_entity` | Yes — Door access | Not set | `lock.*` entity ID | Enables door access for the selected Home Assistant lock. |
 | `door_contact_entity` | Yes — Door access | Not set | `binary_sensor.*` entity ID | Optionally makes the icon reflect the physical door state. An open contact replaces and disables the door action until the door closes. |
 | `door_action` | Yes — Door access | `unlock` | `unlock`, `open` | Calls `lock.unlock`, or `lock.open` for locks that advertise latch-opening support. |
@@ -113,6 +113,17 @@ grid_options:
   min_columns: 12
   min_rows: 3
 ```
+
+For Ring-MQTT, select its Ding binary sensor instead:
+
+```yaml
+doorbell_entity: binary_sensor.front_door_ding
+```
+
+Ring View determines the listener behavior from the entity domain. Event
+entities alert when a new `ring` event arrives. Binary sensors alert only on a
+clean `off` to `on` transition, so retained `on` states, reconnects, attribute
+updates, and the later `on` to `off` reset do not create duplicate alerts.
 
 Ring View 0.2 and newer use this flat configuration only. Earlier nested `preview`, `appearance`, `viewer`, and `performance` structures are not supported.
 

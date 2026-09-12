@@ -295,7 +295,14 @@ function configSchema(
       schema: [
         {
           name: "doorbell_entity",
-          selector: { entity: { domain: "event", device_class: "doorbell" } },
+          selector: {
+            entity: {
+              filter: [
+                { domain: "event", device_class: "doorbell" },
+                { domain: "binary_sensor" },
+              ],
+            },
+          },
         },
       ],
     },

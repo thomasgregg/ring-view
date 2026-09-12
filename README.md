@@ -38,7 +38,7 @@ See what happened, check what is happening, save the moment, and answer the door
 - **Show the freshest view.** Optionally combine the latest recording with a Ring-MQTT snapshot camera for the dashboard preview.
 - **Save a moment from Live.** Optionally show one snapshot button that saves a timestamped image through Home Assistant, with no custom automation.
 - **See when something last happened.** Optionally show a localized relative time from a timestamp sensor, event entity, or date-and-time helper.
-- **Know when someone rings.** A temporary doorbell alert highlights the card. Tap it to open Live.
+- **Know when someone rings.** A temporary doorbell alert works with official Ring event entities and Ring-MQTT Ding binary sensors. Tap it to open Live.
 - **Take the doorbell beyond the dashboard.** The included notification blueprint sends a phone alert, then adds a preview when the recording is ready.
 - **Make it yours without YAML.** Choose cameras, opening behavior, layout, and doorbell features in the visual editor.
 - **Use it across your home.** Responsive phone, tablet, and desktop layouts; Home Assistant themes; English and German; keyboard and screen-reader support.

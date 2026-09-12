@@ -54,6 +54,7 @@ import type {
   NormalizedConfig,
 } from "./types";
 import { activityTimestamp } from "./utilities/activity-time";
+import { isDoorbellRingTransition } from "./utilities/doorbell";
 import {
   entityIsUnavailable,
   friendlyName,
@@ -2105,16 +2106,7 @@ export class RingViewDialog extends LitElement {
     const after = this.hass.states[entityId];
     const beforeState = previous?.states[entityId]?.state ?? this.lastDoorbellState;
     this.lastDoorbellState = after?.state;
-    if (
-      !after
-      || beforeState === undefined
-      || beforeState === after.state
-      || ["unknown", "unavailable"].includes(after.state)
-      || (after.attributes.event_type !== undefined
-        && after.attributes.event_type !== "ring")
-    ) {
-      return;
-    }
+    if (!isDoorbellRingTransition(entityId, beforeState, after)) return;
     this.setRingingUntil(Date.now() + RING_ALERT_DURATION_MS);
   }
 

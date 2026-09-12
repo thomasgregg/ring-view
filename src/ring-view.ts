@@ -29,6 +29,7 @@ import {
   activityTimestamp,
   formatActivityTime,
 } from "./utilities/activity-time";
+import { isDoorbellRingTransition } from "./utilities/doorbell";
 import {
   decodeRingViewUrl,
   ringViewUrlMatchesConfig,
@@ -496,12 +497,7 @@ export class RingView extends LitElement {
     if (!entityId || !previous || !this.hass) return;
     const before = previous.states[entityId];
     const after = this.hass.states[entityId];
-    if (!after || before?.state === after.state || ["unknown", "unavailable"].includes(after.state)) {
-      return;
-    }
-    if (after.attributes.event_type !== undefined && after.attributes.event_type !== "ring") {
-      return;
-    }
+    if (!isDoorbellRingTransition(entityId, before?.state, after)) return;
 
     const now = Date.now();
     if (now - this.lastRingAlertAt < 5_000) return;
