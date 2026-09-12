@@ -102,9 +102,7 @@ describe("snapshot action", () => {
         "aria-label",
       ),
     ).toBe("Snapshot saved");
-    expect(
-      dialog.shadowRoot?.querySelector(".snapshot-feedback.success")?.textContent?.trim(),
-    ).toBe("Snapshot saved");
+    expect(dialog.shadowRoot?.querySelector(".snapshot-feedback")).toBeNull();
 
     await vi.advanceTimersByTimeAsync(2_000);
     expect(

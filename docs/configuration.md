@@ -146,9 +146,10 @@ for its first tap.
 
 The button is both **Take snapshot** and **Save**. Ring View asks Home Assistant
 to run `camera.snapshot` and gives it a timestamped JPEG filename. No separate
-automation, script, or second save button is required. Success or failure
-appears briefly beside the snapshot icon, keeping Home Assistant's bottom area
-clear for Talk and door controls on phones.
+automation, script, or second save button is required. The icon briefly turns
+green when saving succeeds. A readable message appears beside it only when
+saving fails, keeping Home Assistant's bottom area clear for Talk and door
+controls on phones.
 
 Ring View automatically chooses the capture entity:
 

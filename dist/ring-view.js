@@ -1869,10 +1869,6 @@ const Xi = F`
     -webkit-backdrop-filter: blur(12px) saturate(1.15);
   }
 
-  .snapshot-feedback.success {
-    border-color: rgba(129, 199, 132, 0.7);
-  }
-
   .snapshot-feedback.error {
     border-color: rgba(255, 138, 128, 0.76);
   }
@@ -2602,7 +2598,7 @@ function oo(e, t) {
     } catch {
     }
 }
-const R = Ee(class extends Le {
+const E = Ee(class extends Le {
   constructor(e) {
     if (super(e), e.type !== ft.ATTRIBUTE || e.name !== "class" || e.strings?.length > 2) throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.");
   }
@@ -2636,7 +2632,7 @@ const it = Ee(class extends Le {
     return t !== this.key && (so(e), this.key = t), i;
   }
 });
-var ro = Object.defineProperty, ao = Object.getOwnPropertyDescriptor, E = (e, t, i, o) => {
+var ro = Object.defineProperty, ao = Object.getOwnPropertyDescriptor, R = (e, t, i, o) => {
   for (var n = o > 1 ? void 0 : o ? ao(t, i) : t, s = e.length - 1, a; s >= 0; s--)
     (a = e[s]) && (n = (o ? a(t, i, n) : a(n)) || n);
   return o && n && ro(t, i, n), n;
@@ -2810,31 +2806,31 @@ $.styles = F`
       height: 100%;
     }
   `;
-E([
+R([
   _({ attribute: !1 })
 ], $.prototype, "stateObj", 2);
-E([
+R([
   _({ type: Boolean })
 ], $.prototype, "controls", 2);
-E([
+R([
   _({ type: Boolean })
 ], $.prototype, "muted", 2);
-E([
+R([
   _({ type: Boolean, attribute: "allow-exoplayer" })
 ], $.prototype, "allowExoPlayer", 2);
-E([
+R([
   _({ type: Number, attribute: !1 })
 ], $.prototype, "aspectRatio", 2);
-E([
+R([
   _({ attribute: !1 })
 ], $.prototype, "fitMode", 2);
-E([
+R([
   _({ type: Boolean, attribute: "passive-surface" })
 ], $.prototype, "passiveSurface", 2);
-E([
+R([
   p()
 ], $.prototype, "nativeAvailable", 2);
-$ = E([
+$ = R([
   N("ring-view-native-camera-adapter")
 ], $);
 const ho = (e) => e ?? c;
@@ -2993,7 +2989,7 @@ let y = class extends C {
       ` : c}
       ${!this.externalControls && i && this.readyDispatched && !this.playbackBlocked ? h`<div class="talkback-controls">
         <button
-          class=${R({ "talk-button": !0, active: e })}
+          class=${E({ "talk-button": !0, active: e })}
           type="button"
           aria-label=${n}
           aria-pressed=${String(e)}
@@ -3756,7 +3752,7 @@ let f = class extends C {
     return h`
       <span class="snapshot-action-wrap">
         <button
-          class=${R({
+          class=${E({
       "icon-button": !0,
       "snapshot-action": !0,
       working: i,
@@ -3772,13 +3768,9 @@ let f = class extends C {
         >
           ${this.icon(a)}
         </button>
-        ${this.snapshotFeedbackMessage ? h`
+        ${this.snapshotActionStatus === "error" && this.snapshotFeedbackMessage ? h`
               <span
-                class=${R({
-      "snapshot-feedback": !0,
-      success: this.snapshotActionStatus === "success",
-      error: this.snapshotActionStatus === "error"
-    })}
+                class="snapshot-feedback error"
                 aria-hidden="true"
               >
                 ${this.snapshotFeedbackMessage}
@@ -3830,7 +3822,7 @@ let f = class extends C {
               </div>
             ` : c}
         <div
-          class=${R({
+          class=${E({
       "visitor-action-dock": !0,
       "door-only": e && !t,
       "talk-only": t && !e
@@ -3840,7 +3832,7 @@ let f = class extends C {
         >
           ${t ? h`
                 <button
-                  class=${R({
+                  class=${E({
       "visitor-action": !0,
       "talk-action": !0,
       active: this.talkbackTalking
@@ -3864,7 +3856,7 @@ let f = class extends C {
           ${e && t ? h`<span class="visitor-action-divider" aria-hidden="true"></span>` : c}
           ${e ? h`
                 <button
-                  class=${R({
+                  class=${E({
       "visitor-action": !0,
       "door-action": !0,
       "contact-open": l,
@@ -4006,7 +3998,7 @@ let f = class extends C {
     const e = this.activeEntity(), t = this.activeEntityId(), i = w(e), o = !i && !this.suspended && (this.mode === "live" || this.recordingStarted), n = kt(this.config.aspect_ratio), s = $t(this.hass, e, t), a = this.mode === "last_recording" && typeof e?.attributes.video_url == "string" ? e.attributes.video_url : void 0, l = o && ["pending", "ready", "playback-blocked"].includes(this.mediaStatus), d = !!(l && a && !this.recordingVideoFailed), u = !!(o && this.mode === "live" && this.config.two_way_audio && me(this.hass, t)), v = !!(this.inline && !this.inlineStarted || this.mode === "last_recording" && !this.recordingStarted);
     return h`
       <div
-        class=${R({
+        class=${E({
       "media-frame": !0,
       "auto-ratio": this.config.aspect_ratio === "auto"
     })}
@@ -4069,7 +4061,7 @@ let f = class extends C {
       `${t}:${this.session}:recording-video`,
       h`
               <video
-                class=${R({
+                class=${E({
         "video-fallback": !0,
         pending: this.mediaStatus === "pending",
         "controls-hidden": !this.recordingControlsVisible
@@ -4145,7 +4137,7 @@ let f = class extends C {
       const i = this.shouldShowDoorControl() || this.shouldShowTalkControl();
       return h`
         <div
-          class=${R({
+          class=${E({
         "state-layer": !0,
         "with-visitor-controls": i
       })}

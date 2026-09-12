@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.9.0-beta.5] - 2026-09-12
+
+### Changed
+
+- Use only the brief green icon state for successful snapshots, removing the
+  redundant visible confirmation message while preserving the screen-reader
+  announcement.
+- Keep the compact header message for failures, where explanatory text is
+  necessary.
+
+### Tests
+
+- Cover silent visual success feedback and verify that explanatory error text
+  remains clear of the bottom action dock on desktop and phone.
+
 ## [0.9.0-beta.4] - 2026-09-12
 
 ### Fixed

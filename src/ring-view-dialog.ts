@@ -500,14 +500,10 @@ export class RingViewDialog extends LitElement {
         >
           ${this.icon(icon)}
         </button>
-        ${this.snapshotFeedbackMessage
+        ${this.snapshotActionStatus === "error" && this.snapshotFeedbackMessage
           ? html`
               <span
-                class=${classMap({
-                  "snapshot-feedback": true,
-                  success: this.snapshotActionStatus === "success",
-                  error: this.snapshotActionStatus === "error",
-                })}
+                class="snapshot-feedback error"
                 aria-hidden="true"
               >
                 ${this.snapshotFeedbackMessage}

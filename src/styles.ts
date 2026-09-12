@@ -320,10 +320,6 @@ export const dialogStyles = css`
     -webkit-backdrop-filter: blur(12px) saturate(1.15);
   }
 
-  .snapshot-feedback.success {
-    border-color: rgba(129, 199, 132, 0.7);
-  }
-
   .snapshot-feedback.error {
     border-color: rgba(255, 138, 128, 0.76);
   }

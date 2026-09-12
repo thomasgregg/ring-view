@@ -252,9 +252,23 @@ test("shows one snapshot action only after Live starts", async ({ page }) => {
   await expect(snapshot).toBeVisible();
   await snapshot.click();
   await expect(page.getByRole("button", { name: "Snapshot saved" })).toBeVisible();
+  await expect(page.locator("ring-view ring-view-dialog .snapshot-feedback")).toHaveCount(0);
+
+  await page.locator("ring-view").evaluate((element) => {
+    const card = element as HTMLElement & {
+      hass?: { callService?: () => Promise<void> };
+    };
+    if (!card.hass) throw new Error("Demo Home Assistant object unavailable");
+    card.hass.callService = async () => {
+      throw new Error("Cannot write image to file");
+    };
+  });
+  await page.locator("ring-view ring-view-dialog .snapshot-action").click();
   const feedback = page.locator("ring-view ring-view-dialog .snapshot-feedback");
   const visitorDock = page.locator("ring-view ring-view-dialog .visitor-action-dock");
-  await expect(feedback).toHaveText("Snapshot saved");
+  await expect(feedback).toHaveText(
+    "Home Assistant cannot write to the snapshot folder.",
+  );
   await expect(visitorDock).toBeVisible();
   const [feedbackBox, visitorBox] = await Promise.all([
     feedback.boundingBox(),
