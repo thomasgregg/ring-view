@@ -1,6 +1,7 @@
 import { localize } from "../localize";
 import type { HassEntity, HomeAssistant, NormalizedConfig } from "../types";
 import { activityTimestamp } from "./activity-time";
+import { resolveEntitySource } from "./entity-sources";
 
 export const CAMERA_STREAM_FEATURE = 2;
 export const LOCK_OPEN_FEATURE = 1;
@@ -19,7 +20,7 @@ export function supportsRingTalkback(
   entityId: string,
 ): boolean {
   return (
-    hass.entities?.[entityId]?.platform === "ring"
+    resolveEntitySource(hass, "live", entityId).provider === "official_ring"
     && supportsStream(hass.states[entityId])
   );
 }

@@ -65,6 +65,37 @@ const hass: HomeAssistant = {
 };
 
 describe("visual editor", () => {
+  it("keeps the same schema when configured entity platforms change", async () => {
+    const schemas: ConfigFormSchema[][] = [];
+    for (const livePlatform of ["ring", "generic"]) {
+      const editor = document.createElement("ring-view-editor");
+      editor.hass = {
+        ...hass,
+        entities: {
+          ...hass.entities,
+          "camera.live": { entity_id: "camera.live", platform: livePlatform },
+        },
+      };
+      editor.setConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        snapshot_entity: "camera.snapshot",
+        doorbell_entity: "binary_sensor.front_door_contact",
+        last_activity_entity: "sensor.front_door_last_activity",
+        show_snapshot_button: true,
+      });
+      document.body.append(editor);
+      await editor.updateComplete;
+      const form = editor.shadowRoot?.querySelector("ha-form") as
+        | (HTMLElement & { schema?: ConfigFormSchema[] })
+        | null;
+      schemas.push(form?.schema ?? []);
+      editor.remove();
+    }
+
+    expect(schemas[1]).toEqual(schemas[0]);
+  });
+
   it("emits the compact flat configuration and removes obsolete options", async () => {
     const editor = document.createElement("ring-view-editor");
     editor.hass = hass;
