@@ -39,6 +39,8 @@ import {
   recordingMediaMarker,
   selectPreviewEntityId,
 } from "./utilities/preview-selection";
+import { isRingMqttEventSelect } from "./utilities/recording-source";
+import { findRingMqttSnapshotCamera } from "./utilities/snapshot";
 
 const PREVIEW_REFRESH_INTERVAL_MS = 10_000;
 const PREVIEW_FALLBACK_WIDTH = 640;
@@ -93,8 +95,18 @@ export class RingView extends LitElement {
       cameraIds.find((id) => /live(_view)?$/i.test(id)) ??
       cameraIds[1] ??
       "camera.live_view";
-    const recording =
-      cameraIds.find(
+    const officialRecording = cameraIds.find(
+      (id) =>
+        id !== live
+        && hass?.entities?.[id]?.platform === "ring"
+        && (Number(hass.states[id]?.attributes.supported_features ?? 0) & 2) === 0,
+    );
+    const ringMqttRecording = Object.keys(hass?.states ?? {}).find((id) =>
+      hass ? isRingMqttEventSelect(hass, id) : false,
+    );
+    const recording = officialRecording
+      ?? ringMqttRecording
+      ?? cameraIds.find(
         (id) =>
           id !== live &&
           (Number(hass?.states[id]?.attributes.supported_features ?? 0) & 2) === 0,
@@ -102,10 +114,14 @@ export class RingView extends LitElement {
       cameraIds.find((id) => id !== live) ??
       cameraIds[0] ??
       "camera.latest_recording";
+    const snapshot = hass && recording === ringMqttRecording
+      ? findRingMqttSnapshotCamera(hass, recording)
+      : undefined;
     return {
       type: CARD_TYPE,
       recording_entity: recording,
       live_entity: live,
+      ...(snapshot ? { snapshot_entity: snapshot } : {}),
     };
   }
 

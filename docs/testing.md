@@ -50,6 +50,12 @@ entity changes, and separation from every header control at responsive widths.
 Existing opening, switching, recovery,
 accessibility, layout, and stream-count checks remain.
 
+Provider-parity coverage builds equivalent official Ring and Ring-MQTT source
+profiles, asserts an identical visual-editor schema, and compares the measured
+card, media, title, mode, header-action, and visitor-control geometry on a phone
+viewport. Transport elements may differ behind the surface; visible structure
+and spacing may not.
+
 The lifecycle regressions additionally cover repeated recording background/resume,
 late playback promises after switching or reopening, stalled subscription and
 unsubscribe acknowledgments, and doorbell alert expiry across card reinsertion.
