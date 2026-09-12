@@ -265,7 +265,7 @@ describe("entity validation", () => {
     );
   });
 
-  it("validates the configured last activity timestamp without exposing its value", () => {
+  it("validates the configured last activity source without exposing its value", () => {
     const config = normalizeConfig({
       recording_entity: "camera.recording",
       live_entity: "camera.live",
@@ -301,13 +301,49 @@ describe("entity validation", () => {
     };
     const invalidWarnings = validateEntities(hass, config);
     expect(invalidWarnings.find((warning) => warning.kind === "last_activity")?.message)
-      .toContain("does not currently provide a valid date and time");
+      .toContain("does not currently provide a valid activity date and time");
     expect(JSON.stringify(invalidWarnings)).not.toContain(
       "motion detected at the front door",
     );
 
     hass.states[activity.entity_id] = { ...activity, state: "unavailable" };
     expect(validateEntities(hass, config).map((warning) => warning.kind)).toContain(
+      "last_activity",
+    );
+  });
+
+  it("accepts Ring-MQTT Ding attributes as a last activity source", () => {
+    const activity = {
+      ...entity("binary_sensor.front_door_ding", {
+        lastDingTime: "2026-09-12T10:15:30Z",
+      }),
+      state: "off",
+    };
+    const config = normalizeConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      last_activity_entity: activity.entity_id,
+    });
+    const hass: HomeAssistant = {
+      states: {
+        "camera.recording": entity("camera.recording", {
+          entity_picture: "/recording.jpg",
+        }),
+        "camera.live": entity("camera.live", { supported_features: 2 }),
+        [activity.entity_id]: activity,
+      },
+      entities: {
+        [activity.entity_id]: {
+          entity_id: activity.entity_id,
+          platform: "mqtt",
+          device_id: "front-door",
+        },
+      },
+      hassUrl: (path = "") => path,
+      callWS: async () => ({}) as never,
+    };
+
+    expect(validateEntities(hass, config).map((warning) => warning.kind)).not.toContain(
       "last_activity",
     );
   });

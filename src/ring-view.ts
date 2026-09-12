@@ -26,8 +26,8 @@ import { loadMode } from "./utilities/mode-storage";
 import "./ring-view-dialog";
 import type { RingViewDialog } from "./ring-view-dialog";
 import {
-  activityTimestamp,
   formatActivityTime,
+  resolveActivityTimestamp,
 } from "./utilities/activity-time";
 import { isDoorbellRingTransition } from "./utilities/doorbell";
 import {
@@ -189,8 +189,8 @@ export class RingView extends LitElement {
         previous.states[this.config.snapshot_entity] !==
           this.hass.states[this.config.snapshot_entity]) ||
       (this.config.last_activity_entity !== undefined &&
-        previous.states[this.config.last_activity_entity] !==
-          this.hass.states[this.config.last_activity_entity]) ||
+        resolveActivityTimestamp(previous, this.config.last_activity_entity) !==
+          resolveActivityTimestamp(this.hass, this.config.last_activity_entity)) ||
       (this.config.doorbell_entity !== undefined &&
         previous.states[this.config.doorbell_entity] !==
           this.hass.states[this.config.doorbell_entity]) ||
@@ -283,11 +283,9 @@ export class RingView extends LitElement {
     }
 
     const previewInteractive = !safePreview;
-    const activityAt = activityTimestamp(
-      this.config.last_activity_entity
-        ? this.hass.states[this.config.last_activity_entity]
-        : undefined,
-    );
+    const activityAt = this.config.last_activity_entity
+      ? resolveActivityTimestamp(this.hass, this.config.last_activity_entity)
+      : undefined;
     const activity = activityAt === undefined
       ? undefined
       : formatActivityTime(this.hass, activityAt);

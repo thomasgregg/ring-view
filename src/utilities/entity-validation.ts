@@ -1,6 +1,6 @@
 import { localize } from "../localize";
 import type { HassEntity, HomeAssistant, NormalizedConfig } from "../types";
-import { activityTimestamp } from "./activity-time";
+import { resolveActivityTimestamp } from "./activity-time";
 import { resolveEntitySource } from "./entity-sources";
 
 export const CAMERA_STREAM_FEATURE = 2;
@@ -124,7 +124,9 @@ export function validateEntities(
           name: friendlyName(activity, config.last_activity_entity),
         }),
       });
-    } else if (activityTimestamp(activity) === undefined) {
+    } else if (
+      resolveActivityTimestamp(hass, config.last_activity_entity) === undefined
+    ) {
       warnings.push({
         kind: "last_activity",
         message: localize(hass, "warning.activity_timestamp"),
