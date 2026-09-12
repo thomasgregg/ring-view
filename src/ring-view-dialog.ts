@@ -410,17 +410,10 @@ export class RingViewDialog extends LitElement {
   }
 
   private renderModeSwitch(): TemplateResult {
-    const hasActiveMode = !this.inline || this.inlineStarted;
-    const recordingSelected = hasActiveMode && this.mode === "last_recording";
-    const liveSelected = hasActiveMode && this.mode === "live";
-    const recordingLabel = localize(
-      this.hass,
-      hasActiveMode ? "common.last_recording" : "viewer.play_recording",
-    );
-    const liveLabel = localize(
-      this.hass,
-      hasActiveMode ? "common.live" : "viewer.start_live",
-    );
+    const recordingSelected = this.mode === "last_recording";
+    const liveSelected = this.mode === "live";
+    const recordingLabel = localize(this.hass, "common.last_recording");
+    const liveLabel = localize(this.hass, "common.live");
     return html`
       <div
         class="mode-switch"

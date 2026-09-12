@@ -194,10 +194,10 @@ describe("snapshot action", () => {
     const liveTab = idle.dialog.shadowRoot?.querySelector<HTMLButtonElement>(
       "#ring-view-tab-live",
     );
-    expect(recordingTab?.getAttribute("aria-selected")).toBe("false");
+    expect(recordingTab?.getAttribute("aria-selected")).toBe("true");
     expect(liveTab?.getAttribute("aria-selected")).toBe("false");
-    expect(recordingTab?.getAttribute("aria-label")).toBe("Play last recording");
-    expect(liveTab?.getAttribute("aria-label")).toBe("Start live view");
+    expect(recordingTab?.getAttribute("aria-label")).toBe("Last recording");
+    expect(liveTab?.getAttribute("aria-label")).toBe("Live");
     expect(idle.dialog.shadowRoot?.querySelector(".snapshot-action")).toBeNull();
 
     liveTab?.click();

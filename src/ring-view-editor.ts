@@ -238,22 +238,6 @@ function configSchema(
       selector: { entity: { domain: "camera" } },
     },
     {
-      name: "snapshots",
-      type: "expandable",
-      flatten: true,
-      iconPath: mdiCameraOutline,
-      schema: [
-        { name: "show_snapshot_button", selector: { boolean: {} } },
-        ...(config.show_snapshot_button
-          ? [{
-              name: "snapshot_directory",
-              required: true,
-              selector: { text: {} },
-            } satisfies ConfigFormSchema]
-          : []),
-      ],
-    },
-    {
       name: "dashboard_preview",
       type: "expandable",
       flatten: true,
@@ -285,6 +269,22 @@ function configSchema(
         { name: "autoplay_recording", selector: { boolean: {} } },
         { name: "live_muted", selector: { boolean: {} } },
         { name: "two_way_audio", selector: { boolean: {} } },
+      ],
+    },
+    {
+      name: "snapshots",
+      type: "expandable",
+      flatten: true,
+      iconPath: mdiCameraOutline,
+      schema: [
+        { name: "show_snapshot_button", selector: { boolean: {} } },
+        ...(config.show_snapshot_button
+          ? [{
+              name: "snapshot_directory",
+              required: true,
+              selector: { text: {} },
+            } satisfies ConfigFormSchema]
+          : []),
       ],
     },
     {

@@ -194,9 +194,9 @@ describe("visual editor", () => {
         icon: Boolean(field.iconPath),
       })),
     ).toEqual([
-      { name: "snapshots", flatten: true, icon: true },
       { name: "dashboard_preview", flatten: true, icon: true },
       { name: "viewer_behavior", flatten: true, icon: true },
+      { name: "snapshots", flatten: true, icon: true },
       { name: "doorbell_features", flatten: true, icon: true },
       { name: "door_access", flatten: true, icon: true },
       { name: "card_appearance", flatten: true, icon: true },

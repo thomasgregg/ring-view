@@ -89,9 +89,10 @@ In the visual editor, open **Dashboard card → Dashboard behavior**:
 | **Control camera in card** | Adds Recording, Live and optional visitor controls directly to the card. | Wall tablets and hands-on dashboards. |
 
 For an interactive card, **No — wait for a tap** is the calmest startup choice.
-Neither mode appears active until you choose Recording or Live. You can instead
-start the last recording or muted Live automatically. The card requires at
-least **12 columns × 3 rows** in a Sections dashboard.
+The selected Recording or Live view remains highlighted while its still image
+waits for your tap, but no player is loaded yet. You can instead start the last
+recording or muted Live automatically. The card requires at least **12 columns
+× 3 rows** in a Sections dashboard.
 
 Common starting points:
 

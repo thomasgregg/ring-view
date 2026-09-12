@@ -204,11 +204,11 @@ test("keeps an interactive dashboard idle until the user chooses media", async (
 
   await expect(page.getByRole("region", { name: "Camera view" })).toBeVisible();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await expect(page.getByRole("tab", { name: "Play last recording" })).toHaveAttribute(
+  await expect(page.getByRole("tab", { name: "Last recording" })).toHaveAttribute(
     "aria-selected",
-    "false",
+    "true",
   );
-  await expect(page.getByRole("tab", { name: "Start live view" })).toHaveAttribute(
+  await expect(page.getByRole("tab", { name: "Live" })).toHaveAttribute(
     "aria-selected",
     "false",
   );
@@ -247,7 +247,7 @@ test("shows one snapshot action only after Live starts", async ({ page }) => {
   );
 
   await expect(page.getByRole("button", { name: "Take snapshot" })).toHaveCount(0);
-  await page.getByRole("tab", { name: "Start live view" }).click();
+  await page.getByRole("tab", { name: "Live" }).click();
   const snapshot = page.getByRole("button", { name: "Take snapshot" });
   await expect(snapshot).toBeVisible();
   await snapshot.click();

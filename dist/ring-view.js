@@ -660,7 +660,7 @@ const ai = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "editor.aspect_ratio": "Bildformat",
   "editor.fit_mode": "Bildanpassung",
   "editor.helper_dashboard_behavior": "Behalte die gewohnte Vorschau oder zeige die Kamerasteuerung direkt auf dem Dashboard.",
-  "editor.helper_dashboard_start": "Bei Bedarf wird ein Standbild angezeigt, bis Aufnahme oder Live gewählt wird.",
+  "editor.helper_dashboard_start": "Bei Bedarf wird die ausgewählte Ansicht als Standbild angezeigt. Medien starten erst nach Tippen auf das Bild oder eine Ansichtssteuerung.",
   "editor.helper_dashboard_live_muted": "Empfohlen für Wand-Tablets und automatische Starts. Ton kann im Player aktiviert werden.",
   "editor.helper_default_mode": "Beim direkten Öffnen der Live-Ansicht wird eine Ring-Live-Sitzung gestartet.",
   "editor.helper_remember_last_mode": "Verwendet die zuletzt gewählte Ansicht anstelle der Startansicht.",
@@ -859,7 +859,7 @@ const ai = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "editor.aspect_ratio": "Image shape",
   "editor.fit_mode": "Image crop",
   "editor.helper_dashboard_behavior": "Keep the familiar preview, or put camera controls directly on the dashboard.",
-  "editor.helper_dashboard_start": "On demand shows a still image until you choose Recording or Live.",
+  "editor.helper_dashboard_start": "On demand shows the selected view as a still image and starts media only after you tap the image or a view control.",
   "editor.helper_dashboard_live_muted": "Recommended for wall tablets and automatic starts. You can enable sound from the player.",
   "editor.helper_default_mode": "Opening directly on Live starts a Ring live session.",
   "editor.helper_remember_last_mode": "Uses the most recent choice instead of the opening view.",
@@ -3668,13 +3668,7 @@ let f = class extends C {
     `;
   }
   renderModeSwitch() {
-    const e = !this.inline || this.inlineStarted, t = e && this.mode === "last_recording", i = e && this.mode === "live", o = r(
-      this.hass,
-      e ? "common.last_recording" : "viewer.play_recording"
-    ), n = r(
-      this.hass,
-      e ? "common.live" : "viewer.start_live"
-    );
+    const e = this.mode === "last_recording", t = this.mode === "live", i = r(this.hass, "common.last_recording"), o = r(this.hass, "common.live");
     return h`
       <div
         class="mode-switch"
@@ -3686,9 +3680,9 @@ let f = class extends C {
           class="mode-button recording"
           type="button"
           role="tab"
-          aria-label=${o}
-          title=${o}
-          aria-selected=${String(t)}
+          aria-label=${i}
+          title=${i}
+          aria-selected=${String(e)}
           tabindex=${this.mode === "last_recording" ? "0" : "-1"}
           @click=${() => this.selectMode("last_recording")}
           @keydown=${this.handleTabKeyDown}
@@ -3700,9 +3694,9 @@ let f = class extends C {
           class="mode-button live"
           type="button"
           role="tab"
-          aria-label=${n}
-          title=${n}
-          aria-selected=${String(i)}
+          aria-label=${o}
+          title=${o}
+          aria-selected=${String(t)}
           tabindex=${this.mode === "live" ? "0" : "-1"}
           @click=${() => this.selectMode("live")}
           @keydown=${this.handleTabKeyDown}
@@ -5076,20 +5070,6 @@ function No(e, t) {
       selector: { entity: { domain: "camera" } }
     },
     {
-      name: "snapshots",
-      type: "expandable",
-      flatten: !0,
-      iconPath: rt,
-      schema: [
-        { name: "show_snapshot_button", selector: { boolean: {} } },
-        ...t.show_snapshot_button ? [{
-          name: "snapshot_directory",
-          required: !0,
-          selector: { text: {} }
-        }] : []
-      ]
-    },
-    {
       name: "dashboard_preview",
       type: "expandable",
       flatten: !0,
@@ -5121,6 +5101,20 @@ function No(e, t) {
         { name: "autoplay_recording", selector: { boolean: {} } },
         { name: "live_muted", selector: { boolean: {} } },
         { name: "two_way_audio", selector: { boolean: {} } }
+      ]
+    },
+    {
+      name: "snapshots",
+      type: "expandable",
+      flatten: !0,
+      iconPath: rt,
+      schema: [
+        { name: "show_snapshot_button", selector: { boolean: {} } },
+        ...t.show_snapshot_button ? [{
+          name: "snapshot_directory",
+          required: !0,
+          selector: { text: {} }
+        }] : []
       ]
     },
     {

@@ -4,6 +4,22 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.9.0-beta.3] - 2026-09-12
+
+### Changed
+
+- Keep the selected Recording or Live view highlighted while an on-demand
+  dashboard card waits for a tap, separating view selection from playback
+  state consistently.
+- Present the editor's primary surfaces first: **Dashboard card** and
+  **Fullscreen viewer**, followed by the optional **Snapshots** feature.
+- Clarify the on-demand helper text in English and German.
+
+### Tests
+
+- Cover idle selected-view semantics, stable mode labels, and the revised
+  editor section order.
+
 ## [0.9.0-beta.2] - 2026-09-12
 
 ### Changed

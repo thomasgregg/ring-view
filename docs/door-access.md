@@ -158,9 +158,9 @@ capabilities.
 The full editor order is:
 
 1. Cameras
-2. Snapshots
-3. Dashboard card
-4. Fullscreen viewer
+2. Dashboard card
+3. Fullscreen viewer
+4. Snapshots
 5. Doorbell features
 6. Door access
 7. Card appearance
