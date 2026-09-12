@@ -482,23 +482,39 @@ export class RingViewDialog extends LitElement {
           ? mdiAlertCircleOutline
           : mdiCameraOutline;
     return html`
-      <button
-        class=${classMap({
-          "icon-button": true,
-          "snapshot-action": true,
-          working,
-          success: this.snapshotActionStatus === "success",
-          error: this.snapshotActionStatus === "error",
-        })}
-        type="button"
-        aria-label=${label}
-        aria-busy=${String(working)}
-        title=${label}
-        ?disabled=${disabled}
-        @click=${this.takeSnapshot}
-      >
-        ${this.icon(icon)}
-      </button>
+      <span class="snapshot-action-wrap">
+        <button
+          class=${classMap({
+            "icon-button": true,
+            "snapshot-action": true,
+            working,
+            success: this.snapshotActionStatus === "success",
+            error: this.snapshotActionStatus === "error",
+          })}
+          type="button"
+          aria-label=${label}
+          aria-busy=${String(working)}
+          title=${label}
+          ?disabled=${disabled}
+          @click=${this.takeSnapshot}
+        >
+          ${this.icon(icon)}
+        </button>
+        ${this.snapshotFeedbackMessage
+          ? html`
+              <span
+                class=${classMap({
+                  "snapshot-feedback": true,
+                  success: this.snapshotActionStatus === "success",
+                  error: this.snapshotActionStatus === "error",
+                })}
+                aria-hidden="true"
+              >
+                ${this.snapshotFeedbackMessage}
+              </span>
+            `
+          : nothing}
+      </span>
     `;
   }
 
@@ -549,7 +565,6 @@ export class RingViewDialog extends LitElement {
       this.snapshotActionStatus = "success";
       this.snapshotFeedbackMessage = message;
       this.statusAnnouncement = message;
-      this.showNotification(message);
       this.snapshotFeedbackTimer = window.setTimeout(() => {
         if (token !== this.snapshotActionToken) return;
         this.snapshotFeedbackTimer = undefined;
@@ -562,7 +577,6 @@ export class RingViewDialog extends LitElement {
       this.snapshotActionStatus = "error";
       this.snapshotFeedbackMessage = message;
       this.statusAnnouncement = message;
-      this.showNotification(message);
       this.snapshotFeedbackTimer = window.setTimeout(() => {
         if (token !== this.snapshotActionToken) return;
         this.snapshotFeedbackTimer = undefined;
@@ -571,16 +585,6 @@ export class RingViewDialog extends LitElement {
       }, SNAPSHOT_ERROR_DURATION_MS);
     }
   };
-
-  private showNotification(message: string): void {
-    this.dispatchEvent(
-      new CustomEvent("hass-notification", {
-        detail: { message },
-        bubbles: true,
-        composed: true,
-      }),
-    );
-  }
 
   private clearSnapshotFeedback(): void {
     if (this.snapshotFeedbackTimer !== undefined) {

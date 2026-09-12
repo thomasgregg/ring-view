@@ -96,11 +96,14 @@ describe("snapshot action", () => {
       },
       { entity_id: "camera.snapshot" },
     );
-    expect(messages).toEqual(["Snapshot saved"]);
+    expect(messages).toEqual([]);
     expect(
       dialog.shadowRoot?.querySelector(".snapshot-action")?.getAttribute(
         "aria-label",
       ),
+    ).toBe("Snapshot saved");
+    expect(
+      dialog.shadowRoot?.querySelector(".snapshot-feedback.success")?.textContent?.trim(),
     ).toBe("Snapshot saved");
 
     await vi.advanceTimersByTimeAsync(2_000);
@@ -109,6 +112,7 @@ describe("snapshot action", () => {
         "aria-label",
       ),
     ).toBe("Take snapshot");
+    expect(dialog.shadowRoot?.querySelector(".snapshot-feedback")).toBeNull();
   });
 
   it("falls back to the Live camera when the snapshot camera is unavailable", async () => {
@@ -149,13 +153,14 @@ describe("snapshot action", () => {
     await dialog.updateComplete;
 
     expect(callService).toHaveBeenCalledTimes(1);
-    expect(messages).toEqual([
-      "Home Assistant cannot write to the snapshot folder.",
-    ]);
+    expect(messages).toEqual([]);
     expect(
       dialog.shadowRoot?.querySelector(".snapshot-action")?.getAttribute(
         "aria-label",
       ),
+    ).toBe("Home Assistant cannot write to the snapshot folder.");
+    expect(
+      dialog.shadowRoot?.querySelector(".snapshot-feedback.error")?.textContent?.trim(),
     ).toBe("Home Assistant cannot write to the snapshot folder.");
   });
 

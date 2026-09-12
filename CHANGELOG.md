@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.9.0-beta.4] - 2026-09-12
+
+### Fixed
+
+- Replace Home Assistant's bottom snapshot notification with compact success
+  or error feedback beside the header icon, preventing it from covering Talk
+  and door controls on iPhone.
+
+### Tests
+
+- Cover local success and error feedback, removal of the global notification,
+  automatic dismissal, and separation from the bottom action dock on desktop
+  and phone.
+
 ## [0.9.0-beta.3] - 2026-09-12
 
 ### Changed

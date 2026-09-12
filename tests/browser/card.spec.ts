@@ -243,7 +243,7 @@ test("keeps an interactive dashboard idle until the user chooses media", async (
 
 test("shows one snapshot action only after Live starts", async ({ page }) => {
   await page.goto(
-    "/demo/?dashboard=interactive&snapshot_button=1&live_platform=generic",
+    "/demo/?dashboard=interactive&snapshot_button=1&live_platform=generic&door=1&dashboard_door=1",
   );
 
   await expect(page.getByRole("button", { name: "Take snapshot" })).toHaveCount(0);
@@ -252,6 +252,18 @@ test("shows one snapshot action only after Live starts", async ({ page }) => {
   await expect(snapshot).toBeVisible();
   await snapshot.click();
   await expect(page.getByRole("button", { name: "Snapshot saved" })).toBeVisible();
+  const feedback = page.locator("ring-view ring-view-dialog .snapshot-feedback");
+  const visitorDock = page.locator("ring-view ring-view-dialog .visitor-action-dock");
+  await expect(feedback).toHaveText("Snapshot saved");
+  await expect(visitorDock).toBeVisible();
+  const [feedbackBox, visitorBox] = await Promise.all([
+    feedback.boundingBox(),
+    visitorDock.boundingBox(),
+  ]);
+  if (!feedbackBox || !visitorBox) {
+    throw new Error("Snapshot feedback geometry unavailable");
+  }
+  expect(feedbackBox.y + feedbackBox.height).toBeLessThan(visitorBox.y);
 
   const calls = await page.evaluate(() => window.demoDoorCalls ?? []);
   expect(calls).toHaveLength(1);

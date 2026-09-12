@@ -101,7 +101,8 @@ Verify each item on current stable Home Assistant and, where practical, the prev
 23. Enable manual snapshots with `/media/ring-view`. Confirm the camera button
     is absent while on-demand is idle, appears after selecting Live, saves one
     timestamped JPEG per tap, and reports success without changing the selected
-    dashboard preview source.
+    dashboard preview source. On a phone, verify the feedback stays near the
+    header and never covers the bottom Talk or door controls.
 24. If a Ring-MQTT snapshot camera is configured, confirm it is targeted first.
     Make it unavailable and confirm the official Live camera is used instead.
     Also verify the button does not collide with the mode or fullscreen controls
