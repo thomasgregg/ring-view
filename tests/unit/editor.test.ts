@@ -25,6 +25,16 @@ const hass: HomeAssistant = {
     },
     "camera.live": { entity_id: "camera.live", platform: "ring" },
     "camera.snapshot": { entity_id: "camera.snapshot", platform: "mqtt" },
+    "select.front_door_events": {
+      entity_id: "select.front_door_events",
+      platform: "mqtt",
+      unique_id: "front-door_event_select",
+      original_name: "Event Select",
+    },
+    "camera.mqtt_live": {
+      entity_id: "camera.mqtt_live",
+      platform: "generic",
+    },
     "sensor.front_door_last_activity": {
       entity_id: "sensor.front_door_last_activity",
       platform: "template",
@@ -39,6 +49,15 @@ const hass: HomeAssistant = {
     "camera.recording": entity("camera.recording", 0),
     "camera.live": entity("camera.live", 2),
     "camera.snapshot": entity("camera.snapshot", 0),
+    "select.front_door_events": {
+      entity_id: "select.front_door_events",
+      state: "Ding 1",
+      attributes: {
+        recordingUrl: "https://example.test/event.mp4",
+        eventId: "event-1",
+      },
+    },
+    "camera.mqtt_live": entity("camera.mqtt_live", 2),
     "sensor.front_door_last_activity": {
       ...entity("sensor.front_door_last_activity", 0),
       state: "2026-09-12T10:15:30Z",
@@ -65,20 +84,23 @@ const hass: HomeAssistant = {
 };
 
 describe("visual editor", () => {
-  it("keeps the same schema when configured entity platforms change", async () => {
+  it("keeps the same schema for official Ring and Ring-MQTT source profiles", async () => {
     const schemas: ConfigFormSchema[][] = [];
-    for (const livePlatform of ["ring", "generic"]) {
-      const editor = document.createElement("ring-view-editor");
-      editor.hass = {
-        ...hass,
-        entities: {
-          ...hass.entities,
-          "camera.live": { entity_id: "camera.live", platform: livePlatform },
-        },
-      };
-      editor.setConfig({
+    const profiles = [
+      {
         recording_entity: "camera.recording",
         live_entity: "camera.live",
+      },
+      {
+        recording_entity: "select.front_door_events",
+        live_entity: "camera.mqtt_live",
+      },
+    ];
+    for (const profile of profiles) {
+      const editor = document.createElement("ring-view-editor");
+      editor.hass = hass;
+      editor.setConfig({
+        ...profile,
         snapshot_entity: "camera.snapshot",
         doorbell_entity: "binary_sensor.front_door_contact",
         last_activity_entity: "sensor.front_door_last_activity",
@@ -260,7 +282,7 @@ describe("visual editor", () => {
         ?.find((field) => field.name === "snapshots")
         ?.schema?.map((field) => field.name);
 
-    expect(snapshotFields()).toEqual(["show_snapshot_button"]);
+    expect(snapshotFields()).toEqual(["snapshot_entity", "show_snapshot_button"]);
     form?.dispatchEvent(
       new CustomEvent("value-changed", {
         detail: {
@@ -276,6 +298,7 @@ describe("visual editor", () => {
     );
     await editor.updateComplete;
     expect(snapshotFields()).toEqual([
+      "snapshot_entity",
       "show_snapshot_button",
       "snapshot_directory",
     ]);
@@ -293,7 +316,7 @@ describe("visual editor", () => {
     );
   });
 
-  it("only reveals the snapshot settings required by the selected image source", async () => {
+  it("keeps the snapshot source in one section and marks it required when needed", async () => {
     const editor = document.createElement("ring-view-editor");
     editor.hass = hass;
     editor.setConfig({
@@ -313,11 +336,15 @@ describe("visual editor", () => {
           name: field.name,
           required: field.required ?? false,
         }));
+    const snapshotField = () => form?.schema
+      ?.find((field) => field.name === "snapshots")
+      ?.schema?.find((field) => field.name === "snapshot_entity");
 
     expect(previewFields()).toEqual([
       { name: "dashboard_behavior", required: true },
       { name: "preview_source", required: true },
     ]);
+    expect(snapshotField()?.required).toBe(false);
 
     form?.dispatchEvent(
       new CustomEvent("value-changed", {
@@ -336,8 +363,8 @@ describe("visual editor", () => {
     expect(previewFields()).toEqual([
       { name: "dashboard_behavior", required: true },
       { name: "preview_source", required: true },
-      { name: "snapshot_entity", required: true },
     ]);
+    expect(snapshotField()?.required).toBe(true);
 
     form?.dispatchEvent(
       new CustomEvent("value-changed", {
@@ -356,9 +383,9 @@ describe("visual editor", () => {
     expect(previewFields()).toEqual([
       { name: "dashboard_behavior", required: true },
       { name: "preview_source", required: true },
-      { name: "snapshot_entity", required: true },
       { name: "preview_fallback", required: true },
     ]);
+    expect(snapshotField()?.required).toBe(true);
   });
 
   it("localizes native form labels, help, and options from the Home Assistant language", async () => {
@@ -389,7 +416,7 @@ describe("visual editor", () => {
       "Vollbildansicht",
     );
     expect(form?.computeLabel?.({ name: "snapshot_entity" })).toBe(
-      "Kamera für Geräte-Schnappschuss",
+      "Kamera für Geräte-Schnappschuss (optional)",
     );
     expect(form?.computeLabel?.({ name: "snapshots" })).toBe("Schnappschüsse");
     expect(form?.computeLabel?.({ name: "name" })).toBe("Kameraname (optional)");

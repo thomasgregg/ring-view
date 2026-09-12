@@ -112,6 +112,36 @@ export function findRingMqttSnapshotButton(
   );
 }
 
+/** Find the device snapshot camera associated with another Ring-MQTT entity. */
+export function findRingMqttSnapshotCamera(
+  hass: HomeAssistant,
+  anchorEntityId: string,
+): string | undefined {
+  if (
+    resolveEntitySource(hass, "snapshot", anchorEntityId).provider !== "mqtt"
+  ) {
+    return undefined;
+  }
+
+  const exact = findSameDeviceEntityId(
+    hass,
+    anchorEntityId,
+    (entityId, _entity, registry) =>
+      entityId.startsWith("camera.")
+      && registry.platform === "mqtt"
+      && (registry.unique_id?.endsWith("_snapshot") === true
+        || registry.original_name === "Snapshot"),
+  );
+  if (exact) return exact;
+
+  return findSameDeviceEntityId(
+    hass,
+    anchorEntityId,
+    (entityId, _entity, registry) =>
+      entityId.startsWith("camera.") && registry.platform === "mqtt",
+  );
+}
+
 export function isRingMqttSnapshotSource(
   hass: HomeAssistant,
   snapshotEntityId: string,

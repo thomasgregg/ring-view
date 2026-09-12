@@ -45,19 +45,26 @@ See what happened, check what is happening, save the moment, and answer the door
 
 ## Get started
 
-You need Home Assistant **2026.7 or newer**, the official [Ring integration](https://www.home-assistant.io/integrations/ring/), and its **last recording** and **live view** camera entities. Recording access requires a suitable Ring subscription. The last-recording entity is disabled by default. If the two camera entries look identical or their IDs do not use the example `_last_recording` and `_live_view` suffixes, follow [Choosing camera entities](docs/configuration.md#choosing-camera-entities).
+You need Home Assistant **2026.7 or newer** and Ring media exposed through Home
+Assistant. Use the official [Ring integration](https://www.home-assistant.io/integrations/ring/),
+Ring-MQTT, or mix their entities by role. The official setup uses **Last
+recording** and **Live view** cameras. A Ring-MQTT setup uses **Event Select**
+for recordings, its snapshot camera, and a Home Assistant camera configured
+from Ring-MQTT's live RTSP path. Recording access requires a suitable Ring
+subscription. See [Choosing camera entities](docs/configuration.md#choosing-camera-entities)
+for both setups.
 
-The core Recording and Live viewer can also work with other Home Assistant
-camera integrations when one camera exposes recorded media and the other
-supports streaming. Ring remains the tested setup. Two-way audio, Ring Ding
-events, the notification blueprint, and the optional backend patch are
-Ring-specific.
+The core viewer can also use another Home Assistant recording camera when it
+exposes recorded media, and any Live camera that advertises stream support.
+Two-way audio and the optional backend patch remain specific to the official
+Ring Live view camera. [The provider parity guide](docs/compatibility.md#official-ring-and-ring-mqtt-sources)
+shows the exact source for every feature.
 
 [![Open Ring View in HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=thomasgregg&repository=ring-view&category=plugin)
 
 1. Open Ring View in HACS using the button above and download the latest release.
 2. Refresh Home Assistant.
-3. Edit your dashboard, select **Add card → Ring View**, and choose your two camera entities.
+3. Edit your dashboard, select **Add card → Ring View**, and choose a recording source and Live camera.
 
 HACS registers the JavaScript module automatically. Prefer manual installation? See the [installation and configuration guide](docs/configuration.md#manual-installation).
 
@@ -71,7 +78,7 @@ live_entity: camera.front_door_live_view
 
 ### Configure visually
 
-YAML is optional. The visual editor lets you select the cameras and configure
+YAML is optional. The visual editor lets you select the media sources and configure
 dashboard behavior, manual snapshots, Talk, doorbell features, door access and
 appearance.
 

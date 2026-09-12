@@ -4,6 +4,7 @@ import type { HassEntity, HomeAssistant } from "../../src/types";
 import {
   buildSnapshotFilename,
   findRingMqttSnapshotButton,
+  findRingMqttSnapshotCamera,
   formatSnapshotTimestamp,
   normalizeSnapshotDirectory,
   selectSnapshotEntityId,
@@ -121,6 +122,39 @@ describe("manual snapshots", () => {
 
     expect(findRingMqttSnapshotButton(hass, snapshotId)).toBe(refreshId);
     expect(snapshotCaptureMarker(hass, snapshotId)).toBe(1_789_208_130_000);
+  });
+
+  it("finds a renamed same-device Ring-MQTT snapshot camera", () => {
+    const { hass } = setup();
+    const anchorId = "select.renamed_events";
+    const snapshotId = "camera.renamed_snapshot";
+    hass.states[anchorId] = {
+      entity_id: anchorId,
+      state: "Ding 1",
+      attributes: {},
+    };
+    hass.states[snapshotId] = camera(snapshotId);
+    hass.entities = {
+      [anchorId]: {
+        entity_id: anchorId,
+        platform: "mqtt",
+        device_id: "front-door",
+      },
+      [snapshotId]: {
+        entity_id: snapshotId,
+        platform: "mqtt",
+        device_id: "front-door",
+        unique_id: "083a8804c4c5_snapshot",
+        original_name: "Snapshot",
+      },
+    };
+
+    expect(findRingMqttSnapshotCamera(hass, anchorId)).toBe(snapshotId);
+    hass.entities[snapshotId] = {
+      ...hass.entities[snapshotId]!,
+      disabled_by: "user",
+    };
+    expect(findRingMqttSnapshotCamera(hass, anchorId)).toBeUndefined();
   });
 
   it("uses only an unambiguous MQTT button when registry identity is compact", () => {

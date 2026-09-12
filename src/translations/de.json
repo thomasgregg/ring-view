@@ -51,6 +51,7 @@
   "editor.fit_mode": "Bildanpassung",
   "editor.helper_dashboard_behavior": "Behalte die gewohnte Vorschau oder zeige die Kamerasteuerung direkt auf dem Dashboard.",
   "editor.helper_recording_entity": "Wähle die offizielle Ring-Kamera „Letzte Aufnahme“ oder Ring-MQTT „Event Select“. Bei Ring-MQTT bestimmt die ausgewählte Ereignisoption, welche Aufnahme gezeigt wird.",
+  "editor.helper_live_entity": "Wähle die offizielle Ring-Kamera „Live-Ansicht“ oder eine Home-Assistant-Kamera, die mit dem Live-RTSP-Pfad von Ring-MQTT eingerichtet wurde.",
   "editor.helper_dashboard_start": "Bei Bedarf wird die ausgewählte Ansicht als Standbild angezeigt. Medien starten erst nach Tippen auf das Bild oder eine Ansichtssteuerung.",
   "editor.helper_dashboard_live_muted": "Empfohlen für Wand-Tablets und automatische Starts. Ton kann im Player aktiviert werden.",
   "editor.helper_default_mode": "Beim direkten Öffnen der Live-Ansicht wird eine Ring-Live-Sitzung gestartet.",

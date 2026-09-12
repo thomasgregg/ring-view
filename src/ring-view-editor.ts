@@ -113,17 +113,6 @@ function configSchema(
 
   if (
     config.dashboard_behavior === "open_viewer"
-    && ["snapshot", "newest"].includes(config.preview_source)
-  ) {
-    dashboardPreview.push({
-      name: "snapshot_entity",
-      required: true,
-      selector: { entity: { domain: "camera" } },
-    });
-  }
-
-  if (
-    config.dashboard_behavior === "open_viewer"
     && config.preview_source === "newest"
   ) {
     dashboardPreview.push({
@@ -281,6 +270,12 @@ function configSchema(
       flatten: true,
       iconPath: mdiCameraOutline,
       schema: [
+        {
+          name: "snapshot_entity",
+          required: config.dashboard_behavior === "open_viewer"
+            && ["snapshot", "newest"].includes(config.preview_source),
+          selector: { entity: { domain: "camera" } },
+        },
         { name: "show_snapshot_button", selector: { boolean: {} } },
         ...(config.show_snapshot_button
           ? [{
@@ -431,6 +426,7 @@ const LABELS: Record<string, TranslationKey> = {
 
 const HELPERS: Record<string, TranslationKey> = {
   recording_entity: "editor.helper_recording_entity",
+  live_entity: "editor.helper_live_entity",
   dashboard_behavior: "editor.helper_dashboard_behavior",
   dashboard_start: "editor.helper_dashboard_start",
   dashboard_live_muted: "editor.helper_dashboard_live_muted",
@@ -515,7 +511,13 @@ export class RingViewEditor extends LitElement {
     if (!key) return undefined;
     const label = localize(this.hass, key);
     if (
-      !["name", "door_contact_entity", "last_activity_entity"].includes(
+      schema.required
+      || ![
+        "name",
+        "snapshot_entity",
+        "door_contact_entity",
+        "last_activity_entity",
+      ].includes(
         schema.name,
       )
     ) return label;

@@ -65,6 +65,55 @@ describe("card stream lifecycle", () => {
     expect(TestCameraStream.active).toBe(0);
   });
 
+  it("creates an equivalent Ring-MQTT stub from renamed registry entities", () => {
+    const mqttHass: HomeAssistant = {
+      ...hass,
+      entities: {
+        "select.renamed_events": {
+          entity_id: "select.renamed_events",
+          platform: "mqtt",
+          device_id: "front-door",
+          unique_id: "083a8804c4c5_event_select",
+          original_name: "Event Select",
+        },
+        "camera.renamed_snapshot": {
+          entity_id: "camera.renamed_snapshot",
+          platform: "mqtt",
+          device_id: "front-door",
+          unique_id: "083a8804c4c5_snapshot",
+          original_name: "Snapshot",
+        },
+        "camera.front_door_stream": {
+          entity_id: "camera.front_door_stream",
+          platform: "generic",
+        },
+      },
+      states: {
+        "select.renamed_events": {
+          entity_id: "select.renamed_events",
+          state: "Ding 1",
+          attributes: {
+            eventId: "event-1",
+            recordingUrl: "https://example.test/event.mp4",
+          },
+        },
+        "camera.renamed_snapshot": camera("camera.renamed_snapshot", 0),
+        "camera.front_door_stream": camera("camera.front_door_stream", 2),
+      },
+    };
+    const cardClass = customElements.get("ring-view") as typeof RingView;
+
+    expect(cardClass.getStubConfig(mqttHass)).toMatchObject({
+      recording_entity: "select.renamed_events",
+      live_entity: "camera.front_door_stream",
+      snapshot_entity: "camera.renamed_snapshot",
+    });
+    expect(cardClass.getStubConfig(hass)).toMatchObject({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+    });
+  });
+
   it("enforces a 12-column by 3-row minimum in both dashboard modes", () => {
     for (const dashboardBehavior of ["open_viewer", "interactive"] as const) {
       const card = document.createElement("ring-view");

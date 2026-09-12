@@ -28,7 +28,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `type` | No — added automatically | Required | `custom:ring-view` | Identifies the custom card. Added automatically by the card picker. |
 | `recording_entity` | Yes — Config tab | Required | `camera.*` or `select.*` entity ID | Official Ring Last recording camera, or the Ring-MQTT Event Select entity whose current option identifies the recording to play. |
 | `live_entity` | Yes — Config tab | Required | `camera.*` entity ID | Camera entity that starts the Ring live view. |
-| `snapshot_entity` | Yes — Dashboard card | Not set | `camera.*` entity ID | Device snapshot camera, such as the snapshot entity created by Ring-MQTT. Used by snapshot previews and preferred for manual snapshots when configured and available. |
+| `snapshot_entity` | Yes — Snapshots | Not set | `camera.*` entity ID | Device snapshot camera, such as the snapshot entity created by Ring-MQTT. Used by snapshot previews, as the Event Select recording poster, and preferred for manual snapshots when configured and available. |
 | `name` | Yes — Card appearance | Entity name | Text | Optional label used instead of the recording entity's friendly name. |
 | `last_activity_entity` | Yes — Card appearance | Not set | `sensor.*`, `event.*`, `input_datetime.*`, or `binary_sensor.*` entity ID | Shows a localized relative activity timestamp at the top left. Ring-MQTT Ding and motion sensors are supported directly. |
 | `default_mode` | Yes — Fullscreen viewer | `last_recording` | `last_recording`, `live` | View selected when the viewer opens. |
@@ -364,8 +364,8 @@ dock automatically collapses to the door-only pill.
 
 ## Freshest snapshot preview
 
-With **Open fullscreen viewer** selected, open **Dashboard card**, set **Image source** to **Newest snapshot or
-recording**, and select the now-visible **Device snapshot camera**. Ring View still
+With **Open fullscreen viewer** selected, open **Dashboard card** and set **Image source** to **Newest snapshot or
+recording**, then open **Snapshots** and select **Device snapshot camera**. Ring View still
 renders only one passive image on the dashboard, and tapping it opens the
 configured Recording or Live view—there is no third viewer tab.
 
@@ -406,6 +406,13 @@ browser, select that event's **(Transcoded)** option in Home Assistant and try
 again. Configure the Ring-MQTT snapshot camera as `snapshot_entity`; it supplies
 the still image used behind the Last recording view because Event Select is not
 a camera entity.
+
+For Live, follow Ring-MQTT's [Home Assistant Generic Camera instructions](https://github.com/tsightler/ring-mqtt/wiki/Video-Streaming#home-assistant-generic-camera-configuration)
+once, using the device's `_live` RTSP path and its snapshot proxy as the still
+image when available. Choose the resulting camera as `live_entity`. Ring View
+then uses the same Live tab and Home Assistant player as it does for an
+official Ring Live view camera. Do not enable camera stream preloading: opening
+Ring View already starts the stream on demand.
 
 For **two-way audio**, `live_entity` must be the official Ring `live_view` camera. A Ring-MQTT or Generic Camera RTSP entity does not expose the microphone return path Ring View needs. Ring-MQTT can still supply the optional `snapshot_entity` alongside the official Ring live camera.
 

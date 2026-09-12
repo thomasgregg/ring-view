@@ -88,9 +88,17 @@ test("progressively reveals related dashboard preview settings", async ({ page }
           name: field.name,
           required: field.required ?? false,
         }));
-    const result = { initial: visiblePreviewFields() } as Record<
+    const snapshotRequired = () => form.schema
+      .find((field) => field.name === "snapshots")
+      ?.schema?.find((field) => field.name === "snapshot_entity")
+      ?.required ?? false;
+    const current = () => ({
+      preview: visiblePreviewFields(),
+      snapshotRequired: snapshotRequired(),
+    });
+    const result = { initial: current() } as Record<
       string,
-      ReturnType<typeof visiblePreviewFields>
+      ReturnType<typeof current>
     >;
 
     for (const source of ["snapshot", "newest"]) {
@@ -108,27 +116,34 @@ test("progressively reveals related dashboard preview settings", async ({ page }
         }),
       );
       await editor.updateComplete;
-      result[source] = visiblePreviewFields();
+      result[source] = current();
     }
     return result;
   });
 
   expect(states).toEqual({
-    initial: [
-      { name: "dashboard_behavior", required: true },
-      { name: "preview_source", required: true },
-    ],
-    snapshot: [
-      { name: "dashboard_behavior", required: true },
-      { name: "preview_source", required: true },
-      { name: "snapshot_entity", required: true },
-    ],
-    newest: [
-      { name: "dashboard_behavior", required: true },
-      { name: "preview_source", required: true },
-      { name: "snapshot_entity", required: true },
-      { name: "preview_fallback", required: true },
-    ],
+    initial: {
+      preview: [
+        { name: "dashboard_behavior", required: true },
+        { name: "preview_source", required: true },
+      ],
+      snapshotRequired: false,
+    },
+    snapshot: {
+      preview: [
+        { name: "dashboard_behavior", required: true },
+        { name: "preview_source", required: true },
+      ],
+      snapshotRequired: true,
+    },
+    newest: {
+      preview: [
+        { name: "dashboard_behavior", required: true },
+        { name: "preview_source", required: true },
+        { name: "preview_fallback", required: true },
+      ],
+      snapshotRequired: true,
+    },
   });
 });
 
@@ -576,6 +591,66 @@ test("refreshes a Ring-MQTT Event Select before mounting its recording", async (
       (call) => call.domain === "select" && call.service === "select_option",
     ).length,
   )).toBe(1);
+});
+
+test("keeps card and viewer geometry identical across provider profiles", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.route("**/pending-recording.mp4?event=*", async () => undefined);
+  const profiles = [
+    "/demo/?name=1&activity=1&door=1&door_visibility=all",
+    "/demo/?recording_source=mqtt&name=1&activity=1&activity_source=mqtt&door=1&door_visibility=all",
+  ];
+  const measurements: Array<Record<string, number[]>> = [];
+
+  for (const profile of profiles) {
+    await page.goto(profile);
+    const cardBox = await page.locator("ring-view ha-card").boundingBox();
+    await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+    const directRecording = page.locator("video.video-fallback");
+    const nativeRecording = page.locator("ring-view-native-camera-adapter");
+    await expect(directRecording.or(nativeRecording)).toBeAttached();
+    if (await directRecording.count()) {
+      await directRecording.evaluate((element) => {
+        const video = element as HTMLVideoElement;
+        video.play = () => {
+          video.dispatchEvent(new Event("play"));
+          return Promise.resolve();
+        };
+        video.dispatchEvent(new Event("canplay"));
+      });
+    } else {
+      await expect(
+        page.getByRole("img", { name: "Synthetic demo camera media" }),
+      ).toBeVisible();
+    }
+    await expect(page.locator("ring-view-dialog .state-layer")).toHaveCount(0);
+
+    const selectors = {
+      dialog: "ring-view-dialog .dialog",
+      media: "ring-view-dialog .media-frame",
+      modes: "ring-view-dialog .mode-switch",
+      title: "ring-view-dialog .header-copy",
+      actions: "ring-view-dialog .header-actions",
+      visitor: "ring-view-dialog .visitor-action-dock",
+    };
+    const boxes: Record<string, number[]> = {
+      card: [cardBox!.x, cardBox!.y, cardBox!.width, cardBox!.height],
+    };
+    const dialogBox = await page.locator(selectors.dialog).boundingBox();
+    for (const [name, selector] of Object.entries(selectors)) {
+      const box = await page.locator(selector).boundingBox();
+      if (!box || !dialogBox) throw new Error(`Missing ${name} geometry`);
+      boxes[name] = [
+        Math.round((box.x - dialogBox.x) * 10) / 10,
+        Math.round((box.y - dialogBox.y) * 10) / 10,
+        Math.round(box.width * 10) / 10,
+        Math.round(box.height * 10) / 10,
+      ];
+    }
+    measurements.push(boxes);
+  }
+
+  expect(measurements[1]).toEqual(measurements[0]);
 });
 
 test("dismisses idle direct-recording controls and resumes or replays from the video", async ({

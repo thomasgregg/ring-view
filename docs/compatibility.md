@@ -4,20 +4,44 @@
 
 The release target is Home Assistant 2026.9 and the previous two monthly releases where practical. Version 0.1.0 declares Home Assistant 2026.7.0 as its minimum.
 
-## Camera integrations
+## Official Ring and Ring-MQTT sources
 
-Ring View's core Recording and Live surfaces use Home Assistant camera
-entities. They can work with non-Ring integrations when the recording camera
-exposes recorded media through `video_url` or `entity_picture` and the Live
-camera advertises stream support. Ring is the primary tested integration, so
-other camera pairings should be treated as compatible in principle rather than
-fully supported combinations.
+Ring View resolves each configured role independently. Official Ring,
+Ring-MQTT, a manually configured Generic Camera, and a Home Assistant lock can
+therefore be mixed without changing the editor structure, viewer modes,
+controls, spacing, or status design.
 
-Two-way audio is intentionally limited to the official Ring Live view camera.
-Ring Ding events, the included notification blueprint, and the optional Ring
-WebRTC backend patch are also Ring-specific. Snapshot saving uses Home
-Assistant's standard `camera.snapshot` action and can use another integration's
-configured device snapshot camera.
+| Ring View feature | Official Ring source | Ring-MQTT source | User-visible behavior |
+| --- | --- | --- | --- |
+| Last recording | Last recording `camera.*` | `select.*` Event Select | Same Last recording tab and video controls. The Event Select's current option chooses the Ring-MQTT event. |
+| Live | Live view `camera.*` | Home Assistant Generic Camera or RTSP-to-WebRTC camera configured from Ring-MQTT's `_live` RTSP path | Same Live tab and Home Assistant camera player. Ring-MQTT does not auto-discover this camera entity. |
+| Dashboard still | Last recording or Live camera image | Ring-MQTT snapshot `camera.*` | Same passive card. A snapshot camera is also the poster for Event Select recordings. |
+| Manual snapshot | Configured snapshot camera, otherwise Live camera | Snapshot camera plus its same-device Take Snapshot button | Same camera action and feedback. Ring View waits for Ring-MQTT's timestamp update before saving. |
+| Doorbell alert | Ding `event.*` | Ding `binary_sensor.*` | Same bell indicator and Open live view action. |
+| Last activity | Timestamp state from a sensor, event, or helper | Ding or motion binary-sensor attributes | Same localized relative time. The freshest supported same-device MQTT activity wins. |
+| Door access | Any Home Assistant `lock.*` and optional contact sensor | Same | Provider-independent. |
+
+The visual editor always offers the same fields and choices. It never reveals
+or removes design settings based on an entity's integration. The runtime uses
+the selected entity's registry identity only to adapt the transport behind the
+same interface: signed Event Select MP4, snapshot refresh button, activity
+attributes, or normal Home Assistant camera playback. Renamed entities remain
+supported through registry `device_id`, `unique_id`, and original-name data;
+ambiguous companion controls are not guessed.
+
+Two-way audio is the one deliberate provider limitation. The official Ring
+Live view camera exposes the WebRTC signaling path needed to add a browser
+microphone track. Ring-MQTT exposes a one-way RTSP gateway and no equivalent
+microphone return path, so Ring View cannot implement talkback for it. The
+editor remains unchanged and displays a capability warning if two-way audio is
+enabled with a different Live camera.
+
+Ring-MQTT also requires its [documented one-time Home Assistant camera setup](https://github.com/tsightler/ring-mqtt/wiki/Video-Streaming#home-assistant-generic-camera-configuration)
+for the RTSP path; that setup is outside the card. The included notification
+blueprint and optional Ring WebRTC backend patch still target the official Ring
+integration. Other camera pairings remain compatible in principle when a
+recording camera exposes `video_url` or `entity_picture` and the Live camera
+advertises stream support.
 
 The viewer uses Home Assistant's application-level `show-dialog` contract for
 dialog placement, browser Back behavior, and independence from responsive card
