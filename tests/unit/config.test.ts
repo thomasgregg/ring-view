@@ -35,7 +35,7 @@ describe("configuration", () => {
   it("rejects missing, non-camera, and invalid appearance values", () => {
     expect(() =>
       validateConfig({ recording_entity: "light.porch", live_entity: "camera.live" }),
-    ).toThrow(/camera entity/);
+    ).toThrow(/camera or select entity/);
     expect(() =>
       validateConfig({
         recording_entity: "camera.recording",
@@ -113,6 +113,15 @@ describe("configuration", () => {
         door_control_location: "dashboard_only",
       } as never),
     ).toThrow(/door_control_location/);
+  });
+
+  it("accepts a Ring-MQTT Event Select as the recording source", () => {
+    expect(
+      normalizeConfig({
+        recording_entity: "select.front_door_event_select",
+        live_entity: "camera.live",
+      }).recording_entity,
+    ).toBe("select.front_door_event_select");
   });
 
   it.each(["event.front_door_ding", "binary_sensor.front_door_ding"])(

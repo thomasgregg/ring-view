@@ -95,6 +95,17 @@ const recording: HassEntity = {
     supported_features: 0,
   },
 };
+const mqttRecording: HassEntity = {
+  entity_id: "select.front_door_event_select",
+  state: "Ding 1",
+  attributes: {
+    friendly_name: "Front Door Event Select",
+    eventId: "demo-event-1",
+    recordingUrl: query.get("mqtt_recording") === "missing"
+      ? "<Recording Not Found>"
+      : "/demo/pending-recording.mp4?event=1",
+  },
+};
 const live: HassEntity = {
   entity_id: "camera.live_view",
   state: "idle",
@@ -171,6 +182,13 @@ let hass: HomeAssistant = {
       entity_id: recording.entity_id,
       platform: "ring",
     },
+    [mqttRecording.entity_id]: {
+      entity_id: mqttRecording.entity_id,
+      platform: "mqtt",
+      device_id: "demo-ring-device",
+      unique_id: "demo-ring-device_event_select",
+      original_name: "Event Select",
+    },
     [live.entity_id]: {
       entity_id: live.entity_id,
       platform: query.get("live_platform") || "ring",
@@ -208,6 +226,7 @@ let hass: HomeAssistant = {
   },
   states: {
     [recording.entity_id]: recording,
+    [mqttRecording.entity_id]: mqttRecording,
     [live.entity_id]: live,
     [snapshot.entity_id]: snapshot,
     [snapshotRefresh.entity_id]: snapshotRefresh,
@@ -229,6 +248,13 @@ let hass: HomeAssistant = {
       && target?.entity_id === snapshotRefresh.entity_id
     ) {
       queueMicrotask(() => window.demoRefreshSnapshot());
+    }
+    if (
+      domain === "select"
+      && service === "select_option"
+      && target?.entity_id === mqttRecording.entity_id
+    ) {
+      queueMicrotask(() => window.demoRefreshRecording());
     }
   },
   connection: {
@@ -292,7 +318,9 @@ const previewSource: PreviewSource =
     : "last_recording";
 card.setConfig({
   type: "custom:ring-view",
-  recording_entity: recording.entity_id,
+  recording_entity: query.get("recording_source") === "mqtt"
+    ? mqttRecording.entity_id
+    : recording.entity_id,
   live_entity: live.entity_id,
   snapshot_entity: snapshot.entity_id,
   last_activity_entity:
@@ -367,6 +395,26 @@ window.demoRefreshSnapshot = () => {
   dialogManager.updateHass(hass);
 };
 
+window.demoRefreshRecording = () => {
+  const current = hass.states[mqttRecording.entity_id];
+  if (!current) return;
+  hass = {
+    ...hass,
+    states: {
+      ...hass.states,
+      [mqttRecording.entity_id]: {
+        ...current,
+        attributes: {
+          ...current.attributes,
+          recordingUrl: `/demo/pending-recording.mp4?event=${Date.now()}`,
+        },
+      },
+    },
+  };
+  card.hass = hass;
+  dialogManager.updateHass(hass);
+};
+
 declare global {
   interface Window {
     demoActiveStreams?: number;
@@ -380,5 +428,6 @@ declare global {
     }>;
     demoSetEntityState: (entityId: string, state: string) => void;
     demoRefreshSnapshot: () => void;
+    demoRefreshRecording: () => void;
   }
 }

@@ -558,6 +558,26 @@ test("shows only the Ring View loader while a direct recording is pending", asyn
   await expect(page.getByText("Loading last recording…")).toBeVisible();
 });
 
+test("refreshes a Ring-MQTT Event Select before mounting its recording", async ({ page }) => {
+  await page.route("**/pending-recording.mp4?event=*", async () => undefined);
+  await page.goto("/demo/?recording_source=mqtt&mqtt_recording=missing");
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+
+  const recording = page.locator("video.video-fallback");
+  await expect(recording).toBeAttached();
+  await expect(recording).toHaveAttribute("src", /pending-recording\.mp4\?event=/);
+  await expect(page.locator("ring-view-native-camera-adapter")).toHaveCount(0);
+  await expect(page.locator(".media-frame > img.poster")).toHaveAttribute(
+    "src",
+    /source=snapshot/,
+  );
+  await expect.poll(async () => page.evaluate(() =>
+    (window.demoDoorCalls ?? []).filter(
+      (call) => call.domain === "select" && call.service === "select_option",
+    ).length,
+  )).toBe(1);
+});
+
 test("dismisses idle direct-recording controls and resumes or replays from the video", async ({
   page,
 }) => {

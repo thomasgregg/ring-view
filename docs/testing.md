@@ -32,8 +32,9 @@ The unit suite covers configuration defaults and validation, manual snapshot
 source selection, paths, timezone-aware filenames and service feedback,
 snapshot timestamp parsing and freshest-preview fallbacks, official and
 Ring-MQTT last-activity timestamp formats, sibling resolution and localization,
-Ring-MQTT on-demand snapshot discovery and event-driven refresh waits, native
-editor structure and progressive
+Ring-MQTT on-demand snapshot discovery and event-driven refresh waits,
+Ring-MQTT Event Select identification, signed-URL expiry, event-driven recording
+refresh and cancellation, camera-poster selection, native editor structure and progressive
 dashboard fields, entity and talkback capability states, unsupported-camera
 fallback, doorbell alerts, timeout invalidation, passive-dashboard privacy,
 single-renderer switching, close teardown, disconnect teardown, single-offer
@@ -120,6 +121,15 @@ Verify each item on current stable Home Assistant and, where practical, the prev
     both reuse the same centered viewer status display as snapshot failures,
     remain clear of the visitor-action dock, and disappear without leaving a
     second pill or toast behind.
+26. Set `recording_entity` to a renamed Ring-MQTT Event Select and choose a
+    playable event. Confirm Last recording uses the direct MP4 and the configured
+    snapshot camera as its poster, without mounting Home Assistant's camera
+    renderer. Test a missing and an expired `recordingUrl`: Ring View must call
+    `select.select_option` with the entity's current option, wait for a changed
+    playable URL, and cancel cleanly when switching to Live, closing, hiding the
+    page, or suspending the card. Also test Recording Not Found, Transcoding in
+    Progress, a service failure, a 15-second timeout, and a browser playback
+    error followed by one refresh attempt. No signed URL may appear in logs.
 
 ## Visual matrix
 

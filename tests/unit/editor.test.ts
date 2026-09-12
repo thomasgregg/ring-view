@@ -218,6 +218,11 @@ describe("visual editor", () => {
       "recording_entity",
       "live_entity",
     ]);
+    expect(schema[0]?.selector).toEqual({
+      entity: {
+        filter: [{ domain: "camera" }, { domain: "select" }],
+      },
+    });
     expect(
       schema.filter((field) => field.type === "expandable").map((field) => ({
         name: field.name,
@@ -378,7 +383,7 @@ describe("visual editor", () => {
         })
       | null;
     expect(form?.computeLabel?.({ name: "recording_entity" })).toBe(
-      "Kamera für letzte Aufnahme",
+      "Aufnahmequelle",
     );
     expect(form?.computeLabel?.({ name: "viewer_behavior" })).toBe(
       "Vollbildansicht",

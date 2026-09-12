@@ -17,11 +17,15 @@ Live or you select Live. Only the active mode's renderer remains mounted. The
 highlight around a mode icon identifies the selected view, so Recording stays
 highlighted when its video is paused or has ended.
 
-For recordings, Ring View uses the current ephemeral `video_url` when
-available, with Home Assistant's camera renderer as the alternative if it is
-missing or fails. Normal Live uses Home Assistant's camera renderer and its
-WebRTC/HLS/MJPEG selection. Enabling supported two-way audio uses Ring View's
-single-session WebRTC player for Live instead.
+For an official Ring recording camera, Ring View uses the current ephemeral
+`video_url` when available, with Home Assistant's camera renderer as the
+alternative if it is missing or fails. A Ring-MQTT Event Select source instead
+uses its direct `recordingUrl`. Ring View refreshes an absent, nearly expired,
+or once-failed URL by re-selecting the current event and waiting for an explicit
+entity update; it never passes a select entity to the camera renderer. Normal
+Live uses Home Assistant's camera renderer and its WebRTC/HLS/MJPEG selection.
+Enabling supported two-way audio uses Ring View's single-session WebRTC player
+for Live instead.
 
 Home Assistant's application-level dialog manager owns the viewer and its
 history entry, independently of responsive dashboard card rearrangements.
@@ -96,6 +100,7 @@ an operation result. Configuration warnings stay in the visual editor.
 | Snapshot works with Ring-MQTT but not the official Live camera | Keep the Ring-MQTT camera configured as `snapshot_entity`. Ring View prefers it automatically. The official fallback can save only the still image exposed by that entity, not pixels from the active WebRTC player, so it may be unavailable or show the latest recording. |
 | Missing or indistinguishable camera entries | Show disabled entities on the Ring device. Before enabling it, the camera disabled by default is Last recording; the camera enabled by default is Live view. Copy the exact IDs and do not rely on their suffixes. See [Choosing camera entities](configuration.md#choosing-camera-entities). |
 | Last recording remains on an old clip | On some newer wired Ring cameras, 24/7 recording can leave Home Assistant's `last_recording` entity stuck on an old event. This is an [upstream Home Assistant issue](https://github.com/home-assistant/core/issues/176299), not a Ring View cache: the card's preview and Last recording view can update only when Home Assistant supplies a new `last_video_id` or `video_url`. The issue reporter found that disabling 24/7 recording and using periodic snapshots restored updates. Live view, talkback, and Ding alerts use separate entities and remain available. |
+| Ring-MQTT recording says it is unavailable | Open the Event Select entity and choose the intended event. **Recording Not Found** means Ring-MQTT has no clip for that slot. **Transcoding in Progress** can require more than one 15-second attempt; wait and retry. If the original MP4 is rejected by the browser, choose the matching **(Transcoded)** option. Signed URLs are refreshed automatically when Ring-MQTT publishes their replacement. |
 | Old card behavior after updating | Confirm the installed HACS version and refresh the frontend. In the iOS Companion app, **Clear Web View Cache** may be necessary. |
 | No new phone preview | Check the blueprint's selected recording entity and whether a new `last_video_id` appeared within two minutes. See [notifications](notifications.md). |
 

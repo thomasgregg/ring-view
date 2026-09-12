@@ -28,6 +28,60 @@ async function mount() {
   return { dialog, video };
 }
 
+function ringMqttHass(recordingUrl?: string): HomeAssistant {
+  return {
+    ...hass,
+    states: {
+      ...hass.states,
+      "select.front_door_events": {
+        entity_id: "select.front_door_events",
+        state: "Ding 1",
+        attributes: {
+          eventId: "event-1",
+          ...(recordingUrl === undefined ? {} : { recordingUrl }),
+        },
+      },
+      "camera.snapshot": {
+        entity_id: "camera.snapshot",
+        state: "idle",
+        attributes: { entity_picture: "/snapshot.jpg" },
+      },
+    },
+    entities: {
+      "select.front_door_events": {
+        entity_id: "select.front_door_events",
+        platform: "mqtt",
+        device_id: "front-door",
+        unique_id: "083a8804c4c5_event_select",
+        original_name: "Event Select",
+      },
+      "camera.snapshot": {
+        entity_id: "camera.snapshot",
+        platform: "mqtt",
+        device_id: "front-door",
+      },
+    },
+    callService: vi.fn(async () => undefined),
+  };
+}
+
+async function mountRingMqtt(recordingUrl?: string) {
+  const dialog = document.createElement("ring-view-dialog");
+  const mqttHass = ringMqttHass(recordingUrl);
+  dialog.hass = mqttHass;
+  document.body.append(dialog);
+  dialog.showDialog({
+    mode: "last_recording",
+    config: normalizeConfig({
+      recording_entity: "select.front_door_events",
+      live_entity: "camera.live",
+      snapshot_entity: "camera.snapshot",
+    }),
+  });
+  await flush();
+  return { dialog, hass: mqttHass };
+}
+
 describe("recording player lifecycle", () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -53,6 +107,224 @@ describe("recording player lifecycle", () => {
 
     expect(video().classList.contains("pending")).toBe(false);
     expect(dialog.shadowRoot!.querySelector(".spinner")).toBeNull();
+  });
+
+  it("plays a ready Ring-MQTT recording URL with a camera poster", async () => {
+    const { dialog, hass: mqttHass } = await mountRingMqtt(
+      "https://example.test/mqtt-recording.mp4",
+    );
+    const video = dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback");
+    expect(video?.src).toBe("https://example.test/mqtt-recording.mp4");
+    expect(video?.poster).toContain("/snapshot.jpg");
+    expect(dialog.shadowRoot?.querySelector("ring-view-native-camera-adapter")).toBeNull();
+    expect(mqttHass.callService).not.toHaveBeenCalled();
+  });
+
+  it("requests and waits for a fresh Ring-MQTT URL before mounting playback", async () => {
+    const { dialog, hass: mqttHass } = await mountRingMqtt("<Recording Not Found>");
+    expect(mqttHass.callService).toHaveBeenCalledWith(
+      "select",
+      "select_option",
+      { option: "Ding 1" },
+      { entity_id: "select.front_door_events" },
+    );
+    expect(dialog.shadowRoot?.querySelector(".video-fallback")).toBeNull();
+    expect(dialog.shadowRoot?.querySelector("ring-view-native-camera-adapter")).toBeNull();
+    expect(dialog.shadowRoot?.textContent).toContain("Loading last recording");
+
+    dialog.hass = {
+      ...mqttHass,
+      states: {
+        ...mqttHass.states,
+        "select.front_door_events": {
+          ...mqttHass.states["select.front_door_events"]!,
+          attributes: {
+            eventId: "event-1",
+            recordingUrl: "https://example.test/fresh-recording.mp4",
+          },
+        },
+      },
+    };
+    await flush();
+
+    expect(
+      dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback")?.src,
+    ).toBe("https://example.test/fresh-recording.mp4");
+  });
+
+  it("reports a refresh timeout without trying to render a select as a camera", async () => {
+    const { dialog } = await mountRingMqtt("<Transcoding in Progress>");
+    await vi.advanceTimersByTimeAsync(15_000);
+    await dialog.updateComplete;
+    expect(dialog.shadowRoot?.textContent).toContain(
+      "Ring-MQTT did not provide a fresh recording URL in time.",
+    );
+    expect(dialog.shadowRoot?.querySelector("ring-view-native-camera-adapter")).toBeNull();
+  });
+
+  it("refreshes one failed Ring-MQTT video and reports a second playback failure", async () => {
+    const { dialog, hass: mqttHass } = await mountRingMqtt(
+      "https://example.test/first-recording.mp4",
+    );
+    dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback")
+      ?.dispatchEvent(new Event("error"));
+    await flush();
+    expect(mqttHass.callService).toHaveBeenCalledTimes(1);
+    expect(dialog.shadowRoot?.querySelector(".video-fallback")).toBeNull();
+
+    dialog.hass = {
+      ...mqttHass,
+      states: {
+        ...mqttHass.states,
+        "select.front_door_events": {
+          ...mqttHass.states["select.front_door_events"]!,
+          attributes: {
+            eventId: "event-1",
+            recordingUrl: "https://example.test/refreshed-recording.mp4",
+          },
+        },
+      },
+    };
+    await flush();
+    dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback")
+      ?.dispatchEvent(new Event("error"));
+    await flush();
+
+    expect(mqttHass.callService).toHaveBeenCalledTimes(1);
+    expect(dialog.shadowRoot?.textContent).toContain(
+      "The selected Ring-MQTT recording could not be played.",
+    );
+    expect(dialog.shadowRoot?.querySelector("ring-view-native-camera-adapter")).toBeNull();
+  });
+
+  it("refreshes an expired signed Ring-MQTT URL before trying playback", async () => {
+    const { dialog, hass: mqttHass } = await mountRingMqtt(
+      "https://example.test/expired.mp4?X-Amz-Date=20200101T000000Z&X-Amz-Expires=60",
+    );
+    expect(mqttHass.callService).toHaveBeenCalledTimes(1);
+    expect(dialog.shadowRoot?.querySelector(".video-fallback")).toBeNull();
+  });
+
+  it("surfaces a Ring-MQTT refresh service failure immediately", async () => {
+    const mqttHass = ringMqttHass();
+    mqttHass.callService = vi.fn().mockRejectedValue(new Error("service failed"));
+    const dialog = document.createElement("ring-view-dialog");
+    dialog.hass = mqttHass;
+    document.body.append(dialog);
+    dialog.showDialog({
+      mode: "last_recording",
+      config: normalizeConfig({
+        recording_entity: "select.front_door_events",
+        live_entity: "camera.live",
+      }),
+    });
+    await flush();
+
+    expect(dialog.shadowRoot?.textContent).toContain(
+      "Home Assistant could not refresh the Ring-MQTT recording URL.",
+    );
+  });
+
+  it("times out even when the Home Assistant service promise never settles", async () => {
+    const mqttHass = ringMqttHass();
+    mqttHass.callService = vi.fn(() => new Promise(() => undefined));
+    const dialog = document.createElement("ring-view-dialog");
+    dialog.hass = mqttHass;
+    document.body.append(dialog);
+    dialog.showDialog({
+      mode: "last_recording",
+      config: normalizeConfig({
+        recording_entity: "select.front_door_events",
+        live_entity: "camera.live",
+      }),
+    });
+    await flush();
+    await vi.advanceTimersByTimeAsync(15_000);
+    await dialog.updateComplete;
+
+    expect(dialog.shadowRoot?.textContent).toContain(
+      "Ring-MQTT did not provide a fresh recording URL in time.",
+    );
+  });
+
+  it("never passes an unrecognized select source to the camera renderer", async () => {
+    const mqttHass = ringMqttHass();
+    mqttHass.entities = {
+      ...mqttHass.entities,
+      "select.front_door_events": {
+        entity_id: "select.front_door_events",
+        platform: "template",
+      },
+    };
+    const dialog = document.createElement("ring-view-dialog");
+    dialog.hass = mqttHass;
+    document.body.append(dialog);
+    dialog.showDialog({
+      mode: "last_recording",
+      config: normalizeConfig({
+        recording_entity: "select.front_door_events",
+        live_entity: "camera.live",
+      }),
+    });
+    await flush();
+
+    expect(dialog.shadowRoot?.textContent).toContain(
+      "This select entity does not expose a playable recording URL",
+    );
+    expect(dialog.shadowRoot?.querySelector("ring-view-native-camera-adapter")).toBeNull();
+  });
+
+  it("cancels a pending recording refresh when switching to Live", async () => {
+    const { dialog, hass: mqttHass } = await mountRingMqtt();
+    dialog.shadowRoot?.querySelector<HTMLButtonElement>("#ring-view-tab-live")?.click();
+    await flush();
+
+    dialog.hass = {
+      ...mqttHass,
+      states: {
+        ...mqttHass.states,
+        "select.front_door_events": {
+          ...mqttHass.states["select.front_door_events"]!,
+          attributes: {
+            eventId: "event-2",
+            recordingUrl: "https://example.test/late-recording.mp4",
+          },
+        },
+      },
+    };
+    await flush();
+    expect(dialog.shadowRoot?.querySelector(".video-fallback")).toBeNull();
+    expect(dialog.shadowRoot?.querySelector("ring-view-native-camera-adapter")).not.toBeNull();
+  });
+
+  it("does not mount a late recording while hidden and resumes from fresh state", async () => {
+    const visibility = vi.spyOn(document, "hidden", "get").mockReturnValue(true);
+    const { dialog, hass: mqttHass } = await mountRingMqtt();
+    document.dispatchEvent(new Event("visibilitychange"));
+    await flush();
+
+    dialog.hass = {
+      ...mqttHass,
+      states: {
+        ...mqttHass.states,
+        "select.front_door_events": {
+          ...mqttHass.states["select.front_door_events"]!,
+          attributes: {
+            eventId: "event-2",
+            recordingUrl: "https://example.test/while-hidden.mp4",
+          },
+        },
+      },
+    };
+    await flush();
+    expect(dialog.shadowRoot?.querySelector(".video-fallback")).toBeNull();
+
+    visibility.mockReturnValue(false);
+    document.dispatchEvent(new Event("visibilitychange"));
+    await flush();
+    expect(
+      dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback")?.src,
+    ).toBe("https://example.test/while-hidden.mp4");
   });
 
   it("dismisses paused recording controls after inactivity and resumes from the video surface", async () => {

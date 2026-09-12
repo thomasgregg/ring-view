@@ -66,11 +66,20 @@ function assertCameraEntity(
   }
 }
 
+function assertRecordingSource(value: unknown): asserts value is string {
+  if (
+    typeof value !== "string"
+    || (!value.startsWith("camera.") && !value.startsWith("select."))
+  ) {
+    throw new Error(localize(undefined, "config.recording_source_required"));
+  }
+}
+
 export function validateConfig(config: RingViewConfig): void {
   if (!config || typeof config !== "object") {
     throw new Error(localize(undefined, "config.invalid"));
   }
-  assertCameraEntity(config.recording_entity, "config.recording_entity");
+  assertRecordingSource(config.recording_entity);
   assertCameraEntity(config.live_entity, "config.live_entity");
   if (config.snapshot_entity !== undefined && config.snapshot_entity !== "") {
     assertCameraEntity(config.snapshot_entity, "config.snapshot_entity");
