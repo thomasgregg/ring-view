@@ -114,6 +114,13 @@ const snapshot: HassEntity = {
     timestamp: Date.parse("2026-09-06T12:01:00Z") / 1_000,
   },
 };
+const snapshotRefresh: HassEntity = {
+  entity_id: "button.device_take_snapshot",
+  state: "unknown",
+  attributes: {
+    friendly_name: "Device Take Snapshot",
+  },
+};
 const activityAgeSeconds = Number(query.get("activity_age") ?? 125);
 const activity: HassEntity = {
   entity_id: "sensor.front_door_last_activity",
@@ -171,6 +178,16 @@ let hass: HomeAssistant = {
     [snapshot.entity_id]: {
       entity_id: snapshot.entity_id,
       platform: "mqtt",
+      device_id: "demo-ring-device",
+      unique_id: "demo-ring-device_snapshot",
+      original_name: "Snapshot",
+    },
+    [snapshotRefresh.entity_id]: {
+      entity_id: snapshotRefresh.entity_id,
+      platform: "mqtt",
+      device_id: "demo-ring-device",
+      unique_id: "demo-ring-device_take_snapshot",
+      original_name: "Take Snapshot",
     },
     [activity.entity_id]: {
       entity_id: activity.entity_id,
@@ -193,6 +210,7 @@ let hass: HomeAssistant = {
     [recording.entity_id]: recording,
     [live.entity_id]: live,
     [snapshot.entity_id]: snapshot,
+    [snapshotRefresh.entity_id]: snapshotRefresh,
     [activity.entity_id]: activity,
     [door.entity_id]: door,
     [doorContact.entity_id]: doorContact,
@@ -205,6 +223,13 @@ let hass: HomeAssistant = {
       ...(window.demoDoorCalls ?? []),
       { domain, service, serviceData, target },
     ];
+    if (
+      domain === "button"
+      && service === "press"
+      && target?.entity_id === snapshotRefresh.entity_id
+    ) {
+      queueMicrotask(() => window.demoRefreshSnapshot());
+    }
   },
   connection: {
     subscribeMessage: async <T>(callback: (message: T) => void) => {
@@ -318,6 +343,30 @@ window.demoSetEntityState = (entityId: string, state: string) => {
   dialogManager.updateHass(hass);
 };
 
+window.demoRefreshSnapshot = () => {
+  const current = hass.states[snapshot.entity_id];
+  if (!current) return;
+  const previousTimestamp = Number(current.attributes.timestamp ?? 0);
+  hass = {
+    ...hass,
+    states: {
+      ...hass.states,
+      [snapshot.entity_id]: {
+        ...current,
+        attributes: {
+          ...current.attributes,
+          timestamp: Math.max(
+            Math.floor(Date.now() / 1_000),
+            previousTimestamp + 1,
+          ),
+        },
+      },
+    },
+  };
+  card.hass = hass;
+  dialogManager.updateHass(hass);
+};
+
 declare global {
   interface Window {
     demoActiveStreams?: number;
@@ -330,5 +379,6 @@ declare global {
       target?: Record<string, unknown>;
     }>;
     demoSetEntityState: (entityId: string, state: string) => void;
+    demoRefreshSnapshot: () => void;
   }
 }

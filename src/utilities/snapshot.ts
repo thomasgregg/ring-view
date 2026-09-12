@@ -1,5 +1,10 @@
 import type { HomeAssistant, NormalizedConfig } from "../types";
 import { entityIsUnavailable, friendlyName } from "./entity-validation";
+import {
+  findSameDeviceEntityId,
+  resolveEntitySource,
+} from "./entity-sources";
+import { captureTimestamp } from "./preview-selection";
 
 export const DEFAULT_SNAPSHOT_DIRECTORY = "/media/ring-view";
 
@@ -63,6 +68,55 @@ export function selectSnapshotEntityId(
   return entityIsUnavailable(hass.states[config.live_entity])
     ? undefined
     : config.live_entity;
+}
+
+export function snapshotCaptureMarker(
+  hass: HomeAssistant,
+  entityId: string,
+): number | undefined {
+  return captureTimestamp(hass.states[entityId]);
+}
+
+/**
+ * Ring-MQTT gives every camera device one `take_snapshot` button. Prefer its
+ * stable discovery identity, then its original integration name, and finally
+ * accept a single unambiguous MQTT button for compatibility with the compact
+ * entity registry data exposed by some Home Assistant frontends.
+ */
+export function findRingMqttSnapshotButton(
+  hass: HomeAssistant,
+  snapshotEntityId: string,
+): string | undefined {
+  if (
+    resolveEntitySource(hass, "snapshot", snapshotEntityId).provider !== "mqtt"
+  ) {
+    return undefined;
+  }
+
+  const exact = findSameDeviceEntityId(
+    hass,
+    snapshotEntityId,
+    (entityId, _entity, registry) =>
+      entityId.startsWith("button.")
+      && registry.platform === "mqtt"
+      && (registry.unique_id?.endsWith("_take_snapshot") === true
+        || registry.original_name === "Take Snapshot"),
+  );
+  if (exact) return exact;
+
+  return findSameDeviceEntityId(
+    hass,
+    snapshotEntityId,
+    (entityId, _entity, registry) =>
+      entityId.startsWith("button.") && registry.platform === "mqtt",
+  );
+}
+
+export function isRingMqttSnapshotSource(
+  hass: HomeAssistant,
+  snapshotEntityId: string,
+): boolean {
+  return resolveEntitySource(hass, "snapshot", snapshotEntityId).provider === "mqtt";
 }
 
 export function snapshotCameraSlug(
