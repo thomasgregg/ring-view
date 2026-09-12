@@ -53,7 +53,7 @@ import type {
   HomeAssistant,
   NormalizedConfig,
 } from "./types";
-import { activityTimestamp } from "./utilities/activity-time";
+import { resolveActivityTimestamp } from "./utilities/activity-time";
 import { isDoorbellRingTransition } from "./utilities/doorbell";
 import {
   entityIsUnavailable,
@@ -337,11 +337,10 @@ export class RingViewDialog extends LitElement {
     if (!this.open || !this.hass || !this.config) return nothing;
     const title = this.dialogTitle();
     const showTitle = this.config.show_name;
-    const showActivity = activityTimestamp(
-      this.config.last_activity_entity
-        ? this.hass.states[this.config.last_activity_entity]
-        : undefined,
-    ) !== undefined;
+    const showActivity = this.config.last_activity_entity
+      ? resolveActivityTimestamp(this.hass, this.config.last_activity_entity)
+        !== undefined
+      : false;
     const ratio = this.config.aspect_ratio;
     const style = {
       "--ring-view-aspect-ratio":

@@ -186,12 +186,13 @@ test("places the optional last activity source beside the name appearance contro
           { domain: "sensor" },
           { domain: "event" },
           { domain: "input_datetime" },
+          { domain: "binary_sensor" },
         ],
       },
     },
     label: "Last activity timestamp (optional)",
     helper:
-      "Shows relative time at the top left, below the camera name when it is visible. Choose a timestamp sensor, event entity, or Date and/or time helper whose state contains both a date and time.",
+      "Shows relative time at the top left, below the camera name when it is visible. Choose a timestamp sensor, event entity, Date and/or time helper, or a Ring-MQTT Ding or motion sensor.",
   });
 });
 

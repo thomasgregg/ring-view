@@ -329,6 +329,7 @@ function configSchema(
                 { domain: "sensor" },
                 { domain: "event" },
                 { domain: "input_datetime" },
+                { domain: "binary_sensor" },
               ],
             },
           },

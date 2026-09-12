@@ -363,6 +363,69 @@ describe("card stream lifecycle", () => {
     );
   });
 
+  it("updates Ring-MQTT activity when a same-device motion sibling changes", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(Date.parse("2026-09-12T10:30:30Z"));
+    const ding: HassEntity = {
+      entity_id: "binary_sensor.renamed_ding",
+      state: "off",
+      attributes: { lastDingTime: "2026-09-12T10:15:30Z" },
+    };
+    const motion: HassEntity = {
+      entity_id: "binary_sensor.renamed_motion",
+      state: "off",
+      attributes: { lastMotionTime: "2026-09-12T10:17:30Z" },
+    };
+    const mqttHass: HomeAssistant = {
+      ...hass,
+      states: {
+        ...hass.states,
+        [ding.entity_id]: ding,
+        [motion.entity_id]: motion,
+      },
+      entities: {
+        ...hass.entities,
+        [ding.entity_id]: {
+          entity_id: ding.entity_id,
+          platform: "mqtt",
+          device_id: "front-door",
+        },
+        [motion.entity_id]: {
+          entity_id: motion.entity_id,
+          platform: "mqtt",
+          device_id: "front-door",
+        },
+      },
+    };
+    const card = document.createElement("ring-view");
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      last_activity_entity: ding.entity_id,
+    });
+    card.hass = mqttHass;
+    document.body.append(card);
+    await card.updateComplete;
+    let activity = card.shadowRoot?.querySelector("ring-view-activity-time");
+    await activity?.updateComplete;
+    expect(activity?.shadowRoot?.textContent).toContain("13 min ago");
+
+    card.hass = {
+      ...mqttHass,
+      states: {
+        ...mqttHass.states,
+        [motion.entity_id]: {
+          ...motion,
+          attributes: { lastMotionTime: "2026-09-12T10:25:30Z" },
+        },
+      },
+    };
+    await card.updateComplete;
+    activity = card.shadowRoot?.querySelector("ring-view-activity-time");
+    await activity?.updateComplete;
+    expect(activity?.shadowRoot?.textContent).toContain("5 min ago");
+  });
+
   it("keeps the card and viewer name hidden while preserving a dialog label", async () => {
     const card = await mount();
     expect(card.shadowRoot?.querySelector(".name")).toBeNull();

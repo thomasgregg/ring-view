@@ -2,8 +2,8 @@ import { css, LitElement, html, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import type { HomeAssistant } from "./types";
 import {
-  activityTimestamp,
   formatActivityTime,
+  resolveActivityTimestamp,
 } from "./utilities/activity-time";
 
 const REFRESH_INTERVAL_MS = 30_000;
@@ -43,9 +43,9 @@ export class RingViewActivityTime extends LitElement {
   }
 
   protected render() {
-    const timestamp = activityTimestamp(
-      this.entityId ? this.hass?.states[this.entityId] : undefined,
-    );
+    const timestamp = this.hass && this.entityId
+      ? resolveActivityTimestamp(this.hass, this.entityId)
+      : undefined;
     if (timestamp === undefined) return nothing;
     const display = formatActivityTime(this.hass, timestamp);
     return html`
@@ -57,9 +57,9 @@ export class RingViewActivityTime extends LitElement {
 
   protected updated(): void {
     this.clearRefreshTimer();
-    const timestamp = activityTimestamp(
-      this.entityId ? this.hass?.states[this.entityId] : undefined,
-    );
+    const timestamp = this.hass && this.entityId
+      ? resolveActivityTimestamp(this.hass, this.entityId)
+      : undefined;
     if (timestamp === undefined) return;
     this.refreshTimer = window.setTimeout(() => {
       this.refreshTimer = undefined;

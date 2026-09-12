@@ -5,6 +5,8 @@ import {
   activityTimestamp,
   formatActivityTime,
   parseTimestampValue,
+  resolveActivityTimestamp,
+  ringMqttActivityTimestamp,
 } from "../../src/utilities/activity-time";
 
 const entity = (state: string): HassEntity => ({
@@ -56,6 +58,110 @@ describe("last activity timestamps", () => {
     }
     expect(activityTimestamp(undefined)).toBeUndefined();
     expect(activityTimestamp(entity("unknown"))).toBeUndefined();
+  });
+
+  it("reads only the approved Ring-MQTT Ding and motion attributes", () => {
+    const mqttEntity: HassEntity = {
+      entity_id: "binary_sensor.front_door_ding",
+      state: "off",
+      attributes: {
+        lastDingTime: "2026-09-12T10:15:30Z",
+        lastMotionTime: "2026-09-12T10:16:30Z",
+        lastDing: 1_789_208_130,
+        lastMotion: "1789208250000",
+        timestamp: "2026-09-12T11:00:00Z",
+      },
+      last_changed: "2026-09-12T12:00:00Z",
+      last_updated: "2026-09-12T13:00:00Z",
+    };
+
+    expect(ringMqttActivityTimestamp(mqttEntity)).toBe(1_789_208_250_000);
+    expect(ringMqttActivityTimestamp({
+      ...mqttEntity,
+      state: "unavailable",
+    })).toBeUndefined();
+    expect(ringMqttActivityTimestamp({
+      ...mqttEntity,
+      attributes: { timestamp: "2026-09-12T11:00:00Z" },
+    })).toBeUndefined();
+  });
+
+  it("uses the freshest available MQTT Ding or motion sibling on the same device", () => {
+    const ding: HassEntity = {
+      entity_id: "binary_sensor.renamed_ding",
+      state: "off",
+      attributes: { lastDingTime: "2026-09-12T10:15:30Z" },
+    };
+    const motion: HassEntity = {
+      entity_id: "binary_sensor.renamed_motion",
+      state: "off",
+      attributes: { lastMotionTime: "2026-09-12T10:17:30Z" },
+    };
+    const unavailable: HassEntity = {
+      entity_id: "binary_sensor.unavailable_motion",
+      state: "unavailable",
+      attributes: { lastMotionTime: "2026-09-12T10:20:30Z" },
+    };
+    const info: HassEntity = {
+      entity_id: "sensor.renamed_info",
+      state: "2026-09-12T10:30:30Z",
+      attributes: { lastMotionTime: "2026-09-12T10:30:30Z" },
+    };
+    const hass: HomeAssistant = {
+      states: {
+        [ding.entity_id]: ding,
+        [motion.entity_id]: motion,
+        [unavailable.entity_id]: unavailable,
+        [info.entity_id]: info,
+      },
+      entities: Object.fromEntries(
+        Object.keys({
+          [ding.entity_id]: ding,
+          [motion.entity_id]: motion,
+          [unavailable.entity_id]: unavailable,
+          [info.entity_id]: info,
+        }).map((entityId) => [entityId, {
+          entity_id: entityId,
+          platform: "mqtt",
+          device_id: "front-door",
+        }]),
+      ),
+      hassUrl: (path = "") => path,
+      callWS: async () => ({}) as never,
+    };
+
+    expect(resolveActivityTimestamp(hass, ding.entity_id)).toBe(
+      Date.parse("2026-09-12T10:17:30Z"),
+    );
+
+    hass.states[ding.entity_id] = { ...ding, state: "unavailable" };
+    expect(resolveActivityTimestamp(hass, ding.entity_id)).toBe(
+      Date.parse("2026-09-12T10:17:30Z"),
+    );
+  });
+
+  it("degrades to selected attributes without registry data and preserves state timestamps", () => {
+    const ding: HassEntity = {
+      entity_id: "binary_sensor.front_door_ding",
+      state: "off",
+      attributes: { lastDingTime: "2026-09-12T10:15:30Z" },
+    };
+    const official = entity("2026-09-12T10:18:30Z");
+    const hass: HomeAssistant = {
+      states: {
+        [ding.entity_id]: ding,
+        [official.entity_id]: official,
+      },
+      hassUrl: (path = "") => path,
+      callWS: async () => ({}) as never,
+    };
+
+    expect(resolveActivityTimestamp(hass, ding.entity_id)).toBe(
+      Date.parse("2026-09-12T10:15:30Z"),
+    );
+    expect(resolveActivityTimestamp(hass, official.entity_id)).toBe(
+      Date.parse("2026-09-12T10:18:30Z"),
+    );
   });
 
   it("formats compact visible text and a fuller accessible label in English", () => {

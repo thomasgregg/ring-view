@@ -30,8 +30,9 @@ npm run build
 
 The unit suite covers configuration defaults and validation, manual snapshot
 source selection, paths, timezone-aware filenames and service feedback,
-snapshot timestamp parsing and freshest-preview fallbacks, last-activity
-timestamp formats and localization, native editor structure and progressive
+snapshot timestamp parsing and freshest-preview fallbacks, official and
+Ring-MQTT last-activity timestamp formats, sibling resolution and localization,
+native editor structure and progressive
 dashboard fields, entity and talkback capability states, unsupported-camera
 fallback, doorbell alerts, timeout invalidation, passive-dashboard privacy,
 single-renderer switching, close teardown, disconnect teardown, single-offer
@@ -98,6 +99,8 @@ Verify each item on current stable Home Assistant and, where practical, the prev
     viewer with the camera name both enabled and disabled. Confirm the relative
     time updates, the exact hover time is correct, and neither line reaches the
     mode or close/fullscreen controls at the narrowest supported card width.
+    Repeat with a Ring-MQTT Ding sensor and verify a newer motion timestamp from
+    the same device is reflected without using the Info sensor or HA metadata.
 23. Enable manual snapshots with `/media/ring-view`. Confirm the camera button
     is absent while on-demand is idle, appears after selecting Live, saves one
     timestamped JPEG per tap, and reports success without changing the selected
