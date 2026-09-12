@@ -140,6 +140,14 @@ const doorContact: HassEntity = {
     device_class: "door",
   },
 };
+const doorbell: HassEntity = {
+  entity_id: "binary_sensor.front_door_ding",
+  state: "off",
+  attributes: {
+    friendly_name: "Front Door Ding",
+    device_class: "occupancy",
+  },
+};
 recording.attributes.recorded_at = "2026-09-06T12:00:00Z";
 if (query.get("recording_video") === "pending") {
   recording.attributes.video_url = "/demo/pending-recording.mp4";
@@ -176,6 +184,10 @@ let hass: HomeAssistant = {
       entity_id: doorContact.entity_id,
       platform: "demo",
     },
+    [doorbell.entity_id]: {
+      entity_id: doorbell.entity_id,
+      platform: "mqtt",
+    },
   },
   states: {
     [recording.entity_id]: recording,
@@ -184,6 +196,7 @@ let hass: HomeAssistant = {
     [activity.entity_id]: activity,
     [door.entity_id]: door,
     [doorContact.entity_id]: doorContact,
+    [doorbell.entity_id]: doorbell,
   },
   hassUrl: (path = "") => path,
   callWS: async () => ({}) as never,
@@ -267,6 +280,7 @@ card.setConfig({
   preview_source: previewSource,
   preview_fallback: query.get("fallback") === "snapshot" ? "snapshot" : "last_recording",
   two_way_audio: query.get("two_way_audio") === "1",
+  doorbell_entity: query.get("doorbell") === "1" ? doorbell.entity_id : undefined,
   door_entity: query.get("door") === "1" ? door.entity_id : undefined,
   door_contact_entity:
     query.get("door_contact") === "1" ? doorContact.entity_id : undefined,

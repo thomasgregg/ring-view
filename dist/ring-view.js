@@ -474,7 +474,7 @@ const oi = (e, t, i) => {
   return s._$AI(e), s;
 };
 const Re = globalThis;
-let C = class extends U {
+let x = class extends U {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
   }
@@ -496,9 +496,9 @@ let C = class extends U {
     return P;
   }
 };
-C._$litElement$ = !0, C.finalized = !0, Re.litElementHydrateSupport?.({ LitElement: C });
+x._$litElement$ = !0, x.finalized = !0, Re.litElementHydrateSupport?.({ LitElement: x });
 const si = Re.litElementPolyfillSupport;
-si?.({ LitElement: C });
+si?.({ LitElement: x });
 (Re.litElementVersions ??= []).push("4.2.2");
 const ft = { ATTRIBUTE: 1 }, Ee = (e) => (...t) => ({ _$litDirective$: e, values: t });
 let Le = class {
@@ -1083,7 +1083,7 @@ var bi = Object.defineProperty, wi = Object.getOwnPropertyDescriptor, Pe = (e, t
   return o && s && bi(t, i, s), s;
 };
 const yi = 3e4;
-let G = class extends C {
+let G = class extends x {
   disconnectedCallback() {
     this.clearRefreshTimer(), super.disconnectedCallback();
   }
@@ -1794,6 +1794,25 @@ const to = F`
     pointer-events: auto;
   }
 
+  .ring-indicator {
+    width: 36px;
+    height: 36px;
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    color: var(--warning-color, #ffa000);
+    background: rgba(0, 0, 0, 0.38);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.38);
+    pointer-events: none;
+  }
+
+  .ring-indicator svg {
+    width: 22px;
+    height: 22px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+  }
+
   button {
     font: inherit;
   }
@@ -1878,7 +1897,7 @@ const to = F`
     place-items: center;
     border: 0;
     border-radius: 50%;
-    color: rgba(255, 255, 255, 0.72);
+    color: #fff;
     background: transparent;
     cursor: pointer;
   }
@@ -1990,44 +2009,6 @@ const to = F`
   .initial-start-surface:focus-visible {
     outline: 3px solid var(--primary-color, #03a9f4);
     outline-offset: -4px;
-  }
-
-  .dialog-ring-alert {
-    position: absolute;
-    z-index: 6;
-    inset: 68px auto auto 50%;
-    display: inline-flex;
-    min-height: 42px;
-    max-width: calc(100% - 32px);
-    align-items: center;
-    gap: 8px;
-    padding: 8px 13px;
-    border: 1px solid rgba(255, 255, 255, 0.42);
-    border-radius: 999px;
-    color: #fff;
-    background: rgba(198, 40, 40, 0.92);
-    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.38);
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 18px;
-    transform: translateX(-50%);
-    cursor: pointer;
-  }
-
-  .dialog-ring-alert:disabled {
-    opacity: 1;
-    cursor: default;
-  }
-
-  .dialog-ring-alert svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  .ring-action {
-    padding-inline-start: 4px;
-    color: rgba(255, 255, 255, 0.78);
-    font-size: 12px;
   }
 
   .visitor-controls {
@@ -2491,6 +2472,11 @@ const to = F`
     gap: 10px;
   }
 
+  :host([inline]) .doorbell-alert-layer.with-visitor-controls .state-card {
+    flex-direction: column;
+    gap: 8px;
+  }
+
   :host([inline]) .state-layer.with-visitor-controls .spinner {
     flex: 0 0 auto;
   }
@@ -2531,7 +2517,7 @@ function no(e, t) {
     } catch {
     }
 }
-const R = Ee(class extends Le {
+const C = Ee(class extends Le {
   constructor(e) {
     if (super(e), e.type !== ft.ATTRIBUTE || e.name !== "class" || e.strings?.length > 2) throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.");
   }
@@ -2595,7 +2581,7 @@ async function Ct() {
   }
   return uo(de, ho);
 }
-let $ = class extends C {
+let $ = class extends x {
   constructor() {
     super(...arguments), this.controls = !0, this.muted = !0, this.allowExoPlayer = !0, this.fitMode = "cover", this.passiveSurface = !1, this.nativeAvailable = !!customElements.get(de), this.handledStreamEvents = /* @__PURE__ */ new WeakSet(), this.ready = !1, this.handleSurfaceClick = (e) => {
       if (!this.passiveSurface || e.detail === 0 || !this.eventHost) return;
@@ -2781,7 +2767,7 @@ function mo(e, t) {
   }
   return t instanceof Error ? t.message : String(t);
 }
-let y = class extends C {
+let y = class extends x {
   constructor() {
     super(...arguments), this.entityId = "", this.muted = !1, this.fitMode = "cover", this.externalControls = !1, this.microphoneState = "not-requested", this.connectionState = "starting", this.statusMessage = "", this.statusKind = "status", this.actualMuted = !1, this.playbackBlocked = !1, this.readyDispatched = !1, this.connectionToken = 0, this.startAttempted = !1, this.pendingLocalCandidates = [], this.pendingRemoteCandidates = [], this.playbackRequestPending = !1, this.startQueued = !1, this.keyboardPressed = !1, this.externalPressed = !1, this.pressToken = 0, this.stopTalking = () => {
       const e = this.externalPressed;
@@ -2922,7 +2908,7 @@ let y = class extends C {
       ` : l}
       ${!this.externalControls && i && this.readyDispatched && !this.playbackBlocked ? h`<div class="talkback-controls">
         <button
-          class=${R({ "talk-button": !0, active: e })}
+          class=${C({ "talk-button": !0, active: e })}
           type="button"
           aria-label=${s}
           aria-pressed=${String(e)}
@@ -3367,7 +3353,7 @@ function Eo(e) {
   const t = e instanceof Error ? e.message.toLowerCase() : String(e).toLowerCase();
   return /timeout|timed out/.test(t) ? "snapshot.timeout" : /unauthorized|forbidden|permission denied/.test(t) ? "snapshot.permission_failed" : /cannot write|can't write|no access to path|read-only|readonly/.test(t) ? "snapshot.write_failed" : /connection|websocket|service api unavailable/.test(t) ? "snapshot.connection_failed" : /no image|could not provide|not supported|snapshot unavailable/.test(t) ? "snapshot.camera_failed" : "snapshot.failed";
 }
-let f = class extends C {
+let f = class extends x {
   constructor() {
     super(...arguments), this.open = !1, this.inline = !1, this.ringing = !1, this.mode = "last_recording", this.mediaStatus = "idle", this.session = 0, this.suspended = !1, this.recordingMuted = !1, this.recordingStarted = !0, this.recordingControlsVisible = !0, this.recordingEnded = !1, this.liveMuted = !0, this.recordingVideoFailed = !1, this.retryCount = 0, this.statusAnnouncement = "", this.talkbackReady = !1, this.talkbackRequesting = !1, this.talkbackTalking = !1, this.doorActionStatus = "idle", this.snapshotActionStatus = "idle", this.inlineStarted = !0, this.lifecycle = new bo(), this.recordingPlayback = /* @__PURE__ */ new WeakSet(), this.recordingPaused = !1, this.automaticLiveRetry = !0, this.pageUnloading = !1, this.talkKeyboardPressed = !1, this.doorKeyboardPressed = !1, this.doorActionToken = 0, this.snapshotActionToken = 0, this.inlineVisible = !1, this.inlineActive = !1, this.takeSnapshot = async () => {
       const e = this.hass, t = this.config, i = this.snapshotEntityId();
@@ -3621,7 +3607,6 @@ let f = class extends C {
       >
         <div class="body">
           ${this.renderMedia()}
-          ${this.renderRingAlert()}
           <header class="header">
             ${t || i ? h`
                   <div class="header-copy">
@@ -3635,7 +3620,7 @@ let f = class extends C {
                   </div>
                 ` : l}
             <div class="header-actions">
-              ${this.renderSnapshotAction()}
+              ${this.renderRingIndicator()} ${this.renderSnapshotAction()}
               <button
                 class=${this.inline ? "icon-button expand" : "icon-button close"}
                 type="button"
@@ -3661,6 +3646,22 @@ let f = class extends C {
           ${this.statusAnnouncement}
         </div>
       </section>
+    `;
+  }
+  renderRingIndicator() {
+    if (!this.ringing) return l;
+    const e = r(this.hass, "ring.alert");
+    return h`
+      <span
+        class="ring-indicator"
+        role="status"
+        aria-live="polite"
+        aria-label=${e}
+        title=${e}
+      >
+        ${this.icon(nt)}
+        <span class="sr-only">${e}</span>
+      </span>
     `;
   }
   renderModeSwitch() {
@@ -3707,7 +3708,7 @@ let f = class extends C {
     const e = this.snapshotEntityId(), t = this.hass?.connection?.connected !== !1, i = this.snapshotActionStatus === "working", o = i || !e || !t, s = t ? e ? this.snapshotActionStatus === "working" ? "snapshot.saving" : this.snapshotActionStatus === "success" ? "snapshot.saved" : this.snapshotActionStatus === "error" ? this.snapshotFeedbackMessage ? void 0 : "snapshot.failed" : "snapshot.take" : "snapshot.unavailable" : "snapshot.connection_failed", n = s ? r(this.hass, s) : this.snapshotFeedbackMessage, a = this.snapshotActionStatus === "working" ? ze : this.snapshotActionStatus === "success" ? Oe : this.snapshotActionStatus === "error" ? ue : rt;
     return h`
       <button
-        class=${R({
+        class=${C({
       "icon-button": !0,
       "snapshot-action": !0,
       working: i,
@@ -3737,20 +3738,6 @@ let f = class extends C {
   resetSnapshotAction() {
     this.clearSnapshotFeedback(), this.snapshotActionToken += 1, this.snapshotActionStatus = "idle";
   }
-  renderRingAlert() {
-    return this.ringing ? h`
-      <button
-        class="dialog-ring-alert"
-        type="button"
-        ?disabled=${this.mode === "live"}
-        @click=${() => this.selectMode("live")}
-      >
-        ${this.icon(nt)}
-        <span>${r(this.hass, "ring.alert")}</span>
-        ${this.mode === "live" ? l : h`<span class="ring-action">${r(this.hass, "ring.open_live")}</span>`}
-      </button>
-    ` : l;
-  }
   renderVisitorActions() {
     const e = this.shouldShowDoorControl(), t = this.shouldShowTalkControl();
     if (!e && !t) return l;
@@ -3758,7 +3745,7 @@ let f = class extends C {
     return h`
       <div class="visitor-controls">
         <div
-          class=${R({
+          class=${C({
       "visitor-action-dock": !0,
       "door-only": e && !t,
       "talk-only": t && !e
@@ -3768,7 +3755,7 @@ let f = class extends C {
         >
           ${t ? h`
                 <button
-                  class=${R({
+                  class=${C({
       "visitor-action": !0,
       "talk-action": !0,
       active: this.talkbackTalking
@@ -3792,7 +3779,7 @@ let f = class extends C {
           ${e && t ? h`<span class="visitor-action-divider" aria-hidden="true"></span>` : l}
           ${e ? h`
                 <button
-                  class=${R({
+                  class=${C({
       "visitor-action": !0,
       "door-action": !0,
       "contact-open": c,
@@ -3940,7 +3927,7 @@ let f = class extends C {
     const e = this.activeEntity(), t = this.activeEntityId(), i = w(e), o = !i && !this.suspended && (this.mode === "live" || this.recordingStarted), s = kt(this.config.aspect_ratio), n = $t(this.hass, e, t), a = this.mode === "last_recording" && typeof e?.attributes.video_url == "string" ? e.attributes.video_url : void 0, c = o && ["pending", "ready", "playback-blocked"].includes(this.mediaStatus), d = !!(c && a && !this.recordingVideoFailed), p = !!(o && this.mode === "live" && this.config.two_way_audio && me(this.hass, t)), v = !!(this.inline && !this.inlineStarted || this.mode === "last_recording" && !this.recordingStarted);
     return h`
       <div
-        class=${R({
+        class=${C({
       "media-frame": !0,
       "auto-ratio": this.config.aspect_ratio === "auto"
     })}
@@ -4004,7 +3991,7 @@ let f = class extends C {
       `${t}:${this.session}:recording-video`,
       h`
               <video
-                class=${R({
+                class=${C({
         "video-fallback": !0,
         pending: this.mediaStatus === "pending",
         "controls-hidden": !this.recordingControlsVisible
@@ -4036,12 +4023,38 @@ let f = class extends C {
     `;
   }
   renderStateLayer(e, t) {
+    if (this.ringing && (this.mode !== "live" || this.inline && !this.inlineStarted)) {
+      const o = this.shouldShowDoorControl() || this.shouldShowTalkControl();
+      return h`
+        <div
+          class=${C({
+        "state-layer": !0,
+        "doorbell-alert-layer": !0,
+        "with-visitor-controls": o
+      })}
+          role="status"
+          aria-live="polite"
+        >
+          <div class="state-card">
+            <div class="state-actions">
+              <button
+                class="action-button primary"
+                type="button"
+                @click=${() => this.selectMode("live")}
+              >
+                ${r(this.hass, "ring.open_live")}
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
     if (e) {
-      const i = this.activeEntity();
+      const o = this.activeEntity();
       return h`
         <div class="state-layer" role="status">
           <div class="state-card">
-            <div class="state-title">${S(i, this.activeEntityId())}</div>
+            <div class="state-title">${S(o, this.activeEntityId())}</div>
             <div class="state-detail">
               ${r(this.hass, "viewer.entity_unavailable")}
             </div>
@@ -4077,12 +4090,12 @@ let f = class extends C {
         </div>
       `;
     if (this.mediaStatus === "pending" || this.mediaStatus === "retrying") {
-      const i = this.shouldShowDoorControl() || this.shouldShowTalkControl();
+      const o = this.shouldShowDoorControl() || this.shouldShowTalkControl();
       return h`
         <div
-          class=${R({
+          class=${C({
         "state-layer": !0,
-        "with-visitor-controls": i
+        "with-visitor-controls": o
       })}
           role="status"
         >
@@ -4134,10 +4147,10 @@ let f = class extends C {
         </div>
       `;
     if (this.viewerFeedback) {
-      const i = this.viewerFeedback.source === "door" ? "ring-view-door-feedback" : void 0;
+      const o = this.viewerFeedback.source === "door" ? "ring-view-door-feedback" : void 0;
       return h`
         <div
-          class=${R({
+          class=${C({
         "state-layer": !0,
         "viewer-feedback-layer": !0,
         "snapshot-error-layer": this.viewerFeedback.source === "snapshot",
@@ -4148,7 +4161,7 @@ let f = class extends C {
           aria-live=${this.viewerFeedback.kind === "error" ? "assertive" : "polite"}
         >
           <div class="state-card">
-            <div id=${i ?? l} class="state-title">
+            <div id=${o ?? l} class="state-title">
               ${this.viewerFeedback.message}
             </div>
           </div>
@@ -4547,7 +4560,7 @@ var Ho = Object.defineProperty, Oo = Object.getOwnPropertyDescriptor, D = (e, t,
 const Uo = 1e4, zo = 640, Fo = 16 / 9, st = 16, No = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
   di
 )}`;
-let x = class extends C {
+let R = class extends x {
   constructor() {
     super(...arguments), this.preview = !1, this.previewFailed = !1, this.ringAlertVisible = !1, this.previewIntersecting = !1, this.previewVisible = !1, this.previewRequestId = 0, this.lastRingAlertAt = 0, this.previewMarkersInitialized = !1, this.inlinePausedForViewer = !1, this.refreshActivityLabel = () => {
       this.requestUpdate();
@@ -4741,8 +4754,8 @@ let x = class extends C {
     );
     e && (e.hass = this.hass, e.showInline({
       config: this.config,
-      mode: this.ringAlertVisible ? "live" : ee(this.config),
-      start: this.ringAlertVisible ? "on_demand" : this.config.dashboard_start,
+      mode: ee(this.config),
+      start: this.config.dashboard_start,
       ringingUntil: this.ringAlertVisible ? this.lastRingAlertAt + se : void 0
     }), e.setInlineVisible(this.previewVisible));
   }
@@ -4848,31 +4861,31 @@ let x = class extends C {
     return !1;
   }
 };
-x.styles = to;
+R.styles = to;
 D([
   _({ attribute: !1 })
-], x.prototype, "hass", 2);
+], R.prototype, "hass", 2);
 D([
   _({ reflect: !0 })
-], x.prototype, "layout", 2);
+], R.prototype, "layout", 2);
 D([
   _({ type: Boolean })
-], x.prototype, "preview", 2);
+], R.prototype, "preview", 2);
 D([
   u()
-], x.prototype, "config", 2);
+], R.prototype, "config", 2);
 D([
   u()
-], x.prototype, "previewFailed", 2);
+], R.prototype, "previewFailed", 2);
 D([
   u()
-], x.prototype, "lastPoster", 2);
+], R.prototype, "lastPoster", 2);
 D([
   u()
-], x.prototype, "ringAlertVisible", 2);
-x = D([
+], R.prototype, "ringAlertVisible", 2);
+R = D([
   N(_e)
-], x);
+], R);
 window.customCards = window.customCards || [];
 window.customCards.some((e) => e.type === _e) || window.customCards.push({
   type: _e,
@@ -5282,7 +5295,7 @@ const Wo = {
   snapshot_entity: "editor.helper_snapshot_entity",
   preview_fallback: "editor.helper_preview_fallback"
 };
-let M = class extends C {
+let M = class extends x {
   constructor() {
     super(...arguments), this.nativeChecked = !1, this.nativeAvailable = !1, this.computeLabel = (e) => {
       const t = Wo[e.name];
@@ -5392,5 +5405,5 @@ const Zo = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   }
 }, Symbol.toStringTag, { value: "Module" }));
 export {
-  x as RingView
+  R as RingView
 };

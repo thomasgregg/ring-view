@@ -429,8 +429,8 @@ export class RingView extends LitElement {
     viewer.hass = this.hass;
     viewer.showInline({
       config: this.config,
-      mode: this.ringAlertVisible ? "live" : loadMode(this.config),
-      start: this.ringAlertVisible ? "on_demand" : this.config.dashboard_start,
+      mode: loadMode(this.config),
+      start: this.config.dashboard_start,
       ringingUntil: this.ringAlertVisible
         ? this.lastRingAlertAt + RING_ALERT_DURATION_MS
         : undefined,

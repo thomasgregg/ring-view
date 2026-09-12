@@ -245,6 +245,25 @@ export const dialogStyles = css`
     pointer-events: auto;
   }
 
+  .ring-indicator {
+    width: 36px;
+    height: 36px;
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    color: var(--warning-color, #ffa000);
+    background: rgba(0, 0, 0, 0.38);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.38);
+    pointer-events: none;
+  }
+
+  .ring-indicator svg {
+    width: 22px;
+    height: 22px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+  }
+
   button {
     font: inherit;
   }
@@ -329,7 +348,7 @@ export const dialogStyles = css`
     place-items: center;
     border: 0;
     border-radius: 50%;
-    color: rgba(255, 255, 255, 0.72);
+    color: #fff;
     background: transparent;
     cursor: pointer;
   }
@@ -441,44 +460,6 @@ export const dialogStyles = css`
   .initial-start-surface:focus-visible {
     outline: 3px solid var(--primary-color, #03a9f4);
     outline-offset: -4px;
-  }
-
-  .dialog-ring-alert {
-    position: absolute;
-    z-index: 6;
-    inset: 68px auto auto 50%;
-    display: inline-flex;
-    min-height: 42px;
-    max-width: calc(100% - 32px);
-    align-items: center;
-    gap: 8px;
-    padding: 8px 13px;
-    border: 1px solid rgba(255, 255, 255, 0.42);
-    border-radius: 999px;
-    color: #fff;
-    background: rgba(198, 40, 40, 0.92);
-    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.38);
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 18px;
-    transform: translateX(-50%);
-    cursor: pointer;
-  }
-
-  .dialog-ring-alert:disabled {
-    opacity: 1;
-    cursor: default;
-  }
-
-  .dialog-ring-alert svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  .ring-action {
-    padding-inline-start: 4px;
-    color: rgba(255, 255, 255, 0.78);
-    font-size: 12px;
   }
 
   .visitor-controls {
@@ -940,6 +921,11 @@ export const dialogStyles = css`
     flex-direction: row;
     justify-content: center;
     gap: 10px;
+  }
+
+  :host([inline]) .doorbell-alert-layer.with-visitor-controls .state-card {
+    flex-direction: column;
+    gap: 8px;
   }
 
   :host([inline]) .state-layer.with-visitor-controls .spinner {

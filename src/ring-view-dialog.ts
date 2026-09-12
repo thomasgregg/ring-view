@@ -366,7 +366,6 @@ export class RingViewDialog extends LitElement {
       >
         <div class="body">
           ${this.renderMedia()}
-          ${this.renderRingAlert()}
           <header class="header">
             ${showTitle || showActivity
               ? html`
@@ -386,7 +385,7 @@ export class RingViewDialog extends LitElement {
                 `
               : nothing}
             <div class="header-actions">
-              ${this.renderSnapshotAction()}
+              ${this.renderRingIndicator()} ${this.renderSnapshotAction()}
               <button
                 class=${this.inline ? "icon-button expand" : "icon-button close"}
                 type="button"
@@ -414,6 +413,23 @@ export class RingViewDialog extends LitElement {
           ${this.statusAnnouncement}
         </div>
       </section>
+    `;
+  }
+
+  private renderRingIndicator(): TemplateResult | typeof nothing {
+    if (!this.ringing) return nothing;
+    const label = localize(this.hass, "ring.alert");
+    return html`
+      <span
+        class="ring-indicator"
+        role="status"
+        aria-live="polite"
+        aria-label=${label}
+        title=${label}
+      >
+        ${this.icon(mdiBellRingOutline)}
+        <span class="sr-only">${label}</span>
+      </span>
     `;
   }
 
@@ -596,24 +612,6 @@ export class RingViewDialog extends LitElement {
     this.clearSnapshotFeedback();
     this.snapshotActionToken += 1;
     this.snapshotActionStatus = "idle";
-  }
-
-  private renderRingAlert(): TemplateResult | typeof nothing {
-    if (!this.ringing) return nothing;
-    return html`
-      <button
-        class="dialog-ring-alert"
-        type="button"
-        ?disabled=${this.mode === "live"}
-        @click=${() => this.selectMode("live")}
-      >
-        ${this.icon(mdiBellRingOutline)}
-        <span>${localize(this.hass, "ring.alert")}</span>
-        ${this.mode === "live"
-          ? nothing
-          : html`<span class="ring-action">${localize(this.hass, "ring.open_live")}</span>`}
-      </button>
-    `;
   }
 
   private renderVisitorActions(): TemplateResult | typeof nothing {
@@ -1267,6 +1265,36 @@ export class RingViewDialog extends LitElement {
     unavailable: boolean,
     hasRecordingFallback: boolean,
   ): TemplateResult | typeof nothing {
+    const ringNeedsLiveAction = this.ringing
+      && (this.mode !== "live" || (this.inline && !this.inlineStarted));
+    if (ringNeedsLiveAction) {
+      const hasVisitorControls =
+        this.shouldShowDoorControl() || this.shouldShowTalkControl();
+      return html`
+        <div
+          class=${classMap({
+            "state-layer": true,
+            "doorbell-alert-layer": true,
+            "with-visitor-controls": hasVisitorControls,
+          })}
+          role="status"
+          aria-live="polite"
+        >
+          <div class="state-card">
+            <div class="state-actions">
+              <button
+                class="action-button primary"
+                type="button"
+                @click=${() => this.selectMode("live")}
+              >
+                ${localize(this.hass, "ring.open_live")}
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     if (unavailable) {
       const entity = this.activeEntity();
       return html`

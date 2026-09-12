@@ -654,13 +654,19 @@ describe("card stream lifecycle", () => {
       "",
       "/?ring-view-live-entity=camera.live"
         + "&ring-view-recording-entity=camera.recording"
-        + "&ring-view-mode=live"
+        + "&ring-view-mode=last_recording"
         + `&ring-view-ringing-until=${ringingUntil}`,
     );
     await mount();
     await flush();
 
-    expect(getDialog()?.shadowRoot?.querySelector(".dialog-ring-alert")).not.toBeNull();
+    const alert = getDialog()?.shadowRoot?.querySelector(".doorbell-alert-layer");
+    expect(alert?.textContent).toContain("Open live view");
+    expect(alert?.textContent).not.toContain("Someone is at the door");
+    expect(
+      getDialog()?.shadowRoot?.querySelector(".ring-indicator")?.getAttribute("aria-label"),
+    ).toBe("Someone is at the door");
+    expect(getDialog()?.shadowRoot?.querySelector(".dialog-ring-alert")).toBeNull();
   });
 
   it.each([2_000, 20_000])("preserves the original doorbell alert expiry after %i ms detached", async (detachedFor) => {
@@ -746,7 +752,51 @@ describe("card stream lifecycle", () => {
     expect(TestCameraStream.active).toBe(0);
   });
 
-  it("keeps global errors and doorbell alerts current after the opener is removed", async () => {
+  it("shows a temporary Ding indicator while Live is running", async () => {
+    const doorbell: HassEntity = {
+      entity_id: "event.front_door_ding",
+      state: "2026-09-07T08:00:00Z",
+      attributes: { event_type: "ring" },
+    };
+    const card = document.createElement("ring-view");
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      doorbell_entity: doorbell.entity_id,
+      default_mode: "live",
+    });
+    card.hass = {
+      ...hass,
+      states: { ...hass.states, [doorbell.entity_id]: doorbell },
+    };
+    document.body.append(card);
+    await card.updateComplete;
+    card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
+    await flush();
+
+    const dialog = getDialog();
+    expect(TestCameraStream.active).toBe(1);
+    dialog!.hass = {
+      ...hass,
+      states: {
+        ...hass.states,
+        [doorbell.entity_id]: {
+          ...doorbell,
+          state: "2026-09-07T08:01:00Z",
+        },
+      },
+    };
+    await dialog!.updateComplete;
+    await flush();
+
+    expect(dialog?.shadowRoot?.querySelector(".doorbell-alert-layer")).toBeNull();
+    const indicator = dialog?.shadowRoot?.querySelector(".ring-indicator");
+    expect(indicator?.getAttribute("aria-label")).toBe("Someone is at the door");
+    expect(TestCameraStream.active).toBe(1);
+    dialog?.close();
+  });
+
+  it("keeps a global camera error primary when a Ding arrives in Live", async () => {
     const doorbell: HassEntity = {
       entity_id: "event.front_door_ding",
       state: "2026-09-07T08:00:00Z",
@@ -787,7 +837,10 @@ describe("card stream lifecycle", () => {
 
     expect(dialog?.open).toBe(true);
     expect(dialog?.shadowRoot?.textContent).toContain("Camera entity is unavailable.");
-    expect(dialog?.shadowRoot?.querySelector(".dialog-ring-alert")).not.toBeNull();
+    expect(dialog?.shadowRoot?.querySelector(".doorbell-alert-layer")).toBeNull();
+    expect(
+      dialog?.shadowRoot?.querySelector(".ring-indicator")?.getAttribute("aria-label"),
+    ).toBe("Someone is at the door");
     expect(TestCameraStream.active).toBe(0);
     dialog?.close();
   });

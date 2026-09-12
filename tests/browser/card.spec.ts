@@ -713,6 +713,61 @@ test("shows door failures in the shared centered viewer message", async ({ page 
   expect(feedbackBox.y + feedbackBox.height).toBeLessThan(visitorBox.y);
 });
 
+test("uses the shared centered viewer message for a Ding", async ({ page }) => {
+  await page.goto(
+    "/demo/?doorbell=1&dashboard=interactive&dashboard_start=recording"
+      + "&door=1&door_visibility=all&dashboard_door=1&live_platform=generic",
+  );
+  await expect(page.locator("ring-view")).toBeAttached();
+  await page.evaluate(() =>
+    window.demoSetEntityState("binary_sensor.front_door_ding", "on"),
+  );
+
+  const alert = page.locator(
+    "ring-view-dialog[inline] .doorbell-alert-layer .state-card",
+  );
+  const mediaFrame = page.locator("ring-view-dialog[inline] .media-frame");
+  const visitorDock = page.locator("ring-view-dialog[inline] .visitor-action-dock");
+  const openLive = alert.getByRole("button", { name: "Open live view" });
+  await expect(alert).not.toContainText("Someone is at the door");
+  await expect(openLive).toBeVisible();
+  await expect(
+    page.locator('ring-view-dialog[inline] .ring-indicator[aria-label="Someone is at the door"]'),
+  ).toBeVisible();
+  await expect(page.locator("ring-view-dialog .dialog-ring-alert")).toHaveCount(0);
+
+  const [alertBox, frameBox, visitorBox] = await Promise.all([
+    alert.boundingBox(),
+    mediaFrame.boundingBox(),
+    visitorDock.boundingBox(),
+  ]);
+  if (!alertBox || !frameBox || !visitorBox) {
+    throw new Error("Doorbell alert geometry unavailable");
+  }
+  expect(
+    Math.abs(
+      alertBox.x + alertBox.width / 2
+      - (frameBox.x + frameBox.width / 2),
+    ),
+  ).toBeLessThan(2);
+  expect(
+    Math.abs(
+      alertBox.y + alertBox.height / 2
+      - (frameBox.y + frameBox.height / 2),
+    ),
+  ).toBeLessThan(10);
+  expect(alertBox.y + alertBox.height).toBeLessThan(visitorBox.y);
+
+  await openLive.click();
+  await expect(
+    page.locator("ring-view-dialog[inline]").getByRole("tab", { name: "Live" }),
+  ).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator("ring-view-dialog[inline] .doorbell-alert-layer")).toHaveCount(0);
+  await expect(
+    page.locator('ring-view-dialog[inline] .ring-indicator[aria-label="Someone is at the door"]'),
+  ).toBeVisible();
+});
+
 test("uses an optional contact sensor to turn the action into live door status", async ({
   page,
 }) => {

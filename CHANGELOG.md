@@ -4,6 +4,23 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.9.2] - 2026-09-12
+
+### Fixed
+
+- Move the Ding prompt into the shared centered viewer message area and keep it
+  clear of visitor controls on phone and desktop layouts.
+- Show a temporary header bell whenever a Ding arrives, but show **Open live
+  view** only when Live is not actually running. The action remains available
+  when an on-demand Live view is selected but still idle.
+- Use one white tone for the normal header controls, leaving amber for the Ding
+  bell and red for the active Live indicator.
+
+### Tests
+
+- Add responsive browser coverage for the centered Ding prompt, its placement,
+  and its transition into Live.
+
 ## [0.9.1] - 2026-09-12
 
 ### Added
