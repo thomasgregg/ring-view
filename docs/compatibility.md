@@ -4,6 +4,21 @@
 
 The release target is Home Assistant 2026.9 and the previous two monthly releases where practical. Version 0.1.0 declares Home Assistant 2026.7.0 as its minimum.
 
+## Camera integrations
+
+Ring View's core Recording and Live surfaces use Home Assistant camera
+entities. They can work with non-Ring integrations when the recording camera
+exposes recorded media through `video_url` or `entity_picture` and the Live
+camera advertises stream support. Ring is the primary tested integration, so
+other camera pairings should be treated as compatible in principle rather than
+fully supported combinations.
+
+Two-way audio is intentionally limited to the official Ring Live view camera.
+Ring Ding events, the included notification blueprint, and the optional Ring
+WebRTC backend patch are also Ring-specific. Snapshot saving uses Home
+Assistant's standard `camera.snapshot` action and can use another integration's
+configured device snapshot camera.
+
 The viewer uses Home Assistant's application-level `show-dialog` contract for
 dialog placement, browser Back behavior, and independence from responsive card
 relayouts. The dialog itself remains part of Ring View and continues to own its

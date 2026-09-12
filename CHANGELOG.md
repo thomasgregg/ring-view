@@ -4,6 +4,49 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-09-12
+
+### Added
+
+- Add an optional Live-only snapshot action to the interactive dashboard card
+  and fullscreen viewer, saving timestamped JPEG files through Home Assistant's
+  standard `camera.snapshot` action.
+- Prefer a configured device snapshot camera, such as Ring-MQTT, and fall back
+  to the Live camera when it is available.
+- Add a configurable snapshot directory with `/media/ring-view` as the safe,
+  Media-browser-friendly default and clear editor guidance for custom paths.
+
+### Changed
+
+- Rename **Viewer behavior** to **Fullscreen viewer** and organize the editor
+  around Dashboard card, Fullscreen viewer, Snapshots, and the optional visitor
+  features.
+- Keep Recording and Live highlights as selected-view markers, including while
+  an on-demand card waits for a tap or after recording playback ends.
+- Start an idle recording by tapping the unobstructed camera image instead of
+  covering it with a large central Play prompt.
+- Use one centered viewer status treatment for snapshot, door-action, and Ring
+  WebRTC feedback while keeping brief successful actions visible in their own
+  controls.
+
+### Fixed
+
+- Keep snapshot feedback clear of the Talk and door controls on iPhone-sized
+  layouts.
+- Avoid duplicate success messages after a snapshot is saved.
+
+### Documentation
+
+- Add a concise snapshot setup guide and clarify which camera capabilities are
+  general Home Assistant behavior and which features are Ring-specific.
+- Refresh the README hero and visual-editor screenshots using current real Home
+  Assistant captures with clean transparent rounded corners.
+
+### Tests
+
+- Expand unit and browser coverage for snapshot source selection, path safety,
+  service failures, status layout, idle view semantics, and responsive controls.
+
 ## [0.9.0-beta.7] - 2026-09-12
 
 ### Changed

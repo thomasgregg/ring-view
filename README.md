@@ -5,16 +5,16 @@
 [![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://www.hacs.xyz/)
 [![License: MIT](https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/license-mit.svg)](https://github.com/thomasgregg/ring-view/blob/main/LICENSE)
 
-## Your Ring camera. One card. Recording, Live, talkback, and door access.
+## Your Ring camera. One card. Recording, Live, snapshots, talkback, and door access.
 
-See what happened, check what is happening, and answer the door—all without leaving the same viewer. Ring View brings Ring's separate recording and live camera entities together in one Home Assistant dashboard card.
+See what happened, check what is happening, save the moment, and answer the door without leaving the same viewer. Ring View brings Ring's separate recording and live camera entities together in one Home Assistant dashboard card.
 
 <p align="center">
   <a href="https://github.com/thomasgregg/ring-view/blob/main/docs/images/ring-view-modes-rounded.png">
-    <img src="https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/ring-view-modes-rounded.png" alt="Ring View viewer showing the latest recording, live view, and Hold to talk controls" width="100%">
+    <img src="https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/ring-view-modes-rounded.png" alt="Ring View viewer annotated with camera name, last activity, Recording, Live, snapshot, Hold to talk, and Hold to open controls" width="100%">
   </a>
   <br>
-  <sub>Switch between the latest recording and Live, then listen and use push-to-talk in the same session.</sub>
+  <sub>Recording, Live, snapshots, talkback, and door access in one viewer.</sub>
 </p>
 
 ## Contents
@@ -23,6 +23,7 @@ See what happened, check what is happening, and answer the door—all without le
 - [Install and get started](#get-started)
   - [Configure visually](#configure-visually)
   - [Choose the dashboard card behavior](#choose-how-the-dashboard-card-works)
+  - [Save a snapshot](#save-a-snapshot)
   - [Add Talk or door access](#add-talk-or-door-access)
 - [Built-in Ring integration and optional patch](#built-in-ring-integration-or-the-temporary-patch)
 - [Doorbell notifications](#make-your-doorbell-do-more)
@@ -45,6 +46,12 @@ See what happened, check what is happening, and answer the door—all without le
 ## Get started
 
 You need Home Assistant **2026.7 or newer**, the official [Ring integration](https://www.home-assistant.io/integrations/ring/), and its **last recording** and **live view** camera entities. Recording access requires a suitable Ring subscription. The last-recording entity is disabled by default. If the two camera entries look identical or their IDs do not use the example `_last_recording` and `_live_view` suffixes, follow [Choosing camera entities](docs/configuration.md#choosing-camera-entities).
+
+The core Recording and Live viewer can also work with other Home Assistant
+camera integrations when one camera exposes recorded media and the other
+supports streaming. Ring remains the tested setup. Two-way audio, Ring Ding
+events, the notification blueprint, and the optional backend patch are
+Ring-specific.
 
 [![Open Ring View in HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=thomasgregg&repository=ring-view&category=plugin)
 
@@ -70,7 +77,7 @@ appearance.
 
 <p align="center">
   <a href="https://github.com/thomasgregg/ring-view/blob/main/docs/images/configuration-editor.png">
-    <img src="https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/configuration-editor.png" alt="Ring View visual configuration editor with camera selection, optional features and a dashboard preview" width="760">
+    <img src="https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/configuration-editor.png" alt="Ring View visual configuration editor showing camera selection, Dashboard card, Fullscreen viewer, Snapshots, Doorbell features, Door access, and Card appearance" width="760">
   </a>
   <br>
   <sub>Everything can be configured from the Home Assistant card editor.</sub>
@@ -101,6 +108,23 @@ Common starting points:
 - **Entrance monitor:** show controls in the card and start Live muted.
 
 [Compare every dashboard option and see complete examples](docs/configuration.md#dashboard-card-behavior)
+
+### Save a snapshot
+
+Open **Snapshots** and enable **Show snapshot button**. A camera button then
+appears while Live is active in the fullscreen viewer or interactive dashboard
+card. Each tap saves a timestamped JPEG to `/media/ring-view` by default. Open
+**Media > My media > ring-view** in Home Assistant to view the saved images.
+
+The icon briefly turns green after a successful save. If saving fails, the
+viewer uses the same centered status display as its other actionable errors.
+Ring View automatically reuses the device snapshot camera selected under
+**Dashboard card**, such as Ring-MQTT, and otherwise asks the Live camera for a
+snapshot. The official Ring Live camera may not expose the current WebRTC
+frame, so use a Ring-MQTT snapshot camera when you need a reliably fresh device
+image.
+
+[Snapshot source, folder, validation, and privacy details](docs/configuration.md#saving-a-manual-snapshot)
 
 ### Add Talk or door access
 

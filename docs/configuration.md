@@ -28,31 +28,31 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `type` | No — added automatically | Required | `custom:ring-view` | Identifies the custom card. Added automatically by the card picker. |
 | `recording_entity` | Yes — Config tab | Required | `camera.*` entity ID | Camera entity containing the latest recording. |
 | `live_entity` | Yes — Config tab | Required | `camera.*` entity ID | Camera entity that starts the Ring live view. |
-| `snapshot_entity` | Yes — Dashboard preview | Not set | `camera.*` entity ID | Device snapshot camera, such as the snapshot entity created by Ring-MQTT. Used by snapshot previews and preferred for manual snapshots when configured and available. |
-| `name` | Yes — Config tab | Entity name | Text | Optional label used instead of the recording entity's friendly name. |
+| `snapshot_entity` | Yes — Dashboard card | Not set | `camera.*` entity ID | Device snapshot camera, such as the snapshot entity created by Ring-MQTT. Used by snapshot previews and preferred for manual snapshots when configured and available. |
+| `name` | Yes — Card appearance | Entity name | Text | Optional label used instead of the recording entity's friendly name. |
 | `last_activity_entity` | Yes — Card appearance | Not set | `sensor.*`, `event.*`, or `input_datetime.*` entity ID | Shows the selected entity state's date and time as a localized relative timestamp at the top left. |
-| `default_mode` | Yes — Config tab | `last_recording` | `last_recording`, `live` | View selected when the viewer opens. |
-| `remember_last_mode` | Yes — Config tab | `false` | `true`, `false` | Remembers the most recent view in the current browser and uses it instead of `default_mode`. |
-| `autoplay_recording` | Yes — Config tab | `true` | `true`, `false` | Starts the latest recording immediately; when disabled, the viewer waits for Play. |
-| `live_muted` | Yes — Config tab | `false` | `true`, `false` | Starts Live muted. Browser autoplay rules can still require muted playback. |
+| `default_mode` | Yes — Fullscreen viewer | `last_recording` | `last_recording`, `live` | View selected when the viewer opens. |
+| `remember_last_mode` | Yes — Fullscreen viewer | `false` | `true`, `false` | Remembers the most recent view in the current browser and uses it instead of `default_mode`. |
+| `autoplay_recording` | Yes — Fullscreen viewer | `true` | `true`, `false` | Starts the latest recording immediately; when disabled, the viewer waits for Play. |
+| `live_muted` | Yes — Fullscreen viewer | `false` | `true`, `false` | Starts Live muted. Browser autoplay rules can still require muted playback. |
 | `dashboard_behavior` | Yes — Dashboard card | `open_viewer` | `open_viewer`, `interactive` | Keeps the passive card that opens fullscreen, or exposes camera controls directly in the card. |
 | `dashboard_start` | Yes — Dashboard card, interactive only | `on_demand` | `on_demand`, `last_recording`, `live` | Waits for a tap, starts the recording, or starts Live when an interactive card becomes visible. |
 | `dashboard_live_muted` | Yes — Dashboard card, interactive only | `true` | `true`, `false` | Controls audio when Live starts inside the dashboard. Muted is recommended for tablets and autoplay. |
 | `two_way_audio` | Yes — Fullscreen viewer | `false` | `true`, `false` | Uses one direct WebRTC session for live video, listening, and push-to-talk when `live_entity` is an official Ring `live_view` camera. |
-| `doorbell_entity` | Yes, Doorbell features | Not set | `event.*` entity ID | Displays a temporary ring alert when the selected doorbell event reports `ring`. |
+| `doorbell_entity` | Yes — Doorbell features | Not set | `event.*` entity ID | Displays a temporary ring alert when the selected doorbell event reports `ring`. |
 | `door_entity` | Yes — Door access | Not set | `lock.*` entity ID | Enables door access for the selected Home Assistant lock. |
 | `door_contact_entity` | Yes — Door access | Not set | `binary_sensor.*` entity ID | Optionally makes the icon reflect the physical door state. An open contact replaces and disables the door action until the door closes. |
 | `door_action` | Yes — Door access | `unlock` | `unlock`, `open` | Calls `lock.unlock`, or `lock.open` for locks that advertise latch-opening support. |
 | `door_control_visibility` | Yes — Door access | `live_only` | `live_only`, `all_views` | Shows the door action only in Live by default, or also over recordings. |
 | `door_hold_to_activate` | Yes — Door access | `true` | `true`, `false` | Requires a 900 ms press-and-hold confirmation. Disable for one-tap operation. |
 | `door_control_location` | Yes — Door access, interactive only | `viewer_only` | `viewer_only`, `dashboard_and_viewer` | Keeps the door action in fullscreen only, or places it on both the interactive dashboard card and fullscreen viewer. |
-| `show_name` | Yes — Config tab | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer. |
+| `show_name` | Yes — Card appearance | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer. |
 | `show_snapshot_button` | Yes — Snapshots | `false` | `true`, `false` | Shows one manual snapshot action while Live is active. |
 | `snapshot_directory` | Yes — Snapshots | `/media/ring-view` | Absolute directory path | Folder where manual snapshots are saved by Home Assistant. |
-| `preview_source` | Yes — Dashboard preview | `last_recording` | `last_recording`, `live`, `default`, `snapshot`, `newest` | Chooses the entity used for the dashboard still. `default` follows the view that will open; `newest` compares the optional snapshot with the latest recording. |
-| `preview_fallback` | Yes — Dashboard preview | `last_recording` | `last_recording`, `snapshot` | Chooses the still used by `newest` when capture times or update order cannot be compared. Only shown for `newest`. |
-| `aspect_ratio` | Yes — Config tab | `16:9` | `auto`, `16:9`, `4:3`, `1:1` | Sets the dashboard image shape. |
-| `fit_mode` | Yes — Config tab | `cover` | `cover`, `contain` | Crops the image to fill the card or fits the entire image inside it. |
+| `preview_source` | Yes — Dashboard card | `last_recording` | `last_recording`, `live`, `default`, `snapshot`, `newest` | Chooses the entity used for the dashboard still. `default` follows the view that will open; `newest` compares the optional snapshot with the latest recording. |
+| `preview_fallback` | Yes — Dashboard card | `last_recording` | `last_recording`, `snapshot` | Chooses the still used by `newest` when capture times or update order cannot be compared. Only shown for `newest`. |
+| `aspect_ratio` | Yes — Card appearance | `16:9` | `auto`, `16:9`, `4:3`, `1:1` | Sets the dashboard image shape. |
+| `fit_mode` | Yes — Card appearance | `cover` | `cover`, `contain` | Crops the image to fill the card or fits the entire image inside it. |
 | `grid_options` | Yes — Layout tab | See below | Object | Standard Home Assistant Sections-layout sizing. Configure it in the Layout tab. |
 
 ### Layout options
