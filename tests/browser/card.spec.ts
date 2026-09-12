@@ -204,9 +204,13 @@ test("keeps an interactive dashboard idle until the user chooses media", async (
 
   await expect(page.getByRole("region", { name: "Camera view" })).toBeVisible();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await expect(page.getByRole("tab", { name: "Last recording" })).toHaveAttribute(
+  await expect(page.getByRole("tab", { name: "Play last recording" })).toHaveAttribute(
     "aria-selected",
-    "true",
+    "false",
+  );
+  await expect(page.getByRole("tab", { name: "Start live view" })).toHaveAttribute(
+    "aria-selected",
+    "false",
   );
   await expect(page.getByRole("button", { name: "Play last recording" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Play last recording" })).toHaveCSS(
@@ -221,6 +225,10 @@ test("keeps an interactive dashboard idle until the user chooses media", async (
   if (!frameBox) throw new Error("Inline media surface was not visible");
   await page.mouse.click(frameBox.x + 18, frameBox.y + frameBox.height - 18);
   await expect.poll(() => page.evaluate(() => window.demoActiveStreams ?? 0)).toBe(1);
+  await expect(page.getByRole("tab", { name: "Last recording" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
 
   await page.getByRole("tab", { name: "Live" }).click();
   const door = page.getByRole("button", {
@@ -231,6 +239,33 @@ test("keeps an interactive dashboard idle until the user chooses media", async (
   await expect(door).toContainText("Unlock when ready");
   await expect(page.getByRole("img", { name: "Synthetic demo camera media" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Hold to unlock" })).toBeEnabled();
+});
+
+test("shows one snapshot action only after Live starts", async ({ page }) => {
+  await page.goto(
+    "/demo/?dashboard=interactive&snapshot_button=1&live_platform=generic",
+  );
+
+  await expect(page.getByRole("button", { name: "Take snapshot" })).toHaveCount(0);
+  await page.getByRole("tab", { name: "Start live view" }).click();
+  const snapshot = page.getByRole("button", { name: "Take snapshot" });
+  await expect(snapshot).toBeVisible();
+  await snapshot.click();
+  await expect(page.getByRole("button", { name: "Snapshot saved" })).toBeVisible();
+
+  const calls = await page.evaluate(() => window.demoDoorCalls ?? []);
+  expect(calls).toHaveLength(1);
+  expect(calls[0]).toMatchObject({
+    domain: "camera",
+    service: "snapshot",
+    target: { entity_id: "camera.device_snapshot" },
+  });
+  expect(calls[0]?.serviceData.filename).toMatch(
+    /^\/media\/ring-view\/entrance_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}-\d{3}\.jpg$/,
+  );
+
+  await page.getByRole("tab", { name: "Last recording" }).click();
+  await expect(page.getByRole("button", { name: /snapshot/i })).toHaveCount(0);
 });
 
 test("keeps viewer-only door access out of the dashboard", async ({
@@ -1219,7 +1254,7 @@ test("keeps name, activity, modes, and fullscreen action separate at responsive 
 }) => {
   const cameraName = "Thomas Gregg Front Door Camera With A Long Name";
   await page.goto(
-    `/demo/?dashboard=interactive&name=1&activity=1&activity_age=9000&camera_name=${encodeURIComponent(cameraName)}`,
+    `/demo/?dashboard=interactive&dashboard_start=live&snapshot_button=1&name=1&activity=1&activity_age=9000&camera_name=${encodeURIComponent(cameraName)}`,
   );
   const root = page.locator("#card-root");
   const card = page.locator("ring-view");
@@ -1229,6 +1264,7 @@ test("keeps name, activity, modes, and fullscreen action separate at responsive 
   const expand = card.getByRole("button", {
     name: "Open fullscreen camera viewer",
   });
+  const snapshot = card.getByRole("button", { name: "Take snapshot" });
   await expect(activity).toHaveText(/2 hr.*ago/i);
   await expect(activity).toHaveCSS("font-size", "12px");
 
@@ -1237,21 +1273,30 @@ test("keeps name, activity, modes, and fullscreen action separate at responsive 
       element.style.width = `${value}px`;
     }, width);
     await page.evaluate(() => new Promise(requestAnimationFrame));
-    const [cardBox, headingBox, activityBox, modeBox, expandBox] =
+    const [cardBox, headingBox, activityBox, modeBox, snapshotBox, expandBox] =
       await Promise.all([
         card.boundingBox(),
         heading.boundingBox(),
         activity.boundingBox(),
         modeSwitch.boundingBox(),
+        snapshot.boundingBox(),
         expand.boundingBox(),
       ]);
-    if (!cardBox || !headingBox || !activityBox || !modeBox || !expandBox) {
+    if (
+      !cardBox
+      || !headingBox
+      || !activityBox
+      || !modeBox
+      || !snapshotBox
+      || !expandBox
+    ) {
       throw new Error(`Responsive activity geometry unavailable at ${width}px`);
     }
     expect(headingBox.y + headingBox.height).toBeLessThanOrEqual(activityBox.y);
     expect(headingBox.x + headingBox.width).toBeLessThanOrEqual(modeBox.x - 8);
     expect(activityBox.x + activityBox.width).toBeLessThanOrEqual(modeBox.x - 8);
-    expect(modeBox.x + modeBox.width).toBeLessThanOrEqual(expandBox.x - 8);
+    expect(modeBox.x + modeBox.width).toBeLessThanOrEqual(snapshotBox.x - 2);
+    expect(snapshotBox.x + snapshotBox.width).toBeLessThanOrEqual(expandBox.x - 2);
     expect(expandBox.x + expandBox.width).toBeLessThanOrEqual(
       cardBox.x + cardBox.width,
     );

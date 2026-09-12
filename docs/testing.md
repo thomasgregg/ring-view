@@ -28,7 +28,15 @@ npm run test:browser
 npm run build
 ```
 
-The unit suite covers configuration defaults and validation, snapshot timestamp parsing and freshest-preview fallbacks, last-activity timestamp formats and localization, native editor structure and progressive dashboard fields, entity and talkback capability states, unsupported-camera fallback, doorbell alerts, timeout invalidation, passive-dashboard privacy, single-renderer switching, close teardown, disconnect teardown, single-offer two-way audio, press-to-talk muting, interrupted microphone permission, and insecure-connection guidance.
+The unit suite covers configuration defaults and validation, manual snapshot
+source selection, paths, timezone-aware filenames and service feedback,
+snapshot timestamp parsing and freshest-preview fallbacks, last-activity
+timestamp formats and localization, native editor structure and progressive
+dashboard fields, entity and talkback capability states, unsupported-camera
+fallback, doorbell alerts, timeout invalidation, passive-dashboard privacy,
+single-renderer switching, close teardown, disconnect teardown, single-offer
+two-way audio, press-to-talk muting, interrupted microphone permission, and
+insecure-connection guidance.
 
 The browser suite additionally covers the unobstructed on-demand image start
 surface, automatic starts, door-location and Live-readiness gating, fixed inline
@@ -90,6 +98,14 @@ Verify each item on current stable Home Assistant and, where practical, the prev
     viewer with the camera name both enabled and disabled. Confirm the relative
     time updates, the exact hover time is correct, and neither line reaches the
     mode or close/fullscreen controls at the narrowest supported card width.
+23. Enable manual snapshots with `/media/ring-view`. Confirm the camera button
+    is absent while on-demand is idle, appears after selecting Live, saves one
+    timestamped JPEG per tap, and reports success without changing the selected
+    dashboard preview source.
+24. If a Ring-MQTT snapshot camera is configured, confirm it is targeted first.
+    Make it unavailable and confirm the official Live camera is used instead.
+    Also verify the button does not collide with the mode or fullscreen controls
+    at the narrowest supported card width.
 
 ## Visual matrix
 

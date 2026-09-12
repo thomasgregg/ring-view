@@ -1,6 +1,7 @@
 import {
   mdiAlertCircleOutline,
   mdiBellRingOutline,
+  mdiCameraOutline,
   mdiCheckCircleOutline,
   mdiClose,
   mdiDoorClosed,
@@ -26,7 +27,11 @@ import {
   type RingViewDialogParams,
   unregisterActiveRingViewDialog,
 } from "./dialog-controller";
-import { localize, localizeHaOrFallback } from "./localize";
+import {
+  localize,
+  localizeHaOrFallback,
+  type TranslationKey,
+} from "./localize";
 import "./media/native-camera-adapter";
 import "./media/ring-webrtc-player";
 import type {
@@ -56,6 +61,10 @@ import {
 } from "./utilities/entity-validation";
 import { saveMode } from "./utilities/mode-storage";
 import {
+  buildSnapshotFilename,
+  selectSnapshotEntityId,
+} from "./utilities/snapshot";
+import {
   createRingViewUrl,
   currentUrl,
   decodeRingViewUrl,
@@ -75,6 +84,7 @@ type MediaStatus =
   | "error"
   | "compatibility";
 type DoorActionStatus = "idle" | "holding" | "working" | "success" | "error";
+type SnapshotActionStatus = "idle" | "working" | "success" | "error";
 type DoorContactState = "open" | "closed" | "unknown";
 const LIVE_TIMEOUT_SECONDS = 20;
 const LIVE_RETRY_DELAY_MS = 2_500;
@@ -82,6 +92,30 @@ const RECORDING_CONTROLS_HIDE_DELAY_MS = 2_500;
 const DOOR_HOLD_DURATION_MS = 900;
 const DOOR_SUCCESS_DURATION_MS = 2_000;
 const DOOR_ERROR_DURATION_MS = 3_000;
+const SNAPSHOT_SUCCESS_DURATION_MS = 2_000;
+const SNAPSHOT_ERROR_DURATION_MS = 3_000;
+
+function snapshotErrorKey(error: unknown): TranslationKey {
+  const message = error instanceof Error
+    ? error.message.toLowerCase()
+    : String(error).toLowerCase();
+  if (/timeout|timed out/.test(message)) return "snapshot.timeout";
+  if (/unauthorized|forbidden|permission denied/.test(message)) {
+    return "snapshot.permission_failed";
+  }
+  if (
+    /cannot write|can't write|no access to path|read-only|readonly/.test(message)
+  ) {
+    return "snapshot.write_failed";
+  }
+  if (/connection|websocket|service api unavailable/.test(message)) {
+    return "snapshot.connection_failed";
+  }
+  if (/no image|could not provide|not supported|snapshot unavailable/.test(message)) {
+    return "snapshot.camera_failed";
+  }
+  return "snapshot.failed";
+}
 
 @customElement(RING_VIEW_DIALOG_TAG)
 export class RingViewDialog extends LitElement {
@@ -111,6 +145,8 @@ export class RingViewDialog extends LitElement {
   @state() private talkbackTalking = false;
   @state() private doorActionStatus: DoorActionStatus = "idle";
   @state() private doorFeedback?: { message: string };
+  @state() private snapshotActionStatus: SnapshotActionStatus = "idle";
+  @state() private snapshotFeedbackMessage?: string;
   @state() private inlineStarted = true;
 
   private lifecycle = new StreamLifecycle();
@@ -135,6 +171,8 @@ export class RingViewDialog extends LitElement {
   private doorHoldTimer?: number;
   private doorFeedbackTimer?: number;
   private doorActionToken = 0;
+  private snapshotFeedbackTimer?: number;
+  private snapshotActionToken = 0;
   private inlineVisible = false;
   private inlineActive = false;
 
@@ -167,6 +205,7 @@ export class RingViewDialog extends LitElement {
     this.suspended = false;
     this.statusAnnouncement = "";
     this.resetVisitorActions();
+    this.resetSnapshotAction();
     this.lastDoorbellState = this.config.doorbell_entity
       ? this.hass.states[this.config.doorbell_entity]?.state
       : undefined;
@@ -211,6 +250,7 @@ export class RingViewDialog extends LitElement {
     this.suspended = !this.inlineActive;
     this.statusAnnouncement = "";
     this.resetVisitorActions();
+    this.resetSnapshotAction();
     this.lastDoorbellState = this.config.doorbell_entity
       ? this.hass.states[this.config.doorbell_entity]?.state
       : undefined;
@@ -338,6 +378,7 @@ export class RingViewDialog extends LitElement {
                 `
               : nothing}
             <div class="header-actions">
+              ${this.renderSnapshotAction()}
               <button
                 class=${this.inline ? "icon-button expand" : "icon-button close"}
                 type="button"
@@ -369,6 +410,17 @@ export class RingViewDialog extends LitElement {
   }
 
   private renderModeSwitch(): TemplateResult {
+    const hasActiveMode = !this.inline || this.inlineStarted;
+    const recordingSelected = hasActiveMode && this.mode === "last_recording";
+    const liveSelected = hasActiveMode && this.mode === "live";
+    const recordingLabel = localize(
+      this.hass,
+      hasActiveMode ? "common.last_recording" : "viewer.play_recording",
+    );
+    const liveLabel = localize(
+      this.hass,
+      hasActiveMode ? "common.live" : "viewer.start_live",
+    );
     return html`
       <div
         class="mode-switch"
@@ -380,9 +432,9 @@ export class RingViewDialog extends LitElement {
           class="mode-button recording"
           type="button"
           role="tab"
-          aria-label=${localize(this.hass, "common.last_recording")}
-          title=${localize(this.hass, "common.last_recording")}
-          aria-selected=${String(this.mode === "last_recording")}
+          aria-label=${recordingLabel}
+          title=${recordingLabel}
+          aria-selected=${String(recordingSelected)}
           tabindex=${this.mode === "last_recording" ? "0" : "-1"}
           @click=${() => this.selectMode("last_recording")}
           @keydown=${this.handleTabKeyDown}
@@ -394,9 +446,9 @@ export class RingViewDialog extends LitElement {
           class="mode-button live"
           type="button"
           role="tab"
-          aria-label=${localize(this.hass, "common.live")}
-          title=${localize(this.hass, "common.live")}
-          aria-selected=${String(this.mode === "live")}
+          aria-label=${liveLabel}
+          title=${liveLabel}
+          aria-selected=${String(liveSelected)}
           tabindex=${this.mode === "live" ? "0" : "-1"}
           @click=${() => this.selectMode("live")}
           @keydown=${this.handleTabKeyDown}
@@ -405,6 +457,153 @@ export class RingViewDialog extends LitElement {
         </button>
       </div>
     `;
+  }
+
+  private renderSnapshotAction(): TemplateResult | typeof nothing {
+    if (!this.shouldShowSnapshotAction()) return nothing;
+    const entityId = this.snapshotEntityId();
+    const connected = this.hass?.connection?.connected !== false;
+    const working = this.snapshotActionStatus === "working";
+    const disabled = working || !entityId || !connected;
+    const labelKey: TranslationKey | undefined = !connected
+      ? "snapshot.connection_failed"
+      : !entityId
+        ? "snapshot.unavailable"
+        : this.snapshotActionStatus === "working"
+          ? "snapshot.saving"
+          : this.snapshotActionStatus === "success"
+            ? "snapshot.saved"
+            : this.snapshotActionStatus === "error"
+              ? this.snapshotFeedbackMessage
+                ? undefined
+                : "snapshot.failed"
+              : "snapshot.take";
+    const label = labelKey
+      ? localize(this.hass, labelKey)
+      : this.snapshotFeedbackMessage!;
+    const icon = this.snapshotActionStatus === "working"
+      ? mdiLoading
+      : this.snapshotActionStatus === "success"
+        ? mdiCheckCircleOutline
+        : this.snapshotActionStatus === "error"
+          ? mdiAlertCircleOutline
+          : mdiCameraOutline;
+    return html`
+      <button
+        class=${classMap({
+          "icon-button": true,
+          "snapshot-action": true,
+          working,
+          success: this.snapshotActionStatus === "success",
+          error: this.snapshotActionStatus === "error",
+        })}
+        type="button"
+        aria-label=${label}
+        aria-busy=${String(working)}
+        title=${label}
+        ?disabled=${disabled}
+        @click=${this.takeSnapshot}
+      >
+        ${this.icon(icon)}
+      </button>
+    `;
+  }
+
+  private shouldShowSnapshotAction(): boolean {
+    return Boolean(
+      this.config?.show_snapshot_button
+      && this.mode === "live"
+      && (!this.inline || this.inlineStarted),
+    );
+  }
+
+  private snapshotEntityId(): string | undefined {
+    return this.hass && this.config
+      ? selectSnapshotEntityId(this.hass, this.config)
+      : undefined;
+  }
+
+  private takeSnapshot = async (): Promise<void> => {
+    const hass = this.hass;
+    const config = this.config;
+    const entityId = this.snapshotEntityId();
+    if (
+      !hass
+      || !config
+      || !entityId
+      || !this.shouldShowSnapshotAction()
+      || this.snapshotActionStatus === "working"
+    ) {
+      return;
+    }
+
+    this.clearSnapshotFeedback();
+    this.snapshotActionStatus = "working";
+    const token = ++this.snapshotActionToken;
+
+    try {
+      if (hass.connection?.connected === false || !hass.callService) {
+        throw new Error("Home Assistant service API unavailable");
+      }
+      await hass.callService(
+        "camera",
+        "snapshot",
+        { filename: buildSnapshotFilename(hass, config) },
+        { entity_id: entityId },
+      );
+      if (token !== this.snapshotActionToken || !this.open) return;
+      const message = localize(this.hass, "snapshot.saved");
+      this.snapshotActionStatus = "success";
+      this.snapshotFeedbackMessage = message;
+      this.statusAnnouncement = message;
+      this.showNotification(message);
+      this.snapshotFeedbackTimer = window.setTimeout(() => {
+        if (token !== this.snapshotActionToken) return;
+        this.snapshotFeedbackTimer = undefined;
+        this.snapshotFeedbackMessage = undefined;
+        this.snapshotActionStatus = "idle";
+      }, SNAPSHOT_SUCCESS_DURATION_MS);
+    } catch (error) {
+      if (token !== this.snapshotActionToken || !this.open) return;
+      const message = localize(this.hass, snapshotErrorKey(error));
+      this.snapshotActionStatus = "error";
+      this.snapshotFeedbackMessage = message;
+      this.statusAnnouncement = message;
+      this.showNotification(message);
+      this.snapshotFeedbackTimer = window.setTimeout(() => {
+        if (token !== this.snapshotActionToken) return;
+        this.snapshotFeedbackTimer = undefined;
+        this.snapshotFeedbackMessage = undefined;
+        this.snapshotActionStatus = "idle";
+      }, SNAPSHOT_ERROR_DURATION_MS);
+    }
+  };
+
+  private showNotification(message: string): void {
+    this.dispatchEvent(
+      new CustomEvent("hass-notification", {
+        detail: { message },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  }
+
+  private clearSnapshotFeedback(): void {
+    if (this.snapshotFeedbackTimer !== undefined) {
+      window.clearTimeout(this.snapshotFeedbackTimer);
+      this.snapshotFeedbackTimer = undefined;
+    }
+    this.snapshotFeedbackMessage = undefined;
+    if (["success", "error"].includes(this.snapshotActionStatus)) {
+      this.snapshotActionStatus = "idle";
+    }
+  }
+
+  private resetSnapshotAction(): void {
+    this.clearSnapshotFeedback();
+    this.snapshotActionToken += 1;
+    this.snapshotActionStatus = "idle";
   }
 
   private renderRingAlert(): TemplateResult | typeof nothing {
@@ -1229,6 +1428,7 @@ export class RingViewDialog extends LitElement {
       return;
     }
     this.resetVisitorActions();
+    this.resetSnapshotAction();
     this.clearAutomaticLiveRecovery();
     this.lifecycle.dispose();
     this.releaseInlineLive();
@@ -1784,6 +1984,7 @@ export class RingViewDialog extends LitElement {
   private handlePageHide = (): void => {
     this.pageUnloading = true;
     this.resetVisitorActions();
+    this.resetSnapshotAction();
     if (this.inline) {
       this.suspendInline();
       return;
@@ -1943,6 +2144,7 @@ export class RingViewDialog extends LitElement {
     this.recordingStarted = true;
     this.statusAnnouncement = "";
     this.resetVisitorActions();
+    this.resetSnapshotAction();
     this.setRingingUntil();
     this.lastDoorbellState = undefined;
     this.detachGlobalListeners();

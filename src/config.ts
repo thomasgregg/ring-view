@@ -1,5 +1,10 @@
 import { localize, type TranslationKey } from "./localize";
 import type { NormalizedConfig, RingViewConfig } from "./types";
+import {
+  DEFAULT_SNAPSHOT_DIRECTORY,
+  normalizeSnapshotDirectory,
+  snapshotDirectoryProblem,
+} from "./utilities/snapshot";
 
 export const CARD_TYPE = "custom:ring-view";
 export const CARD_TAG = "ring-view";
@@ -21,6 +26,8 @@ const DEFAULTS = {
   show_name: false,
   preview_source: "last_recording",
   preview_fallback: "last_recording",
+  show_snapshot_button: false,
+  snapshot_directory: DEFAULT_SNAPSHOT_DIRECTORY,
   aspect_ratio: "16:9",
   fit_mode: "cover",
 } as const;
@@ -87,6 +94,14 @@ export function validateConfig(config: RingViewConfig): void {
     && !PREVIEW_FALLBACKS.has(config.preview_fallback)
   ) {
     throw new Error(localize(undefined, "config.preview_fallback"));
+  }
+  if (config.snapshot_directory !== undefined) {
+    const problem = snapshotDirectoryProblem(config.snapshot_directory);
+    if (problem) {
+      throw new Error(
+        localize(undefined, `config.snapshot_directory_${problem}`),
+      );
+    }
   }
   if (config.aspect_ratio && !ASPECT_RATIOS.has(config.aspect_ratio)) {
     throw new Error(localize(undefined, "config.aspect_ratio"));
@@ -178,6 +193,11 @@ export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
     show_name: config.show_name ?? DEFAULTS.show_name,
     preview_source: config.preview_source ?? DEFAULTS.preview_source,
     preview_fallback: config.preview_fallback ?? DEFAULTS.preview_fallback,
+    show_snapshot_button:
+      config.show_snapshot_button ?? DEFAULTS.show_snapshot_button,
+    snapshot_directory: normalizeSnapshotDirectory(
+      config.snapshot_directory ?? DEFAULTS.snapshot_directory,
+    ),
     aspect_ratio: config.aspect_ratio ?? DEFAULTS.aspect_ratio,
     fit_mode: config.fit_mode ?? DEFAULTS.fit_mode,
     grid_options: config.grid_options,

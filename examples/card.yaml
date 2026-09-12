@@ -23,6 +23,11 @@ dashboard_start: on_demand
 dashboard_live_muted: true
 door_control_location: viewer_only
 
+# Optional: save a still image while Live is active.
+# Uses snapshot_entity when configured and available, then live_entity.
+show_snapshot_button: true
+snapshot_directory: /media/ring-view
+
 show_name: false
 aspect_ratio: "16:9"
 fit_mode: cover

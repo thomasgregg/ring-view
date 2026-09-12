@@ -167,7 +167,7 @@ describe("visual editor", () => {
     );
   });
 
-  it("groups related settings in five compact native expandable sections", async () => {
+  it("groups related settings in six compact native expandable sections", async () => {
     const editor = document.createElement("ring-view-editor");
     editor.hass = hass;
     editor.setConfig({
@@ -194,12 +194,67 @@ describe("visual editor", () => {
         icon: Boolean(field.iconPath),
       })),
     ).toEqual([
+      { name: "snapshots", flatten: true, icon: true },
       { name: "dashboard_preview", flatten: true, icon: true },
       { name: "viewer_behavior", flatten: true, icon: true },
       { name: "doorbell_features", flatten: true, icon: true },
       { name: "door_access", flatten: true, icon: true },
       { name: "card_appearance", flatten: true, icon: true },
     ]);
+  });
+
+  it("reveals only the save folder when manual snapshots are enabled", async () => {
+    const editor = document.createElement("ring-view-editor");
+    editor.hass = hass;
+    editor.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+    });
+    document.body.append(editor);
+    await editor.updateComplete;
+
+    const form = editor.shadowRoot?.querySelector("ha-form") as
+      | (HTMLElement & {
+          schema?: ConfigFormSchema[];
+          computeHelper?: (schema: ConfigFormSchema) => string | undefined;
+        })
+      | null;
+    const snapshotFields = () =>
+      form?.schema
+        ?.find((field) => field.name === "snapshots")
+        ?.schema?.map((field) => field.name);
+
+    expect(snapshotFields()).toEqual(["show_snapshot_button"]);
+    form?.dispatchEvent(
+      new CustomEvent("value-changed", {
+        detail: {
+          value: {
+            recording_entity: "camera.recording",
+            live_entity: "camera.live",
+            show_snapshot_button: true,
+          },
+        },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+    await editor.updateComplete;
+    expect(snapshotFields()).toEqual([
+      "show_snapshot_button",
+      "snapshot_directory",
+    ]);
+    expect(form?.computeHelper?.({ name: "snapshot_directory" })).toBeUndefined();
+
+    editor.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      show_snapshot_button: true,
+      snapshot_directory: "/config/www/ring-view",
+    });
+    await editor.updateComplete;
+    expect(form?.computeHelper?.({ name: "snapshot_directory" })).toContain(
+      "publicly accessible",
+    );
   });
 
   it("only reveals the snapshot settings required by the selected image source", async () => {
@@ -295,11 +350,12 @@ describe("visual editor", () => {
       "Kamera für letzte Aufnahme",
     );
     expect(form?.computeLabel?.({ name: "viewer_behavior" })).toBe(
-      "Anzeigeverhalten",
+      "Vollbildansicht",
     );
     expect(form?.computeLabel?.({ name: "snapshot_entity" })).toBe(
       "Kamera für Geräte-Schnappschuss",
     );
+    expect(form?.computeLabel?.({ name: "snapshots" })).toBe("Schnappschüsse");
     expect(form?.computeLabel?.({ name: "name" })).toBe("Kameraname (optional)");
     expect(form?.computeLabel?.({ name: "show_name" })).toBe(
       "Kameranamen anzeigen",

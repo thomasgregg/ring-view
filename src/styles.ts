@@ -267,6 +267,27 @@ export const dialogStyles = css`
     background: rgba(255, 255, 255, 0.1);
   }
 
+  .icon-button:disabled {
+    color: rgba(255, 255, 255, 0.38);
+    cursor: default;
+  }
+
+  .icon-button:disabled:hover {
+    background: transparent;
+  }
+
+  .snapshot-action.working svg {
+    animation: spin 0.85s linear infinite;
+  }
+
+  .snapshot-action.success {
+    color: #81c784;
+  }
+
+  .snapshot-action.error {
+    color: #ff8a80;
+  }
+
   .icon-button:focus-visible,
   .mode-button:focus-visible,
   .action-button:focus-visible {
@@ -869,7 +890,8 @@ export const dialogStyles = css`
     }
 
     .door-action.holding::before,
-    .door-action.working svg {
+    .door-action.working svg,
+    .snapshot-action.working svg {
       animation: none;
     }
 

@@ -37,6 +37,9 @@ export interface HassEntityRegistryEntry {
 export interface HomeAssistant {
   states: Record<string, HassEntity>;
   entities?: Record<string, HassEntityRegistryEntry>;
+  config?: {
+    time_zone?: string;
+  };
   connection?: {
     readonly connected?: boolean;
     addEventListener?(event: "disconnected" | "ready", callback: () => void): void;
@@ -96,6 +99,8 @@ export interface RingViewConfig {
   show_name?: boolean;
   preview_source?: PreviewSource;
   preview_fallback?: PreviewFallback;
+  show_snapshot_button?: boolean;
+  snapshot_directory?: string;
   aspect_ratio?: AspectRatio;
   fit_mode?: FitMode;
   grid_options?: GridOptions;

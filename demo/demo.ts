@@ -187,10 +187,10 @@ let hass: HomeAssistant = {
   },
   hassUrl: (path = "") => path,
   callWS: async () => ({}) as never,
-  callService: async (domain, service, serviceData = {}) => {
+  callService: async (domain, service, serviceData = {}, target) => {
     window.demoDoorCalls = [
       ...(window.demoDoorCalls ?? []),
-      { domain, service, serviceData },
+      { domain, service, serviceData, target },
     ];
   },
   connection: {
@@ -287,6 +287,8 @@ card.setConfig({
     query.get("dashboard_door") === "1"
       ? "dashboard_and_viewer"
       : "viewer_only",
+  show_snapshot_button: query.get("snapshot_button") === "1",
+  snapshot_directory: query.get("snapshot_directory") || "/media/ring-view",
 });
 card.hass = hass;
 document.querySelector("#card-root")!.append(card);
@@ -311,6 +313,7 @@ declare global {
       domain: string;
       service: string;
       serviceData: Record<string, unknown>;
+      target?: Record<string, unknown>;
     }>;
     demoSetEntityState: (entityId: string, state: string) => void;
   }

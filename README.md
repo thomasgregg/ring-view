@@ -35,6 +35,7 @@ See what happened, check what is happening, and answer the door—all without le
 - **Operate the door while you watch.** Door access adds a configurable Home Assistant lock action, with a safe hold gesture, optional physical-door status, and a shared Talk/door control dock.
 - **Choose a calm or hands-on dashboard.** Keep the lightweight still-image card, or opt into direct Recording, Live, Talk, and door controls for a wall tablet.
 - **Show the freshest view.** Optionally combine the latest recording with a Ring-MQTT snapshot camera for the dashboard preview.
+- **Save a moment from Live.** Optionally show one snapshot button that saves a timestamped image through Home Assistant, with no custom automation.
 - **See when something last happened.** Optionally show a localized relative time from a timestamp sensor, event entity, or date-and-time helper.
 - **Know when someone rings.** A temporary doorbell alert highlights the card. Tap it to open Live.
 - **Take the doorbell beyond the dashboard.** The included notification blueprint sends a phone alert, then adds a preview when the recording is ready.
@@ -64,7 +65,8 @@ live_entity: camera.front_door_live_view
 ### Configure visually
 
 YAML is optional. The visual editor lets you select the cameras and configure
-dashboard behavior, Talk, doorbell features, door access and appearance.
+dashboard behavior, manual snapshots, Talk, doorbell features, door access and
+appearance.
 
 <p align="center">
   <a href="https://github.com/thomasgregg/ring-view/blob/main/docs/images/configuration-editor.png">
@@ -87,8 +89,9 @@ In the visual editor, open **Dashboard card → Dashboard behavior**:
 | **Control camera in card** | Adds Recording, Live and optional visitor controls directly to the card. | Wall tablets and hands-on dashboards. |
 
 For an interactive card, **No — wait for a tap** is the calmest startup choice.
-You can instead start the last recording or muted Live automatically. The card
-requires at least **12 columns × 3 rows** in a Sections dashboard.
+Neither mode appears active until you choose Recording or Live. You can instead
+start the last recording or muted Live automatically. The card requires at
+least **12 columns × 3 rows** in a Sections dashboard.
 
 Common starting points:
 
@@ -100,7 +103,7 @@ Common starting points:
 
 ### Add Talk or door access
 
-Enable **Viewer behavior → Two-way audio** to add **Hold to talk**. This requires
+Enable **Fullscreen viewer → Two-way audio** to add **Hold to talk**. This requires
 the official Ring Live view camera, an HTTPS Home Assistant connection and
 microphone permission.
 
@@ -143,7 +146,7 @@ Use the same Ring event in your own Home Assistant automations for porch lights,
 
 ## Guides and support
 
-- [Configuration, visual editor, layouts, and snapshot previews](docs/configuration.md)
+- [Configuration, visual editor, manual snapshots, layouts, and previews](docs/configuration.md)
 - [Door-access design, states, and configuration](docs/door-access.md)
 - [Playback, talkback, iPhone rotation, and troubleshooting](docs/playback-and-troubleshooting.md)
 - [Optional temporary backend patch](docs/backend-patch.md)

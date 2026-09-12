@@ -1,5 +1,6 @@
 import {
   mdiCameraControl,
+  mdiCameraOutline,
   mdiDoorbellVideo,
   mdiLockOpenVariantOutline,
   mdiPaletteOutline,
@@ -22,6 +23,7 @@ import type {
   RingViewConfig,
 } from "./types";
 import { validateEntities } from "./utilities/entity-validation";
+import { snapshotDirectoryWarning } from "./utilities/snapshot";
 
 function configSchema(
   hass: HomeAssistant,
@@ -236,6 +238,22 @@ function configSchema(
       selector: { entity: { domain: "camera" } },
     },
     {
+      name: "snapshots",
+      type: "expandable",
+      flatten: true,
+      iconPath: mdiCameraOutline,
+      schema: [
+        { name: "show_snapshot_button", selector: { boolean: {} } },
+        ...(config.show_snapshot_button
+          ? [{
+              name: "snapshot_directory",
+              required: true,
+              selector: { text: {} },
+            } satisfies ConfigFormSchema]
+          : []),
+      ],
+    },
+    {
       name: "dashboard_preview",
       type: "expandable",
       flatten: true,
@@ -367,6 +385,9 @@ const LABELS: Record<string, TranslationKey> = {
   recording_entity: "editor.recording_entity",
   live_entity: "editor.live_entity",
   snapshot_entity: "editor.snapshot_entity",
+  snapshots: "editor.snapshots",
+  show_snapshot_button: "editor.show_snapshot_button",
+  snapshot_directory: "editor.snapshot_directory",
   dashboard_preview: "editor.dashboard_preview",
   dashboard_behavior: "editor.dashboard_behavior",
   dashboard_start: "editor.dashboard_start",
@@ -494,6 +515,16 @@ export class RingViewEditor extends LitElement {
   };
 
   private computeHelper = (schema: ConfigFormSchema): string | undefined => {
+    if (schema.name === "snapshot_directory" && this.config) {
+      const warning = snapshotDirectoryWarning(this.config.snapshot_directory);
+      if (warning === "public") {
+        return localize(this.hass, "editor.helper_snapshot_directory_public");
+      }
+      if (warning === "custom") {
+        return localize(this.hass, "editor.helper_snapshot_directory_custom");
+      }
+      return undefined;
+    }
     const key = HELPERS[schema.name];
     return key ? localize(this.hass, key) : undefined;
   };

@@ -158,11 +158,12 @@ capabilities.
 The full editor order is:
 
 1. Cameras
-2. Dashboard card
-3. Viewer behavior
-4. Doorbell features
-5. Door access
-6. Card appearance
+2. Snapshots
+3. Dashboard card
+4. Fullscreen viewer
+5. Doorbell features
+6. Door access
+7. Card appearance
 
 The **Door access** section uses progressive disclosure:
 

@@ -30,6 +30,10 @@ The card supports keyboard activation, Escape to close, focus trapping and resto
 - Inline media stops before fullscreen opens, suspends when its card or tab is
   hidden, and is coordinated across duplicate cards for the same Live camera.
 - The optional remembered view stores only the selected mode for that entity pair in the local browser.
+- Manual snapshots use Home Assistant's standard `camera.snapshot` action. Ring
+  View does not receive or upload the saved JPEG. The recommended `/media`
+  location is protected by Home Assistant authentication; `/config/www` files
+  can be publicly accessible and trigger an editor warning.
 
 ## A note on privacy & legality
 

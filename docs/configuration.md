@@ -28,7 +28,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `type` | No — added automatically | Required | `custom:ring-view` | Identifies the custom card. Added automatically by the card picker. |
 | `recording_entity` | Yes — Config tab | Required | `camera.*` entity ID | Camera entity containing the latest recording. |
 | `live_entity` | Yes — Config tab | Required | `camera.*` entity ID | Camera entity that starts the Ring live view. |
-| `snapshot_entity` | Yes — Dashboard preview | Not set | `camera.*` entity ID | Device snapshot camera, such as the snapshot entity created by Ring-MQTT. Shown when the selected image source needs it. |
+| `snapshot_entity` | Yes — Dashboard preview | Not set | `camera.*` entity ID | Device snapshot camera, such as the snapshot entity created by Ring-MQTT. Used by snapshot previews and preferred for manual snapshots when configured and available. |
 | `name` | Yes — Config tab | Entity name | Text | Optional label used instead of the recording entity's friendly name. |
 | `last_activity_entity` | Yes — Card appearance | Not set | `sensor.*`, `event.*`, or `input_datetime.*` entity ID | Shows the selected entity state's date and time as a localized relative timestamp at the top left. |
 | `default_mode` | Yes — Config tab | `last_recording` | `last_recording`, `live` | View selected when the viewer opens. |
@@ -38,7 +38,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `dashboard_behavior` | Yes — Dashboard card | `open_viewer` | `open_viewer`, `interactive` | Keeps the passive card that opens fullscreen, or exposes camera controls directly in the card. |
 | `dashboard_start` | Yes — Dashboard card, interactive only | `on_demand` | `on_demand`, `last_recording`, `live` | Waits for a tap, starts the recording, or starts Live when an interactive card becomes visible. |
 | `dashboard_live_muted` | Yes — Dashboard card, interactive only | `true` | `true`, `false` | Controls audio when Live starts inside the dashboard. Muted is recommended for tablets and autoplay. |
-| `two_way_audio` | Yes — Viewer behavior | `false` | `true`, `false` | Uses one direct WebRTC session for live video, listening, and push-to-talk when `live_entity` is an official Ring `live_view` camera. |
+| `two_way_audio` | Yes — Fullscreen viewer | `false` | `true`, `false` | Uses one direct WebRTC session for live video, listening, and push-to-talk when `live_entity` is an official Ring `live_view` camera. |
 | `doorbell_entity` | Yes, Doorbell features | Not set | `event.*` entity ID | Displays a temporary ring alert when the selected doorbell event reports `ring`. |
 | `door_entity` | Yes — Door access | Not set | `lock.*` entity ID | Enables door access for the selected Home Assistant lock. |
 | `door_contact_entity` | Yes — Door access | Not set | `binary_sensor.*` entity ID | Optionally makes the icon reflect the physical door state. An open contact replaces and disables the door action until the door closes. |
@@ -47,6 +47,8 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `door_hold_to_activate` | Yes — Door access | `true` | `true`, `false` | Requires a 900 ms press-and-hold confirmation. Disable for one-tap operation. |
 | `door_control_location` | Yes — Door access, interactive only | `viewer_only` | `viewer_only`, `dashboard_and_viewer` | Keeps the door action in fullscreen only, or places it on both the interactive dashboard card and fullscreen viewer. |
 | `show_name` | Yes — Config tab | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer. |
+| `show_snapshot_button` | Yes — Snapshots | `false` | `true`, `false` | Shows one manual snapshot action while Live is active. |
+| `snapshot_directory` | Yes — Snapshots | `/media/ring-view` | Absolute directory path | Folder where manual snapshots are saved by Home Assistant. |
 | `preview_source` | Yes — Dashboard preview | `last_recording` | `last_recording`, `live`, `default`, `snapshot`, `newest` | Chooses the entity used for the dashboard still. `default` follows the view that will open; `newest` compares the optional snapshot with the latest recording. |
 | `preview_fallback` | Yes — Dashboard preview | `last_recording` | `last_recording`, `snapshot` | Chooses the still used by `newest` when capture times or update order cannot be compared. Only shown for `newest`. |
 | `aspect_ratio` | Yes — Config tab | `16:9` | `auto`, `16:9`, `4:3`, `1:1` | Sets the dashboard image shape. |
@@ -85,6 +87,9 @@ live_muted: false
 dashboard_behavior: interactive
 dashboard_start: on_demand
 dashboard_live_muted: true
+
+show_snapshot_button: true
+snapshot_directory: /media/ring-view
 
 two_way_audio: true
 doorbell_entity: event.front_door_ding
@@ -131,6 +136,66 @@ technology receives the fuller label **Last activity, 2 minutes ago**. Unknown,
 unavailable, or invalid values are not displayed; the visual editor shows a
 configuration warning instead.
 
+## Saving a manual snapshot
+
+Open **Snapshots** and enable **Show snapshot button**. One camera button then
+appears in the header only while Live is actually active. It is available in
+the interactive dashboard card and fullscreen viewer. It stays hidden on the
+passive dashboard card, in Recording, and while an on-demand card is waiting
+for its first tap.
+
+The button is both **Take snapshot** and **Save**. Ring View asks Home Assistant
+to run `camera.snapshot` and gives it a timestamped JPEG filename. No separate
+automation, script, or second save button is required.
+
+Ring View automatically chooses the capture entity:
+
+1. Use the configured `snapshot_entity` when that entity exists and is
+   available. This is normally the Ring-MQTT snapshot camera.
+2. Otherwise use the configured `live_entity`, normally the official Ring Live
+   view camera.
+3. Disable the button if neither camera is available.
+
+The first choice uses the same **Device snapshot camera** already configured
+for dashboard snapshot previews. The Snapshots section deliberately does not
+add another camera selector. The saved image comes from the selected Home
+Assistant camera entity; it is not a browser screenshot of the visible video
+frame.
+
+The official Ring Live camera is a compatibility fallback, not a guarantee of
+a current Live frame. `camera.snapshot` can save only the still image that the
+entity exposes to Home Assistant. It cannot copy pixels from the active WebRTC
+player. With current official Ring behavior, the result can be unavailable or
+represent the latest recording instead. Configure the Ring-MQTT snapshot
+camera when a fresh device snapshot is required.
+
+The default folder is `/media/ring-view`. [Home Assistant OS creates `/media`
+automatically](https://www.home-assistant.io/more-info/local-media/setup-media/).
+Home Assistant Container users must mount a directory at
+`/media`. Open **Media > My media > ring-view** to view saved files. Media files
+require Home Assistant authentication, unlike files under `/config/www`, which
+can be publicly accessible.
+
+The editor checks that the configured path is absolute and rejects the
+filesystem root, path traversal, control characters, and template markers. It
+warns about `/config/www` and custom locations. Only Home Assistant can verify
+that the server folder exists and is writable, so the real write check happens
+when the button is pressed. Custom locations may need to be added to
+[`allowlist_external_dirs`](https://www.home-assistant.io/docs/configuration/basic/)
+in `configuration.yaml`. Home Assistant creates the final subfolder when the
+standard [`camera.snapshot`](https://www.home-assistant.io/actions/camera.snapshot/)
+action saves the first image.
+
+Files are named like
+`entrance_2026-09-12_18-42-03-125.jpg`, using Home Assistant's configured time
+zone. Each tap creates a new file. Ring View does not currently provide a
+gallery, automatic cleanup, or a retention limit.
+
+Saving a file does not replace the dashboard preview. The preview continues to
+follow **Image source** and its own camera entity. A saved JPEG is a file, not a
+camera entity, so treating it as the new preview would require a separate
+Local file camera and would change the meaning of the existing preview setting.
+
 ## Dashboard card behavior
 
 Open **Dashboard card** and choose one of two intentionally distinct surfaces:
@@ -142,7 +207,8 @@ Open **Dashboard card** and choose one of two intentionally distinct surfaces:
 
 The interactive fields appear only after that mode is selected. **No — wait for
 a tap** is the safest startup and does not mount a player until Recording or
-Live is chosen. While Recording is selected, tap or click the camera image to
+Live is chosen. Neither mode is highlighted during this idle state. While
+Recording is selected, tap or click the camera image to
 play it; the large central Play button is intentionally omitted so the image
 stays unobstructed. The image surface is also keyboard accessible. Automatic
 Live starts only while the card is visible and is muted by default. Home

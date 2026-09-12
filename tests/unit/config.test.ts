@@ -25,6 +25,8 @@ describe("configuration", () => {
       show_name: false,
       preview_source: "last_recording",
       preview_fallback: "last_recording",
+      show_snapshot_button: false,
+      snapshot_directory: "/media/ring-view",
       aspect_ratio: "16:9",
       fit_mode: "cover",
     });
@@ -127,6 +129,36 @@ describe("configuration", () => {
       preview_source: "newest",
       preview_fallback: "snapshot",
     });
+  });
+
+  it("normalizes and validates manual snapshot storage", () => {
+    expect(
+      normalizeConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        show_snapshot_button: true,
+        snapshot_directory: " /media/ring-view/ ",
+      }),
+    ).toMatchObject({
+      show_snapshot_button: true,
+      snapshot_directory: "/media/ring-view",
+    });
+
+    for (const snapshot_directory of [
+      "",
+      "media/ring-view",
+      "/",
+      "/media/../config",
+      "/media/{{ camera }}",
+    ]) {
+      expect(() =>
+        validateConfig({
+          recording_entity: "camera.recording",
+          live_entity: "camera.live",
+          snapshot_directory,
+        }),
+      ).toThrow(/snapshot_directory/);
+    }
   });
 
   it("normalizes an optional last activity timestamp entity", () => {

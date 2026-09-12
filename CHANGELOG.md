@@ -4,6 +4,38 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.9.0-beta.1] - 2026-09-12
+
+### Added
+
+- Add an optional camera button while Live is active in the interactive
+  dashboard card or fullscreen viewer.
+- Save each requested image through Home Assistant's `camera.snapshot` action,
+  using the configured device snapshot camera when it is available and the
+  official Live camera otherwise.
+- Add a configurable save folder with `/media/ring-view` as the protected,
+  Media-browser-friendly default, plus editor warnings for public and custom
+  locations.
+- Show working, success, and actionable failure feedback without adding a
+  custom backend automation.
+
+### Changed
+
+- Rename the **Viewer behavior** editor section to **Fullscreen viewer**, making
+  its relationship to **Dashboard card** and the scope of its playback options
+  explicit.
+
+### Fixed
+
+- Leave both Recording and Live unselected while an interactive card is using
+  **No, wait for a tap**, then highlight the mode only after the user starts it.
+
+### Tests
+
+- Cover source selection, path validation, timezone-aware filenames, service
+  calls, repeat-click protection, errors, Live-only visibility, idle mode
+  styling, and responsive header spacing.
+
 ## [0.8.1] - 2026-09-12
 
 ### Added
