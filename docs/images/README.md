@@ -7,7 +7,9 @@ charcoal `#3F3F3F`, and white.
 
 The first README image, `ring-view-modes-rounded.png`, uses a real Ring View
 camera capture obtained through Home Assistant on **12 September 2026**. No AI
-image generation, scene reconstruction, or camera-image enhancement was used.
+image generation or scene reconstruction was used. A subtle uniform brightness,
+saturation, and warmth adjustment was applied to the camera image without
+changing any scene content.
 
 The text labels and gently curved arrows are deterministic vector overlays
 that identify the actual controls in the captured viewer. The outer corners
