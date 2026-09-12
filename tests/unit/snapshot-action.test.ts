@@ -158,7 +158,8 @@ describe("snapshot action", () => {
       ),
     ).toBe("Home Assistant cannot write to the snapshot folder.");
     expect(
-      dialog.shadowRoot?.querySelector(".snapshot-feedback.error")?.textContent?.trim(),
+      dialog.shadowRoot?.querySelector(".snapshot-error-layer .state-title")
+        ?.textContent?.trim(),
     ).toBe("Home Assistant cannot write to the snapshot folder.");
   });
 

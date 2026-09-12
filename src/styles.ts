@@ -288,42 +288,6 @@ export const dialogStyles = css`
     color: #ff8a80;
   }
 
-  .snapshot-action-wrap {
-    position: relative;
-    width: 44px;
-    height: 44px;
-    display: inline-grid;
-    flex: 0 0 auto;
-    place-items: center;
-  }
-
-  .snapshot-feedback {
-    position: absolute;
-    top: calc(100% + 6px);
-    right: -46px;
-    width: max-content;
-    max-width: min(280px, calc(100vw - 64px));
-    padding: 7px 10px;
-    box-sizing: border-box;
-    border: 1px solid rgba(255, 255, 255, 0.36);
-    border-radius: 9px;
-    color: #fff;
-    background: rgba(18, 18, 18, 0.9);
-    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.4);
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 18px;
-    text-align: start;
-    white-space: normal;
-    pointer-events: none;
-    backdrop-filter: blur(12px) saturate(1.15);
-    -webkit-backdrop-filter: blur(12px) saturate(1.15);
-  }
-
-  .snapshot-feedback.error {
-    border-color: rgba(255, 138, 128, 0.76);
-  }
-
   .icon-button:focus-visible,
   .mode-button:focus-visible,
   .action-button:focus-visible {
@@ -961,10 +925,6 @@ export const dialogStyles = css`
   :host([inline]) .body {
     width: 100%;
     height: 100%;
-  }
-
-  :host([inline]) .snapshot-feedback {
-    max-width: min(200px, calc(100vw - 64px));
   }
 
   :host([inline]) .media-frame {

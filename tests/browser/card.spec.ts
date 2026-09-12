@@ -252,7 +252,7 @@ test("shows one snapshot action only after Live starts", async ({ page }) => {
   await expect(snapshot).toBeVisible();
   await snapshot.click();
   await expect(page.getByRole("button", { name: "Snapshot saved" })).toBeVisible();
-  await expect(page.locator("ring-view ring-view-dialog .snapshot-feedback")).toHaveCount(0);
+  await expect(page.locator(".snapshot-error-layer")).toHaveCount(0);
 
   await page.locator("ring-view").evaluate((element) => {
     const card = element as HTMLElement & {
@@ -263,20 +263,35 @@ test("shows one snapshot action only after Live starts", async ({ page }) => {
       throw new Error("Cannot write image to file");
     };
   });
-  await page.locator("ring-view ring-view-dialog .snapshot-action").click();
-  const feedback = page.locator("ring-view ring-view-dialog .snapshot-feedback");
-  const visitorDock = page.locator("ring-view ring-view-dialog .visitor-action-dock");
+  await page.getByRole("button", { name: "Open fullscreen camera viewer" }).click();
+  await page.locator("ring-view-dialog .snapshot-action").click();
+  const feedback = page.locator("ring-view-dialog .snapshot-error-layer .state-card");
+  const mediaFrame = page.locator("ring-view-dialog .media-frame");
+  const visitorDock = page.locator("ring-view-dialog .visitor-action-dock");
   await expect(feedback).toHaveText(
     "Home Assistant cannot write to the snapshot folder.",
   );
   await expect(visitorDock).toBeVisible();
-  const [feedbackBox, visitorBox] = await Promise.all([
+  const [feedbackBox, frameBox, visitorBox] = await Promise.all([
     feedback.boundingBox(),
+    mediaFrame.boundingBox(),
     visitorDock.boundingBox(),
   ]);
-  if (!feedbackBox || !visitorBox) {
+  if (!feedbackBox || !frameBox || !visitorBox) {
     throw new Error("Snapshot feedback geometry unavailable");
   }
+  expect(
+    Math.abs(
+      feedbackBox.x + feedbackBox.width / 2
+      - (frameBox.x + frameBox.width / 2),
+    ),
+  ).toBeLessThan(2);
+  expect(
+    Math.abs(
+      feedbackBox.y + feedbackBox.height / 2
+      - (frameBox.y + frameBox.height / 2),
+    ),
+  ).toBeLessThan(2);
   expect(feedbackBox.y + feedbackBox.height).toBeLessThan(visitorBox.y);
 
   const calls = await page.evaluate(() => window.demoDoorCalls ?? []);
@@ -290,7 +305,7 @@ test("shows one snapshot action only after Live starts", async ({ page }) => {
     /^\/media\/ring-view\/entrance_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}-\d{3}\.jpg$/,
   );
 
-  await page.getByRole("tab", { name: "Last recording" }).click();
+  await page.locator("ring-view-dialog").getByRole("tab", { name: "Last recording" }).click();
   await expect(page.getByRole("button", { name: /snapshot/i })).toHaveCount(0);
 });
 

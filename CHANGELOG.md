@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.9.0-beta.6] - 2026-09-12
+
+### Changed
+
+- Show snapshot failures in Ring View's existing centered status layer instead
+  of introducing a separate header message style and location.
+- Keep the temporary error state below the persistent header and visitor
+  controls so camera navigation, Talk, and door access remain available.
+
+### Tests
+
+- Cover reuse of the common state card, exact fullscreen centering, and
+  separation from the bottom visitor controls on desktop and phone.
+
 ## [0.9.0-beta.5] - 2026-09-12
 
 ### Changed

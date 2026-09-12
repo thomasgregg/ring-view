@@ -102,8 +102,8 @@ Verify each item on current stable Home Assistant and, where practical, the prev
     is absent while on-demand is idle, appears after selecting Live, saves one
     timestamped JPEG per tap, and reports success without changing the selected
     dashboard preview source. Success should use only the green icon. On a
-    phone, verify error feedback stays near the header and never covers the
-    bottom Talk or door controls.
+    phone, verify error feedback uses the common centered status display and
+    never covers the bottom Talk or door controls.
 24. If a Ring-MQTT snapshot camera is configured, confirm it is targeted first.
     Make it unavailable and confirm the official Live camera is used instead.
     Also verify the button does not collide with the mode or fullscreen controls

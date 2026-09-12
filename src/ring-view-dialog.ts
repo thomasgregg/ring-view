@@ -482,35 +482,23 @@ export class RingViewDialog extends LitElement {
           ? mdiAlertCircleOutline
           : mdiCameraOutline;
     return html`
-      <span class="snapshot-action-wrap">
-        <button
-          class=${classMap({
-            "icon-button": true,
-            "snapshot-action": true,
-            working,
-            success: this.snapshotActionStatus === "success",
-            error: this.snapshotActionStatus === "error",
-          })}
-          type="button"
-          aria-label=${label}
-          aria-busy=${String(working)}
-          title=${label}
-          ?disabled=${disabled}
-          @click=${this.takeSnapshot}
-        >
-          ${this.icon(icon)}
-        </button>
-        ${this.snapshotActionStatus === "error" && this.snapshotFeedbackMessage
-          ? html`
-              <span
-                class="snapshot-feedback error"
-                aria-hidden="true"
-              >
-                ${this.snapshotFeedbackMessage}
-              </span>
-            `
-          : nothing}
-      </span>
+      <button
+        class=${classMap({
+          "icon-button": true,
+          "snapshot-action": true,
+          working,
+          success: this.snapshotActionStatus === "success",
+          error: this.snapshotActionStatus === "error",
+        })}
+        type="button"
+        aria-label=${label}
+        aria-busy=${String(working)}
+        title=${label}
+        ?disabled=${disabled}
+        @click=${this.takeSnapshot}
+      >
+        ${this.icon(icon)}
+      </button>
     `;
   }
 
@@ -1377,6 +1365,16 @@ export class RingViewDialog extends LitElement {
               </button>
               ${this.inline ? nothing : this.renderAlternateModeButton()}
             </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (this.snapshotActionStatus === "error" && this.snapshotFeedbackMessage) {
+      return html`
+        <div class="state-layer snapshot-error-layer" role="alert">
+          <div class="state-card">
+            <div class="state-title">${this.snapshotFeedbackMessage}</div>
           </div>
         </div>
       `;
