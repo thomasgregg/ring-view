@@ -19,6 +19,7 @@ async function mount({
   start = "live",
   snapshotState = "idle",
   liveState = "idle",
+  mqttSnapshot = false,
   callService = vi.fn(async () => undefined),
 }: {
   mode?: "live" | "last_recording";
@@ -26,15 +27,43 @@ async function mount({
   start?: "on_demand" | "live" | "last_recording";
   snapshotState?: string;
   liveState?: string;
+  mqttSnapshot?: boolean;
   callService?: ReturnType<typeof vi.fn>;
 } = {}) {
+  const snapshot = {
+    ...camera("camera.snapshot", snapshotState),
+    attributes: {
+      ...camera("camera.snapshot", snapshotState).attributes,
+      ...(mqttSnapshot ? { timestamp: 1_789_208_130 } : {}),
+    },
+  };
   const hass: HomeAssistant = {
     config: { time_zone: "UTC" },
     states: {
       "camera.recording": camera("camera.recording"),
       "camera.live": camera("camera.live", liveState),
-      "camera.snapshot": camera("camera.snapshot", snapshotState),
+      "camera.snapshot": snapshot,
+      ...(mqttSnapshot
+        ? { "button.renamed_refresh": camera("button.renamed_refresh") }
+        : {}),
     },
+    entities: mqttSnapshot
+      ? {
+          "camera.snapshot": {
+            entity_id: "camera.snapshot",
+            platform: "mqtt",
+            device_id: "front-door",
+            unique_id: "083a8804c4c5_snapshot",
+          },
+          "button.renamed_refresh": {
+            entity_id: "button.renamed_refresh",
+            platform: "mqtt",
+            device_id: "front-door",
+            unique_id: "083a8804c4c5_take_snapshot",
+            original_name: "Take Snapshot",
+          },
+        }
+      : undefined,
     hassUrl: (path = "") => path,
     callWS: async () => ({}) as never,
     callService,
@@ -111,6 +140,92 @@ describe("snapshot action", () => {
       ),
     ).toBe("Take snapshot");
     expect(dialog.shadowRoot?.querySelector(".snapshot-feedback")).toBeNull();
+  });
+
+  it("requests and observes a fresh Ring-MQTT image before saving it", async () => {
+    const { callService, dialog, hass } = await mount({ mqttSnapshot: true });
+    dialog.shadowRoot?.querySelector<HTMLButtonElement>(".snapshot-action")?.click();
+    await Promise.resolve();
+
+    expect(callService).toHaveBeenCalledTimes(1);
+    expect(callService).toHaveBeenNthCalledWith(
+      1,
+      "button",
+      "press",
+      {},
+      { entity_id: "button.renamed_refresh" },
+    );
+
+    dialog.hass = {
+      ...hass,
+      states: {
+        ...hass.states,
+        "camera.snapshot": {
+          ...hass.states["camera.snapshot"]!,
+          attributes: {
+            ...hass.states["camera.snapshot"]!.attributes,
+            timestamp: 1_789_208_132,
+          },
+        },
+      },
+    };
+    await dialog.updateComplete;
+    await Promise.resolve();
+
+    expect(callService).toHaveBeenCalledTimes(2);
+    expect(callService).toHaveBeenNthCalledWith(
+      2,
+      "camera",
+      "snapshot",
+      {
+        filename:
+          "/media/ring-view/entrance_2026-09-12_14-30-22-381.jpg",
+      },
+      { entity_id: "camera.snapshot" },
+    );
+  });
+
+  it("does not save a stale Ring-MQTT image when refresh times out", async () => {
+    const { callService, dialog } = await mount({ mqttSnapshot: true });
+    dialog.shadowRoot?.querySelector<HTMLButtonElement>(".snapshot-action")?.click();
+    await Promise.resolve();
+    await vi.advanceTimersByTimeAsync(15_000);
+    await dialog.updateComplete;
+
+    expect(callService).toHaveBeenCalledTimes(1);
+    expect(callService.mock.calls[0]?.slice(0, 2)).toEqual(["button", "press"]);
+    expect(
+      dialog.shadowRoot?.querySelector(".snapshot-error-layer .state-title")
+        ?.textContent?.trim(),
+    ).toBe("The snapshot request timed out.");
+  });
+
+  it("does not claim success when the Ring-MQTT refresh control is missing", async () => {
+    const { callService, dialog, hass } = await mount({ mqttSnapshot: true });
+    delete hass.states["button.renamed_refresh"];
+    dialog.hass = hass;
+    await dialog.updateComplete;
+    dialog.shadowRoot?.querySelector<HTMLButtonElement>(".snapshot-action")?.click();
+    await Promise.resolve();
+    await dialog.updateComplete;
+
+    expect(callService).not.toHaveBeenCalled();
+    expect(
+      dialog.shadowRoot?.querySelector(".snapshot-error-layer .state-title")
+        ?.textContent?.trim(),
+    ).toBe("The Ring-MQTT snapshot refresh control is unavailable.");
+  });
+
+  it("cancels an in-flight Ring-MQTT refresh when the viewer closes", async () => {
+    const { callService, dialog } = await mount({ mqttSnapshot: true });
+    dialog.shadowRoot?.querySelector<HTMLButtonElement>(".snapshot-action")?.click();
+    await Promise.resolve();
+    dialog.close();
+    await Promise.resolve();
+    await vi.advanceTimersByTimeAsync(15_000);
+
+    expect(callService).toHaveBeenCalledTimes(1);
+    expect(callService.mock.calls[0]?.slice(0, 2)).toEqual(["button", "press"]);
   });
 
   it("falls back to the Live camera when the snapshot camera is unavailable", async () => {

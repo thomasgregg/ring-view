@@ -32,7 +32,8 @@ The unit suite covers configuration defaults and validation, manual snapshot
 source selection, paths, timezone-aware filenames and service feedback,
 snapshot timestamp parsing and freshest-preview fallbacks, official and
 Ring-MQTT last-activity timestamp formats, sibling resolution and localization,
-native editor structure and progressive
+Ring-MQTT on-demand snapshot discovery and event-driven refresh waits, native
+editor structure and progressive
 dashboard fields, entity and talkback capability states, unsupported-camera
 fallback, doorbell alerts, timeout invalidation, passive-dashboard privacy,
 single-renderer switching, close teardown, disconnect teardown, single-offer
@@ -108,7 +109,11 @@ Verify each item on current stable Home Assistant and, where practical, the prev
     phone, verify error feedback uses the common centered status display and
     never covers the bottom Talk or door controls.
 24. If a Ring-MQTT snapshot camera is configured, confirm it is targeted first.
-    Make it unavailable and confirm the official Live camera is used instead.
+    Press the snapshot action and confirm its same-device Take Snapshot button
+    is called before `camera.snapshot`, and that saving waits for the camera's
+    timestamp to change. Make it unavailable and confirm the official Live
+    camera is used instead. Remove or disable the refresh button and confirm the
+    card reports an error without saving an old frame.
     Also verify the button does not collide with the mode or fullscreen controls
     at the narrowest supported card width.
 25. Force a door-service failure and a microphone-permission failure. Confirm

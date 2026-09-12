@@ -64,7 +64,10 @@ import {
 import { saveMode } from "./utilities/mode-storage";
 import {
   buildSnapshotFilename,
+  findRingMqttSnapshotButton,
+  isRingMqttSnapshotSource,
   selectSnapshotEntityId,
+  snapshotCaptureMarker,
 } from "./utilities/snapshot";
 import {
   createRingViewUrl,
@@ -102,6 +105,9 @@ const DOOR_SUCCESS_DURATION_MS = 2_000;
 const DOOR_ERROR_DURATION_MS = 3_000;
 const SNAPSHOT_SUCCESS_DURATION_MS = 2_000;
 const SNAPSHOT_ERROR_DURATION_MS = 3_000;
+const SNAPSHOT_REFRESH_TIMEOUT_MS = 15_000;
+
+type SnapshotUpdateResult = "updated" | "timeout" | "cancelled";
 
 function snapshotErrorKey(error: unknown): TranslationKey {
   const message = error instanceof Error
@@ -121,6 +127,9 @@ function snapshotErrorKey(error: unknown): TranslationKey {
   }
   if (/no image|could not provide|not supported|snapshot unavailable/.test(message)) {
     return "snapshot.camera_failed";
+  }
+  if (/refresh control unavailable/.test(message)) {
+    return "snapshot.refresh_unavailable";
   }
   return "snapshot.failed";
 }
@@ -181,6 +190,12 @@ export class RingViewDialog extends LitElement {
   private doorActionToken = 0;
   private snapshotFeedbackTimer?: number;
   private snapshotActionToken = 0;
+  private pendingSnapshotUpdate?: {
+    entityId: string;
+    baseline?: number;
+    timer: number;
+    resolve: (result: SnapshotUpdateResult) => void;
+  };
   private inlineVisible = false;
   private inlineActive = false;
 
@@ -315,6 +330,7 @@ export class RingViewDialog extends LitElement {
   protected willUpdate(changed: PropertyValues<this>): void {
     if (!this.open || !this.config) return;
     if (changed.has("hass")) {
+      this.observePendingSnapshotUpdate();
       this.detectDoorbellEvent(changed.get("hass") as HomeAssistant | undefined);
     }
     if (!changed.has("hass")) return;
@@ -561,6 +577,32 @@ export class RingViewDialog extends LitElement {
       if (hass.connection?.connected === false || !hass.callService) {
         throw new Error("Home Assistant service API unavailable");
       }
+      const refreshButtonId = findRingMqttSnapshotButton(hass, entityId);
+      if (isRingMqttSnapshotSource(hass, entityId) && !refreshButtonId) {
+        throw new Error("Ring-MQTT snapshot refresh control unavailable");
+      }
+      if (refreshButtonId) {
+        const update = this.waitForSnapshotUpdate(
+          entityId,
+          snapshotCaptureMarker(hass, entityId),
+        );
+        try {
+          await hass.callService(
+            "button",
+            "press",
+            {},
+            { entity_id: refreshButtonId },
+          );
+        } catch (error) {
+          this.finishPendingSnapshotUpdate("cancelled");
+          throw error;
+        }
+        const result = await update;
+        if (result !== "updated") {
+          if (result === "cancelled") return;
+          throw new Error("Snapshot refresh timed out");
+        }
+      }
       await hass.callService(
         "camera",
         "snapshot",
@@ -608,9 +650,40 @@ export class RingViewDialog extends LitElement {
   }
 
   private resetSnapshotAction(): void {
+    this.finishPendingSnapshotUpdate("cancelled");
     this.clearSnapshotFeedback();
     this.snapshotActionToken += 1;
     this.snapshotActionStatus = "idle";
+  }
+
+  private waitForSnapshotUpdate(
+    entityId: string,
+    baseline?: number,
+  ): Promise<SnapshotUpdateResult> {
+    this.finishPendingSnapshotUpdate("cancelled");
+    return new Promise((resolve) => {
+      const timer = window.setTimeout(() => {
+        this.finishPendingSnapshotUpdate("timeout");
+      }, SNAPSHOT_REFRESH_TIMEOUT_MS);
+      this.pendingSnapshotUpdate = { entityId, baseline, timer, resolve };
+    });
+  }
+
+  private observePendingSnapshotUpdate(): void {
+    const pending = this.pendingSnapshotUpdate;
+    if (!pending || !this.hass) return;
+    const marker = snapshotCaptureMarker(this.hass, pending.entityId);
+    if (marker !== undefined && marker !== pending.baseline) {
+      this.finishPendingSnapshotUpdate("updated");
+    }
+  }
+
+  private finishPendingSnapshotUpdate(result: SnapshotUpdateResult): void {
+    const pending = this.pendingSnapshotUpdate;
+    if (!pending) return;
+    this.pendingSnapshotUpdate = undefined;
+    window.clearTimeout(pending.timer);
+    pending.resolve(result);
   }
 
   private renderVisitorActions(): TemplateResult | typeof nothing {

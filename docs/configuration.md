@@ -161,10 +161,10 @@ the interactive dashboard card and fullscreen viewer. It stays hidden on the
 passive dashboard card, in Recording, and while an on-demand card is waiting
 for its first tap.
 
-The button is both **Take snapshot** and **Save**. Ring View asks Home Assistant
-to run `camera.snapshot` and gives it a timestamped JPEG filename. No separate
-automation, script, or second save button is required. The icon briefly turns
-green when saving succeeds. A readable message appears only when saving fails,
+The button is both **Take snapshot** and **Save**. Ring View gives Home Assistant
+a timestamped JPEG filename, so no separate automation, script, or second save
+button is required. The icon briefly turns green only after the full capture and
+save sequence succeeds. A readable message appears when either step fails,
 using the same centered status display as Ring View's loading, unavailable,
 Retry, Resume, door-action, and talkback information. Talk and door controls
 remain visible above the temporary status layer.
@@ -178,17 +178,27 @@ Ring View automatically chooses the capture entity:
 3. Disable the button if neither camera is available.
 
 The first choice uses the same **Device snapshot camera** already configured
-for dashboard snapshot previews. The Snapshots section deliberately does not
-add another camera selector. The saved image comes from the selected Home
-Assistant camera entity; it is not a browser screenshot of the visible video
-frame.
+for dashboard snapshot previews. When it belongs to Ring-MQTT, Ring View first
+finds the enabled **Take Snapshot** button on the same Home Assistant device,
+presses it, and waits for the snapshot camera's explicit `timestamp` attribute
+to change. Only then does it call `camera.snapshot` to save the fresh image.
+This wait reacts to Home Assistant state updates and never polls. It times out
+after 15 seconds rather than saving the old image. A missing or ambiguous
+Ring-MQTT refresh control is also reported as an error instead of false success.
+Renaming either entity is supported through registry and device identity.
+
+The Snapshots section deliberately does not add another camera selector. The
+saved image comes from the selected Home Assistant camera entity; it is not a
+browser screenshot of the visible video frame.
 
 The official Ring Live camera is a compatibility fallback, not a guarantee of
 a current Live frame. `camera.snapshot` can save only the still image that the
 entity exposes to Home Assistant. It cannot copy pixels from the active WebRTC
 player. With current official Ring behavior, the result can be unavailable or
 represent the latest recording instead. Configure the Ring-MQTT snapshot
-camera when a fresh device snapshot is required.
+camera when a fresh device snapshot is required. Ring devices that cannot take
+a snapshot while recording or streaming can still time out; Ring View reports
+that limitation and does not save a stale frame.
 
 The default folder is `/media/ring-view`. [Home Assistant OS creates `/media`
 automatically](https://www.home-assistant.io/more-info/local-media/setup-media/).

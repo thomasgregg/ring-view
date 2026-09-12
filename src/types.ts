@@ -34,6 +34,8 @@ export interface HassEntityRegistryEntry {
   platform?: string;
   device_id?: string | null;
   disabled_by?: string | null;
+  original_name?: string | null;
+  unique_id?: string;
 }
 
 export interface HomeAssistant {

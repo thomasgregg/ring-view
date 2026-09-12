@@ -257,10 +257,16 @@ test("shows one snapshot action only after Live starts", async ({ page }) => {
 
   await page.locator("ring-view").evaluate((element) => {
     const card = element as HTMLElement & {
-      hass?: { callService?: () => Promise<void> };
+      hass?: {
+        callService?: (domain: string, service: string) => Promise<void>;
+      };
     };
     if (!card.hass) throw new Error("Demo Home Assistant object unavailable");
-    card.hass.callService = async () => {
+    card.hass.callService = async (domain, service) => {
+      if (domain === "button" && service === "press") {
+        window.demoRefreshSnapshot();
+        return;
+      }
       throw new Error("Cannot write image to file");
     };
   });
@@ -296,13 +302,18 @@ test("shows one snapshot action only after Live starts", async ({ page }) => {
   expect(feedbackBox.y + feedbackBox.height).toBeLessThan(visitorBox.y);
 
   const calls = await page.evaluate(() => window.demoDoorCalls ?? []);
-  expect(calls).toHaveLength(1);
+  expect(calls).toHaveLength(2);
   expect(calls[0]).toMatchObject({
+    domain: "button",
+    service: "press",
+    target: { entity_id: "button.device_take_snapshot" },
+  });
+  expect(calls[1]).toMatchObject({
     domain: "camera",
     service: "snapshot",
     target: { entity_id: "camera.device_snapshot" },
   });
-  expect(calls[0]?.serviceData.filename).toMatch(
+  expect(calls[1]?.serviceData.filename).toMatch(
     /^\/media\/ring-view\/entrance_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}-\d{3}\.jpg$/,
   );
 

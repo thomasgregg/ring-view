@@ -3,9 +3,11 @@ import { normalizeConfig } from "../../src/config";
 import type { HassEntity, HomeAssistant } from "../../src/types";
 import {
   buildSnapshotFilename,
+  findRingMqttSnapshotButton,
   formatSnapshotTimestamp,
   normalizeSnapshotDirectory,
   selectSnapshotEntityId,
+  snapshotCaptureMarker,
   snapshotCameraSlug,
   snapshotDirectoryProblem,
   snapshotDirectoryWarning,
@@ -79,6 +81,81 @@ describe("manual snapshots", () => {
 
     const missing = setup("unavailable", "unavailable");
     expect(selectSnapshotEntityId(missing.hass, missing.config)).toBeUndefined();
+  });
+
+  it("finds a renamed Ring-MQTT snapshot button without guessing its entity ID", () => {
+    const { hass } = setup();
+    const snapshotId = "camera.front_door_snapshot";
+    const refreshId = "button.renamed_camera_action";
+    const unrelatedId = "button.restart_camera_bridge";
+    hass.states[snapshotId] = {
+      ...hass.states[snapshotId]!,
+      attributes: {
+        ...hass.states[snapshotId]!.attributes,
+        timestamp: 1_789_208_130,
+      },
+    };
+    hass.states[refreshId] = camera(refreshId);
+    hass.states[unrelatedId] = camera(unrelatedId);
+    hass.entities = {
+      [snapshotId]: {
+        entity_id: snapshotId,
+        platform: "mqtt",
+        device_id: "front-door",
+        unique_id: "083a8804c4c5_snapshot",
+      },
+      [refreshId]: {
+        entity_id: refreshId,
+        platform: "mqtt",
+        device_id: "front-door",
+        unique_id: "083a8804c4c5_take_snapshot",
+        original_name: "Take Snapshot",
+      },
+      [unrelatedId]: {
+        entity_id: unrelatedId,
+        platform: "mqtt",
+        device_id: "front-door",
+        unique_id: "083a8804c4c5_restart",
+      },
+    };
+
+    expect(findRingMqttSnapshotButton(hass, snapshotId)).toBe(refreshId);
+    expect(snapshotCaptureMarker(hass, snapshotId)).toBe(1_789_208_130_000);
+  });
+
+  it("uses only an unambiguous MQTT button when registry identity is compact", () => {
+    const { hass } = setup();
+    const snapshotId = "camera.front_door_snapshot";
+    const firstId = "button.renamed_action";
+    hass.states[firstId] = camera(firstId);
+    hass.entities = {
+      [snapshotId]: {
+        entity_id: snapshotId,
+        platform: "mqtt",
+        device_id: "front-door",
+      },
+      [firstId]: {
+        entity_id: firstId,
+        platform: "mqtt",
+        device_id: "front-door",
+      },
+    };
+    expect(findRingMqttSnapshotButton(hass, snapshotId)).toBe(firstId);
+
+    const secondId = "button.another_action";
+    hass.states[secondId] = camera(secondId);
+    hass.entities[secondId] = {
+      entity_id: secondId,
+      platform: "mqtt",
+      device_id: "front-door",
+    };
+    expect(findRingMqttSnapshotButton(hass, snapshotId)).toBeUndefined();
+
+    hass.entities[snapshotId] = {
+      ...hass.entities[snapshotId]!,
+      platform: "ring",
+    };
+    expect(findRingMqttSnapshotButton(hass, snapshotId)).toBeUndefined();
   });
 
   it("builds a safe timestamped filename in the Home Assistant timezone", () => {
