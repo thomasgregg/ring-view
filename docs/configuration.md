@@ -207,13 +207,15 @@ Open **Dashboard card** and choose one of two intentionally distinct surfaces:
 
 The interactive fields appear only after that mode is selected. **No — wait for
 a tap** is the safest startup and does not mount a player until Recording or
-Live is chosen. Neither mode is highlighted during this idle state. While
-Recording is selected, tap or click the camera image to
-play it; the large central Play button is intentionally omitted so the image
-stays unobstructed. The image surface is also keyboard accessible. Automatic
-Live starts only while the card is visible and is muted by default. Home
-Assistant edit and card-picker previews never connect to the camera and never
-expose Talk or door actions.
+Live is chosen. Neither mode is highlighted during this idle state. When a
+recording is waiting to start in either the dashboard card or fullscreen
+viewer, tap or click the camera image to play it. The large central Play button
+is intentionally omitted so the image stays unobstructed. The image surface is
+also keyboard accessible. The Recording mode remains highlighted after the
+video ends because it identifies the selected view, not the current playback
+state. Automatic Live starts only while the card is visible and is muted by
+default. Home Assistant edit and card-picker previews never connect to the
+camera and never expose Talk or door actions.
 
 ### Settings that control different parts of the experience
 

@@ -10,8 +10,12 @@ refreshes every ten seconds while visible, and reacts to meaningful layout
 changes. It does not mount a live player or preconnect a live session.
 
 Inside the viewer, the latest recording starts automatically unless
-`autoplay_recording` is disabled. Live begins when the viewer opens in Live or
-you select Live. Only the active mode's renderer remains mounted.
+`autoplay_recording` is disabled. When it is disabled, the unobstructed camera
+image is the Play surface in both the dashboard card and fullscreen viewer;
+there is no separate central Play button. Live begins when the viewer opens in
+Live or you select Live. Only the active mode's renderer remains mounted. The
+highlight around a mode icon identifies the selected view, so Recording stays
+highlighted when its video is paused or has ended.
 
 For recordings, Ring View uses the current ephemeral `video_url` when
 available, with Home Assistant's camera renderer as the alternative if it is

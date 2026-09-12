@@ -103,6 +103,10 @@ describe("recording player lifecycle", () => {
     video().currentTime = 24;
 
     video().dispatchEvent(new Event("ended"));
+    await dialog.updateComplete;
+    expect(
+      dialog.shadowRoot!.querySelector("#ring-view-tab-recording")?.getAttribute("aria-selected"),
+    ).toBe("true");
     await vi.advanceTimersByTimeAsync(2_500);
     await dialog.updateComplete;
     expect(video().controls).toBe(false);

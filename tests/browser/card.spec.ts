@@ -1370,11 +1370,15 @@ test("hides the camera name from both views when disabled", async ({ page }) => 
 test("supports restored playback and card appearance choices", async ({ page }) => {
   await page.goto("/demo/?autoplay=0&remember=1");
   await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
-  await expect(page.getByRole("button", { name: "Play last recording" })).toBeVisible();
+  const startSurface = page.getByRole("button", { name: "Play last recording" });
+  await expect(startSurface).toBeVisible();
+  await page.mouse.move(0, 0);
+  await expect(startSurface).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(page.locator("ring-view-dialog .play-recording")).toHaveCount(0);
   await expect
     .poll(() => page.evaluate(() => window.demoActiveStreams ?? 0))
     .toBe(0);
-  await page.getByRole("button", { name: "Play last recording" }).click();
+  await startSurface.click({ position: { x: 30, y: 30 } });
   await expect.poll(() => page.evaluate(() => window.demoActiveStreams)).toBe(1);
   await page.getByRole("tab", { name: "Live" }).click();
   await page.getByRole("button", { name: "Close camera viewer" }).click();

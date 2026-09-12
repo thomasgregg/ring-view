@@ -331,7 +331,7 @@ describe("card stream lifecycle", () => {
     expect(section?.hasAttribute("aria-labelledby")).toBe(false);
   });
 
-  it("waits for an explicit Play action when recording autoplay is disabled", async () => {
+  it("starts from the unobstructed image when recording autoplay is disabled", async () => {
     const card = document.createElement("ring-view");
     card.setConfig({
       recording_entity: "camera.recording",
@@ -345,8 +345,9 @@ describe("card stream lifecycle", () => {
     await flush();
 
     const dialog = getDialog();
-    const play = dialog?.shadowRoot?.querySelector<HTMLElement>(".play-recording");
-    expect(play?.textContent).toContain("Play last recording");
+    const play = dialog?.shadowRoot?.querySelector<HTMLElement>(".initial-start-surface");
+    expect(play?.getAttribute("aria-label")).toBe("Play last recording");
+    expect(dialog?.shadowRoot?.querySelector(".play-recording")).toBeNull();
     expect(TestCameraStream.active).toBe(0);
     play?.click();
     await flush();

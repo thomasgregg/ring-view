@@ -1148,6 +1148,10 @@ export class RingViewDialog extends LitElement {
       && this.config!.two_way_audio
       && supportsRingTalkback(this.hass!, entityId),
     );
+    const waitingForInitialStart = Boolean(
+      (this.inline && !this.inlineStarted)
+      || (this.mode === "last_recording" && !this.recordingStarted),
+    );
 
     return html`
       <div
@@ -1161,10 +1165,10 @@ export class RingViewDialog extends LitElement {
         }
       >
         <img class="poster" src=${poster} alt="" aria-hidden="true" />
-        ${this.inline && !this.inlineStarted
+        ${waitingForInitialStart
           ? html`
               <button
-                class="inline-start-surface"
+                class="initial-start-surface"
                 type="button"
                 aria-label=${localize(
                   this.hass,
@@ -1309,22 +1313,6 @@ export class RingViewDialog extends LitElement {
             @click=${this.resumeLive}>
             ${this.icon(mdiPlay)}
             <span>${localize(this.hass, "viewer.resume_live")}</span>
-          </button>
-        </div>
-      `;
-    }
-
-    if (this.mode === "last_recording" && !this.recordingStarted) {
-      return html`
-        <div class="state-layer play-layer">
-          <button
-            class="action-button primary play-recording"
-            type="button"
-            aria-label=${localize(this.hass, "viewer.play_recording")}
-            @click=${this.startRecording}
-          >
-            ${this.icon(mdiPlay)}
-            <span>${localize(this.hass, "viewer.play_recording")}</span>
           </button>
         </div>
       `;

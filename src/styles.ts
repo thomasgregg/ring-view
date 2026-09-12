@@ -417,7 +417,7 @@ export const dialogStyles = css`
     outline-offset: -3px;
   }
 
-  .inline-start-surface {
+  .initial-start-surface {
     position: absolute;
     inset: 0;
     z-index: 1;
@@ -430,15 +430,15 @@ export const dialogStyles = css`
     -webkit-tap-highlight-color: transparent;
   }
 
-  .inline-start-surface:hover {
+  .initial-start-surface:hover {
     background: rgba(255, 255, 255, 0.035);
   }
 
-  .inline-start-surface:active {
+  .initial-start-surface:active {
     background: rgba(255, 255, 255, 0.07);
   }
 
-  .inline-start-surface:focus-visible {
+  .initial-start-surface:focus-visible {
     outline: 3px solid var(--primary-color, #03a9f4);
     outline-offset: -4px;
   }

@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.9.0-beta.2] - 2026-09-12
+
+### Changed
+
+- Use the unobstructed camera image as the initial Play surface in both the
+  interactive dashboard card and fullscreen viewer when recording autoplay is
+  disabled, while preserving keyboard access and an accessible label.
+- Document that the mode highlight identifies the selected Recording or Live
+  view rather than the media player's current playback state.
+
+### Tests
+
+- Cover the transparent fullscreen recording start surface and confirm that
+  the former central Play prompt is absent.
+
 ## [0.9.0-beta.1] - 2026-09-12
 
 ### Added
