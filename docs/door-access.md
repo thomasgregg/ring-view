@@ -110,7 +110,7 @@ temporarily suggesting that the door has physically moved.
 | Ready or holding | Configured unlock/open action icon | Current closed/open/warning physical-state icon |
 | Working | Loading icon | Current physical-state icon until the sensor changes |
 | Success | Check icon | Current physical-state icon until the sensor changes |
-| Error | Warning icon | Current physical-state icon; the error text appears above the dock |
+| Error | Warning icon | Current physical-state icon; the error text appears in the centered viewer status display |
 
 ### Action states and feedback
 
@@ -120,13 +120,15 @@ temporarily suggesting that the door has physically moved.
 | Holding | Warm progress fill advances from left to right. Releasing cancels. | In progress; no service call until complete. |
 | Working | **Unlocking…** or **Opening…** and repeat calls are blocked. | No. |
 | Success | Brief green **Unlocked** or **Door opened** state, also announced to assistive technology. | No until the success feedback clears. |
-| Error | Returns to the configured action and shows a concise error above the dock. | Yes; retry is available. |
+| Error | Returns to the configured action and shows a concise error in the centered viewer status display. | Yes; retry is available. |
 | Lock unavailable | Disabled with **Door unavailable**. | No. |
 | Lock jammed | Disabled with **Lock jammed**. | No. |
 | Unsupported open action | Disabled with **Open unsupported** and a configuration warning. | No. |
 
 Success is intentionally shown in the control itself rather than in a second
 toast, keeping the interface calm and avoiding duplicate feedback.
+Failures use the same temporary centered message as snapshot and talkback
+failures. The action dock remains visible and immediately retryable.
 
 ## Home Assistant behavior
 

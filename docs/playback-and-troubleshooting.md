@@ -78,6 +78,13 @@ The temporary backend patch does not bypass this restriction.
 
 ## Connection failures
 
+Ring View uses one centered viewer message for operational information and
+failures, including media recovery, snapshot and door failures, microphone
+problems, muted playback, and short connection interruptions. Persistent
+camera failures add Retry or an alternate-view action in the same location.
+The ringing alert stays near the header because it is an incoming event, not
+an operation result. Configuration warnings stay in the visual editor.
+
 | What you see | What to check |
 | --- | --- |
 | Play/Resume over an otherwise connected stream | Browser autoplay policy; on iPhone, check Low Power Mode. Tap once to start playback. |

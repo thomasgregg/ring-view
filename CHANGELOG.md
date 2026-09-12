@@ -4,6 +4,24 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.9.0-beta.7] - 2026-09-12
+
+### Changed
+
+- Route snapshot, door-action, and Ring WebRTC session feedback through one
+  shared centered viewer message instead of separate header, bottom-dock, and
+  player message treatments.
+- Keep the dashboard preview fallback, visual-editor warnings, and ringing
+  alert in their own contexts because they are not viewer operation results.
+- Preserve brief success feedback in the action itself, including the green
+  snapshot icon and green door state, without adding a duplicate message.
+
+### Tests
+
+- Cover centered door failures on phone-sized layouts and common talkback
+  session feedback from the external Ring WebRTC controls.
+- Pass 147 unit tests and 110 browser tests across desktop and phone projects.
+
 ## [0.9.0-beta.6] - 2026-09-12
 
 ### Changed

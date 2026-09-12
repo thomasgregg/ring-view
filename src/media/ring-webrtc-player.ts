@@ -20,6 +20,11 @@ export interface RingTalkbackState {
   talking: boolean;
 }
 
+export interface RingWebRtcStatus {
+  message: string;
+  kind: "status" | "error";
+}
+
 type SignalMessage =
   | { type: "session"; session_id: string }
   | { type: "answer"; answer: string }
@@ -184,6 +189,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
   @state() private microphoneState: MicrophoneState = "not-requested";
   @state() private connectionState: RTCPeerConnectionState | "starting" = "starting";
   @state() private statusMessage = "";
+  @state() private statusKind: RingWebRtcStatus["kind"] = "status";
   @state() private actualMuted = false;
   @state() private playbackBlocked = false;
   @state() private readyDispatched = false;
@@ -319,8 +325,12 @@ export class RingViewRingWebRtcPlayer extends LitElement {
           <span>${buttonLabel}</span>
         </button>
       </div>` : nothing}
-      ${this.statusMessage && !this.playbackBlocked
-        ? html`<div class="session-status" role="status" aria-live="polite">
+      ${!this.externalControls && this.statusMessage && !this.playbackBlocked
+        ? html`<div
+            class="session-status"
+            role=${this.statusKind === "error" ? "alert" : "status"}
+            aria-live=${this.statusKind === "error" ? "assertive" : "polite"}
+          >
             ${this.statusMessage}
           </div>`
         : nothing}
@@ -455,7 +465,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     }
     if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
       this.microphoneState = "unsupported";
-      this.showStatusMessage(localize(this.hass, "talkback.https_required"));
+      this.showStatusMessage(localize(this.hass, "talkback.https_required"), "error");
       return false;
     }
 
@@ -487,7 +497,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
           this.cancelActivePress();
           this.localStream = undefined;
           this.microphoneState = "failed";
-          this.showStatusMessage(localize(this.hass, "talkback.microphone_ended"));
+          this.showStatusMessage(localize(this.hass, "talkback.microphone_ended"), "error");
         });
         await this.audioSender.replaceTrack(track);
         if (token !== this.connectionToken) {
@@ -504,7 +514,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
         localStream?.getTracks().forEach((track) => track.stop());
         if (token !== this.connectionToken) return false;
         this.microphoneState = "failed";
-        this.showStatusMessage(describeMicrophoneError(this.hass, error));
+        this.showStatusMessage(describeMicrophoneError(this.hass, error), "error");
         return false;
       }
     })();
@@ -771,7 +781,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     void this.disposeSession();
     if (token !== this.connectionToken || !this.isConnected) return;
     this.connectionState = "failed";
-    this.showStatusMessage(message);
+    this.showStatusMessage(message, "error");
     this.dispatchFailure(message);
   }
 
@@ -785,13 +795,24 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     }));
   };
 
-  private showStatusMessage(message: string): void {
+  private showStatusMessage(
+    message: string,
+    kind: RingWebRtcStatus["kind"] = "status",
+  ): void {
     this.clearStatusMessageTimeout();
     this.statusMessage = message;
+    this.statusKind = kind;
+    this.dispatchEvent(
+      new CustomEvent<RingWebRtcStatus>("ring-webrtc-status", {
+        detail: { message, kind },
+        bubbles: true,
+        composed: true,
+      }),
+    );
     if (!message) return;
     this.statusMessageTimeout = window.setTimeout(() => {
       this.statusMessageTimeout = undefined;
-      this.statusMessage = "";
+      this.showStatusMessage("");
     }, STATUS_MESSAGE_DURATION_MS);
   }
 

@@ -108,6 +108,10 @@ Verify each item on current stable Home Assistant and, where practical, the prev
     Make it unavailable and confirm the official Live camera is used instead.
     Also verify the button does not collide with the mode or fullscreen controls
     at the narrowest supported card width.
+25. Force a door-service failure and a microphone-permission failure. Confirm
+    both reuse the same centered viewer status display as snapshot failures,
+    remain clear of the visitor-action dock, and disappear without leaving a
+    second pill or toast behind.
 
 ## Visual matrix
 

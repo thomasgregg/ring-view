@@ -149,8 +149,8 @@ to run `camera.snapshot` and gives it a timestamped JPEG filename. No separate
 automation, script, or second save button is required. The icon briefly turns
 green when saving succeeds. A readable message appears only when saving fails,
 using the same centered status display as Ring View's loading, unavailable,
-Retry, and Resume information. Talk and door controls remain visible above the
-temporary status layer.
+Retry, Resume, door-action, and talkback information. Talk and door controls
+remain visible above the temporary status layer.
 
 Ring View automatically chooses the capture entity:
 

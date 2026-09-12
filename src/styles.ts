@@ -652,33 +652,6 @@ export const dialogStyles = css`
     );
   }
 
-  .door-feedback {
-    min-height: 30px;
-    display: inline-flex;
-    max-width: min(480px, calc(100% - 16px));
-    align-items: center;
-    gap: 7px;
-    padding: 5px 11px;
-    border-radius: 999px;
-    color: rgba(255, 255, 255, 0.94);
-    background: rgba(0, 0, 0, 0.68);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.32);
-    font-size: 12px;
-    line-height: 18px;
-    text-align: center;
-    pointer-events: none;
-  }
-
-  .door-feedback svg {
-    width: 18px;
-    height: 18px;
-    flex: 0 0 auto;
-  }
-
-  .door-feedback.error svg {
-    color: #ff8a80;
-  }
-
   .state-layer {
     position: absolute;
     inset: 0;

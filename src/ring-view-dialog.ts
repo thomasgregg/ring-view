@@ -40,6 +40,7 @@ import type {
 } from "./media/native-camera-adapter";
 import type {
   RingTalkbackState,
+  RingWebRtcStatus,
   RingViewRingWebRtcPlayer,
 } from "./media/ring-webrtc-player";
 import { posterUrl } from "./media/poster-provider";
@@ -86,6 +87,12 @@ type MediaStatus =
 type DoorActionStatus = "idle" | "holding" | "working" | "success" | "error";
 type SnapshotActionStatus = "idle" | "working" | "success" | "error";
 type DoorContactState = "open" | "closed" | "unknown";
+type ViewerFeedbackSource = "door" | "snapshot" | "session";
+interface ViewerFeedback {
+  source: ViewerFeedbackSource;
+  message: string;
+  kind: "status" | "error";
+}
 const LIVE_TIMEOUT_SECONDS = 20;
 const LIVE_RETRY_DELAY_MS = 2_500;
 const RECORDING_CONTROLS_HIDE_DELAY_MS = 2_500;
@@ -144,9 +151,9 @@ export class RingViewDialog extends LitElement {
   @state() private talkbackRequesting = false;
   @state() private talkbackTalking = false;
   @state() private doorActionStatus: DoorActionStatus = "idle";
-  @state() private doorFeedback?: { message: string };
   @state() private snapshotActionStatus: SnapshotActionStatus = "idle";
   @state() private snapshotFeedbackMessage?: string;
+  @state() private viewerFeedback?: ViewerFeedback;
   @state() private inlineStarted = true;
 
   private lifecycle = new StreamLifecycle();
@@ -548,6 +555,7 @@ export class RingViewDialog extends LitElement {
       const message = localize(this.hass, "snapshot.saved");
       this.snapshotActionStatus = "success";
       this.snapshotFeedbackMessage = message;
+      this.clearViewerFeedback("snapshot");
       this.statusAnnouncement = message;
       this.snapshotFeedbackTimer = window.setTimeout(() => {
         if (token !== this.snapshotActionToken) return;
@@ -560,6 +568,7 @@ export class RingViewDialog extends LitElement {
       const message = localize(this.hass, snapshotErrorKey(error));
       this.snapshotActionStatus = "error";
       this.snapshotFeedbackMessage = message;
+      this.setViewerFeedback("snapshot", message, "error");
       this.statusAnnouncement = message;
       this.snapshotFeedbackTimer = window.setTimeout(() => {
         if (token !== this.snapshotActionToken) return;
@@ -576,6 +585,7 @@ export class RingViewDialog extends LitElement {
       this.snapshotFeedbackTimer = undefined;
     }
     this.snapshotFeedbackMessage = undefined;
+    this.clearViewerFeedback("snapshot");
     if (["success", "error"].includes(this.snapshotActionStatus)) {
       this.snapshotActionStatus = "idle";
     }
@@ -628,18 +638,6 @@ export class RingViewDialog extends LitElement {
 
     return html`
       <div class="visitor-controls">
-        ${this.doorFeedback
-          ? html`
-              <div
-                id="ring-view-door-feedback"
-                class="door-feedback error"
-                role="alert"
-              >
-                ${this.icon(mdiAlertCircleOutline)}
-                <span>${this.doorFeedback.message}</span>
-              </div>
-            `
-          : nothing}
         <div
           class=${classMap({
             "visitor-action-dock": true,
@@ -695,7 +693,7 @@ export class RingViewDialog extends LitElement {
                     ? `${doorAriaLabel}. ${contactUnknownLabel}`
                     : doorAriaLabel}
                   aria-busy=${String(this.doorActionStatus === "working")}
-                  aria-describedby=${this.doorFeedback
+                  aria-describedby=${this.viewerFeedback?.source === "door"
                     ? "ring-view-door-feedback"
                     : nothing}
                   ?disabled=${doorDisabled}
@@ -1057,11 +1055,12 @@ export class RingViewDialog extends LitElement {
         action === "open" ? "door.opened" : "door.unlocked",
       );
       this.doorActionStatus = "success";
+      this.clearViewerFeedback("door");
       this.statusAnnouncement = message;
       this.doorFeedbackTimer = window.setTimeout(() => {
         if (token !== this.doorActionToken) return;
         this.doorFeedbackTimer = undefined;
-        this.doorFeedback = undefined;
+        this.clearViewerFeedback("door");
         this.doorActionStatus = "idle";
       }, DOOR_SUCCESS_DURATION_MS);
     } catch {
@@ -1071,12 +1070,12 @@ export class RingViewDialog extends LitElement {
         action === "open" ? "door.open_failed" : "door.unlock_failed",
       );
       this.doorActionStatus = "error";
-      this.doorFeedback = { message };
+      this.setViewerFeedback("door", message, "error");
       this.statusAnnouncement = message;
       this.doorFeedbackTimer = window.setTimeout(() => {
         if (token !== this.doorActionToken) return;
         this.doorFeedbackTimer = undefined;
-        this.doorFeedback = undefined;
+        this.clearViewerFeedback("door");
         this.doorActionStatus = "idle";
       }, DOOR_ERROR_DURATION_MS);
     }
@@ -1087,7 +1086,7 @@ export class RingViewDialog extends LitElement {
       window.clearTimeout(this.doorFeedbackTimer);
       this.doorFeedbackTimer = undefined;
     }
-    this.doorFeedback = undefined;
+    this.clearViewerFeedback("door");
     if (["success", "error"].includes(this.doorActionStatus)) {
       this.doorActionStatus = "idle";
     }
@@ -1102,6 +1101,19 @@ export class RingViewDialog extends LitElement {
     this.talkbackReady = false;
     this.talkbackRequesting = false;
     this.talkbackTalking = false;
+    this.clearViewerFeedback("session");
+  }
+
+  private setViewerFeedback(
+    source: ViewerFeedbackSource,
+    message: string,
+    kind: ViewerFeedback["kind"],
+  ): void {
+    this.viewerFeedback = { source, message, kind };
+  }
+
+  private clearViewerFeedback(source: ViewerFeedbackSource): void {
+    if (this.viewerFeedback?.source === source) this.viewerFeedback = undefined;
   }
 
   private renderMedia(): TemplateResult {
@@ -1189,6 +1201,7 @@ export class RingViewDialog extends LitElement {
                         @ring-webrtc-playback-blocked=${this.handlePlaybackBlocked}
                         @ring-webrtc-capabilities=${this.handleMediaCapabilities}
                         @ring-talkback-state=${this.handleTalkbackState}
+                        @ring-webrtc-status=${this.handleRingWebRtcStatus}
                       ></ring-view-ring-webrtc-player>
                     `
                   : html`
@@ -1370,11 +1383,26 @@ export class RingViewDialog extends LitElement {
       `;
     }
 
-    if (this.snapshotActionStatus === "error" && this.snapshotFeedbackMessage) {
+    if (this.viewerFeedback) {
+      const feedbackId = this.viewerFeedback.source === "door"
+        ? "ring-view-door-feedback"
+        : undefined;
       return html`
-        <div class="state-layer snapshot-error-layer" role="alert">
+        <div
+          class=${classMap({
+            "state-layer": true,
+            "viewer-feedback-layer": true,
+            "snapshot-error-layer": this.viewerFeedback.source === "snapshot",
+            "door-error-layer": this.viewerFeedback.source === "door",
+            "session-message-layer": this.viewerFeedback.source === "session",
+          })}
+          role=${this.viewerFeedback.kind === "error" ? "alert" : "status"}
+          aria-live=${this.viewerFeedback.kind === "error" ? "assertive" : "polite"}
+        >
           <div class="state-card">
-            <div class="state-title">${this.snapshotFeedbackMessage}</div>
+            <div id=${feedbackId ?? nothing} class="state-title">
+              ${this.viewerFeedback.message}
+            </div>
           </div>
         </div>
       `;
@@ -1707,6 +1735,28 @@ export class RingViewDialog extends LitElement {
   private handleRingWebRtcError = (event: Event): void => {
     if (!this.acceptsMediaEvent(event) || this.mode !== "live" || !this.config?.two_way_audio) return;
     this.failMedia();
+  };
+
+  private handleRingWebRtcStatus = (
+    event: CustomEvent<RingWebRtcStatus>,
+  ): void => {
+    if (
+      event.currentTarget
+        !== this.renderRoot.querySelector("ring-view-ring-webrtc-player")
+      || this.mode !== "live"
+      || !this.config?.two_way_audio
+    ) {
+      return;
+    }
+    if (event.detail.message) {
+      this.setViewerFeedback(
+        "session",
+        event.detail.message,
+        event.detail.kind,
+      );
+    } else {
+      this.clearViewerFeedback("session");
+    }
   };
 
   private handleLiveResumeRequired = (event: Event): void => {

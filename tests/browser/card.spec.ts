@@ -663,6 +663,56 @@ test("requires a complete hold before opening the configured door", async ({ pag
   await expect(page.getByRole("button", { name: "Door opened" })).toBeVisible();
 });
 
+test("shows door failures in the shared centered viewer message", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(
+    "/demo/?mode=live&door=1&door_action=open&door_hold=0&live_platform=generic",
+  );
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  const door = page.getByRole("button", { name: "Open door" });
+  await expect(door).toBeEnabled();
+  await page.locator("ring-view").evaluate((element) => {
+    const card = element as HTMLElement & {
+      hass?: { callService?: () => Promise<void> };
+    };
+    if (!card.hass) throw new Error("Demo Home Assistant object unavailable");
+    card.hass.callService = async () => {
+      throw new Error("service failed");
+    };
+  });
+
+  await door.click();
+  const feedback = page.locator(
+    "ring-view-dialog .door-error-layer .state-card",
+  );
+  const mediaFrame = page.locator("ring-view-dialog .media-frame");
+  const visitorDock = page.locator("ring-view-dialog .visitor-action-dock");
+  await expect(feedback).toHaveText("Couldn’t open the door.");
+  await expect(feedback.locator("xpath=..")).toHaveAttribute("role", "alert");
+
+  const [feedbackBox, frameBox, visitorBox] = await Promise.all([
+    feedback.boundingBox(),
+    mediaFrame.boundingBox(),
+    visitorDock.boundingBox(),
+  ]);
+  if (!feedbackBox || !frameBox || !visitorBox) {
+    throw new Error("Door feedback geometry unavailable");
+  }
+  expect(
+    Math.abs(
+      feedbackBox.x + feedbackBox.width / 2
+      - (frameBox.x + frameBox.width / 2),
+    ),
+  ).toBeLessThan(2);
+  expect(
+    Math.abs(
+      feedbackBox.y + feedbackBox.height / 2
+      - (frameBox.y + frameBox.height / 2),
+    ),
+  ).toBeLessThan(2);
+  expect(feedbackBox.y + feedbackBox.height).toBeLessThan(visitorBox.y);
+});
+
 test("uses an optional contact sensor to turn the action into live door status", async ({
   page,
 }) => {

@@ -434,6 +434,68 @@ describe("Ring WebRTC player", () => {
     expect(MockPeerConnection.instances).toHaveLength(2);
   });
 
+  it("routes external session messages through the shared viewer state layer", async () => {
+    const subscribeMessage = vi.fn(async () => vi.fn());
+    const dialog = document.createElement("ring-view-dialog");
+    dialog.hass = {
+      states: {
+        "camera.live": {
+          entity_id: "camera.live",
+          state: "idle",
+          attributes: { supported_features: 2 },
+        },
+      },
+      entities: {
+        "camera.live": { entity_id: "camera.live", platform: "ring" },
+      },
+      hassUrl: (path = "") => path,
+      callWS: async () => ({ configuration: {} }) as never,
+      connection: { subscribeMessage },
+    };
+    document.body.append(dialog);
+    dialog.showDialog({
+      config: normalizeConfig({
+        live_entity: "camera.live",
+        recording_entity: "camera.recording",
+        two_way_audio: true,
+      }),
+      mode: "live",
+    });
+    await flush();
+
+    const player = dialog.shadowRoot?.querySelector(
+      "ring-view-ring-webrtc-player",
+    );
+    const peer = MockPeerConnection.instances[0]!;
+    peer.connectionState = "connected";
+    peer.onconnectionstatechange?.(new Event("connectionstatechange"));
+    player?.shadowRoot?.querySelector("video")?.dispatchEvent(new Event("playing"));
+    await flush();
+
+    player?.dispatchEvent(new CustomEvent("ring-webrtc-status", {
+      detail: { message: "Microphone permission denied.", kind: "error" },
+      bubbles: true,
+      composed: true,
+    }));
+    await dialog.updateComplete;
+
+    const feedback = dialog.shadowRoot?.querySelector(
+      ".session-message-layer .state-card",
+    );
+    expect(feedback?.textContent).toContain("Microphone permission denied.");
+    expect(feedback?.parentElement?.getAttribute("role")).toBe("alert");
+    expect(player?.shadowRoot?.querySelector(".session-status")).toBeNull();
+
+    player?.dispatchEvent(new CustomEvent("ring-webrtc-status", {
+      detail: { message: "", kind: "status" },
+      bubbles: true,
+      composed: true,
+    }));
+    await dialog.updateComplete;
+    expect(dialog.shadowRoot?.querySelector(".session-message-layer")).toBeNull();
+    dialog.close();
+  });
+
   it("requests the microphone on hold without another offer and stops on release", async () => {
     const microphone = new MockTrack("audio");
     const localStream = new MockMediaStream([microphone]);

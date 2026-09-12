@@ -214,8 +214,15 @@ describe("door control", () => {
     await vi.advanceTimersByTimeAsync(0);
     await dialog.updateComplete;
 
-    expect(dialog.shadowRoot?.querySelector('[role="alert"]')?.textContent)
-      .toContain("unlock the door");
+    const feedback = dialog.shadowRoot?.querySelector(
+      ".door-error-layer .state-card",
+    );
+    expect(feedback?.textContent).toContain("unlock the door");
+    expect(feedback?.parentElement?.getAttribute("role")).toBe("alert");
+    expect(dialog.shadowRoot?.querySelector(".door-feedback")).toBeNull();
+    expect(button?.getAttribute("aria-describedby")).toBe(
+      "ring-view-door-feedback",
+    );
     expect(button?.disabled).toBe(false);
 
     button?.click();
