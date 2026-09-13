@@ -498,7 +498,6 @@ describe("visual editor", () => {
       (field) => field.name === "card_appearance",
     );
     expect(cardAppearance?.schema?.map((field) => field.name)).toEqual([
-      "name",
       "show_name",
       "last_activity_entity",
       "",
@@ -580,6 +579,85 @@ describe("visual editor", () => {
       "door_hold_to_activate",
       "door_control_location",
     ]);
+  });
+
+  it("reveals the camera name only when name display is enabled", async () => {
+    const editor = document.createElement("ring-view-editor");
+    editor.hass = hass;
+    editor.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      name: "Entrance",
+      show_name: false,
+    });
+    const listener = vi.fn();
+    editor.addEventListener("config-changed", listener);
+    document.body.append(editor);
+    await editor.updateComplete;
+
+    const form = editor.shadowRoot?.querySelector("ha-form") as
+      | (HTMLElement & { schema?: ConfigFormSchema[] })
+      | null;
+    const appearanceFields = () => form?.schema
+      ?.find((field) => field.name === "card_appearance")
+      ?.schema?.map((field) => field.name);
+
+    expect(appearanceFields()).toEqual([
+      "show_name",
+      "last_activity_entity",
+      "",
+    ]);
+
+    form?.dispatchEvent(
+      new CustomEvent("value-changed", {
+        detail: {
+          value: {
+            recording_entity: "camera.recording",
+            live_entity: "camera.live",
+            show_name: true,
+          },
+        },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+    await editor.updateComplete;
+
+    expect(appearanceFields()).toEqual([
+      "show_name",
+      "name",
+      "last_activity_entity",
+      "",
+    ]);
+    const enabledEvent = listener.mock.calls.at(-1)?.[0] as CustomEvent<{
+      config: RingViewConfig;
+    }>;
+    expect(enabledEvent.detail.config.name).toBe("Entrance");
+
+    form?.dispatchEvent(
+      new CustomEvent("value-changed", {
+        detail: {
+          value: {
+            recording_entity: "camera.recording",
+            live_entity: "camera.live",
+            show_name: false,
+          },
+        },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+    await editor.updateComplete;
+
+    expect(appearanceFields()).toEqual([
+      "show_name",
+      "last_activity_entity",
+      "",
+    ]);
+    const disabledEvent = listener.mock.calls.at(-1)?.[0] as CustomEvent<{
+      config: RingViewConfig;
+    }>;
+    expect(disabledEvent.detail.config.name).toBe("Entrance");
   });
 
   it("progressively reveals the logical door-access controls", async () => {

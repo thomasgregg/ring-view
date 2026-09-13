@@ -2,6 +2,7 @@ import { css } from "lit";
 
 export const cardStyles = css`
   :host {
+    --ring-view-focus-color: rgba(255, 255, 255, 0.92);
     display: block;
     min-width: 0;
     height: 100%;
@@ -60,7 +61,7 @@ export const cardStyles = css`
   }
 
   .preview:focus-visible {
-    outline: 3px solid var(--primary-color, #03a9f4);
+    outline: 3px solid var(--ring-view-focus-color);
     outline-offset: -3px;
   }
 
@@ -164,7 +165,7 @@ export const dialogStyles = css`
     --ring-view-control-lift-bottom: rgba(255, 255, 255, 0.045);
     --ring-view-action-surface: rgba(0, 0, 0, 0.48);
     --ring-view-message-surface: rgba(10, 10, 10, 0.78);
-    --ring-view-focus-color: #62b8ff;
+    --ring-view-focus-color: rgba(255, 255, 255, 0.92);
     --ring-view-live-color: #ff3b30;
     --ring-view-ring-color: #ffb020;
     --ring-view-success-color: #50d890;
@@ -515,7 +516,7 @@ export const dialogStyles = css`
   }
 
   .video-fallback.controls-hidden:focus-visible {
-    outline: 3px solid var(--primary-color, #03a9f4);
+    outline: 3px solid var(--ring-view-focus-color);
     outline-offset: -3px;
   }
 
@@ -541,7 +542,7 @@ export const dialogStyles = css`
   }
 
   .initial-start-surface:focus-visible {
-    outline: 3px solid var(--primary-color, #03a9f4);
+    outline: 3px solid var(--ring-view-focus-color);
     outline-offset: -4px;
   }
 

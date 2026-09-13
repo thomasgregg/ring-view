@@ -29,7 +29,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `recording_entity` | Yes — Config tab | Required | `camera.*` or `select.*` entity ID | Official Ring Last recording camera, or the Ring-MQTT Event Select entity whose current option identifies the recording to play. |
 | `live_entity` | Yes — Config tab | Required | `camera.*` entity ID | Camera entity that starts the Ring live view. |
 | `snapshot_entity` | Yes — Snapshots | Not set | `camera.*` entity ID | Device snapshot camera, such as the snapshot entity created by Ring-MQTT. Used by snapshot previews, as the Event Select recording poster, and preferred for manual snapshots when configured and available. |
-| `name` | Yes — Card appearance | Entity name | Text | Optional label used instead of the recording entity's friendly name. |
+| `name` | Yes — Card appearance, when **Show camera name** is enabled | Entity name | Text | Optional label used instead of the recording entity's friendly name. The editor preserves it while name display is disabled. |
 | `last_activity_entity` | Yes — Card appearance | Not set | `sensor.*`, `event.*`, `input_datetime.*`, or `binary_sensor.*` entity ID | Shows a localized relative activity timestamp at the top left. Ring-MQTT Ding and motion sensors are supported directly. |
 | `default_mode` | Yes — Fullscreen viewer | `last_recording` | `last_recording`, `live` | View selected when the viewer opens. |
 | `remember_last_mode` | Yes — Fullscreen viewer | `false` | `true`, `false` | Remembers the most recent view in the current browser and uses it instead of `default_mode`. |
@@ -48,7 +48,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `door_control_visibility` | Yes — Door access | `live_only` | `live_only`, `all_views` | Shows the door action only in Live by default, or also over recordings. |
 | `door_hold_to_activate` | Yes — Door access | `true` | `true`, `false` | Requires a 1.6-second press-and-hold confirmation. Disable for one-tap operation. |
 | `door_control_location` | Yes — Door access, interactive only | `viewer_only` | `viewer_only`, `dashboard_and_viewer` | Keeps the door action in fullscreen only, or places it on both the interactive dashboard card and fullscreen viewer. |
-| `show_name` | Yes — Card appearance | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer. |
+| `show_name` | Yes — Card appearance | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer, and reveals the optional custom-name field. |
 | `show_snapshot_button` | Yes — Snapshots | `false` | `true`, `false` | Shows one manual snapshot action while Live is active. |
 | `snapshot_directory` | Yes — Snapshots | `/media/ring-view` | Absolute directory path | Folder where manual snapshots are saved by Home Assistant. |
 | `preview_source` | Yes — Dashboard card | `last_recording` | `last_recording`, `live`, `default`, `snapshot`, `newest` | Chooses the entity used for the dashboard still. `default` follows the view that will open; `newest` compares the optional snapshot with the latest recording. |

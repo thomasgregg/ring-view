@@ -4,6 +4,26 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-09-13
+
+### Changed
+
+- Show the optional **Camera name** field only after **Show camera name** is
+  enabled, while preserving an existing custom name when display is turned off.
+
+### Fixed
+
+- Replace the remaining legacy blue focus rings on Ring View's custom camera
+  surfaces with one neutral, glass-compatible focus treatment while preserving
+  visible keyboard focus and operating-system forced-colour behavior.
+
+### Tests
+
+- Cover progressive camera-name disclosure and preserve an existing custom name
+  while its display is disabled.
+- Verify neutral keyboard focus and ring-free pointer selection across custom
+  card, viewer, mode, playback, and recovery surfaces on desktop and phone.
+
 ## [0.11.0] - 2026-09-13
 
 ### Added

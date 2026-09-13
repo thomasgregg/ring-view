@@ -181,6 +181,7 @@ test("keeps a connected stream when autoplay is blocked and plays the same peer 
   await page.getByRole("button", { name: "Close camera viewer" }).focus();
   await page.keyboard.press("Shift+Tab");
   await expect(resume).toBeFocused();
+  await expect(resume).toHaveCSS("outline-color", "rgba(255, 255, 255, 0.92)");
   await page.keyboard.press("Enter");
   await expectMovingVideo(page);
   expect(await page.evaluate(() => window.recovery.state.offers)).toBe(1);

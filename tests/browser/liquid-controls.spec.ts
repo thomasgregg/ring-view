@@ -110,11 +110,14 @@ test("keeps selected, hover, and keyboard focus states inside their hit targets"
   await page.waitForTimeout(180);
   expect((await pseudoStyle(recording, "::before")).backgroundColor)
     .toBe("rgba(255, 255, 255, 0.13)");
+  await recording.click();
+  await page.waitForTimeout(180);
+  expect((await pseudoStyle(recording, "::before")).boxShadow).toBe("none");
   await page.keyboard.press("Tab");
   await recording.focus();
   await page.waitForTimeout(180);
   expect((await pseudoStyle(recording, "::before")).boxShadow)
-    .toContain("rgb(98, 184, 255)");
+    .toContain("rgba(255, 255, 255, 0.92)");
 });
 
 test("keeps the door target stable while a straight-edged hold fill advances", async ({

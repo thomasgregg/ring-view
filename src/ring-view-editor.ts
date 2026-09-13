@@ -320,8 +320,15 @@ function configSchema(
       flatten: true,
       iconPath: mdiPaletteOutline,
       schema: [
-        { name: "name", selector: { text: {} } },
         { name: "show_name", selector: { boolean: {} } },
+        ...(config.show_name
+          ? [
+            {
+              name: "name",
+              selector: { text: {} },
+            } satisfies ConfigFormSchema,
+          ]
+          : []),
         {
           name: "last_activity_entity",
           selector: {

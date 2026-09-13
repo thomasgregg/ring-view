@@ -108,7 +108,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     }
 
     button:focus-visible {
-      outline: 3px solid var(--primary-color, #03a9f4);
+      outline: 3px solid var(--ring-view-focus-color, rgba(255, 255, 255, 0.92));
       outline-offset: 3px;
     }
 
@@ -165,7 +165,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
     }
 
     .playback-resume:focus-visible {
-      outline-color: #62b8ff;
+      outline-color: var(--ring-view-focus-color, rgba(255, 255, 255, 0.92));
     }
 
     @media (max-width: 600px) {

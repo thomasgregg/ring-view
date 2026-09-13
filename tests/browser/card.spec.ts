@@ -217,7 +217,7 @@ test("places recording sound choices beside the playback behavior they control",
   });
 });
 
-test("places the optional last activity source beside the name appearance controls", async ({
+test("reveals the camera name only when enabled and keeps activity nearby", async ({
   page,
 }) => {
   await expect(page.locator("ring-view")).toBeAttached();
@@ -255,8 +255,27 @@ test("places the optional last activity source beside the name appearance contro
     const activity = section?.schema?.find(
       (field) => field.name === "last_activity_entity",
     );
+    const hiddenNameFields = section?.schema?.map((field) => field.name);
+    form.dispatchEvent(
+      new CustomEvent("value-changed", {
+        detail: {
+          value: {
+            recording_entity: "camera.latest_recording",
+            live_entity: "camera.live_view",
+            show_name: true,
+          },
+        },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+    await editor.updateComplete;
+    const updatedSection = form.schema.find(
+      (field) => field.name === "card_appearance",
+    );
     return {
-      fields: section?.schema?.map((field) => field.name),
+      hiddenNameFields,
+      visibleNameFields: updatedSection?.schema?.map((field) => field.name),
       selector: activity?.selector,
       label: activity ? form.computeLabel(activity) : undefined,
       helper: activity ? form.computeHelper(activity) : undefined,
@@ -264,7 +283,8 @@ test("places the optional last activity source beside the name appearance contro
   });
 
   expect(appearance).toEqual({
-    fields: ["name", "show_name", "last_activity_entity", ""],
+    hiddenNameFields: ["show_name", "last_activity_entity", ""],
+    visibleNameFields: ["show_name", "name", "last_activity_entity", ""],
     selector: {
       entity: {
         filter: [
@@ -1096,7 +1116,9 @@ test("opens, switches recording → live → recording, and tears down", async (
 
 test("supports keyboard opening, tab selection, focus return, and Escape", async ({ page }) => {
   const card = page.getByRole("button", { name: /Open Entrance viewer/ });
+  await page.keyboard.press("Tab");
   await card.focus();
+  await expect(card).toHaveCSS("outline-color", "rgba(255, 255, 255, 0.92)");
   await page.keyboard.press("Enter");
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.getByRole("tab", { name: "Last recording" }).focus();
@@ -1804,6 +1826,12 @@ test("supports restored playback and card appearance choices", async ({ page }) 
   await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
   const startSurface = page.getByRole("button", { name: "Play last recording" });
   await expect(startSurface).toBeVisible();
+  await page.keyboard.press("Tab");
+  await startSurface.focus();
+  await expect(startSurface).toHaveCSS(
+    "outline-color",
+    "rgba(255, 255, 255, 0.92)",
+  );
   await page.mouse.move(0, 0);
   await expect(startSurface).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await expect(page.locator("ring-view-dialog .play-recording")).toHaveCount(0);
