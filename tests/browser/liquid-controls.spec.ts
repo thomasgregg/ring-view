@@ -27,7 +27,7 @@ async function openViewer(page: Page, query: string): Promise<void> {
   await expect(page.getByRole("dialog")).toBeVisible();
 }
 
-test("uses one stable utility system and always keeps dashboard enlarge", async ({
+test("uses separate utility surfaces and always keeps dashboard enlarge", async ({
   page,
 }) => {
   await page.goto(
@@ -39,6 +39,7 @@ test("uses one stable utility system and always keeps dashboard enlarge", async 
   const card = page.locator("ring-view");
   const modes = card.getByRole("tablist", { name: "Camera view" });
   const actions = card.locator(".header-actions");
+  const cameraActions = card.locator(".camera-actions");
   const recording = card.getByRole("tab", { name: "Last recording" });
   const live = card.getByRole("tab", { name: "Live" });
   const snapshot = card.getByRole("button", { name: "Take snapshot" });
@@ -47,10 +48,15 @@ test("uses one stable utility system and always keeps dashboard enlarge", async 
   });
   const expectedSize = (page.viewportSize()?.width ?? 1280) <= 600 ? 48 : 44;
 
-  for (const rail of [modes, actions]) {
-    await expect(rail).toHaveCSS("background-color", "rgba(0, 0, 0, 0.3)");
+  await expect(modes).toHaveCSS("background-color", "rgba(0, 0, 0, 0.3)");
+  await expect(actions).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(cameraActions).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  for (const rail of [modes, actions, cameraActions]) {
     await expect(rail).toHaveCSS("border-top-width", "0px");
     await expect(rail).toHaveCSS("box-shadow", "none");
+  }
+  for (const control of [snapshot, enlarge]) {
+    await expect(control).toHaveCSS("background-color", "rgba(0, 0, 0, 0.3)");
   }
   for (const control of [recording, live, snapshot, enlarge]) {
     const box = await control.boundingBox();
@@ -68,7 +74,8 @@ test("uses one stable utility system and always keeps dashboard enlarge", async 
   }
   expect(enlargeBox.x).toBeGreaterThan(cardBox.x + cardBox.width / 2);
   expect(enlargeBox.y - cardBox.y).toBeLessThanOrEqual(16);
-  expect(Math.abs(snapshotBox.x + snapshotBox.width - enlargeBox.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(snapshotBox.x + snapshotBox.width + 8 - enlargeBox.x))
+    .toBeLessThanOrEqual(1);
 
   await enlarge.click();
   await expect(page.getByRole("dialog")).toBeVisible();
@@ -214,7 +221,7 @@ test("keeps portrait, landscape, and desktop controls in distinct stable zones",
     if (viewport.width <= 600) {
       expect(modeBox.x + modeBox.width).toBeLessThanOrEqual(closeBox.x - 8);
       expect(Math.abs(snapshotBox.y - closeBox.y)).toBeLessThanOrEqual(1);
-      expect(Math.abs(snapshotBox.x + snapshotBox.width - closeBox.x))
+      expect(Math.abs(snapshotBox.x + snapshotBox.width + 8 - closeBox.x))
         .toBeLessThanOrEqual(1);
     } else {
       expect(Math.abs(modeBox.y - closeBox.y)).toBeLessThanOrEqual(1);
@@ -343,16 +350,20 @@ test("keeps controls distinguishable in forced-colour mode", async ({ page }) =>
   await page.emulateMedia({ forcedColors: "active" });
   await openViewer(
     page,
-    "mode=live&snapshot_button=1&live_platform=generic&door=1&door_action=open",
+    "mode=live&snapshot_button=1&live_platform=generic&door=1&door_action=open&doorbell=1",
   );
   await expect(page.getByRole("img", { name: "Synthetic demo camera media" })).toBeVisible();
 
   const modes = page.getByRole("tablist", { name: "Camera view" });
-  const cameraActions = page.locator("ring-view-dialog .camera-actions");
+  const bell = page.locator("ring-view-dialog .ring-indicator");
+  const snapshot = page.getByRole("button", { name: "Take snapshot" });
+  const close = page.getByRole("button", { name: "Close camera viewer" });
   const door = page.getByRole("button", { name: "Hold to open" });
   const recording = page.getByRole("tab", { name: "Last recording" });
 
-  for (const rail of [modes, cameraActions, page.locator(".visitor-action-dock")]) {
+  await page.evaluate(() => window.demoSetEntityState("binary_sensor.front_door_ding", "on"));
+  await expect(bell).toBeVisible();
+  for (const rail of [modes, bell, snapshot, close, page.locator(".visitor-action-dock")]) {
     await expect(rail).toHaveCSS("border-top-width", "1px");
     await expect(rail).toHaveCSS("border-top-style", "solid");
   }

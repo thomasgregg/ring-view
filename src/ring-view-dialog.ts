@@ -446,9 +446,13 @@ export class RingViewDialog extends LitElement {
                 `
               : nothing}
             <div class="header-actions">
-              <div class="camera-actions">
-                ${this.renderRingIndicator()} ${this.renderSnapshotAction()}
-              </div>
+              ${cameraActionCount > 0
+                ? html`
+                    <div class="camera-actions">
+                      ${this.renderRingIndicator()} ${this.renderSnapshotAction()}
+                    </div>
+                  `
+                : nothing}
               <button
                 class=${this.inline
                   ? "icon-button chrome-action expand"

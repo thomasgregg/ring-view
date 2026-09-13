@@ -252,15 +252,16 @@ export const dialogStyles = css`
     align-items: center;
     justify-self: end;
     min-height: var(--ring-view-control-size);
-    gap: 0;
+    gap: 8px;
     overflow: visible;
-    border-radius: 28px;
-    background: var(--ring-view-control-surface);
+    background: transparent;
     pointer-events: auto;
   }
 
   .camera-actions {
-    display: contents;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .ring-indicator {
@@ -271,7 +272,7 @@ export const dialogStyles = css`
     flex: 0 0 auto;
     border-radius: 50%;
     color: var(--ring-view-ring-color);
-    background: transparent;
+    background: var(--ring-view-control-surface);
     box-shadow: none;
     pointer-events: none;
   }
@@ -301,6 +302,11 @@ export const dialogStyles = css`
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     transition: color 140ms ease, opacity 140ms ease;
+  }
+
+  .snapshot-action,
+  .chrome-action {
+    background: var(--ring-view-control-surface);
   }
 
   .icon-button::before,
@@ -961,11 +967,11 @@ export const dialogStyles = css`
     }
 
     .header.camera-actions-one {
-      --ring-view-camera-action-offset: var(--ring-view-control-size);
+      --ring-view-camera-action-offset: calc(var(--ring-view-control-size) + 8px);
     }
 
     .header.camera-actions-two {
-      --ring-view-camera-action-offset: calc(2 * var(--ring-view-control-size));
+      --ring-view-camera-action-offset: calc(2 * var(--ring-view-control-size) + 16px);
     }
 
     .header-copy {
@@ -994,18 +1000,18 @@ export const dialogStyles = css`
       right: calc(10px + env(safe-area-inset-right));
       display: flex;
       min-height: var(--ring-view-control-size);
-      border-radius: 28px;
-      background: var(--ring-view-control-surface);
+      gap: 8px;
+      background: transparent;
     }
 
     .camera-actions {
-      display: contents;
+      display: flex;
     }
 
     .header-actions .chrome-action {
       position: relative;
       inset: auto;
-      background: transparent;
+      background: var(--ring-view-control-surface);
     }
 
     .body {
@@ -1141,9 +1147,9 @@ export const dialogStyles = css`
 
   @media (forced-colors: active) {
     .mode-switch,
-    .header-actions,
-    .camera-actions,
-    .header-actions .chrome-action,
+    .ring-indicator,
+    .snapshot-action,
+    .chrome-action,
     .visitor-action-dock,
     .viewer-feedback-layer .state-card,
     .action-button {
@@ -1228,9 +1234,25 @@ export const dialogStyles = css`
   }
 
   :host([inline]) .header {
+    --ring-view-header-actions-width: var(--ring-view-control-size);
     display: grid;
+    grid-template-columns:
+      minmax(0, 1fr) auto
+      minmax(var(--ring-view-header-actions-width), 1fr);
     min-height: 64px;
     padding: 10px 10px 14px 16px;
+  }
+
+  :host([inline]) .header.camera-actions-one {
+    --ring-view-header-actions-width: calc(
+      2 * var(--ring-view-control-size) + 8px
+    );
+  }
+
+  :host([inline]) .header.camera-actions-two {
+    --ring-view-header-actions-width: calc(
+      3 * var(--ring-view-control-size) + 16px
+    );
   }
 
   :host([inline]) .header-copy {
@@ -1248,18 +1270,19 @@ export const dialogStyles = css`
     width: auto;
     min-height: var(--ring-view-control-size);
     flex-direction: row;
-    background: var(--ring-view-control-surface);
+    gap: 8px;
+    background: transparent;
     transform: none;
   }
 
   :host([inline]) .camera-actions {
-    display: contents;
+    display: flex;
   }
 
   :host([inline]) .header-actions .expand {
     position: relative;
     inset: auto;
-    background: transparent;
+    background: var(--ring-view-control-surface);
   }
 
   :host([inline]) h2 {

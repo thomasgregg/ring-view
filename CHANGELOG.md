@@ -6,6 +6,10 @@ All notable changes to this project are documented here.
 
 ### Changed
 
+- Separate Bell, Snapshot, and Close or Enlarge into individual circular glass
+  controls instead of combining unrelated actions in one pill. Close and
+  Enlarge remain fixed at the far-right edge while contextual controls appear
+  to their left without shifting the primary navigation action.
 - Add separate **Start recordings muted** controls for the fullscreen viewer
   and interactive dashboard. Fullscreen recordings keep sound on by default;
   dashboard recordings start muted by default for reliable automatic playback.

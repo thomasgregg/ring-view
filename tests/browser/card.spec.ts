@@ -1659,7 +1659,7 @@ test("keeps name, activity, modes, and fullscreen action separate at responsive 
 }) => {
   const cameraName = "Thomas Gregg Front Door Camera With A Long Name";
   await page.goto(
-    `/demo/?dashboard=interactive&dashboard_start=live&snapshot_button=1&name=1&activity=1&activity_age=9000&camera_name=${encodeURIComponent(cameraName)}`,
+    `/demo/?dashboard=interactive&dashboard_start=live&snapshot_button=1&doorbell=1&name=1&activity=1&activity_age=9000&camera_name=${encodeURIComponent(cameraName)}`,
   );
   const root = page.locator("#card-root");
   const card = page.locator("ring-view");
@@ -1700,14 +1700,39 @@ test("keeps name, activity, modes, and fullscreen action separate at responsive 
     expect(headingBox.y + headingBox.height).toBeLessThanOrEqual(activityBox.y);
     expect(headingBox.x + headingBox.width).toBeLessThanOrEqual(modeBox.x - 8);
     expect(activityBox.x + activityBox.width).toBeLessThanOrEqual(modeBox.x - 8);
-    expect(modeBox.x + modeBox.width).toBeLessThanOrEqual(snapshotBox.x - 2);
+    expect(modeBox.x + modeBox.width).toBeLessThanOrEqual(snapshotBox.x - 8);
     expect(
-      Math.abs(snapshotBox.x + snapshotBox.width - expandBox.x),
+      Math.abs(snapshotBox.x + snapshotBox.width + 8 - expandBox.x),
     ).toBeLessThanOrEqual(1);
     expect(expandBox.x + expandBox.width).toBeLessThanOrEqual(
       cardBox.x + cardBox.width,
     );
   }
+
+  await root.evaluate((element) => {
+    element.style.width = "320px";
+  });
+  const expandBeforeRing = await expand.boundingBox();
+  await page.evaluate(() =>
+    window.demoSetEntityState("binary_sensor.front_door_ding", "on"),
+  );
+  const bell = card.locator(".ring-indicator");
+  await expect(bell).toBeVisible();
+  const [modeBox, bellBox, snapshotBox, expandBox] = await Promise.all([
+    modeSwitch.boundingBox(),
+    bell.boundingBox(),
+    snapshot.boundingBox(),
+    expand.boundingBox(),
+  ]);
+  if (!expandBeforeRing || !modeBox || !bellBox || !snapshotBox || !expandBox) {
+    throw new Error("Ringing responsive geometry unavailable at 320px");
+  }
+  expect(modeBox.x + modeBox.width).toBeLessThanOrEqual(bellBox.x - 8);
+  expect(Math.abs(bellBox.x + bellBox.width + 8 - snapshotBox.x))
+    .toBeLessThanOrEqual(1);
+  expect(Math.abs(snapshotBox.x + snapshotBox.width + 8 - expandBox.x))
+    .toBeLessThanOrEqual(1);
+  expect(expandBox.x).toBe(expandBeforeRing.x);
 });
 
 test("hides invalid activity values and reacts when the entity becomes valid", async ({
