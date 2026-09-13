@@ -160,6 +160,7 @@ export const dialogStyles = css`
     --ring-view-control-size: 44px;
     --ring-view-primary-size: 48px;
     --ring-view-control-surface: rgba(0, 0, 0, 0.3);
+    --ring-view-control-lift: rgba(255, 255, 255, 0);
     --ring-view-action-surface: rgba(0, 0, 0, 0.48);
     --ring-view-message-surface: rgba(10, 10, 10, 0.78);
     --ring-view-focus-color: #62b8ff;
@@ -872,7 +873,7 @@ export const dialogStyles = css`
   }
 
   .action-button:hover {
-    background: rgba(0, 0, 0, 0.64);
+    background-color: rgba(0, 0, 0, 0.64);
   }
 
   .action-button:focus-visible {
@@ -897,6 +898,21 @@ export const dialogStyles = css`
 
   .action-button.primary {
     background: var(--ring-view-action-surface);
+  }
+
+  .mode-switch,
+  .ring-indicator,
+  .snapshot-action,
+  .chrome-action,
+  .visitor-action-dock,
+  .viewer-feedback-layer .state-card,
+  .action-button {
+    background-image: linear-gradient(
+      var(--ring-view-control-lift),
+      var(--ring-view-control-lift)
+    );
+    backdrop-filter: blur(14px) saturate(125%);
+    -webkit-backdrop-filter: blur(14px) saturate(125%);
   }
 
   .sr-only {
@@ -1011,7 +1027,7 @@ export const dialogStyles = css`
     .header-actions .chrome-action {
       position: relative;
       inset: auto;
-      background: var(--ring-view-control-surface);
+      background-color: var(--ring-view-control-surface);
     }
 
     .body {
@@ -1035,6 +1051,44 @@ export const dialogStyles = css`
     .visitor-action {
       gap: 7px;
       font-size: 14px;
+    }
+  }
+
+  @media (max-width: 600px) and (orientation: portrait) {
+    :host(:not([inline])) {
+      --ring-view-control-lift: rgba(255, 255, 255, 0.075);
+    }
+
+    :host(:not([inline])) .header-copy {
+      right: calc(
+        50% + var(--ring-view-control-size) + 8px
+      );
+    }
+
+    :host(:not([inline])) .mode-switch {
+      right: auto;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (max-width: 452px) and (orientation: portrait) {
+    :host(:not([inline])) .header.camera-actions-two {
+      min-height: calc(124px + env(safe-area-inset-top));
+    }
+
+    :host(:not([inline])) .header.camera-actions-two .mode-switch {
+      top: calc(66px + env(safe-area-inset-top));
+    }
+  }
+
+  @media (max-width: 340px) and (orientation: portrait) {
+    :host(:not([inline])) .header.camera-actions-one {
+      min-height: calc(124px + env(safe-area-inset-top));
+    }
+
+    :host(:not([inline])) .header.camera-actions-one .mode-switch {
+      top: calc(66px + env(safe-area-inset-top));
     }
   }
 
@@ -1282,7 +1336,7 @@ export const dialogStyles = css`
   :host([inline]) .header-actions .expand {
     position: relative;
     inset: auto;
-    background: var(--ring-view-control-surface);
+    background-color: var(--ring-view-control-surface);
   }
 
   :host([inline]) h2 {

@@ -1,6 +1,6 @@
-var ye = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z", kt = "M10,21H14A2,2 0 0,1 12,23A2,2 0 0,1 10,21M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M17,11A5,5 0 0,0 12,6A5,5 0 0,0 7,11V18H17V11M19.75,3.19L18.33,4.61C20.04,6.3 21,8.6 21,11H23C23,8.07 21.84,5.25 19.75,3.19M1,11H3C3,8.6 3.96,6.3 5.67,4.61L4.25,3.19C2.16,5.25 1,8.07 1,11Z", Gt = "M9,12C9,11.19 9.3,10.5 9.89,9.89C10.5,9.3 11.19,9 12,9C12.81,9 13.5,9.3 14.11,9.89C14.7,10.5 15,11.19 15,12C15,12.81 14.7,13.5 14.11,14.11C13.5,14.7 12.81,15 12,15C11.19,15 10.5,14.7 9.89,14.11C9.3,13.5 9,12.81 9,12M5.53,8.44L7.31,10.22L5.53,12L7.31,13.78L5.53,15.56L2,12L5.53,8.44M8.44,18.47L10.22,16.69L12,18.47L13.78,16.69L15.56,18.47L12,22L8.44,18.47M18.47,15.56L16.69,13.78L18.47,12L16.69,10.22L18.47,8.44L22,12L18.47,15.56M15.56,5.53L13.78,7.31L12,5.53L10.22,7.31L8.44,5.53L12,2L15.56,5.53Z", At = "M20,4H16.83L15,2H9L7.17,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,18H4V6H8.05L9.88,4H14.12L15.95,6H20V18M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15Z", Ze = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z", Qt = "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z", Yt = "M16,11H18V13H16V11M12,3H19C20.11,3 21,3.89 21,5V19H22V21H2V19H10V5C10,3.89 10.89,3 12,3M12,5V19H19V5H12Z", Ge = "M12,3C10.89,3 10,3.89 10,5H3V19H2V21H22V19H21V5C21,3.89 20.11,3 19,3H12M12,5H19V19H12V5M5,11H7V13H5V11Z", Jt = "M14 15C14 16.11 13.11 17 12 17S10 16.11 10 15 10.9 13 12 13 14 13.9 14 15M18 4V20C18 21.1 17.11 22 16 22H8C6.9 22 6 21.11 6 20V4C6 2.9 6.9 2 8 2H16C17.11 2 18 2.9 18 4M10.5 7C10.5 7.83 11.17 8.5 12 8.5S13.5 7.83 13.5 7 12.83 5.5 12 5.5 10.5 6.17 10.5 7M16 10H8V20H16V10Z", Xt = "M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z", ei = "M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3", Qe = "M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z", St = "M10 13C11.1 13 12 13.89 12 15C12 16.11 11.11 17 10 17S8 16.11 8 15 8.9 13 10 13M18 1C15.24 1 13 3.24 13 6V8H4C2.9 8 2 8.9 2 10V20C2 21.1 2.9 22 4 22H16C17.1 22 18 21.1 18 20V10C18 8.9 17.1 8 16 8H15V6C15 4.34 16.34 3 18 3S21 4.34 21 6V8H23V6C23 3.24 20.76 1 18 1M16 10V20H4V10H16Z", Tt = "M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z", Rt = "M19,11C19,12.19 18.66,13.3 18.1,14.28L16.87,13.05C17.14,12.43 17.3,11.74 17.3,11H19M15,11.16L9,5.18V5A3,3 0 0,1 12,2A3,3 0 0,1 15,5V11L15,11.16M4.27,3L21,19.73L19.73,21L15.54,16.81C14.77,17.27 13.91,17.58 13,17.72V21H11V17.72C7.72,17.23 5,14.41 5,11H6.7C6.7,14 9.24,16.1 12,16.1C12.81,16.1 13.6,15.91 14.31,15.58L12.65,13.92L12,14A3,3 0 0,1 9,11V10.28L3,4.27L4.27,3Z", ti = "M12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2C17.5,2 22,6 22,11A6,6 0 0,1 16,17H14.2C13.9,17 13.7,17.2 13.7,17.5C13.7,17.6 13.8,17.7 13.8,17.8C14.2,18.3 14.4,18.9 14.4,19.5C14.5,20.9 13.4,22 12,22M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C12.3,20 12.5,19.8 12.5,19.5C12.5,19.3 12.4,19.2 12.4,19.1C12,18.6 11.8,18.1 11.8,17.5C11.8,16.1 12.9,15 14.3,15H16A4,4 0 0,0 20,11C20,7.1 16.4,4 12,4M6.5,10C7.3,10 8,10.7 8,11.5C8,12.3 7.3,13 6.5,13C5.7,13 5,12.3 5,11.5C5,10.7 5.7,10 6.5,10M9.5,6C10.3,6 11,6.7 11,7.5C11,8.3 10.3,9 9.5,9C8.7,9 8,8.3 8,7.5C8,6.7 8.7,6 9.5,6M14.5,6C15.3,6 16,6.7 16,7.5C16,8.3 15.3,9 14.5,9C13.7,9 13,8.3 13,7.5C13,6.7 13.7,6 14.5,6M17.5,10C18.3,10 19,10.7 19,11.5C19,12.3 18.3,13 17.5,13C16.7,13 16,12.3 16,11.5C16,10.7 16.7,10 17.5,10Z", $t = "M8,5.14V19.14L19,12.14L8,5.14Z", ii = "M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M10,16.5L16,12L10,7.5V16.5Z";
+var ye = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z", kt = "M10,21H14A2,2 0 0,1 12,23A2,2 0 0,1 10,21M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M17,11A5,5 0 0,0 12,6A5,5 0 0,0 7,11V18H17V11M19.75,3.19L18.33,4.61C20.04,6.3 21,8.6 21,11H23C23,8.07 21.84,5.25 19.75,3.19M1,11H3C3,8.6 3.96,6.3 5.67,4.61L4.25,3.19C2.16,5.25 1,8.07 1,11Z", Gt = "M9,12C9,11.19 9.3,10.5 9.89,9.89C10.5,9.3 11.19,9 12,9C12.81,9 13.5,9.3 14.11,9.89C14.7,10.5 15,11.19 15,12C15,12.81 14.7,13.5 14.11,14.11C13.5,14.7 12.81,15 12,15C11.19,15 10.5,14.7 9.89,14.11C9.3,13.5 9,12.81 9,12M5.53,8.44L7.31,10.22L5.53,12L7.31,13.78L5.53,15.56L2,12L5.53,8.44M8.44,18.47L10.22,16.69L12,18.47L13.78,16.69L15.56,18.47L12,22L8.44,18.47M18.47,15.56L16.69,13.78L18.47,12L16.69,10.22L18.47,8.44L22,12L18.47,15.56M15.56,5.53L13.78,7.31L12,5.53L10.22,7.31L8.44,5.53L12,2L15.56,5.53Z", At = "M20,4H16.83L15,2H9L7.17,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,18H4V6H8.05L9.88,4H14.12L15.95,6H20V18M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15Z", Ze = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z", Qt = "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z", Yt = "M16,11H18V13H16V11M12,3H19C20.11,3 21,3.89 21,5V19H22V21H2V19H10V5C10,3.89 10.89,3 12,3M12,5V19H19V5H12Z", Ge = "M12,3C10.89,3 10,3.89 10,5H3V19H2V21H22V19H21V5C21,3.89 20.11,3 19,3H12M12,5H19V19H12V5M5,11H7V13H5V11Z", Jt = "M14 15C14 16.11 13.11 17 12 17S10 16.11 10 15 10.9 13 12 13 14 13.9 14 15M18 4V20C18 21.1 17.11 22 16 22H8C6.9 22 6 21.11 6 20V4C6 2.9 6.9 2 8 2H16C17.11 2 18 2.9 18 4M10.5 7C10.5 7.83 11.17 8.5 12 8.5S13.5 7.83 13.5 7 12.83 5.5 12 5.5 10.5 6.17 10.5 7M16 10H8V20H16V10Z", Xt = "M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z", ei = "M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3", Qe = "M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z", St = "M10 13C11.1 13 12 13.89 12 15C12 16.11 11.11 17 10 17S8 16.11 8 15 8.9 13 10 13M18 1C15.24 1 13 3.24 13 6V8H4C2.9 8 2 8.9 2 10V20C2 21.1 2.9 22 4 22H16C17.1 22 18 21.1 18 20V10C18 8.9 17.1 8 16 8H15V6C15 4.34 16.34 3 18 3S21 4.34 21 6V8H23V6C23 3.24 20.76 1 18 1M16 10V20H4V10H16Z", Tt = "M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z", Rt = "M19,11C19,12.19 18.66,13.3 18.1,14.28L16.87,13.05C17.14,12.43 17.3,11.74 17.3,11H19M15,11.16L9,5.18V5A3,3 0 0,1 12,2A3,3 0 0,1 15,5V11L15,11.16M4.27,3L21,19.73L19.73,21L15.54,16.81C14.77,17.27 13.91,17.58 13,17.72V21H11V17.72C7.72,17.23 5,14.41 5,11H6.7C6.7,14 9.24,16.1 12,16.1C12.81,16.1 13.6,15.91 14.31,15.58L12.65,13.92L12,14A3,3 0 0,1 9,11V10.28L3,4.27L4.27,3Z", ti = "M12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2C17.5,2 22,6 22,11A6,6 0 0,1 16,17H14.2C13.9,17 13.7,17.2 13.7,17.5C13.7,17.6 13.8,17.7 13.8,17.8C14.2,18.3 14.4,18.9 14.4,19.5C14.5,20.9 13.4,22 12,22M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C12.3,20 12.5,19.8 12.5,19.5C12.5,19.3 12.4,19.2 12.4,19.1C12,18.6 11.8,18.1 11.8,17.5C11.8,16.1 12.9,15 14.3,15H16A4,4 0 0,0 20,11C20,7.1 16.4,4 12,4M6.5,10C7.3,10 8,10.7 8,11.5C8,12.3 7.3,13 6.5,13C5.7,13 5,12.3 5,11.5C5,10.7 5.7,10 6.5,10M9.5,6C10.3,6 11,6.7 11,7.5C11,8.3 10.3,9 9.5,9C8.7,9 8,8.3 8,7.5C8,6.7 8.7,6 9.5,6M14.5,6C15.3,6 16,6.7 16,7.5C16,8.3 15.3,9 14.5,9C13.7,9 13,8.3 13,7.5C13,6.7 13.7,6 14.5,6M17.5,10C18.3,10 19,10.7 19,11.5C19,12.3 18.3,13 17.5,13C16.7,13 16,12.3 16,11.5C16,10.7 16.7,10 17.5,10Z", xt = "M8,5.14V19.14L19,12.14L8,5.14Z", ii = "M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M10,16.5L16,12L10,7.5V16.5Z";
 const ae = globalThis, De = ae.ShadowRoot && (ae.ShadyCSS === void 0 || ae.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, Ie = /* @__PURE__ */ Symbol(), Ye = /* @__PURE__ */ new WeakMap();
-let xt = class {
+let $t = class {
   constructor(t, i, n) {
     if (this._$cssResult$ = !0, n !== Ie) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
     this.cssText = t, this.t = i;
@@ -18,13 +18,13 @@ let xt = class {
     return this.cssText;
   }
 };
-const ni = (e) => new xt(typeof e == "string" ? e : e + "", void 0, Ie), j = (e, ...t) => {
+const ni = (e) => new $t(typeof e == "string" ? e : e + "", void 0, Ie), j = (e, ...t) => {
   const i = e.length === 1 ? e[0] : t.reduce((n, r, o) => n + ((a) => {
     if (a._$cssResult$ === !0) return a.cssText;
     if (typeof a == "number") return a;
     throw Error("Value passed to 'css' function must be a 'css' function result: " + a + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
   })(r) + e[o + 1], e[0]);
-  return new xt(i, e, Ie);
+  return new $t(i, e, Ie);
 }, ri = (e, t) => {
   if (De) e.adoptedStyleSheets = t.map((i) => i instanceof CSSStyleSheet ? i : i.styleSheet);
   else for (const i of t) {
@@ -474,7 +474,7 @@ const Ai = (e, t, i) => {
   return r._$AI(e), r;
 };
 const ze = globalThis;
-let x = class extends W {
+let $ = class extends W {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
   }
@@ -496,9 +496,9 @@ let x = class extends W {
     return D;
   }
 };
-x._$litElement$ = !0, x.finalized = !0, ze.litElementHydrateSupport?.({ LitElement: x });
+$._$litElement$ = !0, $.finalized = !0, ze.litElementHydrateSupport?.({ LitElement: $ });
 const Si = ze.litElementPolyfillSupport;
-Si?.({ LitElement: x });
+Si?.({ LitElement: $ });
 (ze.litElementVersions ??= []).push("4.2.2");
 const Lt = { ATTRIBUTE: 1 }, Oe = (e) => (...t) => ({ _$litDirective$: e, values: t });
 let Fe = class {
@@ -547,7 +547,7 @@ const Z = (e) => (t, i) => {
     customElements.define(e, t);
   }) : customElements.define(e, t);
 };
-const Ri = { attribute: !0, type: String, converter: he, reflect: !1, hasChanged: Ve }, $i = (e = Ri, t, i) => {
+const Ri = { attribute: !0, type: String, converter: he, reflect: !1, hasChanged: Ve }, xi = (e = Ri, t, i) => {
   const { kind: n, metadata: r } = i;
   let o = globalThis.litPropertyMetadata.get(r);
   if (o === void 0 && globalThis.litPropertyMetadata.set(r, o = /* @__PURE__ */ new Map()), n === "setter" && ((e = Object.create(e)).wrapped = !0), o.set(i.name, e), n === "accessor") {
@@ -569,7 +569,7 @@ const Ri = { attribute: !0, type: String, converter: he, reflect: !1, hasChanged
   throw Error("Unsupported decorator location: " + n);
 };
 function _(e) {
-  return (t, i) => typeof i == "object" ? $i(e, t, i) : ((n, r, o) => {
+  return (t, i) => typeof i == "object" ? xi(e, t, i) : ((n, r, o) => {
     const a = r.hasOwnProperty(o);
     return r.constructor.createProperty(o, n), a ? Object.getOwnPropertyDescriptor(r, o) : void 0;
   })(e, t, i);
@@ -577,7 +577,7 @@ function _(e) {
 function g(e) {
   return _({ ...e, state: !0, attribute: !1 });
 }
-const xi = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Synthetic camera preview">
+const $i = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Synthetic camera preview">
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#8fb6c9"/>
@@ -1170,7 +1170,7 @@ var Fi = Object.defineProperty, qi = Object.getOwnPropertyDescriptor, qe = (e, t
   return n && r && Fi(t, i, r), r;
 };
 const Ni = 3e4;
-let te = class extends x {
+let te = class extends $ {
   disconnectedCallback() {
     this.clearRefreshTimer(), super.disconnectedCallback();
   }
@@ -1567,7 +1567,7 @@ function pn(e, t, i = /* @__PURE__ */ new Date()) {
   const n = we(t.snapshot_directory), r = un(i, e.config?.time_zone);
   return `${n}/${hn(e, t)}_${r}.jpg`;
 }
-const Ne = "custom:ring-view", $e = "ring-view", vn = "Ring View", w = {
+const Ne = "custom:ring-view", xe = "ring-view", vn = "Ring View", w = {
   default_mode: "last_recording",
   remember_last_mode: !1,
   autoplay_recording: !0,
@@ -1611,7 +1611,7 @@ function Rn(e) {
   if (typeof e != "string" || !e.startsWith("camera.") && !e.startsWith("select."))
     throw new Error(s(void 0, "config.recording_source_required"));
 }
-function $n(e) {
+function xn(e) {
   if (!e || typeof e != "object")
     throw new Error(s(void 0, "config.invalid"));
   if (Rn(e.recording_entity), pt(e.live_entity, "config.live_entity"), e.snapshot_entity !== void 0 && e.snapshot_entity !== "" && pt(e.snapshot_entity, "config.snapshot_entity"), e.last_activity_entity !== void 0 && e.last_activity_entity !== "" && (typeof e.last_activity_entity != "string" || !/^[a-z0-9_]+\.[a-z0-9_]+$/i.test(e.last_activity_entity)))
@@ -1650,8 +1650,8 @@ function $n(e) {
   if (e.dashboard_start && !Sn.has(e.dashboard_start))
     throw new Error(s(void 0, "config.dashboard_start"));
 }
-function xe(e) {
-  return $n(e), {
+function $e(e) {
+  return xn(e), {
     type: e.type ?? Ne,
     recording_entity: e.recording_entity,
     live_entity: e.live_entity,
@@ -1699,7 +1699,7 @@ function qt(e) {
       return;
   }
 }
-function xn(e) {
+function $n(e) {
   return e === "auto" ? "16 / 9" : e.replace(":", " / ");
 }
 const Be = "ring-view-live-entity", We = "ring-view-recording-entity", Ke = "ring-view-mode", ge = "ring-view-ringing-until";
@@ -1978,6 +1978,7 @@ const Un = j`
     --ring-view-control-size: 44px;
     --ring-view-primary-size: 48px;
     --ring-view-control-surface: rgba(0, 0, 0, 0.3);
+    --ring-view-control-lift: rgba(255, 255, 255, 0);
     --ring-view-action-surface: rgba(0, 0, 0, 0.48);
     --ring-view-message-surface: rgba(10, 10, 10, 0.78);
     --ring-view-focus-color: #62b8ff;
@@ -2690,7 +2691,7 @@ const Un = j`
   }
 
   .action-button:hover {
-    background: rgba(0, 0, 0, 0.64);
+    background-color: rgba(0, 0, 0, 0.64);
   }
 
   .action-button:focus-visible {
@@ -2715,6 +2716,21 @@ const Un = j`
 
   .action-button.primary {
     background: var(--ring-view-action-surface);
+  }
+
+  .mode-switch,
+  .ring-indicator,
+  .snapshot-action,
+  .chrome-action,
+  .visitor-action-dock,
+  .viewer-feedback-layer .state-card,
+  .action-button {
+    background-image: linear-gradient(
+      var(--ring-view-control-lift),
+      var(--ring-view-control-lift)
+    );
+    backdrop-filter: blur(14px) saturate(125%);
+    -webkit-backdrop-filter: blur(14px) saturate(125%);
   }
 
   .sr-only {
@@ -2829,7 +2845,7 @@ const Un = j`
     .header-actions .chrome-action {
       position: relative;
       inset: auto;
-      background: var(--ring-view-control-surface);
+      background-color: var(--ring-view-control-surface);
     }
 
     .body {
@@ -2853,6 +2869,44 @@ const Un = j`
     .visitor-action {
       gap: 7px;
       font-size: 14px;
+    }
+  }
+
+  @media (max-width: 600px) and (orientation: portrait) {
+    :host(:not([inline])) {
+      --ring-view-control-lift: rgba(255, 255, 255, 0.075);
+    }
+
+    :host(:not([inline])) .header-copy {
+      right: calc(
+        50% + var(--ring-view-control-size) + 8px
+      );
+    }
+
+    :host(:not([inline])) .mode-switch {
+      right: auto;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (max-width: 452px) and (orientation: portrait) {
+    :host(:not([inline])) .header.camera-actions-two {
+      min-height: calc(124px + env(safe-area-inset-top));
+    }
+
+    :host(:not([inline])) .header.camera-actions-two .mode-switch {
+      top: calc(66px + env(safe-area-inset-top));
+    }
+  }
+
+  @media (max-width: 340px) and (orientation: portrait) {
+    :host(:not([inline])) .header.camera-actions-one {
+      min-height: calc(124px + env(safe-area-inset-top));
+    }
+
+    :host(:not([inline])) .header.camera-actions-one .mode-switch {
+      top: calc(66px + env(safe-area-inset-top));
     }
   }
 
@@ -3100,7 +3154,7 @@ const Un = j`
   :host([inline]) .header-actions .expand {
     position: relative;
     inset: auto;
-    background: var(--ring-view-control-surface);
+    background-color: var(--ring-view-control-surface);
   }
 
   :host([inline]) h2 {
@@ -3270,7 +3324,7 @@ async function jt() {
   }
   return jn(fe, Kn);
 }
-let $ = class extends x {
+let x = class extends $ {
   constructor() {
     super(...arguments), this.controls = !0, this.muted = !0, this.allowExoPlayer = !0, this.fitMode = "cover", this.passiveSurface = !1, this.nativeAvailable = !!customElements.get(fe), this.handledStreamEvents = /* @__PURE__ */ new WeakSet(), this.ready = !1, this.handleSurfaceClick = (e) => {
       if (!this.passiveSurface || e.detail === 0 || !this.eventHost) return;
@@ -3397,7 +3451,7 @@ let $ = class extends x {
     );
   }
 };
-$.styles = j`
+x.styles = j`
     :host {
       display: block;
       width: 100%;
@@ -3416,31 +3470,31 @@ $.styles = j`
   `;
 M([
   _({ attribute: !1 })
-], $.prototype, "stateObj", 2);
+], x.prototype, "stateObj", 2);
 M([
   _({ type: Boolean })
-], $.prototype, "controls", 2);
+], x.prototype, "controls", 2);
 M([
   _({ type: Boolean })
-], $.prototype, "muted", 2);
+], x.prototype, "muted", 2);
 M([
   _({ type: Boolean, attribute: "allow-exoplayer" })
-], $.prototype, "allowExoPlayer", 2);
+], x.prototype, "allowExoPlayer", 2);
 M([
   _({ type: Number, attribute: !1 })
-], $.prototype, "aspectRatio", 2);
+], x.prototype, "aspectRatio", 2);
 M([
   _({ attribute: !1 })
-], $.prototype, "fitMode", 2);
+], x.prototype, "fitMode", 2);
 M([
   _({ type: Boolean, attribute: "passive-surface" })
-], $.prototype, "passiveSurface", 2);
+], x.prototype, "passiveSurface", 2);
 M([
   g()
-], $.prototype, "nativeAvailable", 2);
-$ = M([
+], x.prototype, "nativeAvailable", 2);
+x = M([
   Z("ring-view-native-camera-adapter")
-], $);
+], x);
 const Zn = (e) => e ?? l;
 var Gn = Object.defineProperty, Qn = Object.getOwnPropertyDescriptor, S = (e, t, i, n) => {
   for (var r = n > 1 ? void 0 : n ? Qn(t, i) : t, o = e.length - 1, a; o >= 0; o--)
@@ -3456,7 +3510,7 @@ function Jn(e, t) {
   }
   return t instanceof Error ? t.message : String(t);
 }
-let k = class extends x {
+let k = class extends $ {
   constructor() {
     super(...arguments), this.entityId = "", this.muted = !1, this.fitMode = "cover", this.externalControls = !1, this.microphoneState = "not-requested", this.connectionState = "starting", this.statusMessage = "", this.statusKind = "status", this.actualMuted = !1, this.playbackBlocked = !1, this.readyDispatched = !1, this.connectionToken = 0, this.startAttempted = !1, this.pendingLocalCandidates = [], this.pendingRemoteCandidates = [], this.playbackRequestPending = !1, this.startQueued = !1, this.keyboardPressed = !1, this.externalPressed = !1, this.pressToken = 0, this.stopTalking = () => {
       const e = this.externalPressed;
@@ -3591,7 +3645,7 @@ let k = class extends x {
       ></video>
       ${this.playbackBlocked ? h`
         <button class="playback-resume" type="button" tabindex="0" @click=${this.resumePlayback}>
-          ${this.icon($t)}
+          ${this.icon(xt)}
           <span>${s(this.hass, "viewer.resume_live")}</span>
         </button>
       ` : l}
@@ -4088,7 +4142,7 @@ function fr(e) {
   const t = e instanceof Error ? e.message.toLowerCase() : String(e).toLowerCase();
   return /timeout|timed out/.test(t) ? "snapshot.timeout" : /unauthorized|forbidden|permission denied/.test(t) ? "snapshot.permission_failed" : /cannot write|can't write|no access to path|read-only|readonly/.test(t) ? "snapshot.write_failed" : /connection|websocket|service api unavailable/.test(t) ? "snapshot.connection_failed" : /no image|could not provide|not supported|snapshot unavailable/.test(t) ? "snapshot.camera_failed" : /refresh control unavailable/.test(t) ? "snapshot.refresh_unavailable" : "snapshot.failed";
 }
-let f = class extends x {
+let f = class extends $ {
   constructor() {
     super(...arguments), this.open = !1, this.inline = !1, this.ringing = !1, this.mode = "last_recording", this.mediaStatus = "idle", this.session = 0, this.suspended = !1, this.recordingMuted = !1, this.recordingStarted = !0, this.recordingControlsVisible = !0, this.recordingEnded = !1, this.liveMuted = !0, this.recordingVideoFailed = !1, this.recordingPreparationActive = !1, this.retryCount = 0, this.statusAnnouncement = "", this.talkbackReady = !1, this.talkbackRequesting = !1, this.talkbackTalking = !1, this.doorActionStatus = "idle", this.snapshotActionStatus = "idle", this.inlineStarted = !0, this.lifecycle = new tr(), this.recordingPlayback = /* @__PURE__ */ new WeakSet(), this.recordingPaused = !1, this.automaticLiveRetry = !0, this.pageUnloading = !1, this.talkKeyboardPressed = !1, this.doorKeyboardPressed = !1, this.doorActionToken = 0, this.snapshotActionToken = 0, this.recordingRefreshAttempted = !1, this.recordingTranscodeFallbackAttempted = !1, this.recordingRefreshToken = 0, this.inlineVisible = !1, this.inlineActive = !1, this.takeSnapshot = async () => {
       const e = this.hass, t = this.config, i = this.snapshotEntityId();
@@ -4900,7 +4954,7 @@ let f = class extends x {
         <div class="state-layer play-layer resume-state">
           <button class="action-button primary play-recording resume-live" type="button"
             @click=${this.resumeLive}>
-            ${this.icon($t)}
+            ${this.icon(xt)}
             <span>${s(this.hass, "viewer.resume_live")}</span>
           </button>
         </div>
@@ -5409,9 +5463,9 @@ var _r = Object.defineProperty, br = Object.getOwnPropertyDescriptor, V = (e, t,
   return n && r && _r(t, i, r), r;
 };
 const wr = 1e4, yr = 640, kr = 16 / 9, yt = 16, Ar = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
-  xi
+  $i
 )}`;
-let C = class extends x {
+let C = class extends $ {
   constructor() {
     super(...arguments), this.preview = !1, this.previewFailed = !1, this.ringAlertVisible = !1, this.previewIntersecting = !1, this.previewVisible = !1, this.previewRequestId = 0, this.lastRingAlertAt = 0, this.previewMarkersInitialized = !1, this.inlinePausedForViewer = !1, this.refreshActivityLabel = () => {
       this.requestUpdate();
@@ -5466,7 +5520,7 @@ let C = class extends x {
     };
   }
   setConfig(e) {
-    const t = xe(e);
+    const t = $e(e);
     (t.recording_entity !== this.config?.recording_entity || t.snapshot_entity !== this.config?.snapshot_entity) && (this.previewMarkersInitialized = !1, this.recordingMarker = void 0, this.snapshotTimestamp = void 0, this.latestObservedPreviewSource = void 0), this.config = t;
   }
   getCardSize() {
@@ -5514,7 +5568,7 @@ let C = class extends x {
       this.hass.states[this.config.recording_entity],
       s(this.hass, "common.camera")
     ), n = this.ringAlertVisible ? "live" : oe(this.config), r = this.isInCardPicker(), o = r || this.preview, a = r ? !1 : y(t), d = {
-      "--ring-view-aspect-ratio": xn(this.config.aspect_ratio),
+      "--ring-view-aspect-ratio": $n(this.config.aspect_ratio),
       "--ring-view-fit-mode": this.config.fit_mode
     };
     if (this.config.dashboard_behavior === "interactive" && !o)
@@ -5738,11 +5792,11 @@ V([
   g()
 ], C.prototype, "ringAlertVisible", 2);
 C = V([
-  Z($e)
+  Z(xe)
 ], C);
 window.customCards = window.customCards || [];
-window.customCards.some((e) => e.type === $e) || window.customCards.push({
-  type: $e,
+window.customCards.some((e) => e.type === xe) || window.customCards.push({
+  type: xe,
   name: vn,
   description: s(void 0, "card.description"),
   preview: !0,
@@ -6101,7 +6155,7 @@ function Rr(e, t) {
     }
   ];
 }
-const $r = {
+const xr = {
   recording_entity: "editor.recording_entity",
   live_entity: "editor.live_entity",
   snapshot_entity: "editor.snapshot_entity",
@@ -6137,7 +6191,7 @@ const $r = {
   preview_fallback: "editor.preview_fallback",
   aspect_ratio: "editor.aspect_ratio",
   fit_mode: "editor.fit_mode"
-}, xr = {
+}, $r = {
   recording_entity: "editor.helper_recording_entity",
   live_entity: "editor.helper_live_entity",
   dashboard_behavior: "editor.helper_dashboard_behavior",
@@ -6163,10 +6217,10 @@ const $r = {
   snapshot_entity: "editor.helper_snapshot_entity",
   preview_fallback: "editor.helper_preview_fallback"
 };
-let I = class extends x {
+let I = class extends $ {
   constructor() {
     super(...arguments), this.nativeChecked = !1, this.nativeAvailable = !1, this.computeLabel = (e) => {
-      const t = $r[e.name];
+      const t = xr[e.name];
       if (!t) return;
       const i = s(this.hass, t);
       if (e.required || ![
@@ -6188,11 +6242,11 @@ let I = class extends x {
         const i = sn(this.config.snapshot_directory);
         return i === "public" ? s(this.hass, "editor.helper_snapshot_directory_public") : i === "custom" ? s(this.hass, "editor.helper_snapshot_directory_custom") : void 0;
       }
-      const t = xr[e.name];
+      const t = $r[e.name];
       return t ? s(this.hass, t) : void 0;
     }, this.valueChanged = (e) => {
       if (!this.config) return;
-      const t = xe({
+      const t = $e({
         ...this.config,
         ...e.detail.value
       });
@@ -6218,7 +6272,7 @@ let I = class extends x {
     };
   }
   setConfig(e) {
-    this.config = xe(e);
+    this.config = $e(e);
   }
   connectedCallback() {
     super.connectedCallback(), jt().then((e) => {

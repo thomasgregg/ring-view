@@ -4,6 +4,33 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.11.0-beta.4] - 2026-09-13
+
+### Changed
+
+- Give Ring View's custom control surfaces a shared glass treatment with
+  backdrop blur and restrained saturation, while leaving all native browser
+  and Home Assistant media-player controls untouched.
+- Add a subtle neutral lift to custom controls in portrait fullscreen so their
+  glass silhouettes remain visible against pure-black letterboxing without
+  washing out controls placed over camera imagery.
+- Center the Recording and Live selector against the full portrait viewport
+  instead of shifting it according to the number of right-side utilities.
+
+### Fixed
+
+- Move the centered mode selector to a dedicated second row only when narrow
+  portrait widths cannot accommodate it beside Snapshot and Close, or beside
+  Bell, Snapshot, and Close, preventing overlap without reducing touch targets.
+- Preserve the glass layer on Close and Enlarge after their responsive
+  positioning rules are applied.
+
+### Tests
+
+- Validate portrait layouts at 320 and 390 pixels, the simultaneous Bell,
+  Snapshot, and Close state, landscape material behavior, exact selector
+  centering, and the complete desktop and phone browser regression suite.
+
 ## [0.11.0-beta.3] - 2026-09-13
 
 ### Changed
