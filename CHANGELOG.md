@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+### Fixed
+
+- Detect repeated Ring-MQTT doorbell presses from a changed `lastDingTime` or
+  `lastDing` attribute while the configured Ding sensor remains `on`.
+
 ## [0.10.0-beta.1] - 2026-09-13
 
 ### Added

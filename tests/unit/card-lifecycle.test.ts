@@ -368,7 +368,9 @@ describe("card stream lifecycle", () => {
     expect(TestCameraStream.active).toBe(1);
   });
 
-  it("shows a Ring-MQTT Ding only for an off-to-on transition", async () => {
+  it("shows Ring-MQTT Dings for off-to-on and a new marker while still on", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(Date.parse("2026-09-12T14:19:00Z"));
     const doorbell: HassEntity = {
       entity_id: "binary_sensor.front_door_ding",
       state: "on",
@@ -382,17 +384,21 @@ describe("card stream lifecycle", () => {
     });
     card.hass = { ...hass, states: { ...hass.states, [doorbell.entity_id]: doorbell } };
     document.body.append(card);
-    await card.updateComplete;
+    await vi.advanceTimersByTimeAsync(0);
     expect(card.shadowRoot?.querySelector(".ring-alert")).toBeNull();
 
     card.hass = {
       ...card.hass,
       states: {
         ...card.hass.states,
-        [doorbell.entity_id]: { ...doorbell, state: "off" },
+        [doorbell.entity_id]: {
+          ...doorbell,
+          state: "off",
+          attributes: { ...doorbell.attributes, lastDingTime: "2026-09-12T14:18:00Z" },
+        },
       },
     };
-    await card.updateComplete;
+    await vi.advanceTimersByTimeAsync(0);
     expect(card.shadowRoot?.querySelector(".ring-alert")).toBeNull();
 
     card.hass = {
@@ -406,10 +412,31 @@ describe("card stream lifecycle", () => {
         },
       },
     };
-    await card.updateComplete;
+    await vi.advanceTimersByTimeAsync(0);
     expect(card.shadowRoot?.querySelector(".ring-alert")?.textContent).toContain(
       "Someone is at the door",
     );
+
+    await vi.advanceTimersByTimeAsync(6_000);
+    card.hass = {
+      ...card.hass,
+      states: {
+        ...card.hass.states,
+        [doorbell.entity_id]: {
+          ...doorbell,
+          state: "on",
+          attributes: { ...doorbell.attributes, lastDingTime: "2026-09-12T14:19:19Z" },
+        },
+      },
+    };
+    await vi.advanceTimersByTimeAsync(0);
+
+    // The second marker starts a fresh twelve-second alert even though the
+    // binary sensor never returned to off.
+    await vi.advanceTimersByTimeAsync(7_000);
+    expect(card.shadowRoot?.querySelector(".ring-alert")).not.toBeNull();
+    await vi.advanceTimersByTimeAsync(5_001);
+    expect(card.shadowRoot?.querySelector(".ring-alert")).toBeNull();
   });
 
   it("updates Ring-MQTT activity when a same-device motion sibling changes", async () => {
@@ -904,6 +931,57 @@ describe("card stream lifecycle", () => {
     expect(dialog?.shadowRoot?.querySelector(".doorbell-alert-layer")).toBeNull();
     const indicator = dialog?.shadowRoot?.querySelector(".ring-indicator");
     expect(indicator?.getAttribute("aria-label")).toBe("Someone is at the door");
+    expect(TestCameraStream.active).toBe(1);
+    dialog?.close();
+  });
+
+  it("shows a repeated Ring-MQTT Ding in Live while the sensor remains on", async () => {
+    const doorbell: HassEntity = {
+      entity_id: "binary_sensor.front_door_ding",
+      state: "on",
+      attributes: {
+        device_class: "occupancy",
+        lastDingTime: "2026-09-12T14:19:13Z",
+      },
+    };
+    const card = document.createElement("ring-view");
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      doorbell_entity: doorbell.entity_id,
+      default_mode: "live",
+    });
+    card.hass = {
+      ...hass,
+      states: { ...hass.states, [doorbell.entity_id]: doorbell },
+    };
+    document.body.append(card);
+    await card.updateComplete;
+    card.shadowRoot?.querySelector<HTMLElement>(".preview")?.click();
+    await flush();
+
+    const dialog = getDialog();
+    expect(dialog?.shadowRoot?.querySelector(".ring-indicator")).toBeNull();
+    dialog!.hass = {
+      ...hass,
+      states: {
+        ...hass.states,
+        [doorbell.entity_id]: {
+          ...doorbell,
+          attributes: {
+            ...doorbell.attributes,
+            lastDingTime: "2026-09-12T14:20:10Z",
+          },
+        },
+      },
+    };
+    await dialog!.updateComplete;
+    await flush();
+
+    expect(
+      dialog?.shadowRoot?.querySelector(".ring-indicator")?.getAttribute("aria-label"),
+    ).toBe("Someone is at the door");
+    expect(dialog?.shadowRoot?.querySelector(".doorbell-alert-layer")).toBeNull();
     expect(TestCameraStream.active).toBe(1);
     dialog?.close();
   });

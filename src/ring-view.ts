@@ -511,7 +511,7 @@ export class RingView extends LitElement {
     if (!entityId || !previous || !this.hass) return;
     const before = previous.states[entityId];
     const after = this.hass.states[entityId];
-    if (!isDoorbellRingTransition(entityId, before?.state, after)) return;
+    if (!isDoorbellRingTransition(entityId, before, after)) return;
 
     const now = Date.now();
     if (now - this.lastRingAlertAt < 5_000) return;

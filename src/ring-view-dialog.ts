@@ -182,7 +182,7 @@ export class RingViewDialog extends LitElement {
   private returnUrl?: string;
   private ringAlertTimer?: number;
   private ringingUntil?: number;
-  private lastDoorbellState?: string;
+  private lastDoorbellEntity?: HassEntity;
   // Playback belongs to an element, not the dialog: every replacement video
   // needs its own attempt, while repeated canplay events must not replay it.
   private readonly recordingPlayback = new WeakSet<HTMLVideoElement>();
@@ -248,8 +248,8 @@ export class RingViewDialog extends LitElement {
     this.statusAnnouncement = "";
     this.resetVisitorActions();
     this.resetSnapshotAction();
-    this.lastDoorbellState = this.config.doorbell_entity
-      ? this.hass.states[this.config.doorbell_entity]?.state
+    this.lastDoorbellEntity = this.config.doorbell_entity
+      ? this.hass.states[this.config.doorbell_entity]
       : undefined;
     this.setRingingUntil(params.ringingUntil);
     this.open = true;
@@ -293,8 +293,8 @@ export class RingViewDialog extends LitElement {
     this.statusAnnouncement = "";
     this.resetVisitorActions();
     this.resetSnapshotAction();
-    this.lastDoorbellState = this.config.doorbell_entity
-      ? this.hass.states[this.config.doorbell_entity]?.state
+    this.lastDoorbellEntity = this.config.doorbell_entity
+      ? this.hass.states[this.config.doorbell_entity]
       : undefined;
     this.setRingingUntil(params.ringingUntil);
     this.open = true;
@@ -2409,9 +2409,9 @@ export class RingViewDialog extends LitElement {
     const entityId = this.config?.doorbell_entity;
     if (!entityId || !this.hass) return;
     const after = this.hass.states[entityId];
-    const beforeState = previous?.states[entityId]?.state ?? this.lastDoorbellState;
-    this.lastDoorbellState = after?.state;
-    if (!isDoorbellRingTransition(entityId, beforeState, after)) return;
+    const before = previous?.states[entityId] ?? this.lastDoorbellEntity;
+    this.lastDoorbellEntity = after;
+    if (!isDoorbellRingTransition(entityId, before, after)) return;
     this.setRingingUntil(Date.now() + RING_ALERT_DURATION_MS);
   }
 
@@ -2472,7 +2472,7 @@ export class RingViewDialog extends LitElement {
     this.resetVisitorActions();
     this.resetSnapshotAction();
     this.setRingingUntil();
-    this.lastDoorbellState = undefined;
+    this.lastDoorbellEntity = undefined;
     this.detachGlobalListeners();
     if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
     if (
