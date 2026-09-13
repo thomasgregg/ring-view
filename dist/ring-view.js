@@ -1978,7 +1978,8 @@ const Un = j`
     --ring-view-control-size: 44px;
     --ring-view-primary-size: 48px;
     --ring-view-control-surface: rgba(0, 0, 0, 0.3);
-    --ring-view-control-lift: rgba(255, 255, 255, 0);
+    --ring-view-control-lift-top: rgba(255, 255, 255, 0.08);
+    --ring-view-control-lift-bottom: rgba(255, 255, 255, 0.045);
     --ring-view-action-surface: rgba(0, 0, 0, 0.48);
     --ring-view-message-surface: rgba(10, 10, 10, 0.78);
     --ring-view-focus-color: #62b8ff;
@@ -2726,11 +2727,12 @@ const Un = j`
   .viewer-feedback-layer .state-card,
   .action-button {
     background-image: linear-gradient(
-      var(--ring-view-control-lift),
-      var(--ring-view-control-lift)
+      180deg,
+      var(--ring-view-control-lift-top),
+      var(--ring-view-control-lift-bottom)
     );
-    backdrop-filter: blur(14px) saturate(125%);
-    -webkit-backdrop-filter: blur(14px) saturate(125%);
+    backdrop-filter: blur(16px) saturate(120%);
+    -webkit-backdrop-filter: blur(16px) saturate(120%);
   }
 
   .sr-only {
@@ -2874,7 +2876,8 @@ const Un = j`
 
   @media (max-width: 600px) and (orientation: portrait) {
     :host(:not([inline])) {
-      --ring-view-control-lift: rgba(255, 255, 255, 0.075);
+      --ring-view-control-lift-top: rgba(255, 255, 255, 0.14);
+      --ring-view-control-lift-bottom: rgba(255, 255, 255, 0.09);
     }
 
     :host(:not([inline])) .header-copy {

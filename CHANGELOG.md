@@ -4,6 +4,23 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.11.0-beta.5] - 2026-09-13
+
+### Fixed
+
+- Restore a visible glass material to every custom Ring View control surface,
+  including desktop and inline dashboard controls, instead of limiting the
+  neutral lift to portrait fullscreen.
+- Strengthen the adaptive portrait lift where controls sit over black
+  letterboxing while keeping the shared treatment borderless and preserving
+  camera detail beneath controls placed over imagery.
+
+### Tests
+
+- Visually validate fullscreen portrait, fullscreen desktop, and the inline
+  dashboard card, then run all 204 unit tests and 144 desktop/phone browser
+  tests.
+
 ## [0.11.0-beta.4] - 2026-09-13
 
 ### Changed
