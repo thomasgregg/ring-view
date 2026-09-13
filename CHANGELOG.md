@@ -59,6 +59,9 @@ All notable changes to this project are documented here.
   elsewhere, while preserving the selected Ding, Motion, or on-demand event.
 - Give a newly selected or transcoding Ring-MQTT event one complete refresh
   cycle before showing a recording error.
+- Move the validation and release workflows to the current Node 24-based
+  checkout and Node setup actions so release checks run without the retired
+  Node 20 action-runtime warning.
 
 ### Fixed
 
