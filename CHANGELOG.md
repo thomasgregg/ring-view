@@ -4,6 +4,29 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+### Changed
+
+- Add separate **Start recordings muted** controls for the fullscreen viewer
+  and interactive dashboard. Fullscreen recordings keep sound on by default;
+  dashboard recordings start muted by default for reliable automatic playback.
+- Preserve the configured recording-audio preference when a browser rejects
+  autoplay. Ring View now leaves the loaded recording and native Play control
+  available instead of silently retrying with a different mute state.
+
+### Fixed
+
+- Request the matching Ring-MQTT **(Transcoded)** event before playback on
+  iPhone/iPad, and as an automatic fallback when a direct Ring recording fails
+  elsewhere. The selected Ding, Motion, or on-demand event is preserved.
+- Keep Ring View's muted state synchronized when the user changes sound through
+  the browser's native recording controls.
+
+### Tests
+
+- Cover both recording-audio settings, audible-autoplay rejection, Apple-mobile
+  preselection without audio-policy changes, exact transcoded-option matching,
+  desktop-only direct playback, and direct-URL failure fallback.
+
 ## [0.11.0-beta.2] - 2026-09-13
 
 ### Changed

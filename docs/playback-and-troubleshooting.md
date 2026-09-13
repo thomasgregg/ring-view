@@ -17,6 +17,16 @@ Live or you select Live. Only the active mode's renderer remains mounted. The
 highlight around a mode icon identifies the selected view, so Recording stays
 highlighted when its video is paused or has ended.
 
+Recording sound is configured separately for the two places that can play it:
+**Fullscreen viewer → Start recordings muted** and, for an interactive card,
+**Dashboard card → Start dashboard recordings muted**. Ring View applies the
+selected value exactly. If muted is off and the browser refuses automatic
+playback with sound, the loaded recording stays ready and its native Play
+control supplies the required tap; Ring View does not silently mute it. Changing
+sound in the native controls affects the current playback only. The equivalent
+Live settings remain separate because Live and recordings can have different
+uses and browser behavior.
+
 For an official Ring recording camera, Ring View uses the current ephemeral
 `video_url` when available, with Home Assistant's camera renderer as the
 alternative if it is missing or fails. A Ring-MQTT Event Select source instead
@@ -91,7 +101,7 @@ an operation result. Configuration warnings stay in the visual editor.
 
 | What you see | What to check |
 | --- | --- |
-| Play/Resume over an otherwise connected stream | Browser autoplay policy; on iPhone, check Low Power Mode. Tap once to start playback. |
+| Play/Resume over an otherwise connected stream | Browser autoplay policy; on iPhone, check Low Power Mode. Tap once to start playback. For recordings, enable the matching **Start … muted** setting if automatic start matters more than initial sound. |
 | Reconnecting, followed by Retry/error | Check Home Assistant connectivity and Ring Live availability. Repeated failures after session teardown can match the [known backend defect](backend-patch.md). |
 | Hold to talk is unavailable | Wait for playback; confirm the official Ring live entity, HTTPS, and microphone permission. |
 | Snapshot button is missing | Enable it under **Snapshots**, then start Live. It is intentionally hidden in Recording, on the passive dashboard, and while an on-demand card is idle. |
@@ -100,7 +110,7 @@ an operation result. Configuration warnings stay in the visual editor.
 | Snapshot works with Ring-MQTT but not the official Live camera | Keep the Ring-MQTT camera configured as `snapshot_entity`. Ring View prefers it automatically. The official fallback can save only the still image exposed by that entity, not pixels from the active WebRTC player, so it may be unavailable or show the latest recording. |
 | Missing or indistinguishable camera entries | Show disabled entities on the Ring device. Before enabling it, the camera disabled by default is Last recording; the camera enabled by default is Live view. Copy the exact IDs and do not rely on their suffixes. See [Choosing camera entities](configuration.md#choosing-camera-entities). |
 | Last recording remains on an old clip | On some newer wired Ring cameras, 24/7 recording can leave Home Assistant's `last_recording` entity stuck on an old event. This is an [upstream Home Assistant issue](https://github.com/home-assistant/core/issues/176299), not a Ring View cache: the card's preview and Last recording view can update only when Home Assistant supplies a new `last_video_id` or `video_url`. The issue reporter found that disabling 24/7 recording and using periodic snapshots restored updates. Live view, talkback, and Ding alerts use separate entities and remain available. |
-| Ring-MQTT recording says it is unavailable | Open the Event Select entity and choose the intended event. **Recording Not Found** means Ring-MQTT has no clip for that slot. **Transcoding in Progress** can require more than one 15-second attempt; wait and retry. If the original MP4 is rejected by the browser, choose the matching **(Transcoded)** option. Signed URLs are refreshed automatically when Ring-MQTT publishes their replacement. |
+| Ring-MQTT recording says it is unavailable | Open the Event Select entity and choose the intended event. **Recording Not Found** means Ring-MQTT has no clip for that slot. **Transcoding in Progress** can take 10–15 seconds; keep the viewer open while Ring View waits for the result. Ring View automatically requests the matching **(Transcoded)** option on iPhone/iPad or after a direct Ring URL fails. Signed URLs are refreshed automatically when Ring-MQTT publishes their replacement. |
 | Old card behavior after updating | Confirm the installed HACS version and refresh the frontend. In the iOS Companion app, **Clear Web View Cache** may be necessary. |
 | No new phone preview | Check the blueprint's selected recording entity and whether a new `last_video_id` appeared within two minutes. See [notifications](notifications.md). |
 

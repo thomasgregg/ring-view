@@ -230,6 +230,184 @@ describe("recording player lifecycle", () => {
     );
   });
 
+  it("selects the matching compatible recording on iPhone without overriding fullscreen audio", async () => {
+    vi.spyOn(window.navigator, "userAgent", "get").mockReturnValue(
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)",
+    );
+    const mqttHass = ringMqttHass("https://example.test/direct-recording.mp4");
+    mqttHass.states["select.front_door_events"]!.attributes.options = [
+      "Ding 1",
+      "Ding 1 (Transcoded)",
+    ];
+    const dialog = document.createElement("ring-view-dialog");
+    dialog.hass = mqttHass;
+    document.body.append(dialog);
+    dialog.showDialog({
+      mode: "last_recording",
+      config: normalizeConfig({
+        recording_entity: "select.front_door_events",
+        live_entity: "camera.live",
+        recording_muted: false,
+      }),
+    });
+    await flush();
+
+    expect(mqttHass.callService).toHaveBeenCalledWith(
+      "select",
+      "select_option",
+      { option: "Ding 1 (Transcoded)" },
+      { entity_id: "select.front_door_events" },
+    );
+    expect(dialog.shadowRoot?.querySelector(".video-fallback")).toBeNull();
+    expect(dialog.shadowRoot?.textContent).toContain(
+      "Preparing a compatible Ring-MQTT recording",
+    );
+
+    dialog.hass = {
+      ...mqttHass,
+      states: {
+        ...mqttHass.states,
+        "select.front_door_events": {
+          ...mqttHass.states["select.front_door_events"]!,
+          state: "Ding 1 (Transcoded)",
+          attributes: {
+            ...mqttHass.states["select.front_door_events"]!.attributes,
+            recordingUrl: "https://example.test/compatible-recording.mp4",
+          },
+        },
+      },
+    };
+    await flush();
+
+    const video = dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback");
+    expect(video?.src).toBe("https://example.test/compatible-recording.mp4");
+    expect(video?.muted).toBe(false);
+    video!.dispatchEvent(new Event("canplay"));
+    await flush();
+    expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1);
+
+    video!.muted = false;
+    video!.dispatchEvent(new Event("volumechange"));
+    await dialog.updateComplete;
+    expect(video?.muted).toBe(false);
+  });
+
+  it("applies the explicit fullscreen recording mute setting", async () => {
+    const dialog = document.createElement("ring-view-dialog");
+    dialog.hass = hass;
+    document.body.append(dialog);
+    dialog.showDialog({
+      mode: "last_recording",
+      config: normalizeConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        recording_muted: true,
+      }),
+    });
+    await flush();
+
+    const video = dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback");
+    expect(video?.muted).toBe(true);
+    video!.dispatchEvent(new Event("canplay"));
+    await flush();
+    expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1);
+    expect(dialog.shadowRoot?.textContent).toContain("Last recording loaded muted");
+  });
+
+  it.each([
+    [true, true],
+    [false, false],
+  ] as const)("applies dashboard_recording_muted=%s in the interactive card", async (
+    dashboardRecordingMuted,
+    expectedMuted,
+  ) => {
+    const dialog = document.createElement("ring-view-dialog");
+    dialog.hass = hass;
+    document.body.append(dialog);
+    dialog.showInline({
+      mode: "last_recording",
+      start: "last_recording",
+      config: normalizeConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        dashboard_behavior: "interactive",
+        dashboard_recording_muted: dashboardRecordingMuted,
+      }),
+    });
+    dialog.setInlineVisible(true);
+    await flush();
+
+    expect(
+      dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback")?.muted,
+    ).toBe(expectedMuted);
+  });
+
+  it("keeps a manually started iPhone recording audible", async () => {
+    vi.spyOn(window.navigator, "userAgent", "get").mockReturnValue(
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)",
+    );
+    const dialog = document.createElement("ring-view-dialog");
+    dialog.hass = hass;
+    document.body.append(dialog);
+    dialog.showDialog({
+      mode: "last_recording",
+      config: normalizeConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        autoplay_recording: false,
+      }),
+    });
+    await flush();
+
+    expect(dialog.shadowRoot?.querySelector(".video-fallback")).toBeNull();
+    dialog.shadowRoot?.querySelector<HTMLButtonElement>(".initial-start-surface")?.click();
+    await flush();
+
+    const video = dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback");
+    expect(video?.muted).toBe(false);
+    video!.dispatchEvent(new Event("canplay"));
+    await flush();
+    expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1);
+    expect(video?.muted).toBe(false);
+  });
+
+  it("falls back from a rejected direct Ring URL to the matching transcoded event", async () => {
+    const mqttHass = ringMqttHass("https://example.test/direct-recording.mp4");
+    mqttHass.states["select.front_door_events"]!.attributes.options = [
+      "Ding 1",
+      "Ding 1 (Transcoded)",
+    ];
+    const dialog = document.createElement("ring-view-dialog");
+    dialog.hass = mqttHass;
+    document.body.append(dialog);
+    dialog.showDialog({
+      mode: "last_recording",
+      config: normalizeConfig({
+        recording_entity: "select.front_door_events",
+        live_entity: "camera.live",
+      }),
+    });
+    await flush();
+
+    dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback")
+      ?.dispatchEvent(new Event("error"));
+    await flush();
+    dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback")
+      ?.dispatchEvent(new Event("error"));
+    await flush();
+
+    expect(mqttHass.callService).toHaveBeenCalledTimes(1);
+    expect(mqttHass.callService).toHaveBeenCalledWith(
+      "select",
+      "select_option",
+      { option: "Ding 1 (Transcoded)" },
+      { entity_id: "select.front_door_events" },
+    );
+    expect(dialog.shadowRoot?.textContent).toContain(
+      "Preparing a compatible Ring-MQTT recording",
+    );
+  });
+
   it("refreshes an expired signed Ring-MQTT URL before trying playback", async () => {
     const { dialog, hass: mqttHass } = await mountRingMqtt(
       "https://example.test/expired.mp4?X-Amz-Date=20200101T000000Z&X-Amz-Expires=60",
@@ -280,7 +458,7 @@ describe("recording player lifecycle", () => {
     );
   });
 
-  it("keeps native controls when iOS rejects both autoplay attempts", async () => {
+  it("keeps native controls and the configured audio when audible autoplay is rejected", async () => {
     vi.mocked(HTMLMediaElement.prototype.play).mockRejectedValue(
       new DOMException("Gesture required", "NotAllowedError"),
     );
@@ -288,11 +466,18 @@ describe("recording player lifecycle", () => {
     video().dispatchEvent(new Event("canplay"));
     await flush();
 
-    expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(2);
+    expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1);
+    expect(video().muted).toBe(false);
     expect(video().controls).toBe(true);
     expect(video().classList.contains("pending")).toBe(false);
     expect(dialog.shadowRoot?.querySelector('[role="alert"]')).toBeNull();
     expect(dialog.shadowRoot?.textContent).not.toContain("Recording unavailable");
+
+    video().dispatchEvent(new Event("play"));
+    await dialog.updateComplete;
+    expect(dialog.shadowRoot?.textContent).toContain(
+      "Last recording loaded. Audio is available.",
+    );
   });
 
   it("never passes an unrecognized select source to the camera renderer", async () => {
@@ -505,28 +690,27 @@ describe("recording player lifecycle", () => {
     expect(dialog.shadowRoot!.querySelector('[role="alert"]')).not.toBeNull();
   });
 
-  it.each(["resolve", "reject"] as const)("ignores an old muted-playback %s after reopening the dialog", async (settlement) => {
+  it.each(["resolve", "reject"] as const)("ignores an old recording play %s after reopening the dialog", async (settlement) => {
     let resolve!: () => void;
     let reject!: (reason: Error) => void;
     const play = vi.mocked(HTMLMediaElement.prototype.play);
-    play.mockRejectedValueOnce(new DOMException("Autoplay blocked", "NotAllowedError"));
     play.mockReturnValueOnce(new Promise<void>((yes, no) => { resolve = yes; reject = no; }));
     const { dialog, video } = await mount();
     video().dispatchEvent(new Event("canplay"));
     await flush();
-    expect(play).toHaveBeenCalledTimes(2);
+    expect(play).toHaveBeenCalledTimes(1);
     dialog.close();
     await flush();
     dialog.showDialog({ mode: "last_recording", config });
     await flush();
     const replacement = video();
     if (settlement === "resolve") resolve();
-    else reject(new Error("Old muted playback stopped"));
+    else reject(new Error("Old playback stopped"));
     await flush();
     expect(video()).toBe(replacement);
     replacement.dispatchEvent(new Event("canplay"));
     await vi.advanceTimersByTimeAsync(25_000);
-    expect(play).toHaveBeenCalledTimes(3);
+    expect(play).toHaveBeenCalledTimes(2);
     expect(video()).toBe(replacement);
     expect(dialog.shadowRoot!.querySelector(".state-layer")).toBeNull();
   });

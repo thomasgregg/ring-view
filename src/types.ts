@@ -88,6 +88,7 @@ export interface RingViewConfig {
   default_mode?: CameraMode;
   remember_last_mode?: boolean;
   autoplay_recording?: boolean;
+  recording_muted?: boolean;
   live_muted?: boolean;
   two_way_audio?: boolean;
   doorbell_entity?: string;
@@ -99,6 +100,7 @@ export interface RingViewConfig {
   door_hold_to_activate?: boolean;
   dashboard_behavior?: DashboardBehavior;
   dashboard_start?: DashboardStart;
+  dashboard_recording_muted?: boolean;
   dashboard_live_muted?: boolean;
   show_name?: boolean;
   preview_source?: PreviewSource;

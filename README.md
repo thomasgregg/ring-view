@@ -54,7 +54,7 @@ remain the same whichever entities you select.
 
 | Ring View feature | Official Ring integration | Ring-MQTT | Our recommendation |
 | --- | --- | --- | --- |
-| **Last recording** | ✅ Select the **Last recording** camera. It is the simplest option, but [some cameras using 24/7 recording can remain on an old clip](https://github.com/home-assistant/core/issues/176299). | ✅ Select **Event Select**, then choose the event to play. **Ding 1** is the newest doorbell press; **Motion 1** is the newest motion event. | Use Event Select if the official camera is stale or missing. Otherwise, the official camera is simpler. |
+| **Last recording** | ✅ Select the **Last recording** camera. It is the simplest option, but [some cameras using 24/7 recording can remain on an old clip](https://github.com/home-assistant/core/issues/176299). | ✅ Select **Event Select**, then choose the event to play. **Ding 1** is the newest doorbell press; **Motion 1** is the newest motion event. Ring View automatically requests the matching **(Transcoded)** option on iPhone/iPad or if the direct Ring URL fails. | Use Event Select if the official camera is stale or missing. The compatible option works on desktop and mobile; Ring View handles that choice automatically. |
 | **Live video** | ✅ Select the **Live view** camera. It works directly and is the only source that supports Ring View talkback. A [known upstream cleanup problem](docs/backend-patch.md) can affect repeated Live sessions on some systems. | ✅ Works after a one-time Home Assistant camera setup using Ring-MQTT's Live stream. It provides video and audio from the doorbell, but not talkback. | Use the official Live view camera, especially when you want **Hold to talk**. |
 | **Two-way audio** | ✅ **Hold to talk** is supported. | ❌ Ring-MQTT's Live stream has no microphone return path. This is a source limitation, not a Ring View setting or bug. | Use the official Live view camera. |
 | **Doorbell alert inside the card** | ✅ Works through the Ring Ding event while its realtime listener is healthy. Upstream failures can leave that listener stopped ([#526](https://github.com/python-ring-doorbell/python-ring-doorbell/issues/526), [#537](https://github.com/python-ring-doorbell/python-ring-doorbell/issues/537)). | ✅ Works through the Ding binary sensor. | Prefer the Ring-MQTT Ding sensor for reliability today. |
@@ -124,13 +124,16 @@ plays. Choosing it in the card editor is only the first step:
 1. Open **Settings → Devices & services → Entities** in Home Assistant.
 2. Search for **Event Select**, then open the one belonging to your Ring camera.
 3. Choose **Ding 1** for the newest doorbell press or **Motion 1** for the newest
-   motion event. Higher numbers are older events.
+   motion event. Higher numbers are older events. You may also choose the
+   matching **(Transcoded)** option. It is safe to leave that option selected:
+   it represents the same event slot and works on both desktop and mobile.
 4. Open Ring View and select **Last recording**.
 
-If the normal recording does not play in your browser, choose the matching
-**(Transcoded)** option. Ring View refreshes the temporary playback link when
-needed, but it deliberately keeps your selected Ding, Motion, or on-demand
-event instead of changing that choice for you.
+Ring View keeps the selected Ding, Motion, or on-demand event. On iPhone/iPad it
+automatically requests that event's matching **(Transcoded)** delivery path
+before playback; on other browsers it does so only if the direct Ring URL fails.
+This needs no extra card setting. Ring-MQTT can take several seconds to prepare
+that URL, during which Ring View continues to show its normal loading message.
 
 <p align="center">
   <a href="https://github.com/thomasgregg/ring-view/blob/main/docs/images/configuration-editor.png">
@@ -157,14 +160,18 @@ In the visual editor, open **Dashboard card → Dashboard behavior**:
 For an interactive card, **No — wait for a tap** is the calmest startup choice.
 The selected Recording or Live view remains highlighted while its still image
 waits for your tap, but no player is loaded yet. You can instead start the last
-recording or muted Live automatically. The card requires at least **12 columns
-× 3 rows** in a Sections dashboard.
+recording or Live automatically. The two nearby sound switches independently
+choose whether dashboard recordings and dashboard Live start muted. This keeps
+the choice visible and predictable instead of letting the card decide from the
+device type. The card requires at least **12 columns × 3 rows** in a Sections
+dashboard.
 
 Common starting points:
 
 - **Everyday dashboard:** open the fullscreen viewer when the card is tapped.
 - **Wall tablet:** show controls in the card and wait for a tap before starting media.
-- **Entrance monitor:** show controls in the card and start Live muted.
+- **Entrance monitor:** show controls in the card, start media automatically,
+  and leave its matching dashboard sound switch enabled.
 
 [Compare every dashboard option and see complete examples](docs/configuration.md#dashboard-card-behavior)
 

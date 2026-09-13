@@ -1057,7 +1057,7 @@ describe("card stream lifecycle", () => {
     dialog?.close();
   });
 
-  it("starts the temporary recording with audio and falls back muted if blocked", async () => {
+  it("preserves fullscreen recording audio and offers native Play if autoplay is blocked", async () => {
     const card = document.createElement("ring-view");
     card.setConfig({
       recording_entity: "camera.recording",
@@ -1088,19 +1088,18 @@ describe("card stream lifecycle", () => {
     expect(TestCameraStream.active).toBe(0);
     const play = vi
       .fn<() => Promise<void>>()
-      .mockRejectedValueOnce(new DOMException("Autoplay blocked", "NotAllowedError"))
-      .mockResolvedValueOnce(undefined);
+      .mockRejectedValueOnce(new DOMException("Autoplay blocked", "NotAllowedError"));
     Object.defineProperty(video, "play", { configurable: true, value: play });
     video?.dispatchEvent(new Event("canplay"));
     await flush();
-    expect(play).toHaveBeenCalledTimes(2);
-    expect(video?.muted).toBe(true);
+    expect(play).toHaveBeenCalledTimes(1);
+    expect(video?.muted).toBe(false);
     expect(dialog?.shadowRoot?.textContent).toContain(
-      "Audio is muted because the browser blocked audible autoplay.",
+      "The browser blocked automatic playback with sound. Press Play to start the recording.",
     );
     expect(video?.controls).toBe(true);
     expect(dialog?.shadowRoot?.querySelector(".audio-button")).toBeNull();
-    expect(play).toHaveBeenCalledTimes(2);
+    expect(play).toHaveBeenCalledTimes(1);
 
     dialog?.shadowRoot?.querySelector<HTMLElement>("#ring-view-tab-live")?.click();
     await flush();

@@ -86,7 +86,10 @@ Verify each item on current stable Home Assistant and, where practical, the prev
 5. Closing, browser Back, dashboard navigation, and hiding the tab close the live session.
 6. Rapid repeated switching never leaves two active media renderers.
 7. iOS and Android Companion apps both play recording and live views.
-8. Native controls and audio behavior work with the configured mute setting.
+8. Fullscreen recordings follow **Start recordings muted** and interactive-card
+   recordings independently follow **Start dashboard recordings muted**. With
+   either option disabled, an audible-autoplay rejection keeps the recording
+   and native Play control available without silently muting it.
 9. No authenticated URL or token appears in browser logs or Lovelace storage.
 10. With two-way audio enabled, Live connects once with incoming audio and no microphone prompt.
 11. Holding **Hold to talk** requests permission when needed, sends audio only while held, and does not interrupt or replace the video session.
@@ -128,14 +131,16 @@ Verify each item on current stable Home Assistant and, where practical, the prev
     remain clear of the visitor-action dock, and disappear without leaving a
     second pill or toast behind.
 26. Set `recording_entity` to a renamed Ring-MQTT Event Select and choose a
-    playable event. Confirm Last recording uses the direct MP4 and the configured
-    snapshot camera as its poster, without mounting Home Assistant's camera
-    renderer. Test a missing and an expired `recordingUrl`: Ring View must call
-    `select.select_option` with the entity's current option, wait for a changed
-    playable URL, and cancel cleanly when switching to Live, closing, hiding the
-    page, or suspending the card. Also test Recording Not Found, Transcoding in
-    Progress, a service failure, a 15-second timeout, and a browser playback
-    error followed by one refresh attempt. No signed URL may appear in logs.
+    playable event. Confirm desktop Last recording uses the direct MP4 while
+    iPhone/iPad requests the same event's matching **(Transcoded)** option before
+    mounting playback. Both must use the configured snapshot camera as poster
+    without mounting Home Assistant's camera renderer. Test a missing and an
+    expired `recordingUrl`: Ring View must call `select.select_option`, wait for
+    a playable URL, and cancel cleanly when switching to Live, closing, hiding
+    the page, or suspending the card. Also test Recording Not Found, Transcoding
+    in Progress, a service failure, a 70-second timeout, and a desktop browser
+    playback error that falls back once to the matching compatible option. No
+    signed URL may appear in logs.
 
 ## Visual matrix
 

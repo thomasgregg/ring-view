@@ -7,6 +7,7 @@ import {
   recordingSourceMarker,
   recordingUrl,
   recordingUrlIsReady,
+  transcodedRecordingOption,
 } from "../../src/utilities/recording-source";
 
 function entity(
@@ -68,6 +69,26 @@ describe("recording sources", () => {
     expect(recordingUrlIsReady(entity("select.events", "Ding 1", {
       recordingUrl: "https://example.test/non-expiring.mp4",
     }))).toBe(true);
+  });
+
+  it("finds only the matching Ring-MQTT transcoded event option", () => {
+    const options = [
+      "Ding 1",
+      "Ding 2",
+      "Ding 1 (Transcoded)",
+      "Motion 1 (Transcoded)",
+    ];
+    expect(transcodedRecordingOption(entity("select.events", "Ding 1", {
+      options,
+    }))).toBe("Ding 1 (Transcoded)");
+    expect(transcodedRecordingOption(entity("select.events", "Ding 2", {
+      options,
+    }))).toBeUndefined();
+    expect(transcodedRecordingOption(entity(
+      "select.events",
+      "Ding 1 (Transcoded)",
+      { options },
+    ))).toBeUndefined();
   });
 
   it("recognizes a renamed Ring-MQTT Event Select by registry identity", () => {

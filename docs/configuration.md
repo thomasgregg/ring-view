@@ -34,9 +34,11 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `default_mode` | Yes — Fullscreen viewer | `last_recording` | `last_recording`, `live` | View selected when the viewer opens. |
 | `remember_last_mode` | Yes — Fullscreen viewer | `false` | `true`, `false` | Remembers the most recent view in the current browser and uses it instead of `default_mode`. |
 | `autoplay_recording` | Yes — Fullscreen viewer | `true` | `true`, `false` | Starts the latest recording immediately; when disabled, the viewer waits for Play. |
+| `recording_muted` | Yes — Fullscreen viewer | `false` | `true`, `false` | Starts fullscreen recordings muted. When disabled, a browser that refuses audible autoplay leaves the recording ready for a manual Play instead of changing this preference. |
 | `live_muted` | Yes — Fullscreen viewer | `false` | `true`, `false` | Starts Live muted. Browser autoplay rules can still require muted playback. |
 | `dashboard_behavior` | Yes — Dashboard card | `open_viewer` | `open_viewer`, `interactive` | Keeps the passive card that opens fullscreen, or exposes camera controls directly in the card. |
 | `dashboard_start` | Yes — Dashboard card, interactive only | `on_demand` | `on_demand`, `last_recording`, `live` | Waits for a tap, starts the recording, or starts Live when an interactive card becomes visible. |
+| `dashboard_recording_muted` | Yes — Dashboard card, interactive only | `true` | `true`, `false` | Starts recordings inside the dashboard muted. This is recommended for reliable autoplay on phones and wall tablets. |
 | `dashboard_live_muted` | Yes — Dashboard card, interactive only | `true` | `true`, `false` | Controls audio when Live starts inside the dashboard. Muted is recommended for tablets and autoplay. |
 | `two_way_audio` | Yes — Fullscreen viewer | `false` | `true`, `false` | Uses one direct WebRTC session for live video, listening, and push-to-talk when `live_entity` is an official Ring `live_view` camera. |
 | `doorbell_entity` | Yes — Doorbell features | Not set | `event.*` or `binary_sensor.*` entity ID | Displays a temporary ring alert when an official Ring event reports `ring`, or when a Ring-MQTT Ding sensor changes from `off` to `on`. |
@@ -82,10 +84,12 @@ last_activity_entity: sensor.front_door_last_activity
 default_mode: last_recording
 remember_last_mode: false
 autoplay_recording: true
+recording_muted: false
 live_muted: false
 
 dashboard_behavior: interactive
 dashboard_start: on_demand
+dashboard_recording_muted: true
 dashboard_live_muted: true
 
 show_snapshot_button: true
@@ -255,7 +259,11 @@ camera and never expose Talk or door actions.
 | --- | --- | --- |
 | **Dashboard behavior** | Whether the dashboard is a still image or an interactive camera. | Which media starts. |
 | **Start media automatically** | What an interactive card starts: nothing, Recording or Live. | What opens in fullscreen. |
+| **Start dashboard recordings muted** | Initial recording sound inside an interactive dashboard card. | Fullscreen recording or Live sound. |
+| **Start dashboard Live muted** | Initial Live sound inside an interactive dashboard card. | Fullscreen Live or recording sound. |
 | **Open viewer on** | Whether fullscreen initially shows Recording or Live. | The interactive dashboard startup. |
+| **Start recordings muted** | Initial recording sound in the fullscreen viewer. | Dashboard recording or Live sound. |
+| **Start live audio muted** | Initial Live sound in the fullscreen viewer. | Dashboard Live or recording sound. |
 | **Show control in** | Whether the door action appears only in Live or also over recordings. | Whether it appears on the dashboard. |
 | **Door control location** | Fullscreen only, or dashboard and fullscreen. | Whether Talk is supported. |
 
@@ -282,6 +290,7 @@ live_entity: camera.front_door_live_view
 
 dashboard_behavior: interactive
 dashboard_start: on_demand
+dashboard_recording_muted: true
 dashboard_live_muted: true
 two_way_audio: true
 
@@ -302,6 +311,7 @@ live_entity: camera.front_door_live_view
 
 dashboard_behavior: interactive
 dashboard_start: live
+dashboard_recording_muted: true
 dashboard_live_muted: true
 two_way_audio: true
 ```
@@ -404,20 +414,21 @@ For Ring-MQTT recording playback:
    1** is the newest motion event; higher numbers are older.
 4. Open Ring View and select **Last recording**.
 
-The current Event Select option, including a transcoded variant, determines
-which event Ring View plays. Ring View reads the
-published `recordingUrl` directly. If the signed URL is missing, is within 30
-seconds of expiry, or fails once in the browser, Ring View re-selects the
-current option and waits up to 15 seconds for Ring-MQTT to publish a different,
-playable URL. The wait is driven by Home Assistant state updates; it does not
-poll. Closing the viewer, changing modes, hiding the page, or suspending an
-inline card cancels the wait and cannot start a late recording.
+The current Event Select option determines which event Ring View plays. Ring
+View reads the published `recordingUrl` directly. On iPhone/iPad it requests
+the matching **(Transcoded)** option before playback while preserving the same
+Ding, Motion, or on-demand event. Other browsers keep the faster direct URL and
+fall back to the matching compatible option only if playback fails. If a signed
+URL is missing or within 30 seconds of expiry, Ring View refreshes it and waits
+up to 70 seconds for Ring-MQTT to publish a playable URL. The wait is driven by
+Home Assistant state updates; it does not poll. Closing the viewer, changing
+modes, hiding the page, or suspending an inline card cancels the wait and cannot
+start a late recording.
 
 Ring-MQTT can report **Recording Not Found** or **Transcoding in Progress**
 instead of a URL. Ring View treats both as unavailable media and shows Retry
-after the refresh wait. If the original event format is not playable in the
-browser, select that event's **(Transcoded)** option in Home Assistant and try
-again. Configure the Ring-MQTT snapshot camera as `snapshot_entity`; it supplies
+after the refresh wait. Configure the Ring-MQTT snapshot camera as
+`snapshot_entity`; it supplies
 the still image used behind the Last recording view because Event Select is not
 a camera entity.
 

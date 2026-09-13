@@ -100,6 +100,12 @@ const mqttRecording: HassEntity = {
   state: "Ding 1",
   attributes: {
     friendly_name: "Front Door Event Select",
+    options: [
+      "Ding 1",
+      "Ding 1 (Transcoded)",
+      "Motion 1",
+      "Motion 1 (Transcoded)",
+    ],
     eventId: "demo-event-1",
     recordingUrl: query.get("mqtt_recording") === "missing"
       ? "<Recording Not Found>"
@@ -268,7 +274,9 @@ let hass: HomeAssistant = {
       && service === "select_option"
       && target?.entity_id === mqttRecording.entity_id
     ) {
-      queueMicrotask(() => window.demoRefreshRecording());
+      queueMicrotask(() => window.demoRefreshRecording(
+        typeof serviceData.option === "string" ? serviceData.option : undefined,
+      ));
     }
   },
   connection: {
@@ -347,6 +355,7 @@ card.setConfig({
   default_mode: query.get("mode") === "live" ? "live" : "last_recording",
   remember_last_mode: query.get("remember") === "1",
   autoplay_recording: query.get("autoplay") !== "0",
+  recording_muted: query.get("recording_muted") === "1",
   show_name: query.get("name") === "1",
   preview_source: previewSource,
   preview_fallback: query.get("fallback") === "snapshot" ? "snapshot" : "last_recording",
@@ -367,6 +376,7 @@ card.setConfig({
       : query.get("dashboard_start") === "live"
         ? "live"
         : "on_demand",
+  dashboard_recording_muted: query.get("dashboard_recording_muted") !== "0",
   dashboard_live_muted: query.get("dashboard_muted") !== "0",
   door_control_location:
     query.get("dashboard_door") === "1"
@@ -413,7 +423,7 @@ window.demoRefreshSnapshot = () => {
   dialogManager.updateHass(hass);
 };
 
-window.demoRefreshRecording = () => {
+window.demoRefreshRecording = (option?: string) => {
   const current = hass.states[mqttRecording.entity_id];
   if (!current) return;
   hass = {
@@ -422,6 +432,7 @@ window.demoRefreshRecording = () => {
       ...hass.states,
       [mqttRecording.entity_id]: {
         ...current,
+        state: option ?? current.state,
         attributes: {
           ...current.attributes,
           recordingUrl: `/demo/pending-recording.mp4?event=${Date.now()}`,
@@ -446,6 +457,6 @@ declare global {
     }>;
     demoSetEntityState: (entityId: string, state: string) => void;
     demoRefreshSnapshot: () => void;
-    demoRefreshRecording: () => void;
+    demoRefreshRecording: (option?: string) => void;
   }
 }

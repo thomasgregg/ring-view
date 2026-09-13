@@ -84,6 +84,21 @@ export function recordingSourceMarker(entity?: HassEntity): string | undefined {
   return undefined;
 }
 
+export function transcodedRecordingOption(entity?: HassEntity): string | undefined {
+  const selected = entity?.state.trim();
+  const options = entity?.attributes.options;
+  if (!selected || /\s\(transcoded\)$/i.test(selected) || !Array.isArray(options)) {
+    return undefined;
+  }
+
+  const candidate = `${selected} (Transcoded)`.toLowerCase();
+  const match = options.find(
+    (option): option is string =>
+      typeof option === "string" && option.toLowerCase() === candidate,
+  );
+  return match;
+}
+
 export function isRingMqttEventSelect(
   hass: HomeAssistant,
   entityId: string,

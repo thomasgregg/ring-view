@@ -147,6 +147,68 @@ test("progressively reveals related dashboard preview settings", async ({ page }
   });
 });
 
+test("places recording sound choices beside the playback behavior they control", async ({ page }) => {
+  await expect(page.locator("ring-view")).toBeAttached();
+  const editorFlow = await page.evaluate(async () => {
+    type FormSchema = { name: string; schema?: FormSchema[] };
+    type Editor = HTMLElement & {
+      hass: HomeAssistant;
+      setConfig: (config: Record<string, unknown>) => void;
+      updateComplete: Promise<unknown>;
+    };
+    const demoCard = document.querySelector("ring-view") as HTMLElement & {
+      hass: HomeAssistant;
+    };
+    const cardClass = customElements.get("ring-view") as CustomElementConstructor & {
+      getConfigElement: () => Promise<Editor>;
+    };
+    const editor = await cardClass.getConfigElement();
+    editor.hass = demoCard.hass;
+    editor.setConfig({
+      recording_entity: "camera.latest_recording",
+      live_entity: "camera.live_view",
+      dashboard_behavior: "interactive",
+    });
+    document.body.replaceChildren(editor);
+    await editor.updateComplete;
+    const form = editor.shadowRoot?.querySelector("ha-form") as HTMLElement & {
+      schema: FormSchema[];
+      computeLabel: (schema: FormSchema) => string;
+    };
+    const dashboard = form.schema.find((field) => field.name === "dashboard_preview")!;
+    const viewer = form.schema.find((field) => field.name === "viewer_behavior")!;
+    const recording = viewer.schema?.find((field) => field.name === "recording_muted")!;
+    const dashboardRecording = dashboard.schema?.find(
+      (field) => field.name === "dashboard_recording_muted",
+    )!;
+    return {
+      dashboard: dashboard.schema?.map((field) => field.name),
+      viewer: viewer.schema?.map((field) => field.name),
+      recordingLabel: form.computeLabel(recording),
+      dashboardRecordingLabel: form.computeLabel(dashboardRecording),
+    };
+  });
+
+  expect(editorFlow).toEqual({
+    dashboard: [
+      "dashboard_behavior",
+      "dashboard_start",
+      "dashboard_recording_muted",
+      "dashboard_live_muted",
+    ],
+    viewer: [
+      "default_mode",
+      "remember_last_mode",
+      "autoplay_recording",
+      "recording_muted",
+      "live_muted",
+      "two_way_audio",
+    ],
+    recordingLabel: "Start recordings muted",
+    dashboardRecordingLabel: "Start dashboard recordings muted",
+  });
+});
+
 test("places the optional last activity source beside the name appearance controls", async ({
   page,
 }) => {
@@ -601,6 +663,65 @@ test("refreshes a Ring-MQTT Event Select before mounting its recording", async (
       (call) => call.domain === "select" && call.service === "select_option",
     ).length,
   )).toBe(1);
+});
+
+test("uses Ring-MQTT's compatible event delivery path on Apple mobile without changing audio", async ({
+  page,
+}, testInfo) => {
+  await page.route("**/pending-recording.mp4?event=*", async () => undefined);
+  await page.goto("/demo/?recording_source=mqtt");
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+
+  const recording = page.locator("video.video-fallback");
+  await expect(recording).toBeAttached();
+  const calls = await page.evaluate(() =>
+    (window.demoDoorCalls ?? []).filter(
+      (call) => call.domain === "select" && call.service === "select_option",
+    )
+  );
+  const phone = testInfo.project.name === "phone";
+  expect(calls).toHaveLength(phone ? 1 : 0);
+  if (phone) {
+    expect(calls[0]?.serviceData.option).toBe("Ding 1 (Transcoded)");
+  }
+  await expect.poll(() => recording.evaluate(
+    (element) => (element as HTMLVideoElement).muted,
+  )).toBe(false);
+});
+
+test("keeps fullscreen and dashboard recording mute preferences independent", async ({ page }) => {
+  await page.route("**/pending-recording.mp4", async () => undefined);
+  await page.goto("/demo/?recording_video=pending&recording_muted=1");
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+  const fullscreenRecording = page.locator("video.video-fallback");
+  await expect(fullscreenRecording).toBeAttached();
+  expect(await fullscreenRecording.evaluate((element) => {
+    const video = element as HTMLVideoElement;
+    return {
+      muted: video.muted,
+      defaultMuted: video.defaultMuted,
+      mutedAttribute: video.hasAttribute("muted"),
+    };
+  })).toEqual({
+    muted: true,
+    defaultMuted: true,
+    mutedAttribute: true,
+  });
+
+  await page.goto(
+    "/demo/?recording_video=pending&dashboard=interactive&dashboard_start=recording"
+      + "&dashboard_recording_muted=0",
+  );
+  await expect.poll(() => page.locator("ring-view-dialog[inline] video.video-fallback").evaluate(
+    (element) => (element as HTMLVideoElement).muted,
+  )).toBe(false);
+
+  await page.goto(
+    "/demo/?recording_video=pending&dashboard=interactive&dashboard_start=recording",
+  );
+  await expect.poll(() => page.locator("ring-view-dialog[inline] video.video-fallback").evaluate(
+    (element) => (element as HTMLVideoElement).muted,
+  )).toBe(true);
 });
 
 test("keeps card and viewer geometry identical across provider profiles", async ({ page }) => {

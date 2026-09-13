@@ -14,6 +14,7 @@ const DEFAULTS = {
   default_mode: "last_recording",
   remember_last_mode: false,
   autoplay_recording: true,
+  recording_muted: false,
   live_muted: false,
   two_way_audio: false,
   door_action: "unlock",
@@ -22,6 +23,7 @@ const DEFAULTS = {
   door_hold_to_activate: true,
   dashboard_behavior: "open_viewer",
   dashboard_start: "on_demand",
+  dashboard_recording_muted: true,
   dashboard_live_muted: true,
   show_name: false,
   preview_source: "last_recording",
@@ -184,6 +186,7 @@ export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
       config.remember_last_mode ?? DEFAULTS.remember_last_mode,
     autoplay_recording:
       config.autoplay_recording ?? DEFAULTS.autoplay_recording,
+    recording_muted: config.recording_muted ?? DEFAULTS.recording_muted,
     live_muted: config.live_muted ?? DEFAULTS.live_muted,
     two_way_audio: config.two_way_audio ?? DEFAULTS.two_way_audio,
     doorbell_entity: config.doorbell_entity || undefined,
@@ -199,6 +202,8 @@ export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
     dashboard_behavior:
       config.dashboard_behavior ?? DEFAULTS.dashboard_behavior,
     dashboard_start: config.dashboard_start ?? DEFAULTS.dashboard_start,
+    dashboard_recording_muted:
+      config.dashboard_recording_muted ?? DEFAULTS.dashboard_recording_muted,
     dashboard_live_muted:
       config.dashboard_live_muted ?? DEFAULTS.dashboard_live_muted,
     show_name: config.show_name ?? DEFAULTS.show_name,

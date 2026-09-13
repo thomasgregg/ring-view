@@ -75,6 +75,7 @@ import {
   recordingSourceMarker,
   recordingUrl,
   recordingUrlIsReady,
+  transcodedRecordingOption,
 } from "./utilities/recording-source";
 import {
   createRingViewUrl,
@@ -117,6 +118,12 @@ const SNAPSHOT_REFRESH_TIMEOUT_MS = 15_000;
 // newly selected/transcoding event one complete refresh cycle before failing.
 const RECORDING_REFRESH_TIMEOUT_MS = 70_000;
 const RECORDING_UNCHANGED_SETTLE_MS = 1_250;
+
+function isAppleMobileBrowser(): boolean {
+  if (typeof navigator === "undefined") return false;
+  if (/iPad|iPhone|iPod/i.test(navigator.userAgent)) return true;
+  return navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+}
 
 type SnapshotUpdateResult = "updated" | "timeout" | "cancelled";
 type RecordingUpdateResult =
@@ -217,6 +224,7 @@ export class RingViewDialog extends LitElement {
     resolve: (result: SnapshotUpdateResult) => void;
   };
   private recordingRefreshAttempted = false;
+  private recordingTranscodeFallbackAttempted = false;
   private recordingRefreshToken = 0;
   private pendingRecordingUpdate?: {
     entityId: string;
@@ -1354,18 +1362,19 @@ export class RingViewDialog extends LitElement {
               `${entityId}:${this.session}:recording-video`,
               html`
               <video
+                .defaultMuted=${this.recordingMuted}
+                .muted=${this.recordingMuted}
+                .src=${fallbackUrl}
                 class=${classMap({
                   "video-fallback": true,
                   pending: this.mediaStatus === "pending",
                   "controls-hidden": !this.recordingControlsVisible,
                 })}
-                src=${fallbackUrl}
                 poster=${poster}
                 playsinline
                 autoplay
                 preload="auto"
                 .controls=${this.recordingControlsVisible}
-                .muted=${this.recordingMuted}
                 tabindex="0"
                 aria-label=${this.recordingControlsVisible
                   ? nothing
@@ -1373,6 +1382,7 @@ export class RingViewDialog extends LitElement {
                 @canplay=${this.handleRecordingCanPlay}
                 @error=${this.handleRecordingVideoError}
                 @play=${this.handleRecordingPlay}
+                @volumechange=${this.handleRecordingVolumeChange}
                 @pause=${this.handleRecordingPause}
                 @ended=${this.handleRecordingEnded}
                 @click=${this.handleRecordingSurfaceClick}
@@ -1647,10 +1657,29 @@ export class RingViewDialog extends LitElement {
       this.statusAnnouncement = localize(this.hass, "viewer.entity_unavailable");
       return;
     }
+    const ringMqttRecording = this.mode === "last_recording"
+      && this.hass
+      && isRingMqttEventSelect(this.hass, this.activeEntityId());
+    const mobileCompatibleOption = ringMqttRecording
+      && isAppleMobileBrowser()
+      ? transcodedRecordingOption(this.activeEntity())
+      : undefined;
+    if (
+      mobileCompatibleOption !== undefined
+      && !this.recordingTranscodeFallbackAttempted
+    ) {
+      // Ring's direct download URL can fail in iPhone/iPad WebKit even when
+      // the media itself is compatible. Ring-MQTT's matching transcoded option
+      // serves the same event through its more broadly compatible delivery
+      // path, so select it before mounting the direct URL on Apple mobile.
+      this.recordingTranscodeFallbackAttempted = true;
+      this.recordingRefreshAttempted = true;
+      void this.refreshRingMqttRecording(mobileCompatibleOption);
+      return;
+    }
     if (
       this.mode === "last_recording"
-      && this.hass
-      && isRingMqttEventSelect(this.hass, this.activeEntityId())
+      && ringMqttRecording
       && (
         !recordingUrlIsReady(this.activeEntity())
         || this.recordingVideoFailed
@@ -1692,7 +1721,14 @@ export class RingViewDialog extends LitElement {
     this.cancelTalkPress();
     this.resetRecordingControls();
     this.retryCount = 0;
-    this.recordingMuted = false;
+    // Audio policy is explicit and context-specific. A browser may still
+    // require a user gesture for audible autoplay, but Ring View must not
+    // silently replace the configured preference with its own mute decision.
+    this.recordingMuted = this.mode === "last_recording"
+      && Boolean(this.config)
+      && (this.inline
+        ? this.config!.dashboard_recording_muted
+        : this.config!.recording_muted);
     this.liveHasAudio = undefined;
     this.recordingVideoFailed = false;
     this.recordingPlaybackRetriedSource = undefined;
@@ -1701,11 +1737,11 @@ export class RingViewDialog extends LitElement {
     this.talkbackTalking = false;
   }
 
-  private async refreshRingMqttRecording(): Promise<void> {
+  private async refreshRingMqttRecording(requestedOption?: string): Promise<void> {
     const hass = this.hass;
     const entityId = this.activeEntityId();
     const entity = this.activeEntity();
-    const option = entity?.state.trim();
+    const option = requestedOption ?? entity?.state.trim();
     if (
       !hass
       || !this.config
@@ -1732,7 +1768,12 @@ export class RingViewDialog extends LitElement {
     this.lifecycle.dispose();
     this.session = this.lifecycle.current();
     this.mediaStatus = "pending";
-    this.statusAnnouncement = localize(this.hass, "viewer.refreshing_recording");
+    this.statusAnnouncement = localize(
+      this.hass,
+      requestedOption && requestedOption !== entity?.state.trim()
+        ? "viewer.preparing_compatible_recording"
+        : "viewer.refreshing_recording",
+    );
     const update = this.waitForRecordingUpdate(
       entityId,
       baseline,
@@ -1833,6 +1874,7 @@ export class RingViewDialog extends LitElement {
     this.recordingPreparationActive = false;
     if (!resetAttempt) return;
     this.recordingRefreshAttempted = false;
+    this.recordingTranscodeFallbackAttempted = false;
     this.recordingVideoFailed = false;
     this.recordingFailureDetail = undefined;
   }
@@ -1917,6 +1959,19 @@ export class RingViewDialog extends LitElement {
         this.startMedia();
         return;
       }
+      const compatibleOption = transcodedRecordingOption(this.activeEntity());
+      if (
+        compatibleOption !== undefined
+        && !this.recordingTranscodeFallbackAttempted
+      ) {
+        // If another browser rejects Ring's direct delivery path, request the
+        // matching Ring-MQTT transcoded event before surfacing an error.
+        this.recordingTranscodeFallbackAttempted = true;
+        this.recordingRefreshAttempted = true;
+        this.recordingVideoFailed = true;
+        void this.refreshRingMqttRecording(compatibleOption);
+        return;
+      }
       this.recordingVideoFailed = true;
       this.statusAnnouncement = localize(this.hass, "viewer.refreshing_recording");
       this.startMedia();
@@ -1958,6 +2013,20 @@ export class RingViewDialog extends LitElement {
     this.recordingPaused = false;
     this.recordingControlsVisible = true;
     video.controls = true;
+    this.statusAnnouncement = localize(
+      this.hass,
+      this.recordingMuted
+        ? "viewer.recording_loaded_muted"
+        : "viewer.recording_loaded_audio",
+    );
+  };
+
+  private handleRecordingVolumeChange = (event: Event): void => {
+    const video = event.currentTarget;
+    if (!(video instanceof HTMLVideoElement) || !this.isCurrentRecording(video, this.session)) {
+      return;
+    }
+    this.recordingMuted = video.muted;
   };
 
   private handleRecordingPause = (event: Event): void => {
@@ -2073,34 +2142,22 @@ export class RingViewDialog extends LitElement {
       await video.play();
     } catch {
       if (!this.isCurrentRecording(video, session)) return;
-      if (this.recordingMuted) {
-        this.handleRecordingVideoError();
-        return;
-      }
-      // Keep the same recording and retry audible-autoplay rejection muted.
-      // Native controls can enable sound afterward.
-      this.recordingMuted = true;
-      video.muted = true;
-      this.statusAnnouncement = localize(this.hass, "viewer.recording_audio_blocked");
-      try {
-        await video.play();
-      } catch {
-        if (this.isCurrentRecording(video, session)) {
-          // canplay proves that the URL loaded. A second play() rejection is a
-          // browser policy decision, not a broken Ring recording. Keep native
-          // controls visible so the user can start it with a tap.
-          this.lifecycle.clearTimeout();
-          this.recordingPaused = true;
-          this.recordingControlsVisible = true;
-          video.controls = true;
-          this.mediaStatus = "ready";
-          this.statusAnnouncement = localize(
-            this.hass,
-            "viewer.recording_manual_playback",
-          );
-        }
-        return;
-      }
+      // canplay proves that the URL loaded. A play() rejection here is a
+      // browser policy decision, not a broken Ring recording. Preserve the
+      // configured mute preference and let the native Play control provide
+      // the required user gesture.
+      this.lifecycle.clearTimeout();
+      this.recordingPaused = true;
+      this.recordingControlsVisible = true;
+      video.controls = true;
+      this.mediaStatus = "ready";
+      this.statusAnnouncement = localize(
+        this.hass,
+        this.recordingMuted
+          ? "viewer.recording_manual_playback"
+          : "viewer.recording_audio_blocked",
+      );
+      return;
     }
     // A resolved/rejected promise from a removed player must never update a
     // reopened dialog or cancel the timeout belonging to a newer Live session.

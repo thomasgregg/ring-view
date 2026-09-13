@@ -163,10 +163,12 @@ describe("visual editor", () => {
       default_mode: "last_recording",
       remember_last_mode: false,
       autoplay_recording: true,
+      recording_muted: false,
       live_muted: false,
       two_way_audio: false,
       dashboard_behavior: "open_viewer",
       dashboard_start: "on_demand",
+      dashboard_recording_muted: true,
       dashboard_live_muted: true,
       preview_source: "last_recording",
       preview_fallback: "last_recording",
@@ -436,6 +438,9 @@ describe("visual editor", () => {
     expect(form?.computeHelper?.({ name: "live_muted" })).toContain(
       "mit Ton zu starten",
     );
+    expect(form?.computeHelper?.({ name: "recording_muted" })).toContain(
+      "Aufnahmen mit Ton zu starten",
+    );
     expect(form?.computeHelper?.({ name: "last_activity_entity" })).toContain(
       "bei sichtbarem Kameranamen darunter",
     );
@@ -450,6 +455,7 @@ describe("visual editor", () => {
       "default_mode",
       "remember_last_mode",
       "autoplay_recording",
+      "recording_muted",
       "live_muted",
       "two_way_audio",
     ]);
@@ -559,6 +565,7 @@ describe("visual editor", () => {
     ).toEqual([
       "dashboard_behavior",
       "dashboard_start",
+      "dashboard_recording_muted",
       "dashboard_live_muted",
     ]);
     expect(
