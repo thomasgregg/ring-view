@@ -439,7 +439,7 @@ describe("visual editor", () => {
       "mit Ton zu starten",
     );
     expect(form?.computeHelper?.({ name: "recording_muted" })).toContain(
-      "Aufnahmen mit Ton zu starten",
+      "um mit Ton zu starten",
     );
     expect(form?.computeHelper?.({ name: "last_activity_entity" })).toContain(
       "bei sichtbarem Kameranamen darunter",

@@ -248,9 +248,9 @@ let W = class extends HTMLElement {
   }
 };
 W.elementStyles = [], W.shadowRootOptions = { mode: "open" }, W[Y("elementProperties")] = /* @__PURE__ */ new Map(), W[Y("finalized")] = /* @__PURE__ */ new Map(), ui?.({ ReactiveElement: W }), (me.reactiveElementVersions ??= []).push("2.1.2");
-const Ue = globalThis, tt = (e) => e, ue = Ue.trustedTypes, it = ue ? ue.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, Ct = "$lit$", L = `lit$${Math.random().toFixed(9).slice(2)}$`, Et = "?" + L, pi = `<${Et}>`, z = document, J = () => z.createComment(""), X = (e) => e === null || typeof e != "object" && typeof e != "function", He = Array.isArray, vi = (e) => He(e) || typeof e?.[Symbol.iterator] == "function", ke = `[ 	
+const Ue = globalThis, tt = (e) => e, ue = Ue.trustedTypes, it = ue ? ue.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, Ct = "$lit$", L = `lit$${Math.random().toFixed(9).slice(2)}$`, Et = "?" + L, pi = `<${Et}>`, O = document, J = () => O.createComment(""), X = (e) => e === null || typeof e != "object" && typeof e != "function", He = Array.isArray, vi = (e) => He(e) || typeof e?.[Symbol.iterator] == "function", ke = `[ 	
 \f\r]`, G = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, nt = /-->/g, rt = />/g, U = RegExp(`>|${ke}(?:([^\\s"'>=/]+)(${ke}*=${ke}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), ot = /'/g, st = /"/g, Pt = /^(?:script|style|textarea|title)$/i, gi = (e) => (t, ...i) => ({ _$litType$: e, strings: t, values: i }), h = gi(1), D = /* @__PURE__ */ Symbol.for("lit-noChange"), l = /* @__PURE__ */ Symbol.for("lit-nothing"), at = /* @__PURE__ */ new WeakMap(), H = z.createTreeWalker(z, 129);
+\f\r"'\`<>=]|("|')|))|$)`, "g"), ot = /'/g, st = /"/g, Pt = /^(?:script|style|textarea|title)$/i, gi = (e) => (t, ...i) => ({ _$litType$: e, strings: t, values: i }), h = gi(1), D = /* @__PURE__ */ Symbol.for("lit-noChange"), l = /* @__PURE__ */ Symbol.for("lit-nothing"), at = /* @__PURE__ */ new WeakMap(), H = O.createTreeWalker(O, 129);
 function Mt(e, t) {
   if (!He(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
   return it !== void 0 ? it.createHTML(t) : t;
@@ -280,8 +280,8 @@ class ee {
     for (; (r = H.nextNode()) !== null && c.length < d; ) {
       if (r.nodeType === 1) {
         if (r.hasAttributes()) for (const v of r.getAttributeNames()) if (v.endsWith(Ct)) {
-          const b = p[a++], A = r.getAttribute(v).split(L), N = /([.?@])?(.*)/.exec(b);
-          c.push({ type: 1, index: o, name: N[2], strings: A, ctor: N[1] === "." ? _i : N[1] === "?" ? bi : N[1] === "@" ? wi : _e }), r.removeAttribute(v);
+          const b = p[a++], A = r.getAttribute(v).split(L), q = /([.?@])?(.*)/.exec(b);
+          c.push({ type: 1, index: o, name: q[2], strings: A, ctor: q[1] === "." ? _i : q[1] === "?" ? bi : q[1] === "@" ? wi : _e }), r.removeAttribute(v);
         } else v.startsWith(L) && (c.push({ type: 6, index: o }), r.removeAttribute(v));
         if (Pt.test(r.tagName)) {
           const v = r.textContent.split(L), b = v.length - 1;
@@ -300,7 +300,7 @@ class ee {
     }
   }
   static createElement(t, i) {
-    const n = z.createElement("template");
+    const n = O.createElement("template");
     return n.innerHTML = t, n;
   }
 }
@@ -321,7 +321,7 @@ class mi {
     return this._$AM._$AU;
   }
   u(t) {
-    const { el: { content: i }, parts: n } = this._$AD, r = (t?.creationScope ?? z).importNode(i, !0);
+    const { el: { content: i }, parts: n } = this._$AD, r = (t?.creationScope ?? O).importNode(i, !0);
     H.currentNode = r;
     let o = H.nextNode(), a = 0, d = 0, c = n[0];
     for (; c !== void 0; ) {
@@ -331,7 +331,7 @@ class mi {
       }
       a !== c?.index && (o = H.nextNode(), a++);
     }
-    return H.currentNode = z, r;
+    return H.currentNode = O, r;
   }
   p(t) {
     let i = 0;
@@ -366,7 +366,7 @@ class ne {
     this._$AH !== t && (this._$AR(), this._$AH = this.O(t));
   }
   _(t) {
-    this._$AH !== l && X(this._$AH) ? this._$AA.nextSibling.data = t : this.T(z.createTextNode(t)), this._$AH = t;
+    this._$AH !== l && X(this._$AH) ? this._$AA.nextSibling.data = t : this.T(O.createTextNode(t)), this._$AH = t;
   }
   $(t) {
     const { values: i, _$litType$: n } = t, r = typeof n == "number" ? this._$AC(t) : (n.el === void 0 && (n.el = ee.createElement(Mt(n.h, n.h[0]), this.options)), n);
@@ -473,7 +473,7 @@ const Ai = (e, t, i) => {
   }
   return r._$AI(e), r;
 };
-const Oe = globalThis;
+const ze = globalThis;
 let x = class extends W {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
@@ -496,11 +496,11 @@ let x = class extends W {
     return D;
   }
 };
-x._$litElement$ = !0, x.finalized = !0, Oe.litElementHydrateSupport?.({ LitElement: x });
-const Si = Oe.litElementPolyfillSupport;
+x._$litElement$ = !0, x.finalized = !0, ze.litElementHydrateSupport?.({ LitElement: x });
+const Si = ze.litElementPolyfillSupport;
 Si?.({ LitElement: x });
-(Oe.litElementVersions ??= []).push("4.2.2");
-const Lt = { ATTRIBUTE: 1 }, ze = (e) => (...t) => ({ _$litDirective$: e, values: t });
+(ze.litElementVersions ??= []).push("4.2.2");
+const Lt = { ATTRIBUTE: 1 }, Oe = (e) => (...t) => ({ _$litDirective$: e, values: t });
 let Fe = class {
   constructor(t) {
   }
@@ -517,7 +517,7 @@ let Fe = class {
     return this.render(...i);
   }
 };
-const Dt = "important", Ti = " !" + Dt, Se = ze(class extends Fe {
+const Dt = "important", Ti = " !" + Dt, Se = Oe(class extends Fe {
   constructor(e) {
     if (super(e), e.type !== Lt.ATTRIBUTE || e.name !== "style" || e.strings?.length > 2) throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
   }
@@ -629,14 +629,14 @@ const xi = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "editor.dashboard_behavior_interactive": "Kamera in der Karte steuern",
   "editor.dashboard_start": "Medien automatisch starten",
   "editor.dashboard_start_on_demand": "Nein — auf Tippen warten",
-  "editor.dashboard_recording_muted": "Dashboard-Aufnahmen stumm starten",
-  "editor.dashboard_live_muted": "Dashboard-Liveansicht stumm starten",
+  "editor.dashboard_recording_muted": "Aufnahmen stumm starten",
+  "editor.dashboard_live_muted": "Live stumm starten",
   "editor.viewer_behavior": "Vollbildansicht",
   "editor.default_mode": "Ansicht öffnen mit",
   "editor.remember_last_mode": "Zuletzt gewählte Ansicht merken",
   "editor.autoplay_recording": "Aufnahme automatisch abspielen",
   "editor.recording_muted": "Aufnahmen stumm starten",
-  "editor.live_muted": "Live-Audio stumm starten",
+  "editor.live_muted": "Live stumm starten",
   "editor.doorbell_features": "Türklingelfunktionen",
   "editor.two_way_audio": "Zwei-Wege-Audio aktivieren",
   "editor.doorbell_entity": "Türklingel-Entität",
@@ -665,13 +665,13 @@ const xi = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "editor.helper_recording_entity": "Wähle die offizielle Ring-Kamera „Letzte Aufnahme“ oder Ring-MQTT „Event Select“. Bei Ring-MQTT bestimmt die ausgewählte Ereignisoption, welche Aufnahme gezeigt wird.",
   "editor.helper_live_entity": "Wähle die offizielle Ring-Kamera „Live-Ansicht“ oder eine Home-Assistant-Kamera, die mit dem Live-RTSP-Pfad von Ring-MQTT eingerichtet wurde.",
   "editor.helper_dashboard_start": "Bei Bedarf wird die ausgewählte Ansicht als Standbild angezeigt. Medien starten erst nach Tippen auf das Bild oder eine Ansichtssteuerung.",
-  "editor.helper_dashboard_recording_muted": "Empfohlen für automatische Wiedergabe auf Smartphones und Wand-Tablets. Ton kann über die Videosteuerung aktiviert werden.",
-  "editor.helper_dashboard_live_muted": "Empfohlen für Wand-Tablets und automatische Starts. Ton kann im Player aktiviert werden.",
+  "editor.helper_dashboard_recording_muted": "Empfohlen für automatische Starts auf Smartphones und Wand-Tablets. Aktiviere den Ton bei Bedarf über die Mediensteuerung.",
+  "editor.helper_dashboard_live_muted": "Empfohlen für automatische Starts auf Smartphones und Wand-Tablets. Aktiviere den Ton bei Bedarf über die Mediensteuerung.",
   "editor.helper_default_mode": "Beim direkten Öffnen der Live-Ansicht wird eine Ring-Live-Sitzung gestartet.",
   "editor.helper_remember_last_mode": "Verwendet die zuletzt gewählte Ansicht anstelle der Startansicht.",
   "editor.helper_autoplay_recording": "Deaktivieren, um vor dem Laden der Aufnahme eine Wiedergabetaste anzuzeigen.",
-  "editor.helper_recording_muted": "Deaktiviert lassen, um Aufnahmen mit Ton zu starten. Falls der Browser die automatische Wiedergabe mit Ton blockiert, drücke Wiedergabe.",
-  "editor.helper_live_muted": "Deaktiviert lassen, um – sofern vom Browser erlaubt – mit Ton zu starten.",
+  "editor.helper_recording_muted": "Deaktiviert lassen, um mit Ton zu starten. Die Autoplay-Regeln des Browsers können trotzdem ein Tippen erfordern.",
+  "editor.helper_live_muted": "Deaktiviert lassen, um mit Ton zu starten. Die Autoplay-Regeln des Browsers können trotzdem ein Tippen erfordern.",
   "editor.helper_two_way_audio": "Erfordert die offizielle Ring-Live-Ansicht-Kamera und verwendet eine WebRTC-Sitzung für Video, Zuhören und Push-to-Talk.",
   "editor.helper_doorbell_entity": "Wähle ein offizielles Ring-Türklingelereignis oder einen binären Ring-MQTT-Klingelsensor. Zeigt einen Klingelhinweis, ohne den Kamerastream zu starten oder zu ersetzen.",
   "editor.helper_door_entity": "Wähle ein Home-Assistant-Schloss für eine Türaktion. Leer lassen, um den Türzugang zu deaktivieren.",
@@ -847,14 +847,14 @@ const xi = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "editor.dashboard_behavior_interactive": "Control camera in card",
   "editor.dashboard_start": "Start media automatically",
   "editor.dashboard_start_on_demand": "No — wait for a tap",
-  "editor.dashboard_recording_muted": "Start dashboard recordings muted",
-  "editor.dashboard_live_muted": "Start dashboard Live muted",
+  "editor.dashboard_recording_muted": "Start recordings muted",
+  "editor.dashboard_live_muted": "Start Live muted",
   "editor.viewer_behavior": "Fullscreen viewer",
   "editor.default_mode": "Open viewer on",
   "editor.remember_last_mode": "Remember last selected view",
   "editor.autoplay_recording": "Play recording automatically",
   "editor.recording_muted": "Start recordings muted",
-  "editor.live_muted": "Start live audio muted",
+  "editor.live_muted": "Start Live muted",
   "editor.doorbell_features": "Doorbell features",
   "editor.two_way_audio": "Enable two-way audio",
   "editor.doorbell_entity": "Doorbell entity",
@@ -883,13 +883,13 @@ const xi = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "editor.helper_recording_entity": "Choose the official Ring Last recording camera or Ring-MQTT Event Select. For Ring-MQTT, the selected event option determines which recording is shown.",
   "editor.helper_live_entity": "Choose the official Ring Live view camera or a Home Assistant camera configured from Ring-MQTT’s live RTSP path.",
   "editor.helper_dashboard_start": "On demand shows the selected view as a still image and starts media only after you tap the image or a view control.",
-  "editor.helper_dashboard_recording_muted": "Recommended for automatic playback on phones and wall tablets. You can enable sound from the video controls.",
-  "editor.helper_dashboard_live_muted": "Recommended for wall tablets and automatic starts. You can enable sound from the player.",
+  "editor.helper_dashboard_recording_muted": "Recommended for automatic starts on phones and wall tablets. Turn sound on in the media controls when needed.",
+  "editor.helper_dashboard_live_muted": "Recommended for automatic starts on phones and wall tablets. Turn sound on in the media controls when needed.",
   "editor.helper_default_mode": "Opening directly on Live starts a Ring live session.",
   "editor.helper_remember_last_mode": "Uses the most recent choice instead of the opening view.",
   "editor.helper_autoplay_recording": "Turn off to show a Play button before loading the recording.",
-  "editor.helper_recording_muted": "Leave off to start recordings with sound. If the browser blocks audible autoplay, press Play.",
-  "editor.helper_live_muted": "Leave off to start with sound when the browser allows it.",
+  "editor.helper_recording_muted": "Leave off to start with sound. Browser autoplay rules may still require a tap.",
+  "editor.helper_live_muted": "Leave off to start with sound. Browser autoplay rules may still require a tap.",
   "editor.helper_two_way_audio": "Requires the official Ring Live view camera and uses one WebRTC session for video, listening, and push-to-talk.",
   "editor.helper_doorbell_entity": "Choose an official Ring doorbell event or a Ring-MQTT binary Ding sensor. Shows an incoming-ring alert without starting or replacing the camera stream.",
   "editor.helper_door_entity": "Choose a Home Assistant lock to add a door action. Leave empty to disable door access.",
@@ -1130,23 +1130,23 @@ function ct(e) {
       )
     );
 }
-function O(e, t) {
+function z(e, t) {
   const i = e.states[t], n = i && !Ht.has(i.state), r = n ? [Hi(i)] : [];
   if (!t.startsWith("binary_sensor.") || (n && r.push(ct(i)), F(e, "activity", t).provider !== "mqtt")) return de(r);
   for (const a of Ut(e, t))
     a === t || !a.startsWith("binary_sensor.") || F(e, "activity", a).provider !== "mqtt" || r.push(ct(e.states[a]));
   return de(r);
 }
-function Oi(e) {
+function zi(e) {
   const t = Math.abs(e);
   return t < 60 ? { unit: "second", seconds: 1 } : t < 3600 ? { unit: "minute", seconds: 60 } : t < 86400 ? { unit: "hour", seconds: 3600 } : t < 2629746 ? { unit: "day", seconds: 86400 } : t < 31556952 ? { unit: "month", seconds: 2629746 } : { unit: "year", seconds: 31556952 };
 }
-function zi(e, t) {
+function Oi(e, t) {
   const i = Math.trunc(e / t);
   return Object.is(i, -0) ? 0 : i;
 }
-function Ot(e, t, i = Date.now()) {
-  const n = It(e), r = (t - i) / 1e3, { unit: o, seconds: a } = Oi(r), d = zi(r, a), c = new Intl.RelativeTimeFormat(n, {
+function zt(e, t, i = Date.now()) {
+  const n = It(e), r = (t - i) / 1e3, { unit: o, seconds: a } = zi(r), d = Oi(r, a), c = new Intl.RelativeTimeFormat(n, {
     numeric: "auto",
     style: "short"
   }).format(d, o), u = n === "en" ? c.replace(/\b(sec|min|hr)\./g, "$1") : c, p = new Intl.RelativeTimeFormat(n, {
@@ -1164,20 +1164,20 @@ function Ot(e, t, i = Date.now()) {
     title: s(e, "activity.title", { time: v })
   };
 }
-var Fi = Object.defineProperty, Ni = Object.getOwnPropertyDescriptor, Ne = (e, t, i, n) => {
-  for (var r = n > 1 ? void 0 : n ? Ni(t, i) : t, o = e.length - 1, a; o >= 0; o--)
+var Fi = Object.defineProperty, qi = Object.getOwnPropertyDescriptor, qe = (e, t, i, n) => {
+  for (var r = n > 1 ? void 0 : n ? qi(t, i) : t, o = e.length - 1, a; o >= 0; o--)
     (a = e[o]) && (r = (n ? a(t, i, r) : a(r)) || r);
   return n && r && Fi(t, i, r), r;
 };
-const qi = 3e4;
+const Ni = 3e4;
 let te = class extends x {
   disconnectedCallback() {
     this.clearRefreshTimer(), super.disconnectedCallback();
   }
   render() {
-    const e = this.hass && this.entityId ? O(this.hass, this.entityId) : void 0;
+    const e = this.hass && this.entityId ? z(this.hass, this.entityId) : void 0;
     if (e === void 0) return l;
-    const t = Ot(this.hass, e);
+    const t = zt(this.hass, e);
     return h`
       <span aria-label=${t.accessible} title=${t.title}>
         ${t.relative}
@@ -1185,14 +1185,14 @@ let te = class extends x {
     `;
   }
   updated() {
-    this.clearRefreshTimer(), (this.hass && this.entityId ? O(this.hass, this.entityId) : void 0) !== void 0 && (this.refreshTimer = window.setTimeout(() => {
+    this.clearRefreshTimer(), (this.hass && this.entityId ? z(this.hass, this.entityId) : void 0) !== void 0 && (this.refreshTimer = window.setTimeout(() => {
       this.refreshTimer = void 0, this.requestUpdate(), this.dispatchEvent(
         new CustomEvent("ring-view-activity-tick", {
           bubbles: !0,
           composed: !0
         })
       );
-    }, qi));
+    }, Ni));
   }
   clearRefreshTimer() {
     this.refreshTimer !== void 0 && (window.clearTimeout(this.refreshTimer), this.refreshTimer = void 0);
@@ -1220,13 +1220,13 @@ te.styles = j`
       white-space: nowrap;
     }
   `;
-Ne([
+qe([
   _({ attribute: !1 })
 ], te.prototype, "hass", 2);
-Ne([
+qe([
   _({ attribute: "entity-id" })
 ], te.prototype, "entityId", 2);
-te = Ne([
+te = qe([
   Z("ring-view-activity-time")
 ], te);
 const Bi = [
@@ -1254,8 +1254,8 @@ function ji(e) {
     return;
   }
   const i = /* @__PURE__ */ new Map();
-  t.searchParams.forEach((A, N) => {
-    i.set(N.toLowerCase(), A);
+  t.searchParams.forEach((A, q) => {
+    i.set(q.toLowerCase(), A);
   });
   const n = i.get("x-amz-date"), r = Number(i.get("x-amz-expires"));
   if (!n || !Number.isFinite(r) || r < 0) return;
@@ -1271,7 +1271,7 @@ function ji(e) {
   );
   return Number.isFinite(b) ? b + r * 1e3 : void 0;
 }
-function q(e, t = Date.now()) {
+function N(e, t = Date.now()) {
   const i = be(e);
   if (!i) return !1;
   const n = ji(i);
@@ -1309,7 +1309,7 @@ function ht(e, t) {
   const i = e.states[t]?.state;
   return i !== void 0 && i !== "unavailable" && i !== "unknown";
 }
-function zt(e, t) {
+function Ot(e, t) {
   return t.recording_entity.startsWith("camera.") ? t.recording_entity : ht(e, t.snapshot_entity) ? t.snapshot_entity : (ht(e, t.live_entity), t.live_entity);
 }
 const Zi = 2, Gi = 1;
@@ -1369,7 +1369,7 @@ function Yi(e, t) {
       message: s(e, "warning.unavailable", {
         name: R(o, t.last_activity_entity)
       })
-    }) : O(e, t.last_activity_entity) === void 0 && r.push({
+    }) : z(e, t.last_activity_entity) === void 0 && r.push({
       kind: "last_activity",
       message: s(e, "warning.activity_timestamp")
     });
@@ -1444,7 +1444,7 @@ function en(e) {
   return Q(e);
 }
 function E(e, t) {
-  return zt(e, t);
+  return Ot(e, t);
 }
 function tn(e, t, i) {
   const n = t.recording_entity, r = t.snapshot_entity;
@@ -1567,7 +1567,7 @@ function pn(e, t, i = /* @__PURE__ */ new Date()) {
   const n = we(t.snapshot_directory), r = un(i, e.config?.time_zone);
   return `${n}/${hn(e, t)}_${r}.jpg`;
 }
-const qe = "custom:ring-view", $e = "ring-view", vn = "Ring View", w = {
+const Ne = "custom:ring-view", $e = "ring-view", vn = "Ring View", w = {
   default_mode: "last_recording",
   remember_last_mode: !1,
   autoplay_recording: !0,
@@ -1652,7 +1652,7 @@ function $n(e) {
 }
 function xe(e) {
   return $n(e), {
-    type: e.type ?? qe,
+    type: e.type ?? Ne,
     recording_entity: e.recording_entity,
     live_entity: e.live_entity,
     snapshot_entity: e.snapshot_entity || void 0,
@@ -1687,7 +1687,7 @@ function xe(e) {
     grid_options: e.grid_options
   };
 }
-function Nt(e) {
+function qt(e) {
   switch (e) {
     case "16:9":
       return 16 / 9;
@@ -1703,7 +1703,7 @@ function xn(e) {
   return e === "auto" ? "16 / 9" : e.replace(":", " / ");
 }
 const Be = "ring-view-live-entity", We = "ring-view-recording-entity", Ke = "ring-view-mode", ge = "ring-view-ringing-until";
-function qt() {
+function Nt() {
   return `${window.location.pathname}${window.location.search}${window.location.hash}`;
 }
 function Ce(e = window.location.search) {
@@ -1758,7 +1758,7 @@ function Mn(e) {
 }
 function Ae(e, t) {
   if (Mn(t)) return;
-  const i = Bt(qt());
+  const i = Bt(Nt());
   Pe(i), e.dispatchEvent(
     new CustomEvent("show-dialog", {
       detail: {
@@ -3146,7 +3146,7 @@ const Un = j`
       pointer-events: none;
     }
   }
-`, On = j`
+`, zn = j`
   :host {
     display: block;
     min-width: 0;
@@ -3163,9 +3163,9 @@ const Un = j`
     gap: 8px;
     margin: 0 0 12px;
   }
-`, zn = "ring-view:mode:";
+`, On = "ring-view:mode:";
 function Kt(e) {
-  return `${zn}${e.recording_entity}|${e.live_entity}`;
+  return `${On}${e.recording_entity}|${e.live_entity}`;
 }
 function oe(e) {
   if (!e.remember_last_mode) return e.default_mode;
@@ -3183,7 +3183,7 @@ function Fn(e, t) {
     } catch {
     }
 }
-const T = ze(class extends Fe {
+const T = Oe(class extends Fe {
   constructor(e) {
     if (super(e), e.type !== Lt.ATTRIBUTE || e.name !== "class" || e.strings?.length > 2) throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.");
   }
@@ -3205,8 +3205,8 @@ const T = ze(class extends Fe {
     return D;
   }
 });
-const Nn = {}, qn = (e, t = Nn) => e._$AH = t;
-const mt = ze(class extends Fe {
+const qn = {}, Nn = (e, t = qn) => e._$AH = t;
+const mt = Oe(class extends Fe {
   constructor() {
     super(...arguments), this.key = l;
   }
@@ -3214,7 +3214,7 @@ const mt = ze(class extends Fe {
     return this.key = e, t;
   }
   update(e, [t, i]) {
-    return t !== this.key && (qn(e), this.key = t), i;
+    return t !== this.key && (Nn(e), this.key = t), i;
   }
 });
 var Bn = Object.defineProperty, Wn = Object.getOwnPropertyDescriptor, M = (e, t, i, n) => {
@@ -4145,7 +4145,7 @@ let f = class extends x {
       if (!(this.mode !== "last_recording" || !this.acceptsMediaEvent(e))) {
         if (this.hass && Te(this.hass, this.activeEntityId())) {
           const t = Q(this.activeEntity());
-          if (t !== void 0 && q(this.activeEntity()) && this.recordingPlaybackRetriedSource !== t) {
+          if (t !== void 0 && N(this.activeEntity()) && this.recordingPlaybackRetriedSource !== t) {
             this.recordingPlaybackRetriedSource = t, this.lifecycle.dispose(), this.recordingVideoFailed = !1, this.statusAnnouncement = s(this.hass, "viewer.loading_recording"), this.startMedia();
             return;
           }
@@ -4309,7 +4309,7 @@ let f = class extends x {
         this.adoptRestoredDialog(e), this.syncUrl();
         return;
       }
-      this.open && this.finishClose(!1, !1), this.inline = !1, this.config = e.config, this.opener = e.opener, this.returnUrl = e.returnUrl ?? Bt(qt()), this.mode = e.mode, this.liveMuted = e.restored && this.mode === "live" ? !0 : this.config.live_muted, this.recordingStarted = this.mode === "live" || this.config.autoplay_recording, this.resetMediaAttempt(), this.automaticLiveRetry = !e.restored, this.pageUnloading = !1, this.suspended = !1, this.statusAnnouncement = "", this.resetVisitorActions(), this.resetSnapshotAction(), this.lastDoorbellEntity = this.config.doorbell_entity ? this.hass.states[this.config.doorbell_entity] : void 0, this.setRingingUntil(e.ringingUntil), this.open = !0, En(this), this.syncUrl(), this.attachGlobalListeners(), e.restored && this.mode === "live" ? this.prepareAutomaticLiveResume() : this.startMedia(), this.updateComplete.then(() => this.focusInitialControl());
+      this.open && this.finishClose(!1, !1), this.inline = !1, this.config = e.config, this.opener = e.opener, this.returnUrl = e.returnUrl ?? Bt(Nt()), this.mode = e.mode, this.liveMuted = e.restored && this.mode === "live" ? !0 : this.config.live_muted, this.recordingStarted = this.mode === "live" || this.config.autoplay_recording, this.resetMediaAttempt(), this.automaticLiveRetry = !e.restored, this.pageUnloading = !1, this.suspended = !1, this.statusAnnouncement = "", this.resetVisitorActions(), this.resetSnapshotAction(), this.lastDoorbellEntity = this.config.doorbell_entity ? this.hass.states[this.config.doorbell_entity] : void 0, this.setRingingUntil(e.ringingUntil), this.open = !0, En(this), this.syncUrl(), this.attachGlobalListeners(), e.restored && this.mode === "live" ? this.prepareAutomaticLiveResume() : this.startMedia(), this.updateComplete.then(() => this.focusInitialControl());
     }
   }
   showInline(e) {
@@ -4350,7 +4350,7 @@ let f = class extends x {
   }
   render() {
     if (!this.open || !this.hass || !this.config) return l;
-    const e = this.dialogTitle(), t = this.config.show_name, i = this.config.last_activity_entity ? O(this.hass, this.config.last_activity_entity) !== void 0 : !1, n = this.config.aspect_ratio, r = {
+    const e = this.dialogTitle(), t = this.config.show_name, i = this.config.last_activity_entity ? z(this.hass, this.config.last_activity_entity) !== void 0 : !1, n = this.config.aspect_ratio, r = {
       "--ring-view-aspect-ratio": n === "auto" ? "16 / 9" : n.replace(":", " / "),
       "--ring-view-fit-mode": this.config.fit_mode
     }, o = Number(this.ringing) + Number(this.shouldShowSnapshotAction());
@@ -4709,7 +4709,7 @@ let f = class extends x {
     this.viewerFeedback?.source === e && (this.viewerFeedback = void 0);
   }
   renderMedia() {
-    const e = this.activeEntity(), t = this.activeEntityId(), i = y(e), n = !i && !this.suspended && (this.mode === "live" || this.recordingStarted), r = Nt(this.config.aspect_ratio), o = this.mode === "last_recording" ? zt(this.hass, this.config) : t, a = Wt(
+    const e = this.activeEntity(), t = this.activeEntityId(), i = y(e), n = !i && !this.suspended && (this.mode === "live" || this.recordingStarted), r = qt(this.config.aspect_ratio), o = this.mode === "last_recording" ? Ot(this.hass, this.config) : t, a = Wt(
       this.hass,
       this.hass.states[o],
       o
@@ -5013,7 +5013,7 @@ let f = class extends x {
       this.recordingTranscodeFallbackAttempted = !0, this.recordingRefreshAttempted = !0, this.refreshRingMqttRecording(t);
       return;
     }
-    if (this.mode === "last_recording" && e && (!q(this.activeEntity()) || this.recordingVideoFailed)) {
+    if (this.mode === "last_recording" && e && (!N(this.activeEntity()) || this.recordingVideoFailed)) {
       if (this.recordingRefreshAttempted) {
         this.failRecordingPreparation("viewer.recording_playback_failed");
         return;
@@ -5021,7 +5021,7 @@ let f = class extends x {
       this.recordingRefreshAttempted = !0, this.refreshRingMqttRecording();
       return;
     }
-    if (this.mode === "last_recording" && this.activeEntityId().startsWith("select.") && !q(this.activeEntity())) {
+    if (this.mode === "last_recording" && this.activeEntityId().startsWith("select.") && !N(this.activeEntity())) {
       this.failRecordingPreparation("viewer.recording_source_unsupported");
       return;
     }
@@ -5048,7 +5048,7 @@ let f = class extends x {
       return;
     }
     this.finishPendingRecordingUpdate("cancelled");
-    const o = ++this.recordingRefreshToken, a = Q(n), d = this.recordingVideoFailed && q(n);
+    const o = ++this.recordingRefreshToken, a = Q(n), d = this.recordingVideoFailed && N(n);
     this.recordingPreparationActive = !0, this.recordingVideoFailed = !1, this.recordingFailureDetail = void 0, this.lifecycle.dispose(), this.session = this.lifecycle.current(), this.mediaStatus = "pending", this.statusAnnouncement = s(
       this.hass,
       e && e !== n?.state.trim() ? "viewer.preparing_compatible_recording" : "viewer.refreshing_recording"
@@ -5067,7 +5067,7 @@ let f = class extends x {
       const p = this.pendingRecordingUpdate;
       !p || p.entityId !== i || (p.settleTimer = window.setTimeout(() => {
         const v = this.hass?.states[i];
-        o === this.recordingRefreshToken && q(v) && Q(v) === a && this.finishPendingRecordingUpdate("unchanged");
+        o === this.recordingRefreshToken && N(v) && Q(v) === a && this.finishPendingRecordingUpdate("unchanged");
       }, vr));
     }).catch(() => {
       o === this.recordingRefreshToken && this.open && this.finishPendingRecordingUpdate("failed");
@@ -5097,7 +5097,7 @@ let f = class extends x {
     const e = this.pendingRecordingUpdate;
     if (!e || !this.hass) return;
     const t = this.hass.states[e.entityId], i = Q(t);
-    i !== void 0 && i !== e.baseline && q(t) && this.finishPendingRecordingUpdate("updated");
+    i !== void 0 && i !== e.baseline && N(t) && this.finishPendingRecordingUpdate("updated");
   }
   finishPendingRecordingUpdate(e) {
     const t = this.pendingRecordingUpdate;
@@ -5434,7 +5434,7 @@ let C = class extends x {
       (d) => d !== i && (Number(e?.states[d]?.attributes.supported_features ?? 0) & 2) === 0
     ) ?? t.find((d) => d !== i) ?? t[0] ?? "camera.latest_recording", a = e && o === r ? cn(e, o) : void 0;
     return {
-      type: qe,
+      type: Ne,
       recording_entity: o,
       live_entity: i,
       ...a ? { snapshot_entity: a } : {}
@@ -5472,7 +5472,7 @@ let C = class extends x {
       if (i !== "hass") return !0;
     if (!e.has("hass") || !this.hass || !this.config) return !1;
     const t = e.get("hass");
-    return t ? t.language !== this.hass.language || t.locale?.language !== this.hass.locale?.language || t.states[this.config.recording_entity] !== this.hass.states[this.config.recording_entity] || t.states[this.config.live_entity] !== this.hass.states[this.config.live_entity] || this.config.snapshot_entity !== void 0 && t.states[this.config.snapshot_entity] !== this.hass.states[this.config.snapshot_entity] || this.config.last_activity_entity !== void 0 && O(t, this.config.last_activity_entity) !== O(this.hass, this.config.last_activity_entity) || this.config.doorbell_entity !== void 0 && t.states[this.config.doorbell_entity] !== this.hass.states[this.config.doorbell_entity] || this.config.door_entity !== void 0 && t.states[this.config.door_entity] !== this.hass.states[this.config.door_entity] || this.config.door_contact_entity !== void 0 && t.states[this.config.door_contact_entity] !== this.hass.states[this.config.door_contact_entity] : !0;
+    return t ? t.language !== this.hass.language || t.locale?.language !== this.hass.locale?.language || t.states[this.config.recording_entity] !== this.hass.states[this.config.recording_entity] || t.states[this.config.live_entity] !== this.hass.states[this.config.live_entity] || this.config.snapshot_entity !== void 0 && t.states[this.config.snapshot_entity] !== this.hass.states[this.config.snapshot_entity] || this.config.last_activity_entity !== void 0 && z(t, this.config.last_activity_entity) !== z(this.hass, this.config.last_activity_entity) || this.config.doorbell_entity !== void 0 && t.states[this.config.doorbell_entity] !== this.hass.states[this.config.doorbell_entity] || this.config.door_entity !== void 0 && t.states[this.config.door_entity] !== this.hass.states[this.config.door_entity] || this.config.door_contact_entity !== void 0 && t.states[this.config.door_contact_entity] !== this.hass.states[this.config.door_contact_entity] : !0;
   }
   willUpdate(e) {
     if (!this.hass || !this.config || (this.observePreviewMedia(), e.has("hass") && this.detectDoorbellEvent(e.get("hass")), this.isInCardPicker())) return;
@@ -5504,7 +5504,7 @@ let C = class extends x {
           </div>
         </ha-card>
       `;
-    const c = !o, u = this.config.last_activity_entity ? O(this.hass, this.config.last_activity_entity) : void 0, p = u === void 0 ? void 0 : Ot(this.hass, u), v = c ? s(this.hass, "card.open_viewer", {
+    const c = !o, u = this.config.last_activity_entity ? z(this.hass, this.config.last_activity_entity) : void 0, p = u === void 0 ? void 0 : zt(this.hass, u), v = c ? s(this.hass, "card.open_viewer", {
       name: i,
       mode: Vn(n, this.hass)
     }) : s(this.hass, "card.preview_alt", { name: i }), b = p ? `${v}. ${p.accessible}.` : v;
@@ -5662,7 +5662,7 @@ let C = class extends x {
     if (this.isInCardPicker() || !this.previewVisible || !this.hass || !this.config) return;
     const t = this.renderRoot.querySelector(".preview");
     if (!t) return;
-    const i = Math.max(1, window.devicePixelRatio || 1), n = t.clientWidth || t.getBoundingClientRect().width, r = n > 0 ? n : yr, o = t.clientHeight || t.getBoundingClientRect().height, a = Nt(this.config.aspect_ratio) ?? kr, d = o > 0 ? o : r / a, c = Math.ceil(r * i), u = Math.ceil(d * i);
+    const i = Math.max(1, window.devicePixelRatio || 1), n = t.clientWidth || t.getBoundingClientRect().width, r = n > 0 ? n : yr, o = t.clientHeight || t.getBoundingClientRect().height, a = qt(this.config.aspect_ratio) ?? kr, d = o > 0 ? o : r / a, c = Math.ceil(r * i), u = Math.ceil(d * i);
     if (!e && this.lastPreviewSize && Math.abs(c - this.lastPreviewSize.width) < yt && Math.abs(u - this.lastPreviewSize.height) < yt)
       return;
     this.lastPreviewSize = { width: c, height: u };
@@ -5728,7 +5728,7 @@ window.customCards.some((e) => e.type === $e) || window.customCards.push({
     );
     return i ? {
       config: {
-        type: qe,
+        type: Ne,
         recording_entity: t,
         live_entity: i
       }
@@ -6230,7 +6230,7 @@ let I = class extends x {
     `;
   }
 };
-I.styles = On;
+I.styles = zn;
 re([
   _({ attribute: !1 })
 ], I.prototype, "hass", 2);

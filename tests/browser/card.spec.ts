@@ -178,14 +178,20 @@ test("places recording sound choices beside the playback behavior they control",
     const dashboard = form.schema.find((field) => field.name === "dashboard_preview")!;
     const viewer = form.schema.find((field) => field.name === "viewer_behavior")!;
     const recording = viewer.schema?.find((field) => field.name === "recording_muted")!;
+    const live = viewer.schema?.find((field) => field.name === "live_muted")!;
     const dashboardRecording = dashboard.schema?.find(
       (field) => field.name === "dashboard_recording_muted",
+    )!;
+    const dashboardLive = dashboard.schema?.find(
+      (field) => field.name === "dashboard_live_muted",
     )!;
     return {
       dashboard: dashboard.schema?.map((field) => field.name),
       viewer: viewer.schema?.map((field) => field.name),
       recordingLabel: form.computeLabel(recording),
+      liveLabel: form.computeLabel(live),
       dashboardRecordingLabel: form.computeLabel(dashboardRecording),
+      dashboardLiveLabel: form.computeLabel(dashboardLive),
     };
   });
 
@@ -205,7 +211,9 @@ test("places recording sound choices beside the playback behavior they control",
       "two_way_audio",
     ],
     recordingLabel: "Start recordings muted",
-    dashboardRecordingLabel: "Start dashboard recordings muted",
+    liveLabel: "Start Live muted",
+    dashboardRecordingLabel: "Start recordings muted",
+    dashboardLiveLabel: "Start Live muted",
   });
 });
 

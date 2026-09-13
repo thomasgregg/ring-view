@@ -87,7 +87,7 @@ Verify each item on current stable Home Assistant and, where practical, the prev
 6. Rapid repeated switching never leaves two active media renderers.
 7. iOS and Android Companion apps both play recording and live views.
 8. Fullscreen recordings follow **Start recordings muted** and interactive-card
-   recordings independently follow **Start dashboard recordings muted**. With
+   recordings independently follow **Dashboard card → Start recordings muted**. With
    either option disabled, an audible-autoplay rejection keeps the recording
    and native Play control available without silently muting it.
 9. No authenticated URL or token appears in browser logs or Lovelace storage.

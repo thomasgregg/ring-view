@@ -259,11 +259,11 @@ camera and never expose Talk or door actions.
 | --- | --- | --- |
 | **Dashboard behavior** | Whether the dashboard is a still image or an interactive camera. | Which media starts. |
 | **Start media automatically** | What an interactive card starts: nothing, Recording or Live. | What opens in fullscreen. |
-| **Start dashboard recordings muted** | Initial recording sound inside an interactive dashboard card. | Fullscreen recording or Live sound. |
-| **Start dashboard Live muted** | Initial Live sound inside an interactive dashboard card. | Fullscreen Live or recording sound. |
+| **Start recordings muted** (Dashboard card) | Initial recording sound inside an interactive dashboard card. | Fullscreen recording or Live sound. |
+| **Start Live muted** (Dashboard card) | Initial Live sound inside an interactive dashboard card. | Fullscreen Live or recording sound. |
 | **Open viewer on** | Whether fullscreen initially shows Recording or Live. | The interactive dashboard startup. |
-| **Start recordings muted** | Initial recording sound in the fullscreen viewer. | Dashboard recording or Live sound. |
-| **Start live audio muted** | Initial Live sound in the fullscreen viewer. | Dashboard Live or recording sound. |
+| **Start recordings muted** (Fullscreen viewer) | Initial recording sound in the fullscreen viewer. | Dashboard recording or Live sound. |
+| **Start Live muted** (Fullscreen viewer) | Initial Live sound in the fullscreen viewer. | Dashboard Live or recording sound. |
 | **Show control in** | Whether the door action appears only in Live or also over recordings. | Whether it appears on the dashboard. |
 | **Door control location** | Fullscreen only, or dashboard and fullscreen. | Whether Talk is supported. |
 

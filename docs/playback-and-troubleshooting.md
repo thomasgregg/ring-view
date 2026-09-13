@@ -19,7 +19,7 @@ highlighted when its video is paused or has ended.
 
 Recording sound is configured separately for the two places that can play it:
 **Fullscreen viewer → Start recordings muted** and, for an interactive card,
-**Dashboard card → Start dashboard recordings muted**. Ring View applies the
+**Dashboard card → Start recordings muted**. Ring View applies the
 selected value exactly. If muted is off and the browser refuses automatic
 playback with sound, the loaded recording stays ready and its native Play
 control supplies the required tap; Ring View does not silently mute it. Changing
