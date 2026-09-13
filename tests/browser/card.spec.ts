@@ -215,7 +215,8 @@ test("keeps an interactive dashboard idle until the user chooses media", async (
   page,
 }) => {
   await page.goto(
-    "/demo/?dashboard=interactive&door=1&dashboard_door=1&live_platform=generic",
+    "/demo/?dashboard=interactive&door=1&dashboard_door=1"
+      + "&live_platform=generic&delay=1500",
   );
 
   await expect(page.getByRole("region", { name: "Camera view" })).toBeVisible();
@@ -247,10 +248,8 @@ test("keeps an interactive dashboard idle until the user chooses media", async (
   );
 
   await page.getByRole("tab", { name: "Live" }).click();
-  const door = page.getByRole("button", {
-    name: "Unlock available after live video connects",
-  });
-  await expect(door).toBeVisible();
+  const door = page.locator("ring-view ring-view-dialog .door-action");
+  await expect(door).toBeAttached();
   await expect(door).toBeDisabled();
   await expect(door).toContainText("Unlock when ready");
   await expect(page.getByRole("img", { name: "Synthetic demo camera media" })).toBeVisible();
@@ -355,6 +354,9 @@ test("keeps the inline action dock consistently sized across card widths", async
   );
 
   const root = page.locator("#card-root");
+  await root.evaluate((element) => {
+    (element as HTMLElement).style.height = "280px";
+  });
   const dock = page.locator("ring-view ring-view-dialog .visitor-action-dock");
   const talk = dock.locator(".talk-action");
   await expect(dock).toBeVisible();
@@ -392,7 +394,7 @@ test("keeps the inline action dock consistently sized across card widths", async
   expect(dockBox.x + dockBox.width).toBeLessThanOrEqual(cardBox.x + cardBox.width);
 });
 
-test("keeps inline connection status clear of fixed visitor controls", async ({
+test("prioritizes connection status on short cards and restores visitor controls with room", async ({
   page,
 }) => {
   await page.goto(
@@ -407,20 +409,28 @@ test("keeps inline connection status clear of fixed visitor controls", async ({
 
   const state = card.locator(".state-layer.with-visitor-controls .state-card");
   const dock = card.locator(".visitor-action-dock");
-  const door = card.getByRole("button", {
-    name: "Open door available after live video connects",
-  });
+  const door = card.locator(".door-action");
   await expect(state).toBeVisible();
-  await expect(dock).toBeVisible();
+  await expect(dock).toBeHidden();
+  await expect(door).toBeAttached();
   await expect(door).toContainText("Open when ready");
 
-  const [stateBox, dockBox] = await Promise.all([
+  const [stateBox, cardBox] = await Promise.all([
     state.boundingBox(),
-    dock.boundingBox(),
+    card.boundingBox(),
   ]);
-  if (!stateBox || !dockBox) throw new Error("Inline loading geometry unavailable");
+  if (!stateBox || !cardBox) throw new Error("Inline loading geometry unavailable");
+  expect(stateBox.y).toBeGreaterThanOrEqual(cardBox.y);
+  expect(stateBox.y + stateBox.height).toBeLessThanOrEqual(cardBox.y + cardBox.height);
 
-  expect(stateBox.y + stateBox.height).toBeLessThan(dockBox.y);
+  await card.evaluate((element) => {
+    element.style.height = "280px";
+  });
+  await expect(dock).toBeVisible();
+  const roomyStateBox = await state.boundingBox();
+  const dockBox = await dock.boundingBox();
+  if (!roomyStateBox || !dockBox) throw new Error("Roomy loading geometry unavailable");
+  expect(roomyStateBox.y + roomyStateBox.height).toBeLessThan(dockBox.y);
 });
 
 test("stops inline media before expanding and resumes it after fullscreen closes", async ({
@@ -630,7 +640,8 @@ test("keeps card and viewer geometry identical across provider profiles", async 
       media: "ring-view-dialog .media-frame",
       modes: "ring-view-dialog .mode-switch",
       title: "ring-view-dialog .header-copy",
-      actions: "ring-view-dialog .header-actions",
+      cameraActions: "ring-view-dialog .camera-actions",
+      chromeAction: "ring-view-dialog .chrome-action",
       visitor: "ring-view-dialog .visitor-action-dock",
     };
     const boxes: Record<string, number[]> = {
@@ -713,7 +724,7 @@ test("dismisses idle direct-recording controls and resumes or replays from the v
   ).toBe(true);
 });
 
-test("merges Talk and door access into one divided action dock", async ({ page }) => {
+test("groups Talk and door access in one borderless action rail", async ({ page }) => {
   await page.goto(
     "/demo/?mode=live&two_way_audio=1&door=1&door_action=open",
   );
@@ -725,18 +736,25 @@ test("merges Talk and door access into one divided action dock", async ({ page }
   await expect(dock).toBeVisible();
   await expect(talk).toBeDisabled();
   await expect(door).toBeVisible();
-  await expect(dock).toHaveCSS("padding-left", "6px");
-  await expect(dock).toHaveCSS("padding-right", "6px");
+  await expect(dock).toHaveCSS("height", "48px");
+  await expect(dock).toHaveCSS("padding-left", "0px");
+  await expect(dock).toHaveCSS("padding-right", "0px");
+  await expect(dock).toHaveCSS("border-top-width", "0px");
+  await expect(dock).toHaveCSS("box-shadow", "none");
+  await expect(dock).toHaveCSS("background-color", "rgba(0, 0, 0, 0.3)");
   const divider = dock.locator(".visitor-action-divider");
-  await expect(divider).toBeVisible();
-  await expect(divider).toHaveCSS("margin-left", "6px");
-  await expect(divider).toHaveCSS("margin-right", "6px");
+  await expect(divider).toHaveCount(0);
   await expect(talk).toHaveCSS("border-top-left-radius", "999px");
-  await expect(talk).toHaveCSS("border-top-right-radius", "0px");
-  await expect(talk).toHaveCSS("border-bottom-right-radius", "0px");
-  await expect(door).toHaveCSS("border-top-left-radius", "0px");
-  await expect(door).toHaveCSS("border-bottom-left-radius", "0px");
+  await expect(talk).toHaveCSS("border-top-right-radius", "999px");
+  await expect(door).toHaveCSS("border-top-left-radius", "999px");
   await expect(door).toHaveCSS("border-top-right-radius", "999px");
+
+  const [talkBox, doorBox] = await Promise.all([
+    talk.boundingBox(),
+    door.boundingBox(),
+  ]);
+  expect(talkBox?.height).toBe(48);
+  expect(doorBox?.height).toBe(48);
 
   const dockBox = await dock.boundingBox();
   const viewport = page.viewportSize();
@@ -754,12 +772,12 @@ test("requires a complete hold before opening the configured door", async ({ pag
 
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
-  await page.waitForTimeout(350);
+  await page.waitForTimeout(700);
   await page.mouse.up();
   expect(await page.evaluate(() => window.demoDoorCalls ?? [])).toHaveLength(0);
 
   await page.mouse.down();
-  await page.waitForTimeout(950);
+  await page.waitForTimeout(1_650);
   await page.mouse.up();
   await expect.poll(() => page.evaluate(() => window.demoDoorCalls?.length ?? 0)).toBe(1);
   expect(await page.evaluate(() => window.demoDoorCalls?.[0])).toEqual({
@@ -863,7 +881,12 @@ test("uses the shared centered viewer message for a Ding", async ({ page }) => {
       - (frameBox.y + frameBox.height / 2),
     ),
   ).toBeLessThan(10);
-  expect(alertBox.y + alertBox.height).toBeLessThan(visitorBox.y);
+  if (frameBox.height <= 220) {
+    await expect(visitorDock).toBeHidden();
+  } else {
+    await expect(visitorDock).toBeVisible();
+    expect(alertBox.y + alertBox.height).toBeLessThan(visitorBox.y);
+  }
 
   await openLive.click();
   await expect(
@@ -1549,7 +1572,9 @@ test("keeps name, activity, modes, and fullscreen action separate at responsive 
     expect(headingBox.x + headingBox.width).toBeLessThanOrEqual(modeBox.x - 8);
     expect(activityBox.x + activityBox.width).toBeLessThanOrEqual(modeBox.x - 8);
     expect(modeBox.x + modeBox.width).toBeLessThanOrEqual(snapshotBox.x - 2);
-    expect(snapshotBox.x + snapshotBox.width).toBeLessThanOrEqual(expandBox.x - 2);
+    expect(
+      Math.abs(snapshotBox.x + snapshotBox.width - expandBox.x),
+    ).toBeLessThanOrEqual(1);
     expect(expandBox.x + expandBox.width).toBeLessThanOrEqual(
       cardBox.x + cardBox.width,
     );

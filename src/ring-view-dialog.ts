@@ -107,7 +107,7 @@ interface ViewerFeedback {
 const LIVE_TIMEOUT_SECONDS = 20;
 const LIVE_RETRY_DELAY_MS = 2_500;
 const RECORDING_CONTROLS_HIDE_DELAY_MS = 2_500;
-const DOOR_HOLD_DURATION_MS = 900;
+const DOOR_HOLD_DURATION_MS = 1_600;
 const DOOR_SUCCESS_DURATION_MS = 2_000;
 const DOOR_ERROR_DURATION_MS = 3_000;
 const SNAPSHOT_SUCCESS_DURATION_MS = 2_000;
@@ -420,9 +420,13 @@ export class RingViewDialog extends LitElement {
                 `
               : nothing}
             <div class="header-actions">
-              ${this.renderRingIndicator()} ${this.renderSnapshotAction()}
+              <div class="camera-actions">
+                ${this.renderRingIndicator()} ${this.renderSnapshotAction()}
+              </div>
               <button
-                class=${this.inline ? "icon-button expand" : "icon-button close"}
+                class=${this.inline
+                  ? "icon-button chrome-action expand"
+                  : "icon-button chrome-action close"}
                 type="button"
                 aria-label=${localize(
                   this.hass,
@@ -762,9 +766,6 @@ export class RingViewDialog extends LitElement {
                   <span>${talkLabel}</span>
                 </button>
               `
-            : nothing}
-          ${showDoor && showTalk
-            ? html`<span class="visitor-action-divider" aria-hidden="true"></span>`
             : nothing}
           ${showDoor
             ? html`
@@ -1404,7 +1405,7 @@ export class RingViewDialog extends LitElement {
     if (unavailable) {
       const entity = this.activeEntity();
       return html`
-        <div class="state-layer" role="status">
+        <div class="state-layer blocking-state unavailable-state" role="status">
           <div class="state-card">
             <div class="state-title">${friendlyName(entity, this.activeEntityId())}</div>
             <div class="state-detail">
@@ -1423,7 +1424,7 @@ export class RingViewDialog extends LitElement {
 
     if (this.suspended) {
       return html`
-        <div class="state-layer" role="status">
+        <div class="state-layer blocking-state suspended-state" role="status">
           <div class="state-card">
             <div class="state-title">
               ${localize(this.hass, "viewer.suspended")}
@@ -1437,7 +1438,7 @@ export class RingViewDialog extends LitElement {
 
     if (this.mode === "live" && this.mediaStatus === "awaiting-resume") {
       return html`
-        <div class="state-layer play-layer">
+        <div class="state-layer play-layer resume-state">
           <button class="action-button primary play-recording resume-live" type="button"
             @click=${this.resumeLive}>
             ${this.icon(mdiPlay)}
@@ -1454,6 +1455,7 @@ export class RingViewDialog extends LitElement {
         <div
           class=${classMap({
             "state-layer": true,
+            "loading-state": true,
             "with-visitor-controls": hasVisitorControls,
           })}
           role="status"
@@ -1474,7 +1476,7 @@ export class RingViewDialog extends LitElement {
 
     if (this.mediaStatus === "compatibility" && !hasRecordingFallback) {
       return html`
-        <div class="state-layer" role="alert">
+        <div class="state-layer blocking-state compatibility-state" role="alert">
           <div class="state-card">
             <div class="state-title">
               ${localize(this.hass, "viewer.native_unavailable_title")}
@@ -1497,7 +1499,7 @@ export class RingViewDialog extends LitElement {
       const recordingDetail = this.recordingFailureDetail
         ?? localize(this.hass, "viewer.ring_protect");
       return html`
-        <div class="state-layer" role="alert">
+        <div class="state-layer blocking-state error-state" role="alert">
           <div class="state-card">
             <div class="state-title">
               ${this.mode === "live"
@@ -1521,6 +1523,8 @@ export class RingViewDialog extends LitElement {
     }
 
     if (this.viewerFeedback) {
+      const hasVisitorControls =
+        this.shouldShowDoorControl() || this.shouldShowTalkControl();
       const feedbackId = this.viewerFeedback.source === "door"
         ? "ring-view-door-feedback"
         : undefined;
@@ -1532,6 +1536,7 @@ export class RingViewDialog extends LitElement {
             "snapshot-error-layer": this.viewerFeedback.source === "snapshot",
             "door-error-layer": this.viewerFeedback.source === "door",
             "session-message-layer": this.viewerFeedback.source === "session",
+            "with-visitor-controls": hasVisitorControls,
           })}
           role=${this.viewerFeedback.kind === "error" ? "alert" : "status"}
           aria-live=${this.viewerFeedback.kind === "error" ? "assertive" : "polite"}

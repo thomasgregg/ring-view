@@ -64,7 +64,7 @@
   "editor.helper_door_contact_entity": "Shows the physical door state: closed, open, or unknown. An open door changes the action to a non-interactive Door open status.",
   "editor.helper_door_action": "Open releases the latch on supported locks. Unlock only releases the lock.",
   "editor.helper_door_control_visibility": "Live only is the safer default. Live and recordings keeps the control active over historical footage.",
-  "editor.helper_door_hold_to_activate": "Release before one second to cancel. Turning this off makes a single tap operate the door.",
+  "editor.helper_door_hold_to_activate": "Release before the 1.6-second hold completes to cancel. Turning this off makes a single tap operate the door.",
   "editor.helper_door_control_location": "Choose where the door action appears. Fullscreen only is safer for shared dashboards.",
   "editor.helper_show_name": "Shown at the top left of both the card and viewer.",
   "editor.helper_last_activity_entity": "Shows relative time at the top left, below the camera name when it is visible. Choose a timestamp sensor, event entity, Date and/or time helper, or a Ring-MQTT Ding or motion sensor.",

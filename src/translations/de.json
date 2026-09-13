@@ -64,7 +64,7 @@
   "editor.helper_door_contact_entity": "Zeigt den physischen Türzustand: geschlossen, offen oder unbekannt. Eine offene Tür ändert die Aktion zum nicht bedienbaren Status „Tür offen“.",
   "editor.helper_door_action": "Öffnen gibt bei unterstützten Schlössern die Falle frei. Entriegeln löst nur das Schloss.",
   "editor.helper_door_control_visibility": "Nur Live ist die sicherere Voreinstellung. Live und Aufnahmen hält das Bedienelement auch über historischem Material aktiv.",
-  "editor.helper_door_hold_to_activate": "Vor Ablauf einer Sekunde loslassen, um abzubrechen. Wenn deaktiviert, betätigt ein einzelnes Tippen die Tür.",
+  "editor.helper_door_hold_to_activate": "Vor Ablauf der 1,6 Sekunden loslassen, um abzubrechen. Wenn deaktiviert, betätigt ein einzelnes Tippen die Tür.",
   "editor.helper_door_control_location": "Lege fest, wo die Türaktion erscheint. Nur Vollbild ist für gemeinsam genutzte Dashboards sicherer.",
   "editor.helper_show_name": "Wird oben links auf der Karte und in der Kameraansicht angezeigt.",
   "editor.helper_last_activity_entity": "Zeigt oben links eine relative Zeit an, bei sichtbarem Kameranamen darunter. Wähle einen Zeitstempel-Sensor, eine Ereignis-Entität, einen Datum-und-Uhrzeit-Helfer oder einen Ring-MQTT-Klingel- oder Bewegungssensor.",
