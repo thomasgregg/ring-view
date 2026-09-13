@@ -35,11 +35,19 @@ if (!notes) {
 const output = [notes];
 
 try {
-  const previousTag = execFileSync(
-    "git",
-    ["describe", "--tags", "--abbrev=0", `${tag}^`],
-    { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] },
-  ).trim();
+  const previousTag = version.includes("-")
+    ? execFileSync(
+      "git",
+      ["describe", "--tags", "--abbrev=0", `${tag}^`],
+      { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] },
+    ).trim()
+    : execFileSync(
+      "git",
+      ["tag", "--merged", `${tag}^`, "--sort=-version:refname"],
+      { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] },
+    )
+      .split(/\r?\n/)
+      .find((candidate) => /^v?\d+\.\d+\.\d+$/.test(candidate));
   const repository = process.env.GITHUB_REPOSITORY;
   const server = process.env.GITHUB_SERVER_URL ?? "https://github.com";
 

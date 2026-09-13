@@ -44,7 +44,7 @@ Hidden tabs suspend native playback and immediately stop active talkback.
 
 ## Listen and Hold to talk
 
-Enable **Doorbell features → Two-way audio** in the visual editor. The live
+Enable **Fullscreen viewer → Two-way audio** in the visual editor. The live
 entity must be the official Ring `live_view` camera, not an RTSP entity from
 Ring-MQTT or Generic Camera. Ring-MQTT can still supply the optional dashboard
 snapshot alongside the official live entity.

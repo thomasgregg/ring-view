@@ -59,7 +59,7 @@
   "editor.helper_dashboard_live_muted": "Empfohlen für automatische Starts auf Smartphones und Wand-Tablets. Aktiviere den Ton bei Bedarf über die Mediensteuerung.",
   "editor.helper_default_mode": "Beim direkten Öffnen der Live-Ansicht wird eine Ring-Live-Sitzung gestartet.",
   "editor.helper_remember_last_mode": "Verwendet die zuletzt gewählte Ansicht anstelle der Startansicht.",
-  "editor.helper_autoplay_recording": "Deaktivieren, um vor dem Laden der Aufnahme eine Wiedergabetaste anzuzeigen.",
+  "editor.helper_autoplay_recording": "Deaktivieren, um vor dem Laden der Aufnahme auf ein Tippen auf das Kamerabild zu warten.",
   "editor.helper_recording_muted": "Deaktiviert lassen, um mit Ton zu starten. Die Autoplay-Regeln des Browsers können trotzdem ein Tippen erfordern.",
   "editor.helper_live_muted": "Deaktiviert lassen, um mit Ton zu starten. Die Autoplay-Regeln des Browsers können trotzdem ein Tippen erfordern.",
   "editor.helper_two_way_audio": "Erfordert die offizielle Ring-Live-Ansicht-Kamera und verwendet eine WebRTC-Sitzung für Video, Zuhören und Push-to-Talk.",

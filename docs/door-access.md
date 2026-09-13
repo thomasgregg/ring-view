@@ -19,9 +19,9 @@ The design has three priorities:
 
 ## Viewer design
 
-### One visitor-action dock
+### One visitor-action rail
 
-When Talk and door access are both available, they share one compact glass dock
+When Talk and door access are both available, they share one compact glass rail
 at the bottom of the viewer:
 
 ```text
@@ -32,9 +32,11 @@ at the bottom of the viewer:
 
 - Both actions use the same height, corner radius, typography, and translucent
   surface, so they read as one visitor interaction.
-- The rail has no outline, divider, shadow, or default blur. Each action uses an
-  inset state surface, so hover, keyboard focus, active Talk, and door progress
-  remain clearly associated with the correct action without drawing nested pills.
+- The rail has no outline, divider, or nested shadow. Its shared glass surface
+  uses a restrained backdrop blur and neutral lift so it remains visible over
+  both camera imagery and black letterboxing. Each action uses an inset state
+  surface, so hover, keyboard focus, active Talk, and door progress remain
+  clearly associated with the correct action without drawing nested pills.
 - Talk remains neutral and becomes red only while audio is transmitted. Door
   progress uses a warm left-to-right fill with a rounded starting edge and a
   straight moving edge, then briefly becomes green on success.
@@ -42,7 +44,7 @@ at the bottom of the viewer:
   Their outer geometry never changes during a press or hold.
 - If only one action is shown, the rail collapses to a balanced single action.
   There is no empty segment or decorative separator.
-- The dock respects phone safe areas and stays reachable in portrait and
+- The rail respects phone safe areas and stays reachable in portrait and
   landscape layouts.
 
 ### Availability and layout
@@ -61,8 +63,8 @@ Door access appears only when `door_entity` is configured.
   available.
 - **Live and recordings** is an explicit option for households that need the
   action in both modes.
-- When Talk is available, both controls always appear in the shared dock.
-- When Talk is disabled or unsupported, the dock automatically collapses to the
+- When Talk is available, both controls always appear in the shared rail.
+- When Talk is disabled or unsupported, the rail automatically collapses to the
   door-only pill. No separate layout setting is needed.
 - Talk itself remains a Live-only action because it depends on the live WebRTC
   session.
@@ -129,7 +131,7 @@ temporarily suggesting that the door has physically moved.
 Success is intentionally shown in the control itself rather than in a second
 toast, keeping the interface calm and avoiding duplicate feedback.
 Failures use the same temporary centered message as snapshot and talkback
-failures. The action dock remains visible and immediately retryable.
+failures. The action rail remains visible and immediately retryable.
 
 ## Home Assistant behavior
 

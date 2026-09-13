@@ -34,7 +34,7 @@ See what happened, check what is happening, save the moment, and answer the door
 
 - **Go from recording to Live in one tap.** Switch views inside the same viewer, with familiar playback and sound controls.
 - **Listen and talk to visitors.** Optional **Hold to talk** adds push-to-talk to the official Ring live camera, using the same connection as the video.
-- **Operate the door while you watch.** Door access adds a configurable Home Assistant lock action, with a safe hold gesture, optional physical-door status, and a shared Talk/door control dock.
+- **Operate the door while you watch.** Door access adds a configurable Home Assistant lock action, with a safe hold gesture, optional physical-door status, and a shared Talk/door control rail.
 - **Choose a calm or hands-on dashboard.** Keep the lightweight still-image card, or opt into direct Recording, Live, Talk, and door controls for a wall tablet.
 - **Show the freshest view.** Optionally combine the latest recording with a Ring-MQTT snapshot camera for the dashboard preview.
 - **Save a moment from Live.** Optionally show one snapshot button that saves a timestamped image through Home Assistant, with no custom automation.

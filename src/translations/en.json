@@ -59,7 +59,7 @@
   "editor.helper_dashboard_live_muted": "Recommended for automatic starts on phones and wall tablets. Turn sound on in the media controls when needed.",
   "editor.helper_default_mode": "Opening directly on Live starts a Ring live session.",
   "editor.helper_remember_last_mode": "Uses the most recent choice instead of the opening view.",
-  "editor.helper_autoplay_recording": "Turn off to show a Play button before loading the recording.",
+  "editor.helper_autoplay_recording": "Turn off to wait for a tap on the camera image before loading the recording.",
   "editor.helper_recording_muted": "Leave off to start with sound. Browser autoplay rules may still require a tap.",
   "editor.helper_live_muted": "Leave off to start with sound. Browser autoplay rules may still require a tap.",
   "editor.helper_two_way_audio": "Requires the official Ring Live view camera and uses one WebRTC session for video, listening, and push-to-talk.",

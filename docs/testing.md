@@ -128,7 +128,7 @@ Verify each item on current stable Home Assistant and, where practical, the prev
     at the narrowest supported card width.
 25. Force a door-service failure and a microphone-permission failure. Confirm
     both reuse the same centered viewer status display as snapshot failures,
-    remain clear of the visitor-action dock, and disappear without leaving a
+    remain clear of the visitor-action rail, and disappear without leaving a
     second pill or toast behind.
 26. Set `recording_entity` to a renamed Ring-MQTT Event Select and choose a
     playable event. Confirm desktop Last recording uses the direct MP4 while

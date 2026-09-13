@@ -4,6 +4,109 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-09-13
+
+### Added
+
+- Add one coherent, low-chrome control language for the fullscreen viewer and
+  interactive dashboard card, with stable circular utilities, borderless
+  translucent rails, consistent icon weight, and restrained semantic colour.
+- Keep an Enlarge action at the far right of every interactive dashboard card
+  so the complete Ring View viewer remains available independently of native
+  browser or Home Assistant fullscreen controls.
+- Add explicit **Start recordings muted** settings for the fullscreen viewer
+  and interactive dashboard. Fullscreen recordings keep sound on by default;
+  dashboard recordings start muted by default for reliable automatic playback.
+- Add forced-colour treatments and compact-height message priority so controls,
+  focus, Ding alerts, and recovery actions remain usable on narrow or short
+  cards without reducing touch targets.
+
+### Changed
+
+- Give every custom Ring View control surface a shared glass treatment with
+  backdrop blur, restrained saturation, and an adaptive neutral lift that stays
+  visible over camera imagery and pure-black letterboxing. Native playback,
+  volume, timeline, captions, and fullscreen controls remain unchanged.
+- Standardize custom utility controls at 44 pixels on desktop and 48 pixels on
+  touch layouts. Talk and door access use stable 48-pixel-high targets across
+  desktop, landscape, portrait, and dashboard modes.
+- Group Recording and Live in one top rail, with a plain red Live dot and inset
+  selected, hover, pressed, and keyboard-focus states that do not change the
+  control's outer size.
+- Keep the mode selector centered against the full portrait viewport. On narrow
+  widths it moves to a dedicated second row only when Snapshot, Bell, and Close
+  cannot fit beside it without overlap.
+- Separate Bell, Snapshot, and Close or Enlarge into individual circular glass
+  controls. Close and Enlarge stay fixed at the far-right edge while contextual
+  controls appear to their left.
+- Keep portrait camera actions in a compact right-edge rail and group Snapshot
+  with Close. Desktop and landscape retain their established header layout.
+- Combine Talk and door access in one borderless visitor-action rail with inset
+  interaction states. Talk turns red only while transmitting, and its active
+  visible label is shortened to **Release** while assistive technology retains
+  the full **Release to stop** instruction.
+- Extend the default door confirmation to 1.6 seconds and show progress as a
+  stationary, warm left-to-right fill with a rounded starting edge and straight
+  moving edge.
+- Present loading as a lightweight spinner and label, actionable recovery as a
+  dark rounded action, and short snapshot, door, and session feedback in one
+  centered dark message surface with left-aligned wrapping text.
+- Preserve each configured recording-audio preference exactly. If a browser
+  refuses audible autoplay, Ring View leaves the loaded recording and its
+  native Play control ready instead of silently changing the mute state.
+- Request the matching Ring-MQTT **(Transcoded)** event before playback on
+  iPhone/iPad and as an automatic fallback when a direct Ring recording fails
+  elsewhere, while preserving the selected Ding, Motion, or on-demand event.
+- Give a newly selected or transcoding Ring-MQTT event one complete refresh
+  cycle before showing a recording error.
+
+### Fixed
+
+- Prevent snapshot, mode, Talk, door, hover, pressed, and focus states from
+  changing control size, outer silhouette, or narrow-card bounds.
+- Preserve the glass layer on Close and Enlarge after responsive positioning,
+  and keep the material visible on desktop, portrait, and inline controls.
+- Keep long status and translated text clear of camera titles, mode controls,
+  visitor actions, and native playback controls. Short cards use concise errors
+  and Retry actions while technical detail remains available in the full viewer
+  and live region.
+- Restore visitor actions when a compact message clears or a short card becomes
+  tall enough, and anchor the rail eight pixels above the bottom of interactive
+  dashboard cards.
+- Keep loaded recordings and native Play controls available when iOS rejects
+  autoplay; browser playback policy is no longer reported as a broken
+  Ring-MQTT URL.
+- Remount each distinct valid Ring-MQTT recording URL once before requesting a
+  refresh, and accept a still-valid URL when Ring-MQTT republishes no change.
+- Keep Ring View's mute state synchronized when sound changes through native
+  recording controls.
+- Replace the remaining legacy blue Resume surface with the shared dark,
+  borderless recovery style.
+- Cancel a door hold even at the final millisecond when the pointer is released
+  or cancelled, and prevent pointer-up after activation from sending a second
+  service call.
+
+### Documentation
+
+- Document the final custom-control layout and glass material, Enlarge action,
+  independent recording-audio settings, Talk state, 1.6-second door hold,
+  compact-message behavior, and automatic Ring-MQTT transcoding across the
+  README and configuration, door-access, playback, compatibility, privacy, and
+  testing guides.
+- Correct stale editor guidance so two-way audio points to **Fullscreen viewer**
+  and disabled recording autoplay accurately describes tapping the unobstructed
+  camera image instead of showing a separate Play button.
+
+### Tests
+
+- Pass 204 unit and component tests and 144 browser scenarios across desktop
+  and phone projects.
+- Cover stable rail geometry, responsive 320- and 390-pixel portrait layouts,
+  dashboard Enlarge behavior, forced colours, reduced motion, provider parity,
+  native-control preservation, compact error geometry, door cancellation,
+  recording-audio policy, iOS autoplay rejection, per-URL retries, exact
+  transcoded-option selection, and direct-URL fallback.
+
 ## [0.11.0-beta.5] - 2026-09-13
 
 ### Fixed
