@@ -6,8 +6,13 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
-- Detect repeated Ring-MQTT doorbell presses from a changed `lastDingTime` or
-  `lastDing` attribute while the configured Ding sensor remains `on`.
+- Detect rapid and repeated Ring-MQTT doorbell presses from advancing
+  `lastDingTime`, `lastDing`, or entity-update timestamps while the configured
+  Ding sensor remains `on`, without relying on a fixed debounce window.
+- Recover a genuinely fresh Ring alert after the dashboard loads or an entity
+  reconnects, while continuing to ignore stale retained MQTT state.
+- Prefix the visible relative time with **Activity** so it cannot be mistaken
+  for the age of an older recording selected through Ring-MQTT Event Select.
 
 ## [0.10.0-beta.1] - 2026-09-13
 

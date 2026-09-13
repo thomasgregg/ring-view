@@ -1409,7 +1409,7 @@ test("shows accessible activity time below the name without overlapping controls
   const activity = page.locator(
     "ring-view > ha-card ring-view-activity-time span",
   );
-  await expect(activity).toHaveText(/2 min.*ago/i);
+  await expect(activity).toHaveText(/^\s*Activity · 2 min.*ago/i);
   await expect(activity).toHaveAttribute(
     "aria-label",
     "Last activity, 2 minutes ago",
@@ -1597,7 +1597,7 @@ test("localizes activity text without letting a longer format reach the controls
   const card = page.locator("ring-view");
   const activity = card.locator("ring-view-activity-time span");
   const modes = card.getByRole("tablist", { name: "Kameraansicht" });
-  await expect(activity).toHaveText(/vor 2 Std/i);
+  await expect(activity).toHaveText(/^\s*Aktivität · vor 2 Std/i);
   await expect(activity).toHaveAttribute(
     "aria-label",
     "Letzte Aktivität, vor 2 Stunden",

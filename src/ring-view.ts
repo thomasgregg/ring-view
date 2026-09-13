@@ -222,7 +222,9 @@ export class RingView extends LitElement {
   protected willUpdate(changed: PropertyValues<this>): void {
     if (!this.hass || !this.config) return;
     this.observePreviewMedia();
-    this.detectDoorbellEvent(changed.get("hass") as HomeAssistant | undefined);
+    if (changed.has("hass")) {
+      this.detectDoorbellEvent(changed.get("hass") as HomeAssistant | undefined);
+    }
     if (this.isInCardPicker()) return;
     const entityId = this.previewEntityId();
     const fallbackPoster = posterUrl(this.hass, this.hass.states[entityId], entityId);
@@ -508,13 +510,12 @@ export class RingView extends LitElement {
 
   private detectDoorbellEvent(previous?: HomeAssistant): void {
     const entityId = this.config?.doorbell_entity;
-    if (!entityId || !previous || !this.hass) return;
-    const before = previous.states[entityId];
+    if (!entityId || !this.hass) return;
+    const before = previous?.states[entityId];
     const after = this.hass.states[entityId];
     if (!isDoorbellRingTransition(entityId, before, after)) return;
 
     const now = Date.now();
-    if (now - this.lastRingAlertAt < 5_000) return;
     this.lastRingAlertAt = now;
     this.updateRingAlert();
   }

@@ -370,7 +370,7 @@ describe("card stream lifecycle", () => {
 
   it("shows Ring-MQTT Dings for off-to-on and a new marker while still on", async () => {
     vi.useFakeTimers();
-    vi.setSystemTime(Date.parse("2026-09-12T14:19:00Z"));
+    vi.setSystemTime(Date.parse("2026-09-12T14:19:13Z"));
     const doorbell: HassEntity = {
       entity_id: "binary_sensor.front_door_ding",
       state: "on",
@@ -417,7 +417,7 @@ describe("card stream lifecycle", () => {
       "Someone is at the door",
     );
 
-    await vi.advanceTimersByTimeAsync(6_000);
+    await vi.advanceTimersByTimeAsync(2_000);
     card.hass = {
       ...card.hass,
       states: {
@@ -425,7 +425,7 @@ describe("card stream lifecycle", () => {
         [doorbell.entity_id]: {
           ...doorbell,
           state: "on",
-          attributes: { ...doorbell.attributes, lastDingTime: "2026-09-12T14:19:19Z" },
+          attributes: { ...doorbell.attributes, lastDingTime: "2026-09-12T14:19:15Z" },
         },
       },
     };
@@ -433,10 +433,32 @@ describe("card stream lifecycle", () => {
 
     // The second marker starts a fresh twelve-second alert even though the
     // binary sensor never returned to off.
-    await vi.advanceTimersByTimeAsync(7_000);
+    await vi.advanceTimersByTimeAsync(10_001);
     expect(card.shadowRoot?.querySelector(".ring-alert")).not.toBeNull();
-    await vi.advanceTimersByTimeAsync(5_001);
-    expect(card.shadowRoot?.querySelector(".ring-alert")).toBeNull();
+  });
+
+  it.each([
+    ["fresh", "2026-09-12T14:20:05Z", true],
+    ["stale", "2026-09-12T14:19:59Z", false],
+  ])("handles a %s retained Ring-MQTT Ding on initial load", async (_, lastDingTime, visible) => {
+    vi.useFakeTimers();
+    vi.setSystemTime(Date.parse("2026-09-12T14:20:12Z"));
+    const doorbell: HassEntity = {
+      entity_id: "binary_sensor.front_door_ding",
+      state: "on",
+      attributes: { device_class: "occupancy", lastDingTime },
+    };
+    const card = document.createElement("ring-view");
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      doorbell_entity: doorbell.entity_id,
+    });
+    card.hass = { ...hass, states: { ...hass.states, [doorbell.entity_id]: doorbell } };
+    document.body.append(card);
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(card.shadowRoot?.querySelector(".ring-alert") !== null).toBe(visible);
   });
 
   it("updates Ring-MQTT activity when a same-device motion sibling changes", async () => {

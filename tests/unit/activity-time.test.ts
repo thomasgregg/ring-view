@@ -171,7 +171,7 @@ describe("last activity timestamps", () => {
       now - 2 * 60 * 1_000,
       now,
     );
-    expect(display.relative).toMatch(/2 min.*ago/i);
+    expect(display.relative).toMatch(/^Activity · 2 min.*ago/i);
     expect(display.accessible).toBe("Last activity, 2 minutes ago");
     expect(display.title).toMatch(/^Last activity: /);
   });
@@ -185,7 +185,7 @@ describe("last activity timestamps", () => {
     } satisfies HomeAssistant;
     const now = Date.parse("2026-09-12T10:15:30Z");
     const display = formatActivityTime(hass, now - 2 * 60 * 1_000, now);
-    expect(display.relative).toContain("2 Min");
+    expect(display.relative).toMatch(/^Aktivität · vor 2 Min/);
     expect(display.accessible).toBe("Letzte Aktivität, vor 2 Minuten");
     expect(display.title).toMatch(/^Letzte Aktivität: /);
   });

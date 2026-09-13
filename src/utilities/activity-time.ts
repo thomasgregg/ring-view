@@ -175,7 +175,7 @@ export function formatActivityTime(
     timeStyle: "short",
   }).format(timestamp);
   return {
-    relative,
+    relative: localize(hass, "activity.relative", { time: relative }),
     accessible: localize(hass, "activity.accessible", {
       time: spokenRelative,
     }),

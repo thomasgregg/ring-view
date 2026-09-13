@@ -91,6 +91,7 @@
   "card.preview_alt": "Vorschau für {name}",
   "card.preview_unavailable": "Kameravorschau nicht verfügbar",
   "card.description": "Letzte Aufnahme ansehen und einen separaten Live-Kamerastream starten.",
+  "activity.relative": "Aktivität · {time}",
   "activity.accessible": "Letzte Aktivität, {time}",
   "activity.title": "Letzte Aktivität: {time}",
   "warning.unavailable": "{name} ist nicht verfügbar.",
