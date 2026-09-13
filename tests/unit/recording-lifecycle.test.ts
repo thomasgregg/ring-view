@@ -154,7 +154,7 @@ describe("recording player lifecycle", () => {
 
   it("reports a refresh timeout without trying to render a select as a camera", async () => {
     const { dialog } = await mountRingMqtt("<Transcoding in Progress>");
-    await vi.advanceTimersByTimeAsync(15_000);
+    await vi.advanceTimersByTimeAsync(70_000);
     await dialog.updateComplete;
     expect(dialog.shadowRoot?.textContent).toContain(
       "Ring-MQTT did not provide a fresh recording URL in time.",
@@ -162,12 +162,18 @@ describe("recording player lifecycle", () => {
     expect(dialog.shadowRoot?.querySelector("ring-view-native-camera-adapter")).toBeNull();
   });
 
-  it("refreshes one failed Ring-MQTT video and reports a second playback failure", async () => {
+  it("remounts once, refreshes once, then reports a Ring-MQTT playback failure", async () => {
     const { dialog, hass: mqttHass } = await mountRingMqtt(
       "https://example.test/first-recording.mp4",
     );
-    dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback")
-      ?.dispatchEvent(new Event("error"));
+    const first = dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback");
+    first?.dispatchEvent(new Event("error"));
+    await flush();
+    const remount = dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback");
+    expect(remount).not.toBe(first);
+    expect(mqttHass.callService).not.toHaveBeenCalled();
+
+    remount?.dispatchEvent(new Event("error"));
     await flush();
     expect(mqttHass.callService).toHaveBeenCalledTimes(1);
     expect(dialog.shadowRoot?.querySelector(".video-fallback")).toBeNull();
@@ -186,8 +192,13 @@ describe("recording player lifecycle", () => {
       },
     };
     await flush();
-    dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback")
-      ?.dispatchEvent(new Event("error"));
+    const refreshed = dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback");
+    refreshed?.dispatchEvent(new Event("error"));
+    await flush();
+    const refreshedRemount = dialog.shadowRoot
+      ?.querySelector<HTMLVideoElement>(".video-fallback");
+    expect(refreshedRemount).not.toBe(refreshed);
+    refreshedRemount?.dispatchEvent(new Event("error"));
     await flush();
 
     expect(mqttHass.callService).toHaveBeenCalledTimes(1);
@@ -195,6 +206,28 @@ describe("recording player lifecycle", () => {
       "The selected Ring-MQTT recording could not be played.",
     );
     expect(dialog.shadowRoot?.querySelector("ring-view-native-camera-adapter")).toBeNull();
+  });
+
+  it("retries the still-valid URL after Ring-MQTT republishes no change", async () => {
+    const { dialog, hass: mqttHass } = await mountRingMqtt(
+      "https://example.test/still-valid.mp4",
+    );
+    dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback")
+      ?.dispatchEvent(new Event("error"));
+    await flush();
+    dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback")
+      ?.dispatchEvent(new Event("error"));
+    await flush();
+    expect(mqttHass.callService).toHaveBeenCalledTimes(1);
+
+    await vi.advanceTimersByTimeAsync(1_250);
+    await dialog.updateComplete;
+    expect(
+      dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback")?.src,
+    ).toBe("https://example.test/still-valid.mp4");
+    expect(dialog.shadowRoot?.textContent).not.toContain(
+      "did not provide a fresh recording URL",
+    );
   });
 
   it("refreshes an expired signed Ring-MQTT URL before trying playback", async () => {
@@ -239,12 +272,27 @@ describe("recording player lifecycle", () => {
       }),
     });
     await flush();
-    await vi.advanceTimersByTimeAsync(15_000);
+    await vi.advanceTimersByTimeAsync(70_000);
     await dialog.updateComplete;
 
     expect(dialog.shadowRoot?.textContent).toContain(
       "Ring-MQTT did not provide a fresh recording URL in time.",
     );
+  });
+
+  it("keeps native controls when iOS rejects both autoplay attempts", async () => {
+    vi.mocked(HTMLMediaElement.prototype.play).mockRejectedValue(
+      new DOMException("Gesture required", "NotAllowedError"),
+    );
+    const { dialog, video } = await mount();
+    video().dispatchEvent(new Event("canplay"));
+    await flush();
+
+    expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(2);
+    expect(video().controls).toBe(true);
+    expect(video().classList.contains("pending")).toBe(false);
+    expect(dialog.shadowRoot?.querySelector('[role="alert"]')).toBeNull();
+    expect(dialog.shadowRoot?.textContent).not.toContain("Recording unavailable");
   });
 
   it("never passes an unrecognized select source to the camera renderer", async () => {

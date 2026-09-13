@@ -158,6 +158,8 @@ test("uses a red Talk state without changing the native video controls", async (
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
   await expect(talk).toHaveAttribute("aria-pressed", "true");
+  await expect(talk).toHaveAttribute("aria-label", "Release to stop");
+  await expect(talk.locator("span")).toHaveText("Release");
   await page.waitForTimeout(180);
   expect((await pseudoStyle(talk, "::before")).backgroundColor)
     .toBe("rgba(255, 59, 48, 0.9)");
@@ -211,13 +213,77 @@ test("keeps portrait, landscape, and desktop controls in distinct stable zones",
 
     if (viewport.width <= 600) {
       expect(modeBox.x + modeBox.width).toBeLessThanOrEqual(closeBox.x - 8);
-      expect(Math.abs(snapshotBox.y + snapshotBox.height / 2 - viewport.height / 2))
-        .toBeLessThanOrEqual(2);
-      expect(snapshotBox.x).toBeGreaterThan(viewport.width - 70);
+      expect(Math.abs(snapshotBox.y - closeBox.y)).toBeLessThanOrEqual(1);
+      expect(Math.abs(snapshotBox.x + snapshotBox.width - closeBox.x))
+        .toBeLessThanOrEqual(1);
     } else {
       expect(Math.abs(modeBox.y - closeBox.y)).toBeLessThanOrEqual(1);
     }
   }
+});
+
+test("anchors dashboard visitor actions to the bottom of a short card", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 423, height: 184 });
+  await page.goto(
+    "/demo/?dashboard=interactive&dashboard_start=live"
+      + "&two_way_audio=1&door=1&dashboard_door=1&live_platform=ring",
+  );
+  const card = page.locator("ring-view");
+  const dock = card.locator(".visitor-action-dock");
+  const [cardBox, dockBox] = await Promise.all([card.boundingBox(), dock.boundingBox()]);
+  if (!cardBox || !dockBox) throw new Error("Dashboard visitor geometry unavailable");
+  expect(cardBox.y + cardBox.height - (dockBox.y + dockBox.height)).toBe(8);
+});
+
+test("keeps a short-card recording error readable and uses the shared Retry style", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 500, height: 420 });
+  await page.goto(
+    "/demo/?dashboard=interactive&dashboard_start=recording"
+      + "&recording_source=mqtt&name=1&activity=1",
+  );
+  const card = page.locator("ring-view");
+  await card.evaluate((element) => {
+    const host = element as HTMLElement;
+    host.style.width = "423px";
+    host.style.height = "184px";
+  });
+  const dialog = card.locator("ring-view-dialog");
+  await dialog.evaluate((element) => {
+    const viewer = element as HTMLElement & {
+      mediaStatus: string;
+      mode: string;
+      recordingFailureDetail: string;
+      requestUpdate(): void;
+    };
+    viewer.mode = "last_recording";
+    viewer.mediaStatus = "error";
+    viewer.recordingFailureDetail =
+      "Ring-MQTT did not provide a fresh recording URL in time.";
+    viewer.requestUpdate();
+  });
+
+  const header = dialog.locator(".header");
+  const state = dialog.locator(".error-state .state-card");
+  const detail = dialog.locator(".error-state .state-detail");
+  const retry = dialog.getByRole("button", { name: "Retry", exact: true });
+  await expect(dialog.getByText("Recording unavailable", { exact: true })).toBeVisible();
+  await expect(detail).toHaveCSS("display", "none");
+  await expect(retry).toHaveCSS("background-color", "rgba(0, 0, 0, 0.48)");
+  await expect(retry).toHaveCSS("border-top-width", "0px");
+  const [cardBox, headerBox, stateBox] = await Promise.all([
+    card.boundingBox(),
+    header.boundingBox(),
+    state.boundingBox(),
+  ]);
+  if (!cardBox || !headerBox || !stateBox) {
+    throw new Error("Compact error geometry unavailable");
+  }
+  expect(stateBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height);
+  expect(stateBox.y + stateBox.height).toBeLessThanOrEqual(cardBox.y + cardBox.height);
 });
 
 test("wraps long transient feedback in one calm left-aligned message surface", async ({

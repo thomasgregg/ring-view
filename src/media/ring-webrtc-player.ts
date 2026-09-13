@@ -152,10 +152,20 @@ export class RingViewRingWebRtcPlayer extends LitElement {
       max-width: calc(100% - 32px);
       transform: translate(-50%, -50%);
       white-space: normal;
-      border-radius: 10px;
-      border-color: var(--primary-color, #03a9f4);
-      background: var(--primary-color, #03a9f4);
+      min-height: 44px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.48);
+      box-shadow: none;
       touch-action: manipulation;
+    }
+
+    .playback-resume:hover {
+      background: rgba(0, 0, 0, 0.64);
+    }
+
+    .playback-resume:focus-visible {
+      outline-color: #62b8ff;
     }
 
     @media (max-width: 600px) {

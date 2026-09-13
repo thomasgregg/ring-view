@@ -952,6 +952,7 @@ export const dialogStyles = css`
     }
 
     .header {
+      --ring-view-camera-action-offset: 0px;
       display: block;
       min-height: calc(64px + env(safe-area-inset-top));
       padding: calc(10px + env(safe-area-inset-top))
@@ -959,44 +960,52 @@ export const dialogStyles = css`
         calc(16px + env(safe-area-inset-left));
     }
 
+    .header.camera-actions-one {
+      --ring-view-camera-action-offset: var(--ring-view-control-size);
+    }
+
+    .header.camera-actions-two {
+      --ring-view-camera-action-offset: calc(2 * var(--ring-view-control-size));
+    }
+
     .header-copy {
       position: absolute;
       top: calc(12px + env(safe-area-inset-top));
-      right: calc(176px + env(safe-area-inset-right));
+      right: calc(
+        176px + var(--ring-view-camera-action-offset)
+        + env(safe-area-inset-right)
+      );
       left: calc(16px + env(safe-area-inset-left));
     }
 
     .mode-switch {
       position: absolute;
       top: calc(10px + env(safe-area-inset-top));
-      right: calc(68px + env(safe-area-inset-right));
+      right: calc(
+        68px + var(--ring-view-camera-action-offset)
+        + env(safe-area-inset-right)
+      );
       transform: none;
     }
 
     .header-actions {
-      display: contents;
-      background: transparent;
-    }
-
-    .camera-actions {
-      position: absolute;
-      top: 50dvh;
-      right: calc(14px + env(safe-area-inset-right));
-      display: flex;
-      width: var(--ring-view-control-size);
-      min-height: 0;
-      flex-direction: column;
-      overflow: hidden;
-      border-radius: 28px;
-      background: var(--ring-view-control-surface);
-      transform: translateY(-50%);
-    }
-
-    .header-actions .chrome-action {
       position: absolute;
       top: calc(10px + env(safe-area-inset-top));
       right: calc(10px + env(safe-area-inset-right));
+      display: flex;
+      min-height: var(--ring-view-control-size);
+      border-radius: 28px;
       background: var(--ring-view-control-surface);
+    }
+
+    .camera-actions {
+      display: contents;
+    }
+
+    .header-actions .chrome-action {
+      position: relative;
+      inset: auto;
+      background: transparent;
     }
 
     .body {
@@ -1070,6 +1079,12 @@ export const dialogStyles = css`
       gap: 6px;
       padding-inline: 10px;
       font-size: 13px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .header.camera-actions-two .header-copy {
+      display: none;
     }
   }
 
@@ -1259,7 +1274,7 @@ export const dialogStyles = css`
 
   :host([inline]) .visitor-controls {
     right: 8px;
-    bottom: 72px;
+    bottom: 8px;
     left: 8px;
   }
 
@@ -1285,6 +1300,29 @@ export const dialogStyles = css`
   }
 
   @container ring-view-inline (max-height: 220px) {
+    :host([inline]) .blocking-state {
+      place-items: center;
+      padding: 64px 12px 8px;
+    }
+
+    :host([inline]) .blocking-state .state-card {
+      gap: 6px;
+    }
+
+    :host([inline]) .blocking-state .state-title {
+      font-size: 14px;
+      line-height: 18px;
+    }
+
+    :host([inline]) .blocking-state .state-detail {
+      display: none;
+    }
+
+    :host([inline]) .blocking-state .action-button {
+      min-height: 40px;
+      padding-inline: 14px;
+    }
+
     :host([inline]) .body:has(.state-layer.with-visitor-controls) .visitor-controls {
       visibility: hidden;
       pointer-events: none;

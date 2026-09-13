@@ -640,7 +640,7 @@ test("keeps card and viewer geometry identical across provider profiles", async 
       media: "ring-view-dialog .media-frame",
       modes: "ring-view-dialog .mode-switch",
       title: "ring-view-dialog .header-copy",
-      cameraActions: "ring-view-dialog .camera-actions",
+      headerActions: "ring-view-dialog .header-actions",
       chromeAction: "ring-view-dialog .chrome-action",
       visitor: "ring-view-dialog .visitor-action-dock",
     };

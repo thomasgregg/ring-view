@@ -4,6 +4,38 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.11.0-beta.2] - 2026-09-13
+
+### Changed
+
+- Shorten the active Talk label to **Release** while retaining the complete
+  **Release to stop** instruction for screen readers.
+- Group Snapshot with Close in the portrait header instead of leaving Snapshot
+  isolated beside the middle of the camera image.
+- Anchor the Talk and door-access rail eight pixels above the bottom of an
+  interactive dashboard card, including short mobile cards.
+- Give a newly selected or transcoding Ring-MQTT event one complete refresh
+  cycle before showing a recording error.
+
+### Fixed
+
+- Keep a loaded recording and its native Play control available when iOS rejects
+  both autoplay attempts; a browser playback policy is no longer treated as a
+  broken Ring-MQTT URL.
+- Remount each distinct valid Ring-MQTT recording URL once before requesting a
+  refresh, and accept the still-valid URL when Ring-MQTT republishes no change.
+- Prevent compact recording errors from colliding with the camera title and
+  mode controls. Short cards now show a concise title and Retry action while the
+  technical detail remains available in the full viewer and live region.
+- Replace the remaining legacy blue Ring View Resume surface with the shared
+  dark, borderless rounded action style.
+
+### Tests
+
+- Cover iOS autoplay rejection, unchanged Ring-MQTT URL refreshes, per-URL media
+  retries, 184-pixel dashboard cards, concise active Talk copy, portrait utility
+  grouping, compact error geometry, and provider-independent layout.
+
 ## [0.11.0-beta.1] - 2026-09-13
 
 ### Added

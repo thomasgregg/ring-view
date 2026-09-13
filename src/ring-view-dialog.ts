@@ -113,10 +113,18 @@ const DOOR_ERROR_DURATION_MS = 3_000;
 const SNAPSHOT_SUCCESS_DURATION_MS = 2_000;
 const SNAPSHOT_ERROR_DURATION_MS = 3_000;
 const SNAPSHOT_REFRESH_TIMEOUT_MS = 15_000;
-const RECORDING_REFRESH_TIMEOUT_MS = 15_000;
+// Ring-MQTT checks selected events on a roughly minute-long cadence. Give a
+// newly selected/transcoding event one complete refresh cycle before failing.
+const RECORDING_REFRESH_TIMEOUT_MS = 70_000;
+const RECORDING_UNCHANGED_SETTLE_MS = 1_250;
 
 type SnapshotUpdateResult = "updated" | "timeout" | "cancelled";
-type RecordingUpdateResult = "updated" | "timeout" | "failed" | "cancelled";
+type RecordingUpdateResult =
+  | "updated"
+  | "unchanged"
+  | "timeout"
+  | "failed"
+  | "cancelled";
 
 function snapshotErrorKey(error: unknown): TranslationKey {
   const message = error instanceof Error
@@ -186,6 +194,7 @@ export class RingViewDialog extends LitElement {
   // Playback belongs to an element, not the dialog: every replacement video
   // needs its own attempt, while repeated canplay events must not replay it.
   private readonly recordingPlayback = new WeakSet<HTMLVideoElement>();
+  private recordingPlaybackRetriedSource?: string;
   private recordingControlsTimer?: number;
   private recordingPaused = false;
   private automaticLiveRetry = true;
@@ -213,6 +222,7 @@ export class RingViewDialog extends LitElement {
     entityId: string;
     baseline?: string;
     timer: number;
+    settleTimer?: number;
     resolve: (result: RecordingUpdateResult) => void;
   };
   private inlineVisible = false;
@@ -383,6 +393,8 @@ export class RingViewDialog extends LitElement {
         ratio === "auto" ? "16 / 9" : ratio.replace(":", " / "),
       "--ring-view-fit-mode": this.config.fit_mode,
     };
+    const cameraActionCount = Number(this.ringing)
+      + Number(this.shouldShowSnapshotAction());
 
     return html`
       ${this.inline
@@ -401,7 +413,13 @@ export class RingViewDialog extends LitElement {
       >
         <div class="body">
           ${this.renderMedia()}
-          <header class="header">
+          <header
+            class=${classMap({
+              header: true,
+              "camera-actions-one": cameraActionCount === 1,
+              "camera-actions-two": cameraActionCount === 2,
+            })}
+          >
             ${showTitle || showActivity
               ? html`
                   <div class="header-copy">
@@ -723,13 +741,16 @@ export class RingViewDialog extends LitElement {
     const contactOpen = doorContactState === "open";
     const contactUnknown = doorContactState === "unknown";
     const contactUnknownLabel = localize(this.hass, "door.contact_unknown");
-    const talkLabel = this.talkbackRequesting
+    const talkAriaLabel = this.talkbackRequesting
       ? localize(this.hass, "talkback.requesting_microphone")
       : this.talkbackTalking
         ? localize(this.hass, "talkback.release_to_stop")
         : this.talkbackReady
           ? localize(this.hass, "talkback.hold_to_talk")
           : localize(this.hass, "talkback.connecting_short");
+    const talkVisibleLabel = this.talkbackTalking
+      ? localize(this.hass, "talkback.release_short")
+      : talkAriaLabel;
 
     return html`
       <div class="visitor-controls">
@@ -751,7 +772,7 @@ export class RingViewDialog extends LitElement {
                     active: this.talkbackTalking,
                   })}
                   type="button"
-                  aria-label=${talkLabel}
+                  aria-label=${talkAriaLabel}
                   aria-pressed=${String(this.talkbackTalking)}
                   ?disabled=${!this.talkbackReady}
                   @contextmenu=${(event: Event) => event.preventDefault()}
@@ -763,7 +784,7 @@ export class RingViewDialog extends LitElement {
                   @keyup=${this.handleTalkKeyUp}
                 >
                   ${this.icon(this.talkbackTalking ? mdiMicrophone : mdiMicrophoneOff)}
-                  <span>${talkLabel}</span>
+                  <span>${talkVisibleLabel}</span>
                 </button>
               `
             : nothing}
@@ -1498,13 +1519,19 @@ export class RingViewDialog extends LitElement {
     if (this.mediaStatus === "error") {
       const recordingDetail = this.recordingFailureDetail
         ?? localize(this.hass, "viewer.ring_protect");
+      const errorTitle = this.mode === "live"
+        ? localize(this.hass, "viewer.live_failed")
+        : localize(
+            this.hass,
+            this.inline
+              ? "viewer.recording_unavailable_short"
+              : "viewer.recording_unavailable",
+          );
       return html`
         <div class="state-layer blocking-state error-state" role="alert">
           <div class="state-card">
             <div class="state-title">
-              ${this.mode === "live"
-                ? localize(this.hass, "viewer.live_failed")
-                : localize(this.hass, "viewer.recording_unavailable")}
+              ${errorTitle}
             </div>
             ${this.mode === "last_recording"
               ? html`<div class="state-detail">
@@ -1668,6 +1695,7 @@ export class RingViewDialog extends LitElement {
     this.recordingMuted = false;
     this.liveHasAudio = undefined;
     this.recordingVideoFailed = false;
+    this.recordingPlaybackRetriedSource = undefined;
     this.talkbackReady = false;
     this.talkbackRequesting = false;
     this.talkbackTalking = false;
@@ -1695,6 +1723,9 @@ export class RingViewDialog extends LitElement {
 
     this.finishPendingRecordingUpdate("cancelled");
     const token = ++this.recordingRefreshToken;
+    const baseline = recordingSourceMarker(entity);
+    const allowUnchangedReady = this.recordingVideoFailed
+      && recordingUrlIsReady(entity);
     this.recordingPreparationActive = true;
     this.recordingVideoFailed = false;
     this.recordingFailureDetail = undefined;
@@ -1704,7 +1735,7 @@ export class RingViewDialog extends LitElement {
     this.statusAnnouncement = localize(this.hass, "viewer.refreshing_recording");
     const update = this.waitForRecordingUpdate(
       entityId,
-      recordingSourceMarker(entity),
+      baseline,
     );
 
     void Promise.resolve()
@@ -1714,6 +1745,21 @@ export class RingViewDialog extends LitElement {
         { option },
         { entity_id: entityId },
       ))
+      .then(() => {
+        if (!allowUnchangedReady || token !== this.recordingRefreshToken) return;
+        const pending = this.pendingRecordingUpdate;
+        if (!pending || pending.entityId !== entityId) return;
+        pending.settleTimer = window.setTimeout(() => {
+          const current = this.hass?.states[entityId];
+          if (
+            token === this.recordingRefreshToken
+            && recordingUrlIsReady(current)
+            && recordingSourceMarker(current) === baseline
+          ) {
+            this.finishPendingRecordingUpdate("unchanged");
+          }
+        }, RECORDING_UNCHANGED_SETTLE_MS);
+      })
       .catch(() => {
         if (token === this.recordingRefreshToken && this.open) {
           this.finishPendingRecordingUpdate("failed");
@@ -1775,6 +1821,9 @@ export class RingViewDialog extends LitElement {
     if (!pending) return;
     this.pendingRecordingUpdate = undefined;
     window.clearTimeout(pending.timer);
+    if (pending.settleTimer !== undefined) {
+      window.clearTimeout(pending.settleTimer);
+    }
     pending.resolve(result);
   }
 
@@ -1853,6 +1902,21 @@ export class RingViewDialog extends LitElement {
       this.hass
       && isRingMqttEventSelect(this.hass, this.activeEntityId())
     ) {
+      const sourceMarker = recordingSourceMarker(this.activeEntity());
+      // iOS can transiently fail the first mount of an otherwise valid signed
+      // URL. Remount each distinct URL once before asking Ring-MQTT to refresh.
+      if (
+        sourceMarker !== undefined
+        && recordingUrlIsReady(this.activeEntity())
+        && this.recordingPlaybackRetriedSource !== sourceMarker
+      ) {
+        this.recordingPlaybackRetriedSource = sourceMarker;
+        this.lifecycle.dispose();
+        this.recordingVideoFailed = false;
+        this.statusAnnouncement = localize(this.hass, "viewer.loading_recording");
+        this.startMedia();
+        return;
+      }
       this.recordingVideoFailed = true;
       this.statusAnnouncement = localize(this.hass, "viewer.refreshing_recording");
       this.startMedia();
@@ -2021,7 +2085,20 @@ export class RingViewDialog extends LitElement {
       try {
         await video.play();
       } catch {
-        if (this.isCurrentRecording(video, session)) this.handleRecordingVideoError();
+        if (this.isCurrentRecording(video, session)) {
+          // canplay proves that the URL loaded. A second play() rejection is a
+          // browser policy decision, not a broken Ring recording. Keep native
+          // controls visible so the user can start it with a tap.
+          this.lifecycle.clearTimeout();
+          this.recordingPaused = true;
+          this.recordingControlsVisible = true;
+          video.controls = true;
+          this.mediaStatus = "ready";
+          this.statusAnnouncement = localize(
+            this.hass,
+            "viewer.recording_manual_playback",
+          );
+        }
         return;
       }
     }
