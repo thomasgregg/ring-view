@@ -4,6 +4,51 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.10.0-beta.1] - 2026-09-13
+
+### Added
+
+- Support Ring-MQTT Ding and motion binary sensors as last-activity sources,
+  including renamed same-device companions and ISO, Unix-second, and
+  Unix-millisecond timestamps.
+- Refresh Ring-MQTT snapshots through the device's **Take Snapshot** button and
+  wait for an explicit new image timestamp before saving the JPEG.
+- Play Ring-MQTT Event Select recordings directly in the existing **Last
+  recording** view, refreshing missing, expiring, failed, or transcoding URLs
+  through Home Assistant state updates.
+
+### Changed
+
+- Resolve recording, Live, snapshot, doorbell, and activity entities as
+  independent source roles so official Ring, Ring-MQTT, and mixed setups share
+  the same Ring View configuration and interface.
+- Discover renamed same-device Ring-MQTT companion entities from Home
+  Assistant's registry while refusing disabled or ambiguous matches.
+- Keep the visual editor's sections, controls, and preview geometry consistent
+  across official Ring and Ring-MQTT source profiles.
+- Keep two-way audio limited to an official Ring Live camera because Ring-MQTT
+  exposes one-way RTSP without a microphone return path.
+
+### Fixed
+
+- Prevent Ring-MQTT snapshot saves from reporting success while persisting a
+  stale image.
+- Reject non-playable Ring-MQTT recording sentinels and URLs that are too close
+  to expiry, with one bounded refresh attempt after a browser playback failure.
+- Cancel pending snapshot and recording refreshes when the viewer closes,
+  changes mode, becomes hidden, or is suspended.
+
+### Documentation
+
+- Add provider-role mapping, Ring-MQTT Live camera setup, Event Select behavior,
+  snapshot requirements, privacy notes, and troubleshooting guidance.
+
+### Tests
+
+- Pass 187 unit tests and 116 browser tests across desktop and phone projects,
+  including renamed entities, mixed providers, missing registry data,
+  ambiguity, timeouts, cancellation, signed-URL expiry, and layout parity.
+
 ## [0.9.2] - 2026-09-12
 
 ### Fixed
