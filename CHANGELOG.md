@@ -6,6 +6,9 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Support official Ring and Ring-MQTT entities in the included phone
+  notification blueprint, including repeated MQTT presses and fresh snapshot
+  previews without stale-image fallback.
 - Detect rapid and repeated Ring-MQTT doorbell presses from advancing
   `lastDingTime`, `lastDing`, or entity-update timestamps while the configured
   Ding sensor remains `on`, without relying on a fixed debounce window.

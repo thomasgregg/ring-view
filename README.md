@@ -39,7 +39,7 @@ See what happened, check what is happening, save the moment, and answer the door
 - **Save a moment from Live.** Optionally show one snapshot button that saves a timestamped image through Home Assistant, with no custom automation.
 - **See when something last happened.** Optionally show a localized relative time from a timestamp sensor, event entity, or date-and-time helper.
 - **Know when someone rings.** A temporary doorbell alert works with official Ring event entities and Ring-MQTT Ding binary sensors. Tap it to open Live.
-- **Take the doorbell beyond the dashboard.** The included notification blueprint sends a phone alert, then adds a preview when the recording is ready.
+- **Take the doorbell beyond the dashboard.** The included notification blueprint works with official Ring and Ring-MQTT, sends a phone alert, then adds a fresh camera preview when it is ready.
 - **Make it yours without YAML.** Choose cameras, opening behavior, layout, and doorbell features in the visual editor.
 - **Use it across your home.** Responsive phone, tablet, and desktop layouts; Home Assistant themes; English and German; keyboard and screen-reader support.
 
@@ -162,17 +162,22 @@ The patch is **temporary**, intended only until the upstream Ring library fix is
 
 ## Make your doorbell do more
 
-The included **Ring View doorbell notification** blueprint connects your Ring Ding event, recording camera, and Companion app:
+The included **Ring View doorbell notification** blueprint connects either an
+official Ring Ding event or Ring-MQTT Ding sensor, a preview camera, and the
+Companion app:
 
 1. Someone rings → your phone gets an immediate notification.
 2. Tap the notification → Home Assistant opens your chosen dashboard.
-3. The new recording becomes available → the same notification gains a preview.
+3. The official recording or Ring-MQTT snapshot becomes available → the same
+   notification gains a fresh preview.
 
 It works even when the dashboard is closed, and the preview does not start another live session.
 
 [![Import the Ring View doorbell notification blueprint.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https://github.com/thomasgregg/ring-view/blob/main/blueprints/automation/ring_view/doorbell_notification.yaml)
 
-Use the same Ring event in your own Home Assistant automations for porch lights, announcements, or presence-aware alerts. Those are ideas for additional automations—not actions the included blueprint runs automatically.
+Use the same doorbell signal in your own Home Assistant automations for porch
+lights, announcements, or presence-aware alerts. Those are ideas for
+additional automations—not actions the included blueprint runs automatically.
 
 [Set up notifications and explore automation ideas](docs/notifications.md)
 

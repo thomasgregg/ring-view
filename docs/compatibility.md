@@ -18,6 +18,7 @@ controls, spacing, or status design.
 | Dashboard still | Last recording or Live camera image | Ring-MQTT snapshot `camera.*` | Same passive card. A snapshot camera is also the poster for Event Select recordings. |
 | Manual snapshot | Configured snapshot camera, otherwise Live camera | Snapshot camera plus its same-device Take Snapshot button | Same camera action and feedback. Ring View waits for Ring-MQTT's timestamp update before saving. |
 | Doorbell alert | Ding `event.*` | Ding `binary_sensor.*` | Same bell indicator and Open live view action. |
+| Phone notification blueprint | Ding event plus Last recording camera | Ding binary sensor plus Snapshot camera | Same immediate notification and later fresh preview. Repeated MQTT presses while the Ding sensor remains `on` are detected. |
 | Last activity | Timestamp state from a sensor, event, or helper | Ding or motion binary-sensor attributes | Same localized relative time. The freshest supported same-device MQTT activity wins. |
 | Door access | Any Home Assistant `lock.*` and optional contact sensor | Same | Provider-independent. |
 
@@ -38,10 +39,11 @@ enabled with a different Live camera.
 
 Ring-MQTT also requires its [documented one-time Home Assistant camera setup](https://github.com/tsightler/ring-mqtt/wiki/Video-Streaming#home-assistant-generic-camera-configuration)
 for the RTSP path; that setup is outside the card. The included notification
-blueprint and optional Ring WebRTC backend patch still target the official Ring
-integration. Other camera pairings remain compatible in principle when a
-recording camera exposes `video_url` or `entity_picture` and the Live camera
-advertises stream support.
+blueprint uses the selected official Last recording camera or Ring-MQTT
+Snapshot camera without starting a stream. The optional Ring WebRTC backend
+patch still targets only the official Ring integration. Other camera pairings
+remain compatible in principle when a recording camera exposes `video_url` or
+`entity_picture` and the Live camera advertises stream support.
 
 The viewer uses Home Assistant's application-level `show-dialog` contract for
 dialog placement, browser Back behavior, and independence from responsive card
