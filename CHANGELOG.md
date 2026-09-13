@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.11.0-beta.3] - 2026-09-13
+
 ### Changed
 
 - Separate Bell, Snapshot, and Close or Enlarge into individual circular glass
