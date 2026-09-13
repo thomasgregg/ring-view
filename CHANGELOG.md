@@ -4,11 +4,43 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-09-13
+
+### Added
+
+- Support Ring-MQTT Ding and motion binary sensors as last-activity sources,
+  including renamed same-device companions and ISO, Unix-second, and
+  Unix-millisecond timestamps.
+- Refresh Ring-MQTT snapshots through the device's **Take Snapshot** button and
+  wait for an explicit new image timestamp before saving the JPEG.
+- Play Ring-MQTT Event Select recordings directly in the existing **Last
+  recording** view, refreshing missing, expiring, failed, or transcoding URLs
+  through Home Assistant state updates.
+- Support official Ring and Ring-MQTT entities in one phone-notification
+  blueprint, with the same visual inputs and notification flow.
+
+### Changed
+
+- Resolve recording, Live, snapshot, doorbell, and activity entities as
+  independent source roles so official Ring, Ring-MQTT, and mixed setups share
+  the same Ring View configuration and interface.
+- Discover renamed same-device Ring-MQTT companion entities from Home
+  Assistant's registry while refusing disabled or ambiguous matches.
+- Keep the visual editor's sections, controls, and preview geometry consistent
+  across official Ring and Ring-MQTT source profiles.
+- Keep two-way audio limited to an official Ring Live camera because Ring-MQTT
+  exposes one-way RTSP without a microphone return path.
+- Send the phone notification immediately, then update that same alert only
+  after a fresh official recording or Ring-MQTT Ding snapshot is available.
+
 ### Fixed
 
-- Support official Ring and Ring-MQTT entities in the included phone
-  notification blueprint, including repeated MQTT presses and fresh snapshot
-  previews without stale-image fallback.
+- Prevent Ring-MQTT snapshot saves from reporting success while persisting a
+  stale image.
+- Reject non-playable Ring-MQTT recording sentinels and URLs that are too close
+  to expiry, with one bounded refresh attempt after a browser playback failure.
+- Cancel pending snapshot and recording refreshes when the viewer closes,
+  changes mode, becomes hidden, or is suspended.
 - Detect rapid and repeated Ring-MQTT doorbell presses from advancing
   `lastDingTime`, `lastDing`, or entity-update timestamps while the configured
   Ding sensor remains `on`, without relying on a fixed debounce window.
@@ -16,6 +48,8 @@ All notable changes to this project are documented here.
   reconnects, while continuing to ignore stale retained MQTT state.
 - Prefix the visible relative time with **Activity** so it cannot be mistaken
   for the age of an older recording selected through Ring-MQTT Event Select.
+- Ignore stale, backward, malformed, and implausibly future doorbell markers,
+  and avoid attaching an old notification preview after a timeout.
 
 ### Documentation
 
@@ -25,6 +59,19 @@ All notable changes to this project are documented here.
   Ring-MQTT Event Select recording before opening **Last recording**.
 - Align the doorbell guide with the current temporary bell and centered **Open
   live view** behavior.
+- Document how to update the blueprint and configure its official Ring or
+  Ring-MQTT Ding and preview sources.
+- Publish the code- and test-backed analysis of the official Ring realtime
+  listener failure and its recommended upstream repair sequence.
+
+### Tests
+
+- Pass 194 unit and component tests and 116 browser scenarios across desktop
+  and phone projects.
+- Cover provider parity, renamed entities, mixed sources, repeated Dings,
+  reconnect freshness, timestamp normalization, snapshot refresh, Event Select
+  playback, signed-URL expiry, cancellation, accessibility, and responsive
+  layout behavior.
 
 ## [0.10.0-beta.1] - 2026-09-13
 

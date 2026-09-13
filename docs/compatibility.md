@@ -2,7 +2,9 @@
 
 ## Supported Home Assistant versions
 
-The release target is Home Assistant 2026.9 and the previous two monthly releases where practical. Version 0.1.0 declares Home Assistant 2026.7.0 as its minimum.
+The release target is Home Assistant 2026.9 and the previous two monthly
+releases where practical. Ring View declares Home Assistant 2026.7.0 as its
+minimum.
 
 ## Official Ring and Ring-MQTT sources
 

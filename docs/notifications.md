@@ -26,18 +26,23 @@ runs in Home Assistant instead.
 
 ### Setup
 
-1. Import the blueprint and create an automation from it.
+1. Import the blueprint and create an automation from it. If it is already
+   installed, import it again and choose **Overwrite**; existing automations
+   keep their configured inputs.
 2. Under **Ring View sources**, select:
 
    - For official Ring: the **Ding event** and matching **Last recording**
      camera.
    - For Ring-MQTT: the **Ding binary sensor** and matching **Snapshot** camera.
 
-3. Choose the phone registered with the Home Assistant **Companion app**.
-4. Set **Dashboard path** to the actual view containing your Ring View card,
+3. For Ring-MQTT, set the camera's **Snapshot Mode** to an option that includes
+   **Ding**. Choose **Interval + Ding** if you also want periodic dashboard
+   images.
+4. Choose the phone registered with the Home Assistant **Companion app**.
+5. Set **Dashboard path** to the actual view containing your Ring View card,
    such as `/lovelace/entrance`. Replace the example/test path; the blueprint
    does not create or configure a dashboard for you.
-5. Save, then test with a real doorbell press. Confirm phone notification
+6. Save, then test with a real doorbell press. Confirm phone notification
    permission is enabled.
 
 ### What happens

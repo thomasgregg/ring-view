@@ -48,10 +48,9 @@ See what happened, check what is happening, save the moment, and answer the door
 
 Ring View supports both Home Assistant's built-in **Ring integration** and the
 separate [**Ring-MQTT add-on**](https://github.com/tsightler/ring-mqtt). You do
-not have to choose one provider for the
-whole card: each feature can use the source that works best for it. The visual
-editor, viewer, controls, and layout remain the same whichever entities you
-select.
+not have to choose one provider for the whole card: each feature can use the
+source that works best for it. The visual editor, viewer, controls, and layout
+remain the same whichever entities you select.
 
 | Ring View feature | Official Ring integration | Ring-MQTT | Our recommendation |
 | --- | --- | --- | --- |
@@ -226,6 +225,11 @@ It works even when the dashboard is closed, and the preview does not start anoth
 
 [![Import the Ring View doorbell notification blueprint.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https://github.com/thomasgregg/ring-view/blob/main/blueprints/automation/ring_view/doorbell_notification.yaml)
 
+Already using an older version? Import it again and choose **Overwrite**. Your
+existing automation remains compatible because the blueprint keeps the same
+input fields; you can then switch its Ding and preview entities between
+official Ring and Ring-MQTT in the normal visual editor.
+
 Use the same doorbell signal in your own Home Assistant automations for porch
 lights, announcements, or presence-aware alerts. Those are ideas for
 additional automations—not actions the included blueprint runs automatically.
@@ -239,6 +243,7 @@ additional automations—not actions the included blueprint runs automatically.
 - [Playback, talkback, iPhone rotation, and troubleshooting](docs/playback-and-troubleshooting.md)
 - [Optional temporary backend patch](docs/backend-patch.md)
 - [Doorbell notifications and automation blueprint](docs/notifications.md)
+- [Official Ring realtime-listener reliability analysis](docs/ring-listener-reliability-analysis.md)
 - [Security, privacy, and accessibility](docs/privacy-and-accessibility.md)
 - [Compatibility](docs/compatibility.md) · [Testing and development](docs/testing.md) · [Rollback](docs/rollback.md) · [Changelog](CHANGELOG.md)
 
