@@ -7,7 +7,7 @@
 
 ## Your Ring camera. One card. Recording, Live, snapshots, talkback, and door access.
 
-See what happened, check what is happening, save the moment, and answer the door without leaving the same viewer. Ring View brings Ring's separate recording and live camera entities together in one Home Assistant dashboard card.
+See what happened, check what is happening, save the moment, and answer the door without leaving the same viewer. Ring View brings Ring media together in one Home Assistant dashboard card. It supports Home Assistant's official Ring integration, Ring-MQTT, or a mix of entities from both.
 
 <p align="center">
   <a href="https://github.com/thomasgregg/ring-view/blob/main/docs/images/ring-view-modes-rounded.png">
@@ -20,6 +20,7 @@ See what happened, check what is happening, save the moment, and answer the door
 ## Contents
 
 - [What Ring View can do](#what-you-can-do)
+- [Choose official Ring, Ring-MQTT, or both](#choose-official-ring-ring-mqtt-or-both)
 - [Install and get started](#get-started)
   - [Configure visually](#configure-visually)
   - [Choose the dashboard card behavior](#choose-how-the-dashboard-card-works)
@@ -39,20 +40,53 @@ See what happened, check what is happening, save the moment, and answer the door
 - **Save a moment from Live.** Optionally show one snapshot button that saves a timestamped image through Home Assistant, with no custom automation.
 - **See when something last happened.** Optionally show a localized relative time from a timestamp sensor, event entity, or date-and-time helper.
 - **Know when someone rings.** A temporary doorbell alert works with official Ring event entities and Ring-MQTT Ding binary sensors. Tap it to open Live.
-- **Take the doorbell beyond the dashboard.** The included notification blueprint sends a phone alert, then adds a preview when the recording is ready.
+- **Take the doorbell beyond the dashboard.** The included notification blueprint works with official Ring and Ring-MQTT, sends a phone alert, then adds a fresh camera preview when it is ready.
 - **Make it yours without YAML.** Choose cameras, opening behavior, layout, and doorbell features in the visual editor.
 - **Use it across your home.** Responsive phone, tablet, and desktop layouts; Home Assistant themes; English and German; keyboard and screen-reader support.
+
+## Choose official Ring, Ring-MQTT, or both
+
+Ring View supports both Home Assistant's built-in **Ring integration** and the
+separate [**Ring-MQTT add-on**](https://github.com/tsightler/ring-mqtt). You do
+not have to choose one provider for the whole card: each feature can use the
+source that works best for it. The visual editor, viewer, controls, and layout
+remain the same whichever entities you select.
+
+| Ring View feature | Official Ring integration | Ring-MQTT | Our recommendation |
+| --- | --- | --- | --- |
+| **Last recording** | ✅ Select the **Last recording** camera. It is the simplest option, but [some cameras using 24/7 recording can remain on an old clip](https://github.com/home-assistant/core/issues/176299). | ✅ Select **Event Select**, then choose the event to play. **Ding 1** is the newest doorbell press; **Motion 1** is the newest motion event. | Use Event Select if the official camera is stale or missing. Otherwise, the official camera is simpler. |
+| **Live video** | ✅ Select the **Live view** camera. It works directly and is the only source that supports Ring View talkback. A [known upstream cleanup problem](docs/backend-patch.md) can affect repeated Live sessions on some systems. | ✅ Works after a one-time Home Assistant camera setup using Ring-MQTT's Live stream. It provides video and audio from the doorbell, but not talkback. | Use the official Live view camera, especially when you want **Hold to talk**. |
+| **Two-way audio** | ✅ **Hold to talk** is supported. | ❌ Ring-MQTT's Live stream has no microphone return path. This is a source limitation, not a Ring View setting or bug. | Use the official Live view camera. |
+| **Doorbell alert inside the card** | ✅ Works through the Ring Ding event while its realtime listener is healthy. Upstream failures can leave that listener stopped ([#526](https://github.com/python-ring-doorbell/python-ring-doorbell/issues/526), [#537](https://github.com/python-ring-doorbell/python-ring-doorbell/issues/537)). | ✅ Works through the Ding binary sensor. | Prefer the Ring-MQTT Ding sensor for reliability today. |
+| **Last activity time** | ✅ A Ring event or another Home Assistant timestamp can be used, but a Ring event depends on the same realtime listener. | ✅ Ring-MQTT Ding and motion sensors are supported directly; Ring View chooses the freshest activity time from the device. | Prefer a Ring-MQTT Ding or motion sensor. |
+| **Dashboard image and saved snapshots** | ⚠️ A Ring camera may provide a still image, but the official Live camera does not always expose the current Live frame for saving. | ✅ The snapshot camera provides the dashboard image. For a manual save, Ring View asks **Take Snapshot** for a new image first. | Use the Ring-MQTT snapshot camera for the freshest and most dependable image. |
+| **Phone-notification blueprint** | ✅ Select the Ding event and Last recording camera. The alert is immediate; a fresh recording preview follows when available. | ✅ Select the Ding binary sensor and Snapshot camera. Repeated presses are detected while Ding remains on, and only a fresh Ding snapshot is attached. | Prefer the Ring-MQTT Ding and Snapshot entities while the official realtime listener is unreliable. Set Snapshot Mode to an option that includes **Ding**. |
+| **Door access** | ✅ Any Home Assistant lock and optional contact sensor. | ✅ The same—door access is independent of the camera provider. | Use whichever lock is already connected to Home Assistant. |
+
+### Recommended mixed setup
+
+For the most complete experience today, keep both integrations and choose:
+
+- **Last recording:** Ring-MQTT **Event Select**.
+- **Live and Hold to talk:** official Ring **Live view** camera.
+- **Dashboard image and manual snapshots:** Ring-MQTT **Snapshot** camera.
+- **Doorbell alert and last activity:** Ring-MQTT **Ding** and motion sensors.
+- **Phone notification:** Ring-MQTT **Ding** sensor and **Snapshot** camera.
+- **Door access:** any Home Assistant lock and optional contact sensor.
+
+This combines Ring-MQTT's dependable events and snapshots with the official
+integration's Live talkback path. You can still choose only official Ring or
+only Ring-MQTT when that better matches your installation. See the
+[provider guide](docs/compatibility.md#official-ring-and-ring-mqtt-sources) for
+the detailed source mapping and limitations.
 
 ## Get started
 
 You need Home Assistant **2026.7 or newer** and Ring media exposed through Home
-Assistant. Use the official [Ring integration](https://www.home-assistant.io/integrations/ring/),
-Ring-MQTT, or mix their entities by role. The official setup uses **Last
-recording** and **Live view** cameras. A Ring-MQTT setup uses **Event Select**
-for recordings, its snapshot camera, and a Home Assistant camera configured
-from Ring-MQTT's live RTSP path. Recording access requires a suitable Ring
-subscription. See [Choosing camera entities](docs/configuration.md#choosing-camera-entities)
-for both setups.
+Assistant. Install the official [Ring integration](https://www.home-assistant.io/integrations/ring/),
+Ring-MQTT, or both. Recording access requires a suitable Ring subscription.
+Ring View itself needs no Ring login; it uses the entities already available
+in Home Assistant.
 
 The core viewer can also use another Home Assistant recording camera when it
 exposes recorded media, and any Live camera that advertises stream support.
@@ -81,6 +115,22 @@ live_entity: camera.front_door_live_view
 YAML is optional. The visual editor lets you select the media sources and configure
 dashboard behavior, manual snapshots, Talk, doorbell features, door access and
 appearance.
+
+#### If you use Ring-MQTT Event Select for recordings
+
+Event Select is a Home Assistant menu that decides which recording Ring View
+plays. Choosing it in the card editor is only the first step:
+
+1. Open **Settings → Devices & services → Entities** in Home Assistant.
+2. Search for **Event Select**, then open the one belonging to your Ring camera.
+3. Choose **Ding 1** for the newest doorbell press or **Motion 1** for the newest
+   motion event. Higher numbers are older events.
+4. Open Ring View and select **Last recording**.
+
+If the normal recording does not play in your browser, choose the matching
+**(Transcoded)** option. Ring View refreshes the temporary playback link when
+needed, but it deliberately keeps your selected Ding, Motion, or on-demand
+event instead of changing that choice for you.
 
 <p align="center">
   <a href="https://github.com/thomasgregg/ring-view/blob/main/docs/images/configuration-editor.png">
@@ -162,17 +212,27 @@ The patch is **temporary**, intended only until the upstream Ring library fix is
 
 ## Make your doorbell do more
 
-The included **Ring View doorbell notification** blueprint connects your Ring Ding event, recording camera, and Companion app:
+The included **Ring View doorbell notification** blueprint connects either an
+official Ring Ding event or Ring-MQTT Ding sensor, a preview camera, and the
+Companion app:
 
 1. Someone rings → your phone gets an immediate notification.
 2. Tap the notification → Home Assistant opens your chosen dashboard.
-3. The new recording becomes available → the same notification gains a preview.
+3. The official recording or Ring-MQTT snapshot becomes available → the same
+   notification gains a fresh preview.
 
 It works even when the dashboard is closed, and the preview does not start another live session.
 
 [![Import the Ring View doorbell notification blueprint.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https://github.com/thomasgregg/ring-view/blob/main/blueprints/automation/ring_view/doorbell_notification.yaml)
 
-Use the same Ring event in your own Home Assistant automations for porch lights, announcements, or presence-aware alerts. Those are ideas for additional automations—not actions the included blueprint runs automatically.
+Already using an older version? Import it again and choose **Overwrite**. Your
+existing automation remains compatible because the blueprint keeps the same
+input fields; you can then switch its Ding and preview entities between
+official Ring and Ring-MQTT in the normal visual editor.
+
+Use the same doorbell signal in your own Home Assistant automations for porch
+lights, announcements, or presence-aware alerts. Those are ideas for
+additional automations—not actions the included blueprint runs automatically.
 
 [Set up notifications and explore automation ideas](docs/notifications.md)
 
@@ -183,6 +243,7 @@ Use the same Ring event in your own Home Assistant automations for porch lights,
 - [Playback, talkback, iPhone rotation, and troubleshooting](docs/playback-and-troubleshooting.md)
 - [Optional temporary backend patch](docs/backend-patch.md)
 - [Doorbell notifications and automation blueprint](docs/notifications.md)
+- [Official Ring realtime-listener reliability analysis](docs/ring-listener-reliability-analysis.md)
 - [Security, privacy, and accessibility](docs/privacy-and-accessibility.md)
 - [Compatibility](docs/compatibility.md) · [Testing and development](docs/testing.md) · [Rollback](docs/rollback.md) · [Changelog](CHANGELOG.md)
 

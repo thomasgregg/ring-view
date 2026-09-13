@@ -8,9 +8,10 @@ In the visual editor, open **Doorbell features** and select either your official
 Ring Ding event entity, for example `event.front_door_ding`, or a Ring-MQTT Ding
 binary sensor such as `binary_sensor.front_door_ding`.
 
-A fresh `ring` event or an `off` to `on` Ding transition displays **Someone is
-at the door** for twelve seconds.
-Tapping the card during that alert opens Live. An already active Live session
+A fresh `ring` event, an `off` to `on` Ding transition, or a newer Ring-MQTT
+Ding timestamp while the sensor remains `on` displays the bell alert for
+twelve seconds. If Live is not running, Ring View also offers **Open live
+view** in the shared centered message area. An already active Live session
 is left untouched. The alert expires from the original event time; rebuilding
 the card does not restart its twelve-second lifetime.
 
@@ -25,33 +26,52 @@ runs in Home Assistant instead.
 
 ### Setup
 
-1. Import the blueprint and create an automation from it.
-2. Select the Ring **Ding event entity** and the matching **last-recording
-   camera**.
-3. Choose the phone registered with the Home Assistant **Companion app**.
-4. Set **Dashboard path** to the actual view containing your Ring View card,
+1. Import the blueprint and create an automation from it. If it is already
+   installed, import it again and choose **Overwrite**; existing automations
+   keep their configured inputs.
+2. Under **Ring View sources**, select:
+
+   - For official Ring: the **Ding event** and matching **Last recording**
+     camera.
+   - For Ring-MQTT: the **Ding binary sensor** and matching **Snapshot** camera.
+
+3. For Ring-MQTT, set the camera's **Snapshot Mode** to an option that includes
+   **Ding**. Choose **Interval + Ding** if you also want periodic dashboard
+   images.
+4. Choose the phone registered with the Home Assistant **Companion app**.
+5. Set **Dashboard path** to the actual view containing your Ring View card,
    such as `/lovelace/entrance`. Replace the example/test path; the blueprint
    does not create or configure a dashboard for you.
-5. Save, then test with a real doorbell press. Confirm phone notification
+6. Save, then test with a real doorbell press. Confirm phone notification
    permission is enabled.
 
 ### What happens
 
-- A Ring Ding event sends an immediate **Someone is at the door** notification.
+- An official Ring or Ring-MQTT Ding sends an immediate **Someone is at the
+  door** notification. Repeated Ring-MQTT presses are detected even while its
+  Ding sensor remains `on`.
 - Tapping it opens the configured Home Assistant dashboard, not a guaranteed
   automatically opened Live viewer.
-- The automation waits up to **two minutes** for the recording camera's
-  `last_video_id` to change.
-- When the recording is ready, it updates the same tagged notification with a
-  recording preview. No extra Ring live session is started.
-- If no new recording appears within two minutes, the immediate notification
-  remains; there is no preview update.
+- The automation waits up to **two minutes** for a new official recording ID or
+  a newer Ring-MQTT Ding snapshot timestamp.
+- When the chosen preview camera updates, the automation updates the same
+  tagged notification with its fresh image. No extra Ring live session is
+  started.
+- If the camera does not publish a new image within two minutes, the immediate
+  notification remains unchanged; an older image is never attached as if it
+  were current.
 - Another ring restarts the wait. The shared notification tag updates the same
   alert rather than creating a separate notification for every stage.
 
-The blueprint requires Home Assistant **2026.7 or newer**, a Ring recording
-entity with `last_video_id`, and a working Companion app notification device.
-The optional backend patch is not required for this automation.
+The blueprint requires Home Assistant **2026.7 or newer**, a supported Ding
+entity, a camera preview entity, and a working Companion app notification
+device. The optional backend patch is not required for this automation.
+
+Ring-MQTT snapshot timing depends on the camera and its **Snapshot Mode**. For
+the most useful doorbell preview, choose a mode that includes Ding snapshots.
+Low-power cameras may not always produce a snapshot while recording; in that
+case the immediate alert still arrives and the blueprint safely leaves it
+without a stale preview.
 
 On some newer wired Ring cameras using 24/7 recording, an
 [upstream Home Assistant issue](https://github.com/home-assistant/core/issues/176299)
@@ -61,9 +81,9 @@ a new recording and therefore leaves the notification without a recording
 preview after the two-minute wait. The issue reporter found that disabling
 24/7 recording and using periodic snapshots restored recording updates.
 
-## Build on the same Ring event
+## Build on the same doorbell signal
 
-You can use the doorbell event in additional Home Assistant automations to:
+You can use the doorbell signal in additional Home Assistant automations to:
 
 - Turn on an entrance light after dark.
 - Announce a visitor on a speaker.

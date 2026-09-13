@@ -91,6 +91,7 @@
   "card.preview_alt": "{name} preview",
   "card.preview_unavailable": "Camera preview unavailable",
   "card.description": "View the latest recording and start a separate live camera stream.",
+  "activity.relative": "Activity · {time}",
   "activity.accessible": "Last activity, {time}",
   "activity.title": "Last activity: {time}",
   "warning.unavailable": "{name} is unavailable.",

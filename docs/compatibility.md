@@ -2,7 +2,9 @@
 
 ## Supported Home Assistant versions
 
-The release target is Home Assistant 2026.9 and the previous two monthly releases where practical. Version 0.1.0 declares Home Assistant 2026.7.0 as its minimum.
+The release target is Home Assistant 2026.9 and the previous two monthly
+releases where practical. Ring View declares Home Assistant 2026.7.0 as its
+minimum.
 
 ## Official Ring and Ring-MQTT sources
 
@@ -18,8 +20,23 @@ controls, spacing, or status design.
 | Dashboard still | Last recording or Live camera image | Ring-MQTT snapshot `camera.*` | Same passive card. A snapshot camera is also the poster for Event Select recordings. |
 | Manual snapshot | Configured snapshot camera, otherwise Live camera | Snapshot camera plus its same-device Take Snapshot button | Same camera action and feedback. Ring View waits for Ring-MQTT's timestamp update before saving. |
 | Doorbell alert | Ding `event.*` | Ding `binary_sensor.*` | Same bell indicator and Open live view action. |
+| Phone notification blueprint | Ding event plus Last recording camera | Ding binary sensor plus Snapshot camera | Same immediate notification and later fresh preview. Repeated MQTT presses while the Ding sensor remains `on` are detected. |
 | Last activity | Timestamp state from a sensor, event, or helper | Ding or motion binary-sensor attributes | Same localized relative time. The freshest supported same-device MQTT activity wins. |
 | Door access | Any Home Assistant `lock.*` and optional contact sensor | Same | Provider-independent. |
+
+For the broadest feature coverage, use Ring-MQTT Event Select for recordings,
+the Ring-MQTT snapshot camera for stills and saved snapshots, Ring-MQTT Ding and
+motion sensors for alerts and activity time, and the official Ring Live view
+camera for Live video and two-way audio. This recommended mix is a choice of
+entities inside the same Ring View editor; it does not create a second card or
+change the design.
+
+Event Select is a persistent Home Assistant menu. The user must open that
+entity and choose the desired slot: **Ding 1** is the newest doorbell event,
+**Motion 1** is the newest motion event, and higher numbers are older. Ring View
+refreshes the playback link for the selected slot but does not silently switch
+the user's event choice. If the original recording format does not play, choose
+the matching **(Transcoded)** option.
 
 The visual editor always offers the same fields and choices. It never reveals
 or removes design settings based on an entity's integration. The runtime uses
@@ -38,10 +55,11 @@ enabled with a different Live camera.
 
 Ring-MQTT also requires its [documented one-time Home Assistant camera setup](https://github.com/tsightler/ring-mqtt/wiki/Video-Streaming#home-assistant-generic-camera-configuration)
 for the RTSP path; that setup is outside the card. The included notification
-blueprint and optional Ring WebRTC backend patch still target the official Ring
-integration. Other camera pairings remain compatible in principle when a
-recording camera exposes `video_url` or `entity_picture` and the Live camera
-advertises stream support.
+blueprint uses the selected official Last recording camera or Ring-MQTT
+Snapshot camera without starting a stream. The optional Ring WebRTC backend
+patch still targets only the official Ring integration. Other camera pairings
+remain compatible in principle when a recording camera exposes `video_url` or
+`entity_picture` and the Live camera advertises stream support.
 
 The viewer uses Home Assistant's application-level `show-dialog` contract for
 dialog placement, browser Back behavior, and independence from responsive card

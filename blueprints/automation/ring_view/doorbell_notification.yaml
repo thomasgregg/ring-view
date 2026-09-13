@@ -1,55 +1,176 @@
 blueprint:
   name: Ring View doorbell notification
   description: >-
-    Sends an immediate Home Assistant Companion notification when a doorbell
-    event is received. Tapping opens the configured Ring View dashboard. When
-    Ring finishes processing a new recording, the same notification is updated
-    with a camera preview. The recording camera path does not start another
-    Ring live-view session.
+    Sends an immediate Home Assistant Companion notification for an official
+    Ring or Ring-MQTT doorbell signal. Tapping opens the configured Ring View
+    dashboard. When the selected preview camera publishes a new recording or
+    snapshot, the same notification is updated with that image. No additional
+    Ring live-view session is started.
   domain: automation
+  author: Thomas Gregg
+  source_url: >-
+    https://github.com/thomasgregg/ring-view/blob/main/blueprints/automation/ring_view/doorbell_notification.yaml
   homeassistant:
     min_version: 2026.7.0
   input:
-    doorbell_event:
-      name: Doorbell event
-      description: Select the Ring Ding event entity.
-      selector:
-        entity:
-          filter:
-            - domain: event
-              device_class: doorbell
-    recording_camera:
-      name: Last recording camera
-      description: Select the Ring last-recording camera entity.
-      selector:
-        entity:
-          filter:
-            - domain: camera
-    notification_device:
-      name: Phone or tablet
-      description: Select a device running the Home Assistant Companion app.
-      selector:
-        device:
-          filter:
-            - integration: mobile_app
-    dashboard_path:
-      name: Ring View dashboard path
-      description: Relative Home Assistant path opened when the notification is tapped.
-      default: /ring-camera-test/ring-view
-      selector:
-        text: {}
+    sources:
+      name: Ring View sources
+      icon: mdi:doorbell-video
+      input:
+        doorbell_event:
+          name: Doorbell signal
+          description: >-
+            Select the same official Ring Ding event or Ring-MQTT Ding binary
+            sensor used by the Ring View card.
+          selector:
+            entity:
+              filter:
+                - domain: event
+                  device_class: doorbell
+                - domain: binary_sensor
+                  integration: mqtt
+        recording_camera:
+          name: Notification preview camera
+          description: >-
+            Select the official Ring Last recording camera or the Ring-MQTT
+            Snapshot camera. A preview is added only after this camera updates.
+          selector:
+            entity:
+              filter:
+                - domain: camera
+    delivery:
+      name: Notification delivery
+      icon: mdi:cellphone-message
+      input:
+        notification_device:
+          name: Phone or tablet
+          description: Select a device running the Home Assistant Companion app.
+          selector:
+            device:
+              filter:
+                - integration: mobile_app
+        dashboard_path:
+          name: Ring View dashboard path
+          description: Relative Home Assistant path opened when the notification is tapped.
+          default: /lovelace/entrance
+          selector:
+            text: {}
 
 triggers:
-  - trigger: event.received
-    target:
-      entity_id: !input doorbell_event
-    options:
-      event_type:
-        - ring
+  # Omitting from/to is intentional: Home Assistant then reports both state
+  # and attribute changes, including another Ring-MQTT Ding while still on.
+  - trigger: state
+    entity_id: !input doorbell_event
+
+conditions:
+  - alias: Continue only for a new doorbell press
+    condition: template
+    value_template: >-
+      {% if trigger is not defined or trigger.platform != 'state' %}
+        {{ false }}
+      {% else %}
+        {% set before = trigger.from_state %}
+        {% set after = trigger.to_state %}
+        {% set before_state = before.state if before is not none else none %}
+        {% set recent_before = before_state in [none, 'unknown', 'unavailable'] %}
+        {% if after is none or after.state in ['unknown', 'unavailable'] %}
+          {{ false }}
+        {% elif after.entity_id.startswith('event.') %}
+          {% set current_event = as_timestamp(after.state, none) %}
+          {% set previous_event = as_timestamp(before_state, none) %}
+          {% set event_type = after.attributes.event_type | default('ring', true) %}
+          {{ event_type == 'ring' and current_event is not none and (
+            (previous_event is not none and current_event > previous_event)
+            or (recent_before
+              and current_event >= now().timestamp() - 12
+              and current_event <= now().timestamp() + 5)
+          ) }}
+        {% elif after.entity_id.startswith('binary_sensor.') %}
+          {% set previous_time_raw = before.attributes.lastDingTime
+            | default(none) if before is not none else none %}
+          {% set previous_epoch_raw = before.attributes.lastDing
+            | default(none) if before is not none else none %}
+          {% set current_time_raw = after.attributes.lastDingTime
+            | default(none) %}
+          {% set current_epoch_raw = after.attributes.lastDing
+            | default(none) %}
+          {% set previous_time_number = previous_time_raw | float(none) %}
+          {% set previous_epoch_number = previous_epoch_raw | float(none) %}
+          {% set current_time_number = current_time_raw | float(none) %}
+          {% set current_epoch_number = current_epoch_raw | float(none) %}
+          {% set previous_time = previous_time_number
+            if previous_time_number is not none
+            else as_timestamp(previous_time_raw, none) %}
+          {% set previous_epoch = previous_epoch_number
+            if previous_epoch_number is not none
+            else as_timestamp(previous_epoch_raw, none) %}
+          {% set current_time = current_time_number
+            if current_time_number is not none
+            else as_timestamp(current_time_raw, none) %}
+          {% set current_epoch = current_epoch_number
+            if current_epoch_number is not none
+            else as_timestamp(current_epoch_raw, none) %}
+          {% set previous_ding = previous_time
+            if previous_epoch is none
+              or (previous_time is not none and previous_time >= previous_epoch)
+            else previous_epoch %}
+          {% set current_ding = current_time
+            if current_epoch is none
+              or (current_time is not none and current_time >= current_epoch)
+            else current_epoch %}
+          {% set previous_has_marker = before is not none and (
+            'lastDingTime' in before.attributes or 'lastDing' in before.attributes
+          ) %}
+          {% set current_has_marker =
+            'lastDingTime' in after.attributes or 'lastDing' in after.attributes %}
+          {% set previous_update = as_timestamp(
+            before.last_updated, none
+          ) if before is not none else none %}
+          {% set current_update = as_timestamp(after.last_updated, none) %}
+          {{ after.state == 'on' and (
+            before_state == 'off'
+            or (recent_before and current_ding is not none
+              and current_ding >= now().timestamp() - 12
+              and current_ding <= now().timestamp() + 5)
+            or (before_state == 'on' and (
+              ((previous_has_marker or current_has_marker)
+                and previous_ding is not none
+                and current_ding is not none
+                and current_ding > previous_ding)
+              or (not previous_has_marker and not current_has_marker
+                and previous_update is not none
+                and current_update is not none
+                and current_update > previous_update)
+            ))
+          ) }}
+        {% else %}
+          {{ false }}
+        {% endif %}
+      {% endif %}
 
 variables:
-  recording_camera_id: !input recording_camera
+  preview_camera_id: !input recording_camera
   dashboard_path_value: !input dashboard_path
+  preview_kind: >-
+    {% set preview = states[preview_camera_id] %}
+    {% if preview.attributes.last_video_id | default(none) is not none %}
+      recording
+    {% elif preview.attributes.timestamp | default(none) is not none %}
+      snapshot
+    {% else %}
+      camera
+    {% endif %}
+  preview_marker_before: >-
+    {% set preview = states[preview_camera_id] %}
+    {% if preview_kind == 'recording' %}
+      {{ preview.attributes.last_video_id }}
+    {% elif preview_kind == 'snapshot' %}
+      {% set raw = preview.attributes.timestamp %}
+      {% set numeric = raw | float(none) %}
+      {{ numeric if numeric is not none else as_timestamp(raw, none) }}
+    {% else %}
+      {{ as_timestamp(preview.last_updated, none) }}
+    {% endif %}
 
 actions:
   - alias: Notify immediately
@@ -63,14 +184,31 @@ actions:
       group: ring-view
       url: "{{ dashboard_path_value }}"
       clickAction: "{{ dashboard_path_value }}"
-  - alias: Wait for the new Ring recording
-    wait_for_trigger:
-      - trigger: state
-        entity_id: !input recording_camera
-        attribute: last_video_id
+  - alias: Wait for a genuinely new preview
+    # A template wait closes the small race where the camera can update while
+    # the immediate mobile notification is being sent.
+    wait_template: >-
+      {% set preview = states[preview_camera_id] %}
+      {% if preview_kind == 'recording' %}
+        {% set current = preview.attributes.last_video_id | default(none) %}
+        {{ current is not none
+          and (current ~ '') != (preview_marker_before ~ '') }}
+      {% elif preview_kind == 'snapshot' %}
+        {% set raw = preview.attributes.timestamp | default(none) %}
+        {% set numeric = raw | float(none) %}
+        {% set current = numeric
+          if numeric is not none else as_timestamp(raw, none) %}
+        {{ current is not none
+          and current > (preview_marker_before | float(-1))
+          and (preview.attributes.type | default('ding', true)) == 'ding' }}
+      {% else %}
+        {% set current = as_timestamp(preview.last_updated, none) %}
+        {{ current is not none
+          and current > (preview_marker_before | float(-1)) }}
+      {% endif %}
     timeout: "00:02:00"
     continue_on_timeout: false
-  - alias: Add the visitor preview to the existing notification
+  - alias: Add the fresh preview to the existing notification
     device_id: !input notification_device
     domain: mobile_app
     type: notify
@@ -81,9 +219,10 @@ actions:
       group: ring-view
       url: "{{ dashboard_path_value }}"
       clickAction: "{{ dashboard_path_value }}"
-      entity_id: "{{ recording_camera_id }}"
+      entity_id: "{{ preview_camera_id }}"
       image: >-
-        /api/camera_proxy/{{ recording_camera_id }}?v={{
-        state_attr(recording_camera_id, 'last_video_id') }}
+        /api/camera_proxy/{{ preview_camera_id }}?v={{
+        now().timestamp() | int }}
 
 mode: restart
+max_exceeded: silent
