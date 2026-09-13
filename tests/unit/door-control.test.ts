@@ -108,18 +108,35 @@ describe("door control", () => {
     expect(button?.textContent).toContain("Hold to open");
 
     dispatchPointer(button!, "pointerdown");
-    await vi.advanceTimersByTimeAsync(899);
+    await vi.advanceTimersByTimeAsync(1_599);
     dispatchPointer(button!, "pointerup");
     await vi.advanceTimersByTimeAsync(1_000);
     expect(callService).not.toHaveBeenCalled();
 
     dispatchPointer(button!, "pointerdown", 2);
-    await vi.advanceTimersByTimeAsync(900);
+    await vi.advanceTimersByTimeAsync(1_600);
     expect(callService).toHaveBeenCalledTimes(1);
     expect(callService).toHaveBeenCalledWith("lock", "open", {
       entity_id: "lock.front_door",
     });
     expect(dialog.shadowRoot?.textContent).toContain("Door opened");
+
+    dispatchPointer(button!, "pointerup", 2);
+    await vi.advanceTimersByTimeAsync(2_000);
+    expect(callService).toHaveBeenCalledTimes(1);
+  });
+
+  it("cancels a nearly complete hold when the pointer is cancelled", async () => {
+    const { dialog, callService } = await mount();
+    const button = dialog.shadowRoot?.querySelector<HTMLButtonElement>(".door-action");
+
+    dispatchPointer(button!, "pointerdown");
+    await vi.advanceTimersByTimeAsync(1_599);
+    dispatchPointer(button!, "pointercancel");
+    await vi.advanceTimersByTimeAsync(2_000);
+
+    expect(callService).not.toHaveBeenCalled();
+    expect(button?.classList.contains("holding")).toBe(false);
   });
 
   it("can use an immediate single-tap unlock action", async () => {

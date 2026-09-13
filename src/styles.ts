@@ -157,6 +157,16 @@ export const cardStyles = css`
 
 export const dialogStyles = css`
   :host {
+    --ring-view-control-size: 44px;
+    --ring-view-primary-size: 48px;
+    --ring-view-control-surface: rgba(0, 0, 0, 0.3);
+    --ring-view-action-surface: rgba(0, 0, 0, 0.48);
+    --ring-view-message-surface: rgba(10, 10, 10, 0.78);
+    --ring-view-focus-color: #62b8ff;
+    --ring-view-live-color: #ff3b30;
+    --ring-view-ring-color: #ffb020;
+    --ring-view-success-color: #50d890;
+    --ring-view-error-color: #ff6b6b;
     position: fixed;
     inset: 0;
     z-index: 999;
@@ -241,27 +251,35 @@ export const dialogStyles = css`
     display: flex;
     align-items: center;
     justify-self: end;
-    gap: 2px;
+    min-height: var(--ring-view-control-size);
+    gap: 0;
+    overflow: visible;
+    border-radius: 28px;
+    background: var(--ring-view-control-surface);
     pointer-events: auto;
   }
 
+  .camera-actions {
+    display: contents;
+  }
+
   .ring-indicator {
-    width: 36px;
-    height: 36px;
+    width: var(--ring-view-control-size);
+    height: var(--ring-view-control-size);
     display: inline-grid;
     place-items: center;
     flex: 0 0 auto;
     border-radius: 50%;
-    color: var(--warning-color, #ffa000);
-    background: rgba(0, 0, 0, 0.38);
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.38);
+    color: var(--ring-view-ring-color);
+    background: transparent;
+    box-shadow: none;
     pointer-events: none;
   }
 
   .ring-indicator svg {
     width: 22px;
     height: 22px;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+    animation: ring-once 550ms ease-out 1;
   }
 
   button {
@@ -269,8 +287,9 @@ export const dialogStyles = css`
   }
 
   .icon-button {
-    width: 44px;
-    height: 44px;
+    position: relative;
+    width: var(--ring-view-control-size);
+    height: var(--ring-view-control-size);
     display: inline-grid;
     place-items: center;
     flex: 0 0 auto;
@@ -280,10 +299,37 @@ export const dialogStyles = css`
     color: #fff;
     background: transparent;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 140ms ease, opacity 140ms ease;
   }
 
-  .icon-button:hover {
-    background: rgba(255, 255, 255, 0.1);
+  .icon-button::before,
+  .mode-button::before {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    z-index: 0;
+    border-radius: 50%;
+    background: transparent;
+    transition: background 140ms ease, box-shadow 140ms ease, transform 100ms ease;
+  }
+
+  .icon-button > svg,
+  .mode-button > svg,
+  .mode-button > .mode-icon-live {
+    position: relative;
+    z-index: 1;
+  }
+
+  .icon-button:hover:not(:disabled)::before,
+  .mode-button:hover::before {
+    background: rgba(255, 255, 255, 0.13);
+  }
+
+  .icon-button:active:not(:disabled)::before,
+  .mode-button:active::before {
+    background: rgba(255, 255, 255, 0.18);
+    transform: scale(0.92);
   }
 
   .icon-button:disabled {
@@ -295,23 +341,39 @@ export const dialogStyles = css`
     background: transparent;
   }
 
+  .icon-button:disabled::before {
+    background: transparent;
+  }
+
   .snapshot-action.working svg {
     animation: spin 0.85s linear infinite;
   }
 
   .snapshot-action.success {
-    color: #81c784;
+    color: var(--ring-view-success-color);
+  }
+
+  .snapshot-action.success::before {
+    background: rgba(22, 128, 75, 0.28);
   }
 
   .snapshot-action.error {
-    color: #ff8a80;
+    color: var(--ring-view-error-color);
+  }
+
+  .snapshot-action.error::before {
+    background: rgba(166, 35, 35, 0.34);
   }
 
   .icon-button:focus-visible,
   .mode-button:focus-visible,
   .action-button:focus-visible {
-    outline: 3px solid var(--primary-color, #03a9f4);
-    outline-offset: 3px;
+    outline: none;
+  }
+
+  .icon-button:focus-visible::before,
+  .mode-button:focus-visible::before {
+    box-shadow: 0 0 0 3px var(--ring-view-focus-color);
   }
 
   svg {
@@ -335,14 +397,19 @@ export const dialogStyles = css`
     display: flex;
     align-items: center;
     justify-self: center;
-    gap: 2px;
+    min-height: var(--ring-view-control-size);
+    gap: 0;
+    overflow: visible;
+    border-radius: 28px;
+    background: var(--ring-view-control-surface);
     pointer-events: auto;
   }
 
   .mode-button {
+    position: relative;
     display: inline-grid;
-    width: 44px;
-    height: 44px;
+    width: var(--ring-view-control-size);
+    height: var(--ring-view-control-size);
     flex: 0 0 auto;
     padding: 0;
     place-items: center;
@@ -351,22 +418,30 @@ export const dialogStyles = css`
     color: #fff;
     background: transparent;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .mode-button:hover {
     color: #fff;
-    background: rgba(255, 255, 255, 0.08);
+    background: transparent;
   }
 
   .mode-button[aria-selected="true"] {
     color: #fff;
-    background: rgba(255, 255, 255, 0.14);
+    background: transparent;
+  }
+
+  .mode-button[aria-selected="true"]::before {
+    background: rgba(255, 255, 255, 0.17);
+  }
+
+  .mode-button[aria-selected="true"]:hover::before {
+    background: rgba(255, 255, 255, 0.22);
   }
 
   .mode-button.live[aria-selected="true"] {
     color: #fff;
-    background: rgba(219, 68, 55, 0.16);
-    background: color-mix(in srgb, var(--error-color, #db4437) 16%, transparent);
+    background: transparent;
   }
 
   .mode-button svg {
@@ -375,11 +450,11 @@ export const dialogStyles = css`
   }
 
   .mode-button .mode-icon-live {
-    width: 14px;
-    height: 14px;
+    width: 17px;
+    height: 17px;
     border-radius: 50%;
-    background: var(--error-color, #db4437);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+    background: var(--ring-view-live-color);
+    box-shadow: none;
   }
 
   .media-frame {
@@ -465,7 +540,7 @@ export const dialogStyles = css`
   .visitor-controls {
     position: absolute;
     z-index: 7;
-    inset: auto 16px 10px;
+    inset: auto 16px 72px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -475,37 +550,37 @@ export const dialogStyles = css`
 
   .visitor-action-dock {
     display: flex;
+    height: var(--ring-view-primary-size);
     max-width: 100%;
     align-items: center;
     justify-content: center;
     gap: 0;
-    padding: 3px 6px;
+    padding: 0;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.42);
-    border-radius: 999px;
+    border: 0;
+    border-radius: 28px;
     color: #fff;
-    background: rgba(18, 18, 18, 0.8);
-    box-shadow: 0 5px 22px rgba(0, 0, 0, 0.38);
-    backdrop-filter: blur(14px) saturate(1.2);
-    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    background: var(--ring-view-control-surface);
+    box-shadow: none;
     pointer-events: auto;
   }
 
   .visitor-action {
     position: relative;
-    min-height: 44px;
+    height: var(--ring-view-primary-size);
+    min-height: var(--ring-view-primary-size);
     display: inline-flex;
-    min-width: 0;
+    min-width: 112px;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 9px 15px;
+    padding: 0 15px;
     overflow: hidden;
     border: 0;
     border-radius: 999px;
     color: #fff;
     background: transparent;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     line-height: 20px;
     white-space: nowrap;
@@ -514,49 +589,92 @@ export const dialogStyles = css`
     user-select: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
+    transition: color 140ms ease, opacity 140ms ease, transform 100ms ease;
   }
 
-  .visitor-action-dock:not(.door-only):not(.talk-only) .talk-action {
-    border-radius: 999px 0 0 999px;
+  .visitor-action::before {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    z-index: 0;
+    border-radius: calc((var(--ring-view-primary-size) - 8px) / 2);
+    background: transparent;
+    transition: background 140ms ease, box-shadow 140ms ease, transform 100ms ease;
   }
 
-  .visitor-action-dock:not(.door-only):not(.talk-only) .door-action {
-    border-radius: 0 999px 999px 0;
+  .visitor-action > * {
+    position: relative;
+    z-index: 2;
   }
 
-  .visitor-action:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.1);
+  .visitor-action > span {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .visitor-action:hover:not(:disabled)::before {
+    background: rgba(255, 255, 255, 0.13);
+  }
+
+  .visitor-action:active:not(:disabled)::before {
+    transform: scale(0.97);
+  }
+
+  .door-action:active::before {
+    transform: none;
+  }
+
+  .visitor-action:focus-visible {
+    z-index: 2;
+    outline: none;
+  }
+
+  .visitor-action:focus-visible::before {
+    box-shadow: 0 0 0 3px var(--ring-view-focus-color);
   }
 
   .visitor-action:disabled {
-    color: rgba(255, 255, 255, 0.68);
+    color: rgba(255, 255, 255, 0.4);
     cursor: default;
   }
 
-  .visitor-action svg {
-    width: 21px;
-    height: 21px;
-    flex: 0 0 auto;
+  .visitor-action:disabled::before {
+    background: transparent;
   }
 
-  .visitor-action-divider {
-    width: 1px;
-    height: 26px;
+  .visitor-action svg {
+    width: 23px;
+    height: 23px;
     flex: 0 0 auto;
-    margin: 0 6px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.38);
-    box-shadow: 1px 0 rgba(0, 0, 0, 0.32);
-    pointer-events: none;
   }
 
   .talk-action.active {
-    background: var(--error-color, #db4437);
-    transform: scale(0.98);
+    background: transparent;
+  }
+
+  .talk-action.active::before {
+    background: rgba(255, 59, 48, 0.82);
+  }
+
+  .talk-action.active:hover::before {
+    background: rgba(255, 59, 48, 0.9);
+  }
+
+  .talk-action {
+    width: 142px;
+    max-width: 142px;
   }
 
   .door-action svg {
-    color: var(--warning-color, #f2b544);
+    color: #fff;
+  }
+
+  .door-action {
+    width: 168px;
+    min-width: 168px;
+    max-width: 168px;
   }
 
   .door-action-copy {
@@ -564,6 +682,14 @@ export const dialogStyles = css`
     min-width: 0;
     flex-direction: column;
     align-items: flex-start;
+    overflow: hidden;
+  }
+
+  .door-action-copy > span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .door-contact-state {
@@ -574,43 +700,39 @@ export const dialogStyles = css`
   }
 
   .door-action.contact-open {
-    color: #fff;
-    background: color-mix(
-      in srgb,
-      var(--warning-color, #f2b544) 16%,
-      transparent
-    );
+    color: var(--ring-view-ring-color);
+    background: transparent;
+  }
+
+  .door-action.contact-open::before {
+    background: rgba(255, 176, 32, 0.2);
   }
 
   .door-action.contact-open:disabled {
     color: #fff;
   }
 
-  .door-action::before {
+  .door-action::after {
     content: "";
     position: absolute;
-    inset: 0 auto 0 0;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    z-index: 1;
     width: 0;
-    background: color-mix(
-      in srgb,
-      var(--warning-color, #f2b544) 28%,
-      transparent
-    );
+    border-radius: calc((var(--ring-view-primary-size) - 8px) / 2) 0 0
+      calc((var(--ring-view-primary-size) - 8px) / 2);
+    background: rgba(255, 176, 32, 0.58);
     pointer-events: none;
   }
 
-  .door-action > * {
-    position: relative;
-    z-index: 1;
-  }
-
-  .door-action.holding::before {
-    width: 100%;
-    animation: door-hold 900ms linear forwards;
+  .door-action.holding::after {
+    animation: door-hold 1600ms linear forwards;
   }
 
   .door-action.working {
-    background: rgba(10, 10, 10, 0.94);
+    color: #ffe0a4;
+    background: transparent;
   }
 
   .door-action.working svg {
@@ -618,19 +740,25 @@ export const dialogStyles = css`
   }
 
   .door-action.success {
-    background: rgba(32, 112, 68, 0.92);
+    color: var(--ring-view-success-color);
+    background: transparent;
+  }
+
+  .door-action.success::before {
+    background: rgba(38, 145, 91, 0.24);
   }
 
   .door-action.success svg {
-    color: #fff;
+    color: currentColor;
   }
 
   .door-action.error {
-    background: color-mix(
-      in srgb,
-      var(--error-color, #db4437) 24%,
-      transparent
-    );
+    color: #fff;
+    background: transparent;
+  }
+
+  .door-action.error::before {
+    background: rgba(199, 51, 51, 0.62);
   }
 
   .state-layer {
@@ -641,7 +769,7 @@ export const dialogStyles = css`
     padding: 24px;
     box-sizing: border-box;
     color: #fff;
-    background: rgba(0, 0, 0, 0.42);
+    background: rgba(0, 0, 0, 0.28);
     text-align: center;
     z-index: 2;
   }
@@ -654,10 +782,52 @@ export const dialogStyles = css`
     width: min(440px, 100%);
   }
 
+  .viewer-feedback-layer {
+    z-index: 6;
+    padding: 76px 24px;
+    background: transparent;
+    pointer-events: none;
+  }
+
+  .viewer-feedback-layer .state-card {
+    width: auto;
+    max-width: min(430px, 100%);
+    min-height: 44px;
+    justify-content: center;
+    padding: 11px 15px;
+    box-sizing: border-box;
+    border-radius: 22px;
+    background: var(--ring-view-message-surface);
+    pointer-events: auto;
+  }
+
+  .viewer-feedback-layer .state-title {
+    font-size: 14px;
+    line-height: 19px;
+    text-align: left;
+  }
+
+  .doorbell-alert-layer {
+    z-index: 6;
+    background: transparent;
+    pointer-events: none;
+  }
+
+  .doorbell-alert-layer .state-actions {
+    pointer-events: auto;
+  }
+
+  .loading-state .state-card {
+    width: auto;
+    flex-direction: row;
+    gap: 11px;
+  }
+
   .spinner {
-    width: 30px;
-    height: 30px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
+    width: 26px;
+    height: 26px;
+    flex: 0 0 auto;
+    border: 2.5px solid rgba(255, 255, 255, 0.3);
     border-top-color: #fff;
     border-radius: 50%;
     animation: spin 0.85s linear infinite;
@@ -683,14 +853,25 @@ export const dialogStyles = css`
   }
 
   .action-button {
-    min-height: 44px;
-    padding: 8px 16px;
-    border: 1px solid rgba(255, 255, 255, 0.56);
-    border-radius: 10px;
+    min-height: var(--ring-view-control-size);
+    padding: 0 16px;
+    border: 0;
+    border-radius: calc(var(--ring-view-control-size) / 2);
     color: #fff;
-    background: rgba(0, 0, 0, 0.38);
+    background: var(--ring-view-action-surface);
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .action-button:hover {
+    background: rgba(0, 0, 0, 0.64);
+  }
+
+  .action-button:focus-visible {
+    outline: 3px solid var(--ring-view-focus-color);
+    outline-offset: 3px;
   }
 
   .play-recording {
@@ -709,8 +890,7 @@ export const dialogStyles = css`
   }
 
   .action-button.primary {
-    border-color: var(--primary-color, #03a9f4);
-    background: var(--primary-color, #03a9f4);
+    background: var(--ring-view-action-surface);
   }
 
   .sr-only {
@@ -736,11 +916,31 @@ export const dialogStyles = css`
       width: 0;
     }
     to {
-      width: 100%;
+      width: calc(100% - 8px);
+    }
+  }
+
+  @keyframes ring-once {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+    25% {
+      transform: rotate(10deg);
+    }
+    55% {
+      transform: rotate(-9deg);
+    }
+    80% {
+      transform: rotate(4deg);
     }
   }
 
   @media (max-width: 600px) {
+    :host {
+      --ring-view-control-size: 48px;
+    }
+
     .dialog {
       inset: 0;
       width: 100vw;
@@ -752,10 +952,51 @@ export const dialogStyles = css`
     }
 
     .header {
+      display: block;
       min-height: calc(64px + env(safe-area-inset-top));
       padding: calc(10px + env(safe-area-inset-top))
         calc(10px + env(safe-area-inset-right)) 14px
         calc(16px + env(safe-area-inset-left));
+    }
+
+    .header-copy {
+      position: absolute;
+      top: calc(12px + env(safe-area-inset-top));
+      right: calc(176px + env(safe-area-inset-right));
+      left: calc(16px + env(safe-area-inset-left));
+    }
+
+    .mode-switch {
+      position: absolute;
+      top: calc(10px + env(safe-area-inset-top));
+      right: calc(68px + env(safe-area-inset-right));
+      transform: none;
+    }
+
+    .header-actions {
+      display: contents;
+      background: transparent;
+    }
+
+    .camera-actions {
+      position: absolute;
+      top: 50dvh;
+      right: calc(14px + env(safe-area-inset-right));
+      display: flex;
+      width: var(--ring-view-control-size);
+      min-height: 0;
+      flex-direction: column;
+      overflow: hidden;
+      border-radius: 28px;
+      background: var(--ring-view-control-surface);
+      transform: translateY(-50%);
+    }
+
+    .header-actions .chrome-action {
+      position: absolute;
+      top: calc(10px + env(safe-area-inset-top));
+      right: calc(10px + env(safe-area-inset-right));
+      background: var(--ring-view-control-surface);
     }
 
     .body {
@@ -772,14 +1013,13 @@ export const dialogStyles = css`
 
     .visitor-controls {
       right: max(8px, env(safe-area-inset-right));
-      bottom: max(8px, env(safe-area-inset-bottom));
+      bottom: max(64px, calc(56px + env(safe-area-inset-bottom)));
       left: max(8px, env(safe-area-inset-left));
     }
 
     .visitor-action {
       gap: 7px;
-      padding-inline: 11px;
-      font-size: 13px;
+      font-size: 14px;
     }
   }
 
@@ -820,7 +1060,7 @@ export const dialogStyles = css`
 
     .visitor-controls {
       right: max(8px, env(safe-area-inset-right));
-      bottom: max(8px, env(safe-area-inset-bottom));
+      bottom: max(72px, calc(64px + env(safe-area-inset-bottom)));
       left: max(8px, env(safe-area-inset-left));
     }
   }
@@ -828,8 +1068,26 @@ export const dialogStyles = css`
   @media (max-width: 340px) {
     .visitor-action {
       gap: 6px;
+      padding-inline: 10px;
+      font-size: 13px;
+    }
+  }
+
+  @media (max-width: 290px) {
+    .visitor-action {
+      min-width: var(--ring-view-control-size);
       padding-inline: 8px;
-      font-size: 12px;
+    }
+
+    .visitor-action > span {
+      display: none;
+    }
+
+    .talk-action,
+    .door-action {
+      width: var(--ring-view-control-size);
+      min-width: var(--ring-view-control-size);
+      max-width: var(--ring-view-control-size);
     }
   }
 
@@ -843,14 +1101,76 @@ export const dialogStyles = css`
       transform: none;
     }
 
-    .door-action.holding::before,
+    .ring-indicator svg {
+      animation: none;
+    }
+
+    .icon-button,
+    .icon-button::before,
+    .mode-button::before,
+    .visitor-action,
+    .visitor-action::before {
+      transition: none;
+    }
+
+    .door-action.holding::after,
     .door-action.working svg,
     .snapshot-action.working svg {
       animation: none;
     }
 
-    .door-action.holding::before {
-      width: 100%;
+    .door-action.holding::after {
+      width: calc(100% - 8px);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .mode-switch,
+    .header-actions,
+    .camera-actions,
+    .header-actions .chrome-action,
+    .visitor-action-dock,
+    .viewer-feedback-layer .state-card,
+    .action-button {
+      border: 1px solid ButtonText;
+      color: ButtonText;
+      background: ButtonFace;
+      forced-color-adjust: none;
+    }
+
+    .icon-button:focus-visible::before,
+    .mode-button:focus-visible::before,
+    .visitor-action:focus-visible::before {
+      box-shadow: 0 0 0 3px Highlight;
+    }
+
+    .icon-button:focus-visible,
+    .mode-button:focus-visible,
+    .visitor-action:focus-visible {
+      outline: 3px solid Highlight;
+      outline-offset: -4px;
+      forced-color-adjust: none;
+    }
+
+    .mode-button[aria-selected="true"] {
+      color: HighlightText;
+    }
+
+    .mode-button[aria-selected="true"]::before,
+    .talk-action.active::before,
+    .door-action.holding::after {
+      background: Highlight;
+      forced-color-adjust: none;
+    }
+
+    .mode-button .mode-icon-live {
+      background: LinkText;
+      forced-color-adjust: none;
+    }
+
+    .ring-indicator {
+      color: LinkText;
+      forced-color-adjust: none;
     }
   }
 
@@ -879,6 +1199,8 @@ export const dialogStyles = css`
   :host([inline]) .body {
     width: 100%;
     height: 100%;
+    container-name: ring-view-inline;
+    container-type: size;
   }
 
   :host([inline]) .media-frame {
@@ -891,8 +1213,38 @@ export const dialogStyles = css`
   }
 
   :host([inline]) .header {
+    display: grid;
     min-height: 64px;
     padding: 10px 10px 14px 16px;
+  }
+
+  :host([inline]) .header-copy {
+    position: static;
+  }
+
+  :host([inline]) .mode-switch {
+    position: static;
+    transform: none;
+  }
+
+  :host([inline]) .header-actions {
+    position: static;
+    display: flex;
+    width: auto;
+    min-height: var(--ring-view-control-size);
+    flex-direction: row;
+    background: var(--ring-view-control-surface);
+    transform: none;
+  }
+
+  :host([inline]) .camera-actions {
+    display: contents;
+  }
+
+  :host([inline]) .header-actions .expand {
+    position: relative;
+    inset: auto;
+    background: transparent;
   }
 
   :host([inline]) h2 {
@@ -907,12 +1259,12 @@ export const dialogStyles = css`
 
   :host([inline]) .visitor-controls {
     right: 8px;
-    bottom: 8px;
+    bottom: 72px;
     left: 8px;
   }
 
   :host([inline]) .state-layer.with-visitor-controls {
-    padding: 56px 16px 68px;
+    padding: 64px 16px;
   }
 
   :host([inline]) .state-layer.with-visitor-controls .state-card {
@@ -930,6 +1282,13 @@ export const dialogStyles = css`
 
   :host([inline]) .state-layer.with-visitor-controls .spinner {
     flex: 0 0 auto;
+  }
+
+  @container ring-view-inline (max-height: 220px) {
+    :host([inline]) .body:has(.state-layer.with-visitor-controls) .visitor-controls {
+      visibility: hidden;
+      pointer-events: none;
+    }
   }
 `;
 

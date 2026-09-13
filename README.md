@@ -141,7 +141,9 @@ event instead of changing that choice for you.
 </p>
 
 Tap the card to open the viewer. The history icon selects the latest recording;
-the red dot selects Live.
+the red dot selects Live. Ring View's own controls use consistent dark,
+borderless rails over the camera image. The browser or Home Assistant player's
+native playback, volume, timeline, and fullscreen controls remain unchanged.
 
 ### Choose how the dashboard card works
 
@@ -150,7 +152,7 @@ In the visual editor, open **Dashboard card → Dashboard behavior**:
 | Choose | What it does | Good for |
 | --- | --- | --- |
 | **Open fullscreen viewer** (default) | Shows a still image. Tap it to open the complete viewer. | Phones and everyday dashboards. |
-| **Control camera in card** | Adds Recording, Live and optional visitor controls directly to the card. | Wall tablets and hands-on dashboards. |
+| **Control camera in card** | Adds Recording, Live and optional visitor controls directly to the card. The enlarge button remains at the top right and opens the complete Ring View viewer. | Wall tablets and hands-on dashboards. |
 
 For an interactive card, **No — wait for a tap** is the calmest startup choice.
 The selected Recording or Live view remains highlighted while its still image
@@ -188,6 +190,11 @@ image.
 Enable **Fullscreen viewer → Two-way audio** to add **Hold to talk**. This requires
 the official Ring Live view camera, an HTTPS Home Assistant connection and
 microphone permission.
+
+Talk and door access share one calm, borderless action rail with 48-pixel touch
+targets. Talk becomes red only while audio is being transmitted. A door action
+fills from left to right during its 1.6-second confirmation and stays the same
+size throughout the hold.
 
 To add a door action, open **Door access** and select a lock. Choose **Unlock**
 or, for a compatible lock such as Nuki, **Open door** to release the latch. An

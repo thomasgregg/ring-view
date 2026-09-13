@@ -4,6 +4,83 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.11.0-beta.1] - 2026-09-13
+
+### Added
+
+- Add one coherent, low-chrome control language inspired by modern video-player
+  interfaces: borderless translucent rails, circular inset interaction states,
+  consistent icon weight, and restrained semantic colour.
+- Keep an enlarge action at the top right of every interactive dashboard card.
+  It opens the complete Ring View viewer and remains distinct from any native
+  fullscreen action supplied by the browser or Home Assistant media player.
+- Add explicit forced-colour treatment for utility rails, visitor actions,
+  selected modes, door progress, and keyboard focus.
+- Add a compact-height rule that gives a central connection, Ding, or feedback
+  message temporary priority over visitor controls when both cannot fit without
+  colliding.
+
+### Changed
+
+- Standardize custom utility controls at 44 pixels on desktop and 48 pixels on
+  touch layouts. Talk and door access now use stable 48-pixel-high targets in
+  desktop, landscape, portrait, and dashboard modes.
+- Group Recording and Live in one top rail. The selected mode, hover, pressed,
+  and keyboard-focus treatments stay four pixels inside the control instead of
+  changing its outer size.
+- Use a plain 17-pixel red dot for Live without the unrelated white ring that
+  previously made the selected state look like a different control family.
+- Keep portrait camera actions in a compact vertical rail at the right edge,
+  while mode switching stays near the top right and Close stays in the corner.
+  Desktop and landscape retain their established header arrangement.
+- Combine Talk and door access in one borderless visitor rail without a divider,
+  nested outlines, shadow, or default blur. Talk turns red only while audio is
+  being transmitted.
+- Extend the default door confirmation to 1.6 seconds. Its warm progress surface
+  fills from left to right with a rounded starting edge and a straight moving
+  edge, while the target and its contents remain stationary.
+- Present loading as a lightweight spinner and label, actionable recovery as a
+  dark rounded action, and short snapshot, door, and session feedback as one
+  central dark message surface with left-aligned wrapping text.
+- Preserve the browser and Home Assistant media player's own playback, volume,
+  timeline, captions, and fullscreen controls exactly as supplied.
+
+### Fixed
+
+- Prevent snapshot, mode, Talk, and door states from changing the size or outer
+  silhouette of their controls.
+- Prevent the snapshot focus/selected treatment from overflowing the edge of a
+  narrow card or appearing visibly non-circular.
+- Keep long status and translated text inside the camera surface without
+  overlapping header controls, visitor actions, or native playback controls.
+- Restore visitor actions automatically when a short interactive card becomes
+  tall enough or its central message clears.
+- Keep both Talk and door access at equal 48-by-48 icon targets on exceptionally
+  narrow screens where visible labels can no longer fit.
+- Make keyboard focus visible in Windows forced-colour mode, where decorative
+  box shadows may be suppressed by the browser.
+- Cancel a door hold at the final millisecond when the pointer is released or
+  cancelled, and prevent pointer-up after activation from sending a second
+  service call.
+
+### Documentation
+
+- Describe the new custom-control layout, dashboard enlarge action, Talk state,
+  visitor rail, compact-message priority, and 1.6-second door confirmation in
+  the README and configuration, door-access, privacy, and accessibility guides.
+- Explicitly distinguish Ring View's custom controls from the native media
+  controls that the redesign intentionally does not modify.
+
+### Tests
+
+- Pass 195 unit and component tests and 134 browser scenarios across desktop and
+  phone projects.
+- Cover stable rail geometry, dashboard enlarge behavior, selected, hover,
+  pressed, and keyboard states, active Talk colour, progressive door fill,
+  pointer cancellation, compact-height recovery, long feedback text, portrait,
+  landscape, 280-pixel width, reduced motion, forced colours, provider parity,
+  and preservation of native media controls.
+
 ## [0.10.0] - 2026-09-13
 
 ### Added

@@ -44,7 +44,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `door_contact_entity` | Yes — Door access | Not set | `binary_sensor.*` entity ID | Optionally makes the icon reflect the physical door state. An open contact replaces and disables the door action until the door closes. |
 | `door_action` | Yes — Door access | `unlock` | `unlock`, `open` | Calls `lock.unlock`, or `lock.open` for locks that advertise latch-opening support. |
 | `door_control_visibility` | Yes — Door access | `live_only` | `live_only`, `all_views` | Shows the door action only in Live by default, or also over recordings. |
-| `door_hold_to_activate` | Yes — Door access | `true` | `true`, `false` | Requires a 900 ms press-and-hold confirmation. Disable for one-tap operation. |
+| `door_hold_to_activate` | Yes — Door access | `true` | `true`, `false` | Requires a 1.6-second press-and-hold confirmation. Disable for one-tap operation. |
 | `door_control_location` | Yes — Door access, interactive only | `viewer_only` | `viewer_only`, `dashboard_and_viewer` | Keeps the door action in fullscreen only, or places it on both the interactive dashboard card and fullscreen viewer. |
 | `show_name` | Yes — Card appearance | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer. |
 | `show_snapshot_button` | Yes — Snapshots | `false` | `true`, `false` | Shows one manual snapshot action while Live is active. |
@@ -327,6 +327,10 @@ reads **Open when ready** or **Unlock when ready** and stays disabled until the
 current Live player has connected. It hides if Live fails, leaving the compact
 Retry state and the existing mode tabs.
 
+On an exceptionally short interactive card, Ring View temporarily prioritizes
+a connection, Ding, or error message instead of stacking it over the visitor
+rail. The rail returns when the message clears or the card has enough height.
+
 ## Door access
 
 Open **Door access** and select a Home Assistant lock to enable the feature. The
@@ -350,15 +354,16 @@ the latch. Ring View disables Open when the selected entity does not advertise
 that capability.
 
 **Require hold to activate** is the default confirmation. It is not a pop-up:
-hold the action for 900 ms while a visible progress fill completes, or release
+hold the action for 1.6 seconds while a visible progress fill completes, or release
 early to cancel. Turning it off makes the action respond to a single deliberate
 tap, click, Space, or Enter activation.
 
 **Live view only** is the recommended default. **Live and recordings** is
 available for users who intentionally want door access while viewing historical
-footage. When Talk and door access are both visible, they share one dock with a
-short divider. If Talk is disabled or unsupported by the configured camera, the
-dock automatically collapses to the door-only pill.
+footage. When Talk and door access are both visible, they share one borderless
+rail with separate inset interaction states. If Talk is disabled or unsupported
+by the configured camera, the rail automatically collapses to the door-only
+action.
 
 [Full door-access guide](door-access.md)
 

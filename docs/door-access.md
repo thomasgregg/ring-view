@@ -15,7 +15,7 @@ The design has three priorities:
 
 1. Keep the visitor and the door action in the same visual context.
 2. Make an accidental door operation difficult without slowing down routine use.
-3. Keep Talk and door access visually related while preserving clear separation.
+3. Keep Talk and door access visually related without adding decorative chrome.
 
 ## Viewer design
 
@@ -25,26 +25,23 @@ When Talk and door access are both available, they share one compact glass dock
 at the bottom of the viewer:
 
 ```text
-┌───────────────────────┬───────────────────────┐
-│  microphone  Talk     │  lock-open  Unlock   │
-└───────────────────────┴───────────────────────┘
-                        ↑
-                short vertical divider
+╭────────────────────────────────────────────────╮
+│   microphone  Talk       door  Hold to open    │
+╰────────────────────────────────────────────────╯
 ```
 
 - Both actions use the same height, corner radius, typography, and translucent
   surface, so they read as one visitor interaction.
-- A short, low-contrast vertical bar separates the communication action from the
-  physical-access action. Balanced spacing on both sides gives the divider room
-  to breathe without making the dock look like two unrelated buttons. Matching
-  horizontal inset at the two outer edges keeps that spacing optically balanced.
-- In the combined dock, only the two outer ends are rounded. The sides facing
-  the divider are flat, so hover, hold, active, and success fills read as two
-  segments of one control instead of nested pills.
-- Talk remains neutral and becomes red while active. Door access uses a warm
-  accent for its icon and hold progress, then briefly becomes green on success.
-- If only one action is shown, the dock collapses to a balanced single-action
-  pill with both ends fully rounded. There is no empty segment or divider.
+- The rail has no outline, divider, shadow, or default blur. Each action uses an
+  inset state surface, so hover, keyboard focus, active Talk, and door progress
+  remain clearly associated with the correct action without drawing nested pills.
+- Talk remains neutral and becomes red only while audio is transmitted. Door
+  progress uses a warm left-to-right fill with a rounded starting edge and a
+  straight moving edge, then briefly becomes green on success.
+- Both actions keep a 48-pixel target in desktop, landscape, and portrait views.
+  Their outer geometry never changes during a press or hold.
+- If only one action is shown, the rail collapses to a balanced single action.
+  There is no empty segment or decorative separator.
 - The dock respects phone safe areas and stays reachable in portrait and
   landscape layouts.
 
@@ -58,6 +55,10 @@ Door access appears only when `door_entity` is configured.
   **Dashboard and fullscreen**. Selecting a lock defaults to fullscreen only.
 - On an interactive card, a Live-only action is disabled as **Waiting for
   Live…** until the current Live picture is ready and hides if Live fails.
+- On an exceptionally short interactive card, a central connection, Ding, or
+  error message temporarily takes visual priority instead of overlapping the
+  visitor rail. The rail returns when the message clears or more height is
+  available.
 - **Live and recordings** is an explicit option for households that need the
   action in both modes.
 - When Talk is available, both controls always appear in the shared dock.
@@ -73,7 +74,7 @@ Door access appears only when `door_entity` is configured.
 The default confirmation is a press-and-hold interaction, not a second dialog:
 
 1. Press and hold the door control.
-2. A visible fill completes over 900 milliseconds.
+2. A visible fill completes over 1.6 seconds.
 3. Releasing early cancels without calling Home Assistant.
 4. At completion, the configured lock service is called exactly once.
 
@@ -189,7 +190,7 @@ way, and presents dependent choices only when they can affect the viewer.
 | Door contact sensor | `door_contact_entity` | Not set | `binary_sensor.*` entity ID | Makes the icon show the physical state and replaces the action with disabled **Door open** while open. |
 | Action when pressed | `door_action` | `unlock` | `unlock`, `open` | Calls `lock.unlock`, or `lock.open` to release the latch when supported. |
 | Show control in | `door_control_visibility` | `live_only` | `live_only`, `all_views` | Keeps the control in Live only, or explicitly also shows it over recordings. |
-| Require hold to activate | `door_hold_to_activate` | `true` | `true`, `false` | Requires the 900 ms hold confirmation; `false` enables one-tap operation. |
+| Require hold to activate | `door_hold_to_activate` | `true` | `true`, `false` | Requires the 1.6-second hold confirmation; `false` enables one-tap operation. |
 | Door control location | `door_control_location` | `viewer_only` | `viewer_only`, `dashboard_and_viewer` | Keeps the action in fullscreen only, or places it on both the interactive dashboard card and fullscreen viewer. |
 
 Example:

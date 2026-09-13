@@ -18,7 +18,7 @@ The card supports keyboard activation, Escape to close, focus trapping and resto
 - Door access calls only the standard Home Assistant service for the configured
   `lock.*` entity. Ring View stores no lock credentials, access codes, or vendor
   tokens. Home Assistant remains responsible for service authorization.
-- Door access requires a 900 ms hold by default. The hold is cancelled when the
+- Door access requires a 1.6-second hold by default. The hold is cancelled when the
   viewer closes, changes view, loses focus, or becomes hidden. A user who disables
   this confirmation accepts one-tap operation for everyone allowed to use that
   dashboard and entity.
