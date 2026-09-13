@@ -389,9 +389,18 @@ For the official Ring integration, use its last-recording and live-view entities
 
 The `_last_recording` and `_live_view` suffixes in this guide are examples, not requirements. Home Assistant entity IDs can be changed and may be assigned differently. In one [field report covering fresh 2K and 4K Ring doorbell installations](https://community.home-assistant.io/t/ring-doorbell-live-stream/855118/8), both camera entries appeared alike and neither entity ID used the expected suffix. Identify the entities by their roles and default enabled state rather than relying on their displayed names or ID suffixes.
 
-For Ring-MQTT recording playback, choose the device's **Event Select** entity as
-`recording_entity`. Its current option—such as **Ding 1**, **Motion 1**, or a
-transcoded variant—determines which event Ring View plays. Ring View reads the
+For Ring-MQTT recording playback:
+
+1. Choose the device's **Event Select** entity as **Last recording** in the Ring
+   View editor.
+2. Open **Settings → Devices & services → Entities** in Home Assistant.
+3. Search for **Event Select**, open the entity for this Ring camera, and choose
+   the recording you want. **Ding 1** is the newest doorbell press and **Motion
+   1** is the newest motion event; higher numbers are older.
+4. Open Ring View and select **Last recording**.
+
+The current Event Select option, including a transcoded variant, determines
+which event Ring View plays. Ring View reads the
 published `recordingUrl` directly. If the signed URL is missing, is within 30
 seconds of expiry, or fails once in the browser, Ring View re-selects the
 current option and waits up to 15 seconds for Ring-MQTT to publish a different,

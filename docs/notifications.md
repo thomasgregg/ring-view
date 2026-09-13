@@ -10,8 +10,8 @@ binary sensor such as `binary_sensor.front_door_ding`.
 
 A fresh `ring` event, an `off` to `on` Ding transition, or a newer Ring-MQTT
 Ding timestamp while the sensor remains `on` displays the bell alert for
-twelve seconds.
-Tapping the card during that alert opens Live. An already active Live session
+twelve seconds. If Live is not running, Ring View also offers **Open live
+view** in the shared centered message area. An already active Live session
 is left untouched. The alert expires from the original event time; rebuilding
 the card does not restart its twelve-second lifetime.
 

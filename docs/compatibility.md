@@ -22,6 +22,20 @@ controls, spacing, or status design.
 | Last activity | Timestamp state from a sensor, event, or helper | Ding or motion binary-sensor attributes | Same localized relative time. The freshest supported same-device MQTT activity wins. |
 | Door access | Any Home Assistant `lock.*` and optional contact sensor | Same | Provider-independent. |
 
+For the broadest feature coverage, use Ring-MQTT Event Select for recordings,
+the Ring-MQTT snapshot camera for stills and saved snapshots, Ring-MQTT Ding and
+motion sensors for alerts and activity time, and the official Ring Live view
+camera for Live video and two-way audio. This recommended mix is a choice of
+entities inside the same Ring View editor; it does not create a second card or
+change the design.
+
+Event Select is a persistent Home Assistant menu. The user must open that
+entity and choose the desired slot: **Ding 1** is the newest doorbell event,
+**Motion 1** is the newest motion event, and higher numbers are older. Ring View
+refreshes the playback link for the selected slot but does not silently switch
+the user's event choice. If the original recording format does not play, choose
+the matching **(Transcoded)** option.
+
 The visual editor always offers the same fields and choices. It never reveals
 or removes design settings based on an entity's integration. The runtime uses
 the selected entity's registry identity only to adapt the transport behind the

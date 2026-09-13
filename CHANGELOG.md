@@ -17,6 +17,15 @@ All notable changes to this project are documented here.
 - Prefix the visible relative time with **Activity** so it cannot be mistaken
   for the age of an older recording selected through Ring-MQTT Event Select.
 
+### Documentation
+
+- Add a plain-language official Ring versus Ring-MQTT feature table and a
+  recommended mixed-entity setup to the README.
+- Explain exactly where to choose **Ding 1**, **Motion 1**, or a transcoded
+  Ring-MQTT Event Select recording before opening **Last recording**.
+- Align the doorbell guide with the current temporary bell and centered **Open
+  live view** behavior.
+
 ## [0.10.0-beta.1] - 2026-09-13
 
 ### Added
