@@ -1,8 +1,27 @@
 import { describe, expect, it, vi } from "vitest";
-import { sizedPosterUrl } from "../../src/media/poster-provider";
+import { posterUrl, sizedPosterUrl } from "../../src/media/poster-provider";
 import type { HomeAssistant } from "../../src/types";
 
 describe("sized camera poster", () => {
+  it("adds an event revision without replacing an existing camera token", () => {
+    const hass: HomeAssistant = {
+      states: {},
+      hassUrl: (path = "") => `https://ha.test${path}`,
+      callWS: async () => ({}) as never,
+    };
+    const entity = {
+      entity_id: "camera.recording",
+      state: "idle",
+      attributes: { entity_picture: "/api/camera_proxy/camera.recording?token=stable" },
+    };
+
+    expect(posterUrl(hass, entity, entity.entity_id, "last_video_id:event-2"))
+      .toBe(
+        "https://ha.test/api/camera_proxy/camera.recording?token=stable"
+        + "&ring_view_media=last_video_id%3Aevent-2",
+      );
+  });
+
   it("requests a signed camera proxy path with physical pixel dimensions", async () => {
     const callWS = vi.fn(async (_message: Record<string, unknown>) => ({
       path: "/api/camera_proxy/camera.recording?authSig=temporary",

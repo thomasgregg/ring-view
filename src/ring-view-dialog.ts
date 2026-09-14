@@ -71,6 +71,7 @@ import {
 } from "./utilities/snapshot";
 import {
   isRingMqttEventSelect,
+  recordingPosterRevision,
   recordingPosterEntityId,
   recordingSourceMarker,
   recordingUrl,
@@ -1253,10 +1254,14 @@ export class RingViewDialog extends LitElement {
     const posterEntityId = this.mode === "last_recording"
       ? recordingPosterEntityId(this.hass!, this.config!)
       : entityId;
+    const posterRevision = this.mode === "last_recording"
+      ? recordingPosterRevision(entity)
+      : undefined;
     const poster = posterUrl(
       this.hass!,
       this.hass!.states[posterEntityId],
       posterEntityId,
+      posterRevision,
     );
     const fallbackUrl = this.mode === "last_recording"
       ? recordingUrl(entity)

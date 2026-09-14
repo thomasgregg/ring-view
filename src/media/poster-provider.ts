@@ -20,12 +20,15 @@ export function posterUrl(
   hass: HomeAssistant,
   entity: HassEntity | undefined,
   entityId: string,
+  revision?: string,
 ): string {
   const picture = entity?.attributes.entity_picture;
-  if (typeof picture === "string" && picture.length > 0) {
-    return hass.hassUrl(picture);
-  }
-  return hass.hassUrl(`/api/camera_proxy/${encodeURIComponent(entityId)}`);
+  const url = typeof picture === "string" && picture.length > 0
+    ? hass.hassUrl(picture)
+    : hass.hassUrl(`/api/camera_proxy/${encodeURIComponent(entityId)}`);
+  if (!revision) return url;
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}ring_view_media=${encodeURIComponent(revision)}`;
 }
 
 /**

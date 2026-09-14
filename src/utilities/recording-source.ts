@@ -10,6 +10,11 @@ const RECORDING_URL_ATTRIBUTES = [
   "recordingUrl",
   "recording_url",
 ] as const;
+const RECORDING_EVENT_ID_ATTRIBUTES = [
+  "eventId",
+  "event_id",
+  "last_video_id",
+] as const;
 const MINIMUM_SIGNED_URL_LIFETIME_MS = 30_000;
 
 function nonPlayableRecordingUrl(value: string): boolean {
@@ -82,6 +87,26 @@ export function recordingSourceMarker(entity?: HassEntity): string | undefined {
     }
   }
   return undefined;
+}
+
+/**
+ * Return a compact revision for the still frame associated with a recording.
+ * Camera entity_picture URLs normally keep the same access token across Ring
+ * events, so the event ID must participate in the rendered URL to make the
+ * browser request the new frame.
+ */
+export function recordingPosterRevision(entity?: HassEntity): string | undefined {
+  if (!entity) return undefined;
+  for (const attribute of RECORDING_EVENT_ID_ATTRIBUTES) {
+    const value = entity.attributes[attribute];
+    if (typeof value === "string" && value.trim() !== "") {
+      return `${attribute}:${value.trim()}`;
+    }
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return `${attribute}:${String(value)}`;
+    }
+  }
+  return entity.last_updated ? `updated:${entity.last_updated}` : undefined;
 }
 
 export function transcodedRecordingOption(entity?: HassEntity): string | undefined {

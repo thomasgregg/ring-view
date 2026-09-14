@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.11.3] - 2026-09-14
+
+### Fixed
+
+- Refresh recording preview images when a new Ring event arrives, even when
+  Home Assistant keeps the same authenticated camera-proxy URL. Ring View now
+  includes the recording event ID in the rendered image URL so the browser
+  cannot retain a frame from the previous event.
+
+### Tests
+
+- Cover official Ring `last_video_id` and Ring-MQTT `eventId` revisions, query
+  preservation for authenticated camera URLs, and the complete stale-preview
+  regression lifecycle.
+
 ## [0.11.2] - 2026-09-14
 
 ### Added

@@ -4,6 +4,7 @@ import type { HassEntity, HomeAssistant } from "../../src/types";
 import {
   isRingMqttEventSelect,
   recordingPosterEntityId,
+  recordingPosterRevision,
   recordingSourceMarker,
   recordingUrl,
   recordingUrlIsReady,
@@ -123,5 +124,16 @@ describe("recording sources", () => {
       state: "unavailable",
     };
     expect(recordingPosterEntityId(homeAssistant, config)).toBe("camera.live");
+  });
+
+  it("uses the event ID as the recording poster revision", () => {
+    expect(recordingPosterRevision(entity("camera.recording", "idle", {
+      last_video_id: 12345,
+      video_url: "https://example.test/first.mp4",
+    }))).toBe("last_video_id:12345");
+    expect(recordingPosterRevision(entity("select.events", "Motion 1", {
+      eventId: "event-2",
+      recordingUrl: "https://example.test/second.mp4",
+    }))).toBe("eventId:event-2");
   });
 });

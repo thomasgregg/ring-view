@@ -120,6 +120,52 @@ describe("recording player lifecycle", () => {
     expect(mqttHass.callService).not.toHaveBeenCalled();
   });
 
+  it("reloads a stable camera poster URL when the recording event changes", async () => {
+    const dialog = document.createElement("ring-view-dialog");
+    const initialHass: HomeAssistant = {
+      ...hass,
+      states: {
+        ...hass.states,
+        "camera.recording": {
+          ...hass.states["camera.recording"]!,
+          attributes: {
+            ...hass.states["camera.recording"]!.attributes,
+            entity_picture: "/api/camera_proxy/camera.recording?token=stable",
+            last_video_id: "event-1",
+          },
+        },
+      },
+    };
+    dialog.hass = initialHass;
+    document.body.append(dialog);
+    dialog.showDialog({ mode: "last_recording", config });
+    await flush();
+
+    const poster = () => dialog.shadowRoot
+      ?.querySelector<HTMLImageElement>(".media-frame > img.poster")
+      ?.getAttribute("src");
+    const firstPoster = poster();
+    expect(firstPoster).toContain("ring_view_media=last_video_id%3Aevent-1");
+
+    dialog.hass = {
+      ...initialHass,
+      states: {
+        ...initialHass.states,
+        "camera.recording": {
+          ...initialHass.states["camera.recording"]!,
+          attributes: {
+            ...initialHass.states["camera.recording"]!.attributes,
+            last_video_id: "event-2",
+          },
+        },
+      },
+    };
+    await flush();
+
+    expect(poster()).toContain("ring_view_media=last_video_id%3Aevent-2");
+    expect(poster()).not.toBe(firstPoster);
+  });
+
   it("requests and waits for a fresh Ring-MQTT URL before mounting playback", async () => {
     const { dialog, hass: mqttHass } = await mountRingMqtt("<Recording Not Found>");
     expect(mqttHass.callService).toHaveBeenCalledWith(
