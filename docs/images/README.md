@@ -12,7 +12,8 @@ arrows, and rounded viewer framing around the current combined control rails.
 
 The labels identify the actual controls in the captured viewer: camera name and
 activity, recording and Live switching, snapshots, talkback, and door access.
-The rounded viewer is presented against a neutral checkerboard surround.
+The viewer is tightly cropped to its rounded boundary, with transparent pixels
+outside the four curved corners.
 
 `ring-view-modes.png` and `ring-view-annotations.png` are retained as source
 assets for the earlier documentation image and are not used by the current
