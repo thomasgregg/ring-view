@@ -4,6 +4,22 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-09-14
+
+### Added
+
+- Add **View Live** and **Watch Recording** actions to the doorbell
+  notification blueprint. The immediate alert opens Ring View in fullscreen
+  Live mode; once fresh media is ready, the updated alert can open either Live
+  or the matching recording. The matching Ring View Live camera and recording
+  source are now required blueprint inputs.
+
+### Fixed
+
+- Restore notification deep links for Ring-MQTT cards whose recording source is
+  an Event Select entity, while retaining camera-source validation for official
+  Ring recordings.
+
 ## [0.11.3] - 2026-09-14
 
 ### Fixed

@@ -42,12 +42,16 @@ runs in Home Assistant instead.
 5. Set **Dashboard path** to the actual view containing your Ring View card,
    such as `/lovelace/entrance`. Replace the example/test path; the blueprint
    does not create or configure a dashboard for you.
-6. If iOS shows an attachment-error thumbnail, set **External image address**
+6. Select the same **Ring View Live camera**
+   and **Ring View recording source** used by the card. The recording source is
+   the official Last recording camera or the Ring-MQTT Event Select—not the
+   Ring-MQTT Snapshot camera selected for the notification preview.
+7. If iOS shows an attachment-error thumbnail, set **External image address**
    to the full HTTPS address used to reach Home Assistant remotely, for example
    `https://example.ui.nabu.casa`. Ring View then saves the fresh frame under
    `/config/www` and gives iOS an absolute `/local/...` image URL. Leave this
    field empty when authenticated camera-proxy thumbnails already work.
-7. Save, then test with a real doorbell press. Confirm phone notification
+8. Save, then test with a real doorbell press. Confirm phone notification
    permission is enabled.
 
 ### What happens
@@ -55,13 +59,17 @@ runs in Home Assistant instead.
 - An official Ring or Ring-MQTT Ding sends an immediate **Someone is at the
   door** notification. Repeated Ring-MQTT presses are detected even while its
   Ding sensor remains `on`.
-- Tapping it opens the configured Home Assistant dashboard, not a guaranteed
-  automatically opened Live viewer.
+- Tapping the immediate alert or choosing **View Live** opens Ring View directly
+  in fullscreen Live mode.
+  The viewer retains its normal controls, including **Hold to talk** when the
+  official Ring Live view camera and two-way audio are configured.
 - The automation waits up to **two minutes** for a new official recording ID or
   a newer Ring-MQTT Ding snapshot timestamp.
 - When the chosen preview camera updates, the automation updates the same
-  tagged notification with its fresh image. No extra Ring live session is
-  started.
+  tagged notification to say **Recording ready**, adds its fresh image, and
+  offers **View Live** and **Watch Recording**. Tapping the updated notification
+  opens that recording. The notification preview does not start an extra Ring
+  live session.
 - By default the preview uses Home Assistant's authenticated camera proxy. If
   **External image address** is configured, the blueprint instead writes one
   current JPEG per selected camera to `/config/www` and sends its absolute
@@ -74,9 +82,16 @@ runs in Home Assistant instead.
 - Another ring restarts the wait. The shared notification tag updates the same
   alert rather than creating a separate notification for every stage.
 
+On iOS and macOS, the Companion app automatically appends its configured Snooze
+actions to notifications. To show only the Ring View actions, open **Settings →
+Companion app → Notifications → Snooze Actions** in the app and turn off the
+durations you do not want. This is a device-wide Companion app preference, not
+a setting that Ring View can disable for only this notification.
+
 The blueprint requires Home Assistant **2026.7 or newer**, a supported Ding
-entity, a camera preview entity, and a working Companion app notification
-device. The optional backend patch is not required for this automation.
+entity, a camera preview entity, the Ring View Live and recording sources, and a
+working Companion app notification device. The optional backend patch is not
+required for this automation.
 
 Ring-MQTT snapshot timing depends on the camera and its **Snapshot Mode**. For
 the most useful doorbell preview, choose a mode that includes Ding snapshots.

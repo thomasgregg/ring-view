@@ -60,7 +60,7 @@ remain the same whichever entities you select.
 | **Doorbell alert inside the card** | ✅ Works through the Ring Ding event while its realtime listener is healthy. Upstream failures can leave that listener stopped ([#526](https://github.com/python-ring-doorbell/python-ring-doorbell/issues/526), [#537](https://github.com/python-ring-doorbell/python-ring-doorbell/issues/537)). | ✅ Works through the Ding binary sensor. | Prefer the Ring-MQTT Ding sensor for reliability today. |
 | **Last activity time** | ✅ A Ring event or another Home Assistant timestamp can be used, but a Ring event depends on the same realtime listener. | ✅ Ring-MQTT Ding and motion sensors are supported directly; Ring View chooses the freshest activity time from the device. | Prefer a Ring-MQTT Ding or motion sensor. |
 | **Dashboard image and saved snapshots** | ⚠️ A Ring camera may provide a still image, but the official Live camera does not always expose the current Live frame for saving. | ✅ The snapshot camera provides the dashboard image. For a manual save, Ring View asks **Take Snapshot** for a new image first. | Use the Ring-MQTT snapshot camera for the freshest and most dependable image. |
-| **Phone-notification blueprint** | ✅ Select the Ding event and Last recording camera. The alert is immediate; a fresh recording preview follows when available. | ✅ Select the Ding binary sensor and Snapshot camera. Repeated presses are detected while Ding remains on, and only a fresh Ding snapshot is attached. | Prefer the Ring-MQTT Ding and Snapshot entities while the official realtime listener is unreliable. Set Snapshot Mode to an option that includes **Ding**. |
+| **Phone-notification blueprint** | ✅ Select the Ding event, Last recording camera for both the preview and recording action, and Live view camera. The alert opens Live immediately; a fresh recording preview and playback action follow. | ✅ Select the Ding binary sensor, Snapshot camera for the preview, Event Select for the recording action, and the Live camera used by Ring View. Repeated presses are detected while Ding remains on. | Prefer Ring-MQTT Ding and Snapshot for reliable detection and previews, with the card's normal recording and Live sources for the viewer actions. Set Snapshot Mode to an option that includes **Ding**. |
 | **Door access** | ✅ Any Home Assistant lock and optional contact sensor. | ✅ The same—door access is independent of the camera provider. | Use whichever lock is already connected to Home Assistant. |
 
 ### Recommended mixed setup
@@ -71,7 +71,8 @@ For the most complete experience today, keep both integrations and choose:
 - **Live and Hold to talk:** official Ring **Live view** camera.
 - **Dashboard image and manual snapshots:** Ring-MQTT **Snapshot** camera.
 - **Doorbell alert and last activity:** Ring-MQTT **Ding** and motion sensors.
-- **Phone notification:** Ring-MQTT **Ding** sensor and **Snapshot** camera.
+- **Phone notification:** Ring-MQTT **Ding** sensor and **Snapshot** camera,
+  plus the same **Event Select** and **Live** camera used by Ring View.
 - **Door access:** any Home Assistant lock and optional contact sensor.
 
 This combines Ring-MQTT's dependable events and snapshots with the official
@@ -231,11 +232,14 @@ official Ring Ding event or Ring-MQTT Ding sensor, a preview camera, and the
 Companion app:
 
 1. Someone rings → your phone gets an immediate notification.
-2. Tap the notification → Home Assistant opens your chosen dashboard.
+2. Tap the notification or choose **View Live** → Ring View opens directly in
+   its fullscreen Live viewer.
 3. The official recording or Ring-MQTT snapshot becomes available → the same
-   notification gains a fresh preview.
+   notification gains a fresh preview and a **Watch Recording** action.
 
-It works even when the dashboard is closed, and the preview does not start another live session.
+It works even when the dashboard is closed, and the preview does not start
+another live session. Select the matching Ring View Live camera and recording
+source when creating or updating the blueprint automation.
 
 If iOS can display the expanded camera view but shows an attachment error in
 the compact thumbnail, the blueprint can optionally save the fresh frame in
@@ -246,9 +250,9 @@ who knows their URL.
 [![Import the Ring View doorbell notification blueprint.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https://github.com/thomasgregg/ring-view/blob/main/blueprints/automation/ring_view/doorbell_notification.yaml)
 
 Already using an older version? Import it again and choose **Overwrite**. Your
-existing automation remains compatible because the blueprint keeps the same
-input fields; you can then switch its Ding and preview entities between
-official Ring and Ring-MQTT in the normal visual editor.
+automation must then be updated with the Ring View Live camera and recording
+source used by the card. You can also switch its Ding and preview entities
+between official Ring and Ring-MQTT in the normal visual editor.
 
 Use the same doorbell signal in your own Home Assistant automations for porch
 lights, announcements, or presence-aware alerts. Those are ideas for

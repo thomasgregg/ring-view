@@ -20,7 +20,7 @@ controls, spacing, or status design.
 | Dashboard still | Last recording or Live camera image | Ring-MQTT snapshot `camera.*` | Same passive card. A snapshot camera is also the poster for Event Select recordings. |
 | Manual snapshot | Configured snapshot camera, otherwise Live camera | Snapshot camera plus its same-device Take Snapshot button | Same camera action and feedback. Ring View waits for Ring-MQTT's timestamp update before saving. |
 | Doorbell alert | Ding `event.*` | Ding `binary_sensor.*` | Same bell indicator and Open live view action. |
-| Phone notification blueprint | Ding event plus Last recording camera | Ding binary sensor plus Snapshot camera | Same immediate notification and later fresh preview. Repeated MQTT presses while the Ding sensor remains `on` are detected. |
+| Phone notification blueprint | Ding event, Last recording preview/source, and Live view camera | Ding binary sensor, Snapshot preview, Event Select recording source, and Ring View Live camera | Same immediate **View Live** action and later **Watch Recording** action. Repeated MQTT presses while the Ding sensor remains `on` are detected. |
 | Last activity | Timestamp state from a sensor, event, or helper | Ding or motion binary-sensor attributes | Same localized relative time. The freshest supported same-device MQTT activity wins. |
 | Door access | Any Home Assistant `lock.*` and optional contact sensor | Same | Provider-independent. |
 

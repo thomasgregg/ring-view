@@ -61,6 +61,21 @@ describe("dialog URL state", () => {
     ).toBe(false);
   });
 
+  it("restores Ring-MQTT Event Select recording sources", () => {
+    const url = createRingViewUrl("/dashboard/entrance", {
+      liveEntity: "camera.front_door_live",
+      recordingEntity: "select.front_door_event_select",
+      mode: "last_recording",
+    });
+
+    expect(decodeRingViewUrl(new URL(url, location.origin).search)).toEqual({
+      liveEntity: "camera.front_door_live",
+      recordingEntity: "select.front_door_event_select",
+      mode: "last_recording",
+      ringingUntil: undefined,
+    });
+  });
+
   it("keeps Home Assistant history fields while adding its recoverable URL", () => {
     replaceCurrentUrl("/dashboard/security?ring-view-mode=live", "/restore-ring-view");
     expect(history.state).toEqual({ root: true, refreshUrl: "/restore-ring-view" });

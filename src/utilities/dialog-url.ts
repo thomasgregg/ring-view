@@ -27,7 +27,8 @@ export function decodeRingViewUrl(
   const mode = params.get(MODE_PARAM);
   if (
     !liveEntity?.startsWith("camera.")
-    || !recordingEntity?.startsWith("camera.")
+    || (!recordingEntity?.startsWith("camera.")
+      && !recordingEntity?.startsWith("select."))
     || (mode !== "live" && mode !== "last_recording")
   ) {
     return undefined;

@@ -2,10 +2,11 @@ blueprint:
   name: Ring View doorbell notification
   description: >-
     Sends an immediate Home Assistant Companion notification for an official
-    Ring or Ring-MQTT doorbell signal. Tapping opens the configured Ring View
-    dashboard. When the selected preview camera publishes a new recording or
-    snapshot, the same notification is updated with that image. No additional
-    Ring live-view session is started.
+    Ring or Ring-MQTT doorbell signal. View Live and Watch Recording actions
+    open the matching Ring View fullscreen mode directly. When the
+    selected preview camera publishes a new recording or snapshot, the same
+    notification is updated with that image. The preview itself does not start
+    an additional Ring live-view session.
   domain: automation
   author: Thomas Gregg
   source_url: >-
@@ -55,6 +56,27 @@ blueprint:
           default: /lovelace/entrance
           selector:
             text: {}
+        viewer_live_camera:
+          name: Ring View Live camera
+          description: >-
+            Select the same Live camera used by the Ring View card. Together
+            with the recording source below, this adds the View Live action and
+            opens the fullscreen viewer directly.
+          selector:
+            entity:
+              filter:
+                - domain: camera
+        viewer_recording_source:
+          name: Ring View recording source
+          description: >-
+            Select the same Last recording camera or Ring-MQTT Event Select
+            used by the Ring View card. Together with the Live camera above,
+            this adds Watch Recording after fresh media is ready.
+          selector:
+            entity:
+              filter:
+                - domain: camera
+                - domain: select
         notification_image_base_url:
           name: External image address (optional)
           description: >-
@@ -164,7 +186,21 @@ conditions:
 variables:
   preview_camera_id: !input recording_camera
   dashboard_path_value: !input dashboard_path
+  viewer_live_camera_id: !input viewer_live_camera
+  viewer_recording_source_id: !input viewer_recording_source
   notification_image_base_url_value: !input notification_image_base_url
+  viewer_url_separator: >-
+    {{ '&' if '?' in dashboard_path_value else '?' }}
+  live_view_url: >-
+    {{ dashboard_path_value }}{{ viewer_url_separator
+    }}ring-view-live-entity={{ viewer_live_camera_id
+    }}&ring-view-recording-entity={{ viewer_recording_source_id
+    }}&ring-view-mode=live
+  recording_view_url: >-
+    {{ dashboard_path_value }}{{ viewer_url_separator
+    }}ring-view-live-entity={{ viewer_live_camera_id
+    }}&ring-view-recording-entity={{ viewer_recording_source_id
+    }}&ring-view-mode=last_recording
   notification_image_file_key: >-
     {{ preview_camera_id | replace('.', '-') | replace('_', '-') }}
   notification_image_filename: >-
@@ -196,12 +232,17 @@ actions:
     domain: mobile_app
     type: notify
     title: Someone is at the door
-    message: Tap to open Ring View
+    message: Tap to view Live
     data:
       tag: ring-view-doorbell
       group: ring-view
-      url: "{{ dashboard_path_value }}"
-      clickAction: "{{ dashboard_path_value }}"
+      url: "{{ live_view_url }}"
+      clickAction: "{{ live_view_url }}"
+      actions:
+        - action: URI
+          title: View Live
+          uri: "{{ live_view_url }}"
+          icon: sfsymbols:video
   - alias: Wait for a genuinely new preview
     # A template wait closes the small race where the camera can update while
     # the immediate mobile notification is being sent.
@@ -243,12 +284,12 @@ actions:
     domain: mobile_app
     type: notify
     title: Someone is at the door
-    message: Tap to open Ring View
+    message: Recording ready
     data:
       tag: ring-view-doorbell
       group: ring-view
-      url: "{{ dashboard_path_value }}"
-      clickAction: "{{ dashboard_path_value }}"
+      url: "{{ recording_view_url }}"
+      clickAction: "{{ recording_view_url }}"
       entity_id: "{{ preview_camera_id }}"
       image: >-
         {% set base = notification_image_base_url_value | trim %}
@@ -259,6 +300,15 @@ actions:
           /api/camera_proxy/{{ preview_camera_id }}?v={{
           now().timestamp() | int }}
         {% endif %}
+      actions:
+        - action: URI
+          title: View Live
+          uri: "{{ live_view_url }}"
+          icon: sfsymbols:video
+        - action: URI
+          title: Watch Recording
+          uri: "{{ recording_view_url }}"
+          icon: sfsymbols:play.rectangle
 
 mode: restart
 max_exceeded: silent

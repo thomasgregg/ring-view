@@ -25,4 +25,25 @@ describe("doorbell notification blueprint", () => {
       /publicly\s+accessible to anyone who knows its URL/,
     );
   });
+
+  it("adds two-stage Ring View notification actions", () => {
+    expect(blueprint).toContain("viewer_live_camera:");
+    expect(blueprint).toContain("viewer_recording_source:");
+    expect(blueprint).toContain("ring-view-mode=live");
+    expect(blueprint).toContain("ring-view-mode=last_recording");
+    expect(blueprint).toContain("title: View Live");
+    expect(blueprint).toContain("message: Recording ready");
+    expect(blueprint).toContain("title: Watch Recording");
+  });
+
+  it("requires viewer sources and has no dashboard-only fallback", () => {
+    const viewerInputs = blueprint.slice(
+      blueprint.indexOf("viewer_live_camera:"),
+      blueprint.indexOf("notification_image_base_url:"),
+    );
+    expect(viewerInputs).not.toContain("default:");
+    expect(blueprint).not.toContain("viewer_actions_enabled");
+    expect(blueprint).not.toContain("Tap to open Ring View");
+    expect(blueprint).not.toContain("dashboard fallback");
+  });
 });
