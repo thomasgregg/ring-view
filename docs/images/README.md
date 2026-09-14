@@ -6,14 +6,13 @@
 charcoal `#3F3F3F`, and white.
 
 The first README image, `ring-view-modes-rounded.png`, uses a real Ring View
-camera capture obtained through Home Assistant on **12 September 2026**. No AI
-image generation or scene reconstruction was used. A subtle uniform brightness,
-saturation, and warmth adjustment was applied to the camera image without
-changing any scene content.
+camera capture obtained through Home Assistant on **14 September 2026** as its
+base. An AI-assisted compositing pass adds the six documentation labels, curved
+arrows, and rounded viewer framing around the current combined control rails.
 
-The text labels and gently curved arrows are deterministic vector overlays
-that identify the actual controls in the captured viewer. The outer corners
-are clipped to the viewer's real rounded shape with transparent pixels.
+The labels identify the actual controls in the captured viewer: camera name and
+activity, recording and Live switching, snapshots, talkback, and door access.
+The rounded viewer is presented against a neutral checkerboard surround.
 
 `ring-view-modes.png` and `ring-view-annotations.png` are retained as source
 assets for the earlier documentation image and are not used by the current
