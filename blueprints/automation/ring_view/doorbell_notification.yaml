@@ -55,6 +55,19 @@ blueprint:
           default: /lovelace/entrance
           selector:
             text: {}
+        notification_image_base_url:
+          name: External image address (optional)
+          description: >-
+            Full HTTPS address used to reach Home Assistant from the internet,
+            without a trailing slash. When set, Ring View saves the fresh
+            preview in /config/www and uses an absolute URL so iOS can load the
+            compact notification thumbnail. The snapshot is then publicly
+            accessible to anyone who knows its URL. Leave empty to keep the
+            authenticated camera-proxy method.
+          default: ""
+          selector:
+            text:
+              type: url
 
 triggers:
   # Omitting from/to is intentional: Home Assistant then reports both state
@@ -151,6 +164,11 @@ conditions:
 variables:
   preview_camera_id: !input recording_camera
   dashboard_path_value: !input dashboard_path
+  notification_image_base_url_value: !input notification_image_base_url
+  notification_image_file_key: >-
+    {{ preview_camera_id | replace('.', '-') | replace('_', '-') }}
+  notification_image_filename: >-
+    /config/www/ring-view-{{ notification_image_file_key }}.jpg
   preview_kind: >-
     {% set preview = states[preview_camera_id] %}
     {% if preview.attributes.last_video_id | default(none) is not none %}
@@ -208,6 +226,18 @@ actions:
       {% endif %}
     timeout: "00:02:00"
     continue_on_timeout: false
+  - alias: Prepare the optional public notification image
+    if:
+      - condition: template
+        value_template: >-
+          {{ notification_image_base_url_value | trim != '' }}
+    then:
+      - alias: Save a public snapshot for the notification extension
+        action: camera.snapshot
+        target:
+          entity_id: "{{ preview_camera_id }}"
+        data:
+          filename: "{{ notification_image_filename }}"
   - alias: Add the fresh preview to the existing notification
     device_id: !input notification_device
     domain: mobile_app
@@ -221,8 +251,14 @@ actions:
       clickAction: "{{ dashboard_path_value }}"
       entity_id: "{{ preview_camera_id }}"
       image: >-
-        /api/camera_proxy/{{ preview_camera_id }}?v={{
-        now().timestamp() | int }}
+        {% set base = notification_image_base_url_value | trim %}
+        {% if base %}
+          {{ base.rstrip('/') }}/local/ring-view-{{
+          notification_image_file_key }}.jpg?v={{ now().timestamp() | int }}
+        {% else %}
+          /api/camera_proxy/{{ preview_camera_id }}?v={{
+          now().timestamp() | int }}
+        {% endif %}
 
 mode: restart
 max_exceeded: silent

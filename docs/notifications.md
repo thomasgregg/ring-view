@@ -42,7 +42,12 @@ runs in Home Assistant instead.
 5. Set **Dashboard path** to the actual view containing your Ring View card,
    such as `/lovelace/entrance`. Replace the example/test path; the blueprint
    does not create or configure a dashboard for you.
-6. Save, then test with a real doorbell press. Confirm phone notification
+6. If iOS shows an attachment-error thumbnail, set **External image address**
+   to the full HTTPS address used to reach Home Assistant remotely, for example
+   `https://example.ui.nabu.casa`. Ring View then saves the fresh frame under
+   `/config/www` and gives iOS an absolute `/local/...` image URL. Leave this
+   field empty when authenticated camera-proxy thumbnails already work.
+7. Save, then test with a real doorbell press. Confirm phone notification
    permission is enabled.
 
 ### What happens
@@ -57,6 +62,12 @@ runs in Home Assistant instead.
 - When the chosen preview camera updates, the automation updates the same
   tagged notification with its fresh image. No extra Ring live session is
   started.
+- By default the preview uses Home Assistant's authenticated camera proxy. If
+  **External image address** is configured, the blueprint instead writes one
+  current JPEG per selected camera to `/config/www` and sends its absolute
+  HTTPS `/local/...` URL. This works around iOS notification-extension setups
+  that can open the expanded camera view but cannot resolve an authenticated or
+  relative compact thumbnail.
 - If the camera does not publish a new image within two minutes, the immediate
   notification remains unchanged; an older image is never attached as if it
   were current.
@@ -72,6 +83,17 @@ the most useful doorbell preview, choose a mode that includes Ding snapshots.
 Low-power cameras may not always produce a snapshot while recording; in that
 case the immediate alert still arrives and the blueprint safely leaves it
 without a stale preview.
+
+### Public-snapshot privacy
+
+The optional external-image method deliberately stores the latest notification
+preview in `/config/www`. Home Assistant serves that file without
+authentication. Its camera-derived filename is stable and the next successful
+doorbell notification overwrites it; it is not automatically deleted. Use this
+option only when you accept that anyone who learns the full URL can view the
+latest saved frame. Clearing **External image address** returns the blueprint to
+the authenticated camera-proxy method, but does not remove an existing file
+from `/config/www`.
 
 On some newer wired Ring cameras using 24/7 recording, an
 [upstream Home Assistant issue](https://github.com/home-assistant/core/issues/176299)

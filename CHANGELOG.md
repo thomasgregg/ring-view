@@ -4,6 +4,19 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+### Added
+
+- Add an optional external Home Assistant image address to the doorbell
+  notification blueprint. When configured, the blueprint saves the confirmed
+  fresh preview in `/config/www` and sends an absolute HTTPS `/local` URL for
+  iOS notification extensions that reject authenticated or relative thumbnail
+  URLs. The existing authenticated camera-proxy behavior remains the default.
+
+### Documentation
+
+- Document external-image setup, stable per-camera filenames, and the public
+  access and retention implications of notification snapshots in `/config/www`.
+
 ## [0.11.1] - 2026-09-13
 
 ### Changed

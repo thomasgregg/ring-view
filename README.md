@@ -237,6 +237,12 @@ Companion app:
 
 It works even when the dashboard is closed, and the preview does not start another live session.
 
+If iOS can display the expanded camera view but shows an attachment error in
+the compact thumbnail, the blueprint can optionally save the fresh frame in
+`/config/www` and use your full external Home Assistant HTTPS address. This is
+opt-in because files served through `/local` are publicly accessible to anyone
+who knows their URL.
+
 [![Import the Ring View doorbell notification blueprint.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https://github.com/thomasgregg/ring-view/blob/main/blueprints/automation/ring_view/doorbell_notification.yaml)
 
 Already using an older version? Import it again and choose **Overwrite**. Your
