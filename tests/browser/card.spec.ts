@@ -459,7 +459,6 @@ test("keeps the inline action dock consistently sized across card widths", async
     (element as HTMLElement).style.height = "280px";
   });
   const dock = page.locator("ring-view ring-view-dialog .visitor-action-dock");
-  const talk = dock.locator(".talk-action");
   await expect(dock).toBeVisible();
 
   const measureAt = async (width: number) => {
@@ -467,20 +466,41 @@ test("keeps the inline action dock consistently sized across card widths", async
       (element as HTMLElement).style.width = `${value}px`;
     }, width);
     await page.evaluate(() => new Promise(requestAnimationFrame));
-    return talk.evaluate((element) => {
-      const style = getComputedStyle(element);
-      const box = element.getBoundingClientRect();
-      const icon = element.querySelector("svg")?.getBoundingClientRect();
+    return dock.evaluate((element) => {
+      const talkButton = element.querySelector<HTMLElement>(".talk-action")!;
+      const doorButton = element.querySelector<HTMLElement>(".door-action")!;
+      const label = talkButton.querySelector<HTMLElement>("span");
+      const dockBox = element.getBoundingClientRect();
+      const doorBox = doorButton.getBoundingClientRect();
+      const talkBox = talkButton.getBoundingClientRect();
+      const style = getComputedStyle(talkButton);
+      const icon = talkButton.querySelector("svg")?.getBoundingClientRect();
       return {
+        dockWidth: dockBox.width,
+        doorWidth: doorBox.width,
         font: Number.parseFloat(style.fontSize),
-        height: box.height,
+        gap: doorBox.x - (talkBox.x + talkBox.width),
+        height: talkBox.height,
         icon: icon?.width ?? 0,
+        labelDisplay: label ? getComputedStyle(label).display : "missing",
+        talkWidth: talkBox.width,
       };
     });
   };
 
+  const narrow = await measureAt(300);
   const compact = await measureAt(360);
   const roomy = await measureAt(720);
+  expect(narrow.labelDisplay).toBe("none");
+  expect(narrow.talkWidth).toBe(48);
+  expect(narrow.doorWidth).toBe(48);
+  expect(narrow.dockWidth).toBe(104);
+  expect(narrow.gap).toBe(8);
+  expect(compact.labelDisplay).not.toBe("none");
+  expect(compact.talkWidth).toBe(142);
+  expect(compact.doorWidth).toBe(168);
+  expect(compact.dockWidth).toBe(318);
+  expect(compact.gap).toBe(8);
   expect(compact.height).toBeGreaterThanOrEqual(44);
   expect(roomy.font).toBe(compact.font);
   expect(roomy.height).toBe(compact.height);
@@ -914,7 +934,7 @@ test("dismisses idle direct-recording controls and resumes or replays from the v
   ).toBe(true);
 });
 
-test("groups Talk and door access in one borderless action rail", async ({ page }) => {
+test("renders labelled Talk and door access as independent action pills", async ({ page }) => {
   await page.goto(
     "/demo/?mode=live&two_way_audio=1&door=1&door_action=open",
   );
@@ -931,7 +951,12 @@ test("groups Talk and door access in one borderless action rail", async ({ page 
   await expect(dock).toHaveCSS("padding-right", "0px");
   await expect(dock).toHaveCSS("border-top-width", "0px");
   await expect(dock).toHaveCSS("box-shadow", "none");
-  await expect(dock).toHaveCSS("background-color", "rgba(0, 0, 0, 0.3)");
+  await expect(dock).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(dock).toHaveCSS("pointer-events", "none");
+  await expect(talk).toHaveCSS("background-color", "rgba(0, 0, 0, 0.3)");
+  await expect(door).toHaveCSS("background-color", "rgba(0, 0, 0, 0.3)");
+  await expect(talk).toHaveCSS("pointer-events", "auto");
+  await expect(door).toHaveCSS("pointer-events", "auto");
   const divider = dock.locator(".visitor-action-divider");
   await expect(divider).toHaveCount(0);
   await expect(talk).toHaveCSS("border-top-left-radius", "999px");
@@ -943,12 +968,17 @@ test("groups Talk and door access in one borderless action rail", async ({ page 
     talk.boundingBox(),
     door.boundingBox(),
   ]);
-  expect(talkBox?.height).toBe(48);
-  expect(doorBox?.height).toBe(48);
+  if (!talkBox || !doorBox) throw new Error("Action button geometry unavailable");
+  expect(talkBox.height).toBe(48);
+  expect(doorBox.height).toBe(48);
+  expect(talkBox.width).toBe(142);
+  expect(doorBox.width).toBe(168);
+  expect(doorBox.x - (talkBox.x + talkBox.width)).toBe(8);
 
   const dockBox = await dock.boundingBox();
   const viewport = page.viewportSize();
   if (!dockBox || !viewport) throw new Error("Action dock geometry unavailable");
+  expect(dockBox.width).toBe(318);
   expect(dockBox.x).toBeGreaterThanOrEqual(0);
   expect(dockBox.x + dockBox.width).toBeLessThanOrEqual(viewport.width);
 });

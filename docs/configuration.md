@@ -282,9 +282,9 @@ camera and never expose Talk or door actions.
 | **Door control location** | Fullscreen only, or dashboard and fullscreen. | Whether Talk is supported. |
 
 Talk is always Live-only and requires **Enable two-way audio** plus the official
-Ring Live view camera. If Talk and door access are both available, they share
-one borderless visitor-action rail. If either is unavailable, the rail
-automatically becomes one fully rounded control.
+Ring Live view camera. If Talk and door access are both available, they appear
+next to each other as independent, fully rounded controls. If either is
+unavailable, the remaining action stays centered on its own.
 
 ### Common configurations
 

@@ -4,6 +4,17 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.2-beta.1] - 2026-09-15
+
+### Changed
+
+- Present Talk and door access as separate rounded controls instead of one
+  shared capsule. Labelled actions use independent pills, icon-only actions use
+  independent 48-pixel circles, and narrow dashboard cards collapse labels
+  before the controls can overflow.
+- Use the same fixed-surface, straight-edge door hold animation for labelled
+  and icon-only controls.
+
 ## [0.12.1] - 2026-09-15
 
 ### Added

@@ -132,7 +132,11 @@ test("keeps the door target stable while a straight-edged hold fill advances", a
   const initialBox = await door.boundingBox();
   expect(initialBox?.width).toBe(168);
   expect(initialBox?.height).toBe(48);
-  expect((await dock.boundingBox())?.height).toBe(48);
+  const dockBox = await dock.boundingBox();
+  expect(dockBox?.width).toBe(168);
+  expect(dockBox?.height).toBe(48);
+  await expect(dock).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(door).toHaveCSS("background-color", "rgba(0, 0, 0, 0.3)");
 
   if (!initialBox) throw new Error("Door target geometry unavailable");
   await page.mouse.move(
@@ -142,11 +146,15 @@ test("keeps the door target stable while a straight-edged hold fill advances", a
   await page.mouse.down();
   await page.waitForTimeout(650);
   const progress = await pseudoStyle(door, "::after");
-  const progressWidth = Number.parseFloat(progress.width ?? "0");
-  expect(progressWidth).toBeGreaterThan(30);
-  expect(progressWidth).toBeLessThan(160);
+  expect(progress.width).toBe("160px");
   expect(progress.borderTopLeftRadius).toBe("20px");
-  expect(progress.borderTopRightRadius).toBe("0px");
+  expect(progress.borderTopRightRadius).toBe("20px");
+  const clipped = (progress.clipPath ?? "").match(
+    /^inset\(0px ([0-9.]+)% 0px 0px\)$/,
+  );
+  expect(clipped).not.toBeNull();
+  expect(Number(clipped?.[1])).toBeGreaterThan(10);
+  expect(Number(clipped?.[1])).toBeLessThan(90);
   expect((await door.boundingBox())?.width).toBe(168);
   await page.mouse.up();
   expect(await page.evaluate(() => window.demoDoorCalls ?? [])).toHaveLength(0);
@@ -165,6 +173,7 @@ test("reveals icon-only door progress inside its fixed inner circle", async ({
   const box = await door.boundingBox();
   if (!box) throw new Error("Icon-only door target geometry unavailable");
   expect(box.width).toBe(48);
+  expect((await page.locator(".visitor-action-dock").boundingBox())?.width).toBe(48);
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
   await page.waitForTimeout(650);
@@ -424,7 +433,7 @@ test("honors reduced motion while preserving complete hold feedback", async ({ p
     const progress = await pseudoStyle(door, "::after");
     expect(progress.animationName).toBe("none");
     expect(Number.parseFloat(progress.width ?? "0")).toBe(iconOnly ? 40 : 160);
-    expect(progress.clipPath).toBe(iconOnly ? "inset(0px)" : "none");
+    expect(progress.clipPath).toBe("inset(0px)");
     await page.mouse.up();
     expect(await page.evaluate(() => window.demoDoorCalls ?? [])).toHaveLength(0);
   }
@@ -447,7 +456,7 @@ test("keeps controls distinguishable in forced-colour mode", async ({ page }) =>
 
   await page.evaluate(() => window.demoSetEntityState("binary_sensor.front_door_ding", "on"));
   await expect(bell).toBeVisible();
-  for (const rail of [modes, bell, snapshot, close, page.locator(".visitor-action-dock")]) {
+  for (const rail of [modes, bell, snapshot, close, door]) {
     await expect(rail).toHaveCSS("border-top-width", "1px");
     await expect(rail).toHaveCSS("border-top-style", "solid");
   }
@@ -485,7 +494,7 @@ test("retains accessible touch targets at an exceptionally narrow width", async 
   expect(talkBox.height).toBe(48);
   expect(doorBox.width).toBe(48);
   expect(doorBox.height).toBe(48);
-  expect(dockBox.width).toBe(96);
+  expect(dockBox.width).toBe(104);
   expect(dockBox.x).toBeGreaterThanOrEqual(8);
   expect(dockBox.x + dockBox.width).toBeLessThanOrEqual(272);
   await expect(talk.locator("span")).toHaveCSS("display", "none");
@@ -514,6 +523,9 @@ test("uses compact icon-only visitor actions across viewer layouts and the dashb
     const door = dialog.locator(".door-action");
 
     await expect(dock).toHaveClass(/icon-only/);
+    await expect(dock).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await expect(talk).toHaveCSS("background-color", "rgba(0, 0, 0, 0.3)");
+    await expect(door).toHaveCSS("background-color", "rgba(0, 0, 0, 0.3)");
     await expect(talk.locator("span")).toHaveCount(0);
     await expect(door.locator(".door-action-copy")).toHaveCount(0);
     await expect(talk).toHaveAttribute("title", /Connecting|Hold to talk/);
@@ -534,7 +546,8 @@ test("uses compact icon-only visitor actions across viewer layouts and the dashb
     expect(talkBox.height).toBe(48);
     expect(doorBox.width).toBe(48);
     expect(doorBox.height).toBe(48);
-    expect(dockBox.width).toBe(96);
+    expect(dockBox.width).toBe(104);
+    expect(doorBox.x - (talkBox.x + talkBox.width)).toBe(8);
     expect(dockBox.x).toBeGreaterThanOrEqual(8);
     expect(dockBox.x + dockBox.width).toBeLessThanOrEqual(viewport.width - 8);
     expect(dockBox.y + dockBox.height).toBeLessThanOrEqual(viewport.height);
@@ -567,7 +580,7 @@ test("uses compact icon-only visitor actions across viewer layouts and the dashb
   await expect(dock).toHaveClass(/icon-only/);
   await expect(card.locator(".talk-action span")).toHaveCount(0);
   await expect(card.locator(".door-action-copy")).toHaveCount(0);
-  expect(dockBox.width).toBe(96);
+  expect(dockBox.width).toBe(104);
   expect(cardBox.y + cardBox.height - (dockBox.y + dockBox.height)).toBe(8);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(423);
 });

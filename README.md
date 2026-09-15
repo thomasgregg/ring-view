@@ -199,10 +199,10 @@ Enable **Fullscreen viewer → Two-way audio** to add **Hold to talk**. This req
 the official Ring Live view camera, an HTTPS Home Assistant connection and
 microphone permission.
 
-Talk and door access share one calm, borderless action rail with 48-pixel touch
-targets. Talk becomes red only while audio is being transmitted. A door action
-fills from left to right during its 1.6-second confirmation and stays the same
-size throughout the hold.
+Talk and door access sit together as independent, fully rounded controls with
+48-pixel touch targets. Talk becomes red only while audio is being transmitted.
+A door action fills from left to right during its 1.6-second confirmation and
+stays the same size throughout the hold.
 
 For a more compact rail, turn off **Card appearance → Show Talk and door button text**.
 Talk and door actions then remain 48-pixel controls with icons, hover labels,

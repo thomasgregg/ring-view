@@ -2528,19 +2528,20 @@ const Yr = Z`
     max-width: 100%;
     align-items: center;
     justify-content: center;
-    gap: 0;
+    gap: 8px;
     padding: 0;
-    overflow: hidden;
+    overflow: visible;
     border: 0;
-    border-radius: 28px;
+    border-radius: 0;
     color: #fff;
-    background: var(--ring-view-control-surface);
+    background: transparent;
     box-shadow: none;
-    pointer-events: auto;
+    pointer-events: none;
   }
 
   .visitor-action {
     position: relative;
+    box-sizing: border-box;
     height: var(--ring-view-primary-size);
     min-height: var(--ring-view-primary-size);
     display: inline-flex;
@@ -2553,7 +2554,7 @@ const Yr = Z`
     border: 0;
     border-radius: 999px;
     color: #fff;
-    background: transparent;
+    background-color: var(--ring-view-control-surface);
     font-size: 15px;
     font-weight: 600;
     line-height: 20px;
@@ -2563,6 +2564,7 @@ const Yr = Z`
     user-select: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
     transition: color 140ms ease, opacity 140ms ease, transform 100ms ease;
   }
 
@@ -2624,10 +2626,6 @@ const Yr = Z`
     flex: 0 0 auto;
   }
 
-  .talk-action.active {
-    background: transparent;
-  }
-
   .talk-action.active::before {
     background: rgba(255, 59, 48, 0.82);
   }
@@ -2683,7 +2681,6 @@ const Yr = Z`
 
   .door-action.contact-open {
     color: var(--ring-view-ring-color);
-    background: transparent;
   }
 
   .door-action.contact-open::before {
@@ -2700,32 +2697,21 @@ const Yr = Z`
     top: 4px;
     bottom: 4px;
     left: 4px;
-    z-index: 1;
-    width: 0;
-    border-radius: calc((var(--ring-view-primary-size) - 8px) / 2) 0 0
-      calc((var(--ring-view-primary-size) - 8px) / 2);
-    background: rgba(255, 176, 32, 0.58);
-    pointer-events: none;
-  }
-
-  .visitor-action-dock.icon-only .door-action::after {
     right: 4px;
+    z-index: 1;
     width: auto;
     border-radius: calc((var(--ring-view-primary-size) - 8px) / 2);
+    background: rgba(255, 176, 32, 0.58);
     clip-path: inset(0 100% 0 0);
+    pointer-events: none;
   }
 
   .door-action.holding::after {
     animation: door-hold 1600ms linear forwards;
   }
 
-  .visitor-action-dock.icon-only .door-action.holding::after {
-    animation-name: door-hold-icon-only;
-  }
-
   .door-action.working {
     color: #ffe0a4;
-    background: transparent;
   }
 
   .door-action.working svg {
@@ -2734,7 +2720,6 @@ const Yr = Z`
 
   .door-action.success {
     color: var(--ring-view-success-color);
-    background: transparent;
   }
 
   .door-action.success::before {
@@ -2747,7 +2732,6 @@ const Yr = Z`
 
   .door-action.error {
     color: #fff;
-    background: transparent;
   }
 
   .door-action.error::before {
@@ -2890,7 +2874,7 @@ const Yr = Z`
   .ring-indicator,
   .snapshot-action,
   .chrome-action,
-  .visitor-action-dock,
+  .visitor-action,
   .viewer-feedback-layer .state-card,
   .action-button {
     background-image: linear-gradient(
@@ -2921,15 +2905,6 @@ const Yr = Z`
   }
 
   @keyframes door-hold {
-    from {
-      width: 0;
-    }
-    to {
-      width: calc(100% - 8px);
-    }
-  }
-
-  @keyframes door-hold-icon-only {
     from {
       clip-path: inset(0 100% 0 0);
     }
@@ -3145,9 +3120,9 @@ const Yr = Z`
     }
   }
 
-  @media (max-width: 290px) {
+  @media (max-width: 319px) {
     .visitor-action {
-      min-width: var(--ring-view-control-size);
+      min-width: var(--ring-view-primary-size);
       padding-inline: 8px;
     }
 
@@ -3157,9 +3132,9 @@ const Yr = Z`
 
     .talk-action,
     .door-action {
-      width: var(--ring-view-control-size);
-      min-width: var(--ring-view-control-size);
-      max-width: var(--ring-view-control-size);
+      width: var(--ring-view-primary-size);
+      min-width: var(--ring-view-primary-size);
+      max-width: var(--ring-view-primary-size);
     }
   }
 
@@ -3192,10 +3167,6 @@ const Yr = Z`
     }
 
     .door-action.holding::after {
-      width: calc(100% - 8px);
-    }
-
-    .visitor-action-dock.icon-only .door-action.holding::after {
       width: auto;
       animation: none;
       clip-path: inset(0);
@@ -3207,7 +3178,7 @@ const Yr = Z`
     .ring-indicator,
     .snapshot-action,
     .chrome-action,
-    .visitor-action-dock,
+    .visitor-action,
     .viewer-feedback-layer .state-card,
     .action-button {
       border: 1px solid ButtonText;
@@ -3377,6 +3348,20 @@ const Yr = Z`
 
   :host([inline]) .state-layer.with-visitor-controls .spinner {
     flex: 0 0 auto;
+  }
+
+  @container ring-view-inline (max-width: 319px) {
+    :host([inline]) .visitor-action {
+      width: var(--ring-view-primary-size);
+      min-width: var(--ring-view-primary-size);
+      max-width: var(--ring-view-primary-size);
+      gap: 0;
+      padding-inline: 8px;
+    }
+
+    :host([inline]) .visitor-action > span {
+      display: none;
+    }
   }
 
   @container ring-view-inline (max-height: 220px) {
