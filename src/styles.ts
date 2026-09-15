@@ -40,8 +40,14 @@ export const cardStyles = css`
     background: #000;
   }
 
-  :host([layout="grid"]) .inline-shell {
+  :host([layout="grid"]):not([intrinsic-grid-height]) .inline-shell {
     aspect-ratio: auto;
+  }
+
+  :host([layout="grid"][intrinsic-grid-height]),
+  :host([layout="grid"][intrinsic-grid-height]) ha-card,
+  :host([layout="grid"][intrinsic-grid-height]) .inline-shell {
+    height: auto;
   }
 
   .preview {
@@ -56,8 +62,12 @@ export const cardStyles = css`
     background: #000;
   }
 
-  :host([layout="grid"]) .preview {
+  :host([layout="grid"]):not([intrinsic-grid-height]) .preview {
     aspect-ratio: auto;
+  }
+
+  :host([layout="grid"][intrinsic-grid-height]) .preview {
+    height: auto;
   }
 
   .preview:focus-visible {

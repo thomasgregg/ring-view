@@ -1099,7 +1099,7 @@ function qi(e) {
   const t = Number(e[1]), i = Number(e[2]), r = Number(e[3]), n = Number(e[4]), o = Number(e[5]), a = Number(e[6] ?? 0), d = new Date(Date.UTC(t, i, 0)).getUTCDate();
   return i >= 1 && i <= 12 && r >= 1 && r <= d && n >= 0 && n <= 23 && o >= 0 && o <= 59 && a >= 0 && a <= 59;
 }
-function M(e) {
+function L(e) {
   if (typeof e != "string" && typeof e != "number") return;
   const t = String(e).trim();
   if (!t || ["unknown", "unavailable", "none", "null"].includes(t.toLowerCase()))
@@ -1116,7 +1116,7 @@ function M(e) {
   return Number.isFinite(n) ? n : void 0;
 }
 function Bi(e) {
-  return M(e?.state);
+  return L(e?.state);
 }
 function ce(e) {
   const t = e.filter((i) => i !== void 0);
@@ -1126,7 +1126,7 @@ function vt(e) {
   if (!(!e || qt.has(e.state)))
     return ce(
       Ni.map(
-        (t) => M(e.attributes[t])
+        (t) => L(e.attributes[t])
       )
     );
 }
@@ -1350,7 +1350,7 @@ function or(e, t) {
   if (y(i) ? n.push({
     kind: "recording",
     message: s(e, "warning.unavailable", {
-      name: R(i, t.recording_entity)
+      name: T(i, t.recording_entity)
     })
   }) : nr(i) || n.push({
     kind: "recording",
@@ -1358,7 +1358,7 @@ function or(e, t) {
   }), y(r) ? n.push({
     kind: "live",
     message: s(e, "warning.unavailable", {
-      name: R(r, t.live_entity)
+      name: T(r, t.live_entity)
     })
   }) : Kt(r) ? t.two_way_audio && !Ee(e, t.live_entity) && n.push({
     kind: "talkback",
@@ -1371,7 +1371,7 @@ function or(e, t) {
     y(o) && n.push({
       kind: "snapshot",
       message: s(e, "warning.unavailable", {
-        name: R(o, t.snapshot_entity)
+        name: T(o, t.snapshot_entity)
       })
     });
   } else ["snapshot", "newest"].includes(t.preview_source) && n.push({
@@ -1383,7 +1383,7 @@ function or(e, t) {
     y(o) ? n.push({
       kind: "last_activity",
       message: s(e, "warning.unavailable", {
-        name: R(o, t.last_activity_entity)
+        name: T(o, t.last_activity_entity)
       })
     }) : z(e, t.last_activity_entity) === void 0 && n.push({
       kind: "last_activity",
@@ -1395,7 +1395,7 @@ function or(e, t) {
     y(o) ? n.push({
       kind: "doorbell",
       message: s(e, "warning.unavailable", {
-        name: R(o, t.doorbell_entity)
+        name: T(o, t.doorbell_entity)
       })
     }) : Array.isArray(o?.attributes.event_types) && !o.attributes.event_types.includes("ring") && n.push({
       kind: "doorbell",
@@ -1407,7 +1407,7 @@ function or(e, t) {
     y(o) ? n.push({
       kind: "door",
       message: s(e, "warning.unavailable", {
-        name: R(o, t.door_entity)
+        name: T(o, t.door_entity)
       })
     }) : t.door_action === "open" && !le(o) && n.push({
       kind: "door",
@@ -1419,7 +1419,7 @@ function or(e, t) {
     y(o) && n.push({
       kind: "door_contact",
       message: s(e, "warning.unavailable", {
-        name: R(o, t.door_contact_entity)
+        name: T(o, t.door_contact_entity)
       })
     });
   }
@@ -1428,7 +1428,7 @@ function or(e, t) {
     message: s(e, "warning.compatibility")
   }), n;
 }
-function R(e, t) {
+function T(e, t) {
   return e?.attributes.friendly_name || t;
 }
 const sr = [
@@ -1459,37 +1459,37 @@ function ge(e) {
 function dr(e) {
   return Y(e);
 }
-function C(e, t) {
+function M(e, t) {
   return Wt(e, t);
 }
 function cr(e, t, i) {
   const r = t.recording_entity, n = t.snapshot_entity;
-  if (!n) return C(e, t);
+  if (!n) return M(e, t);
   const o = e.states[r], a = e.states[n], d = !y(o), c = !y(a);
   if (d && !c)
-    return C(e, t);
+    return M(e, t);
   if (c && !d) return n;
   if (d && c) {
     const u = ge(o), p = ge(a);
     if (u !== void 0 && p !== void 0)
-      return u !== p ? p > u ? n : C(e, t) : t.preview_fallback === "snapshot" ? n : C(e, t);
+      return u !== p ? p > u ? n : M(e, t) : t.preview_fallback === "snapshot" ? n : M(e, t);
     if (i !== void 0)
-      return i === "snapshot" ? n : C(e, t);
+      return i === "snapshot" ? n : M(e, t);
   }
-  return t.preview_fallback === "snapshot" ? n : C(e, t);
+  return t.preview_fallback === "snapshot" ? n : M(e, t);
 }
 function lr(e, t, i, r) {
   switch (t.preview_source) {
     case "live":
       return t.live_entity;
     case "snapshot":
-      return t.snapshot_entity ?? C(e, t);
+      return t.snapshot_entity ?? M(e, t);
     case "newest":
       return cr(e, t, r);
     case "default":
-      return i === "live" ? t.live_entity : C(e, t);
+      return i === "live" ? t.live_entity : M(e, t);
     default:
-      return C(e, t);
+      return M(e, t);
   }
 }
 const hr = "/media/ring-view";
@@ -1551,7 +1551,7 @@ function mr(e, t) {
 }
 function _r(e, t) {
   const i = e.states[t.live_entity];
-  return (t.name || R(i, t.live_entity.split(".", 2)[1] || "ring-camera")).normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-{2,}/g, "-").replace(/^-+|-+$/g, "") || "ring-camera";
+  return (t.name || T(i, t.live_entity.split(".", 2)[1] || "ring-camera")).normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-{2,}/g, "-").replace(/^-+|-+$/g, "") || "ring-camera";
 }
 function W(e, t) {
   return e.find((i) => i.type === t)?.value ?? "00";
@@ -1883,8 +1883,14 @@ const qr = Z`
     background: #000;
   }
 
-  :host([layout="grid"]) .inline-shell {
+  :host([layout="grid"]):not([intrinsic-grid-height]) .inline-shell {
     aspect-ratio: auto;
+  }
+
+  :host([layout="grid"][intrinsic-grid-height]),
+  :host([layout="grid"][intrinsic-grid-height]) ha-card,
+  :host([layout="grid"][intrinsic-grid-height]) .inline-shell {
+    height: auto;
   }
 
   .preview {
@@ -1899,8 +1905,12 @@ const qr = Z`
     background: #000;
   }
 
-  :host([layout="grid"]) .preview {
+  :host([layout="grid"]):not([intrinsic-grid-height]) .preview {
     aspect-ratio: auto;
+  }
+
+  :host([layout="grid"][intrinsic-grid-height]) .preview {
+    height: auto;
   }
 
   .preview:focus-visible {
@@ -3338,7 +3348,7 @@ function me(e) {
     composed: !0
   });
 }
-var Jr = Object.defineProperty, Xr = Object.getOwnPropertyDescriptor, L = (e, t, i, r) => {
+var Jr = Object.defineProperty, Xr = Object.getOwnPropertyDescriptor, P = (e, t, i, r) => {
   for (var n = r > 1 ? void 0 : r ? Xr(t, i) : t, o = e.length - 1, a; o >= 0; o--)
     (a = e[o]) && (n = (r ? a(t, i, n) : a(n)) || n);
   return r && n && Jr(t, i, n), n;
@@ -3368,7 +3378,7 @@ async function Xt() {
   }
   return tn(_e, en);
 }
-let T = class extends E {
+let $ = class extends E {
   constructor() {
     super(...arguments), this.controls = !0, this.muted = !0, this.allowExoPlayer = !0, this.fitMode = "cover", this.passiveSurface = !1, this.nativeAvailable = !!customElements.get(_e), this.observedMedia = /* @__PURE__ */ new Set(), this.handledStreamEvents = /* @__PURE__ */ new WeakSet(), this.ready = !1, this.handleSurfaceClick = (e) => {
       if (!this.passiveSurface || e.detail === 0 || !this.eventHost) return;
@@ -3522,7 +3532,7 @@ let T = class extends E {
     );
   }
 };
-T.styles = Z`
+$.styles = Z`
     :host {
       display: block;
       width: 100%;
@@ -3539,33 +3549,33 @@ T.styles = Z`
       height: 100%;
     }
   `;
-L([
+P([
   _({ attribute: !1 })
-], T.prototype, "stateObj", 2);
-L([
+], $.prototype, "stateObj", 2);
+P([
   _({ type: Boolean })
-], T.prototype, "controls", 2);
-L([
+], $.prototype, "controls", 2);
+P([
   _({ type: Boolean })
-], T.prototype, "muted", 2);
-L([
+], $.prototype, "muted", 2);
+P([
   _({ type: Boolean, attribute: "allow-exoplayer" })
-], T.prototype, "allowExoPlayer", 2);
-L([
+], $.prototype, "allowExoPlayer", 2);
+P([
   _({ type: Number, attribute: !1 })
-], T.prototype, "aspectRatio", 2);
-L([
+], $.prototype, "aspectRatio", 2);
+P([
   _({ attribute: !1 })
-], T.prototype, "fitMode", 2);
-L([
+], $.prototype, "fitMode", 2);
+P([
   _({ type: Boolean, attribute: "passive-surface" })
-], T.prototype, "passiveSurface", 2);
-L([
+], $.prototype, "passiveSurface", 2);
+P([
   g()
-], T.prototype, "nativeAvailable", 2);
-T = L([
+], $.prototype, "nativeAvailable", 2);
+$ = P([
   G("ring-view-native-camera-adapter")
-], T);
+], $);
 const rn = (e) => e ?? l;
 var nn = Object.defineProperty, on = Object.getOwnPropertyDescriptor, S = (e, t, i, r) => {
   for (var n = r > 1 ? void 0 : r ? on(t, i) : t, o = e.length - 1, a; o >= 0; o--)
@@ -4160,16 +4170,16 @@ function ei(e, t, i, r = Date.now()) {
     const a = He(t), d = He(i);
     if (Rt(t) || Rt(i))
       return a !== void 0 && d !== void 0 && d > a;
-    const c = M(t.last_updated), u = M(i.last_updated);
+    const c = L(t.last_updated), u = L(i.last_updated);
     return c !== void 0 && u !== void 0 && u > c;
   }
   if (!e.startsWith("event.") || i.attributes.event_type !== void 0 && i.attributes.event_type !== "ring")
     return !1;
-  const n = M(t.state), o = M(i.state);
+  const n = L(t.state), o = L(i.state);
   return o === void 0 ? !1 : n === void 0 ? Ue(o, r) : o > n;
 }
 function cn(e, t, i) {
-  return e.startsWith("binary_sensor.") ? t.state !== "on" ? !1 : Ue(He(t), i) : e.startsWith("event.") && (t.attributes.event_type === void 0 || t.attributes.event_type === "ring") && Ue(M(t.state), i);
+  return e.startsWith("binary_sensor.") ? t.state !== "on" ? !1 : Ue(He(t), i) : e.startsWith("event.") && (t.attributes.event_type === void 0 || t.attributes.event_type === "ring") && Ue(L(t.state), i);
 }
 function Ue(e, t) {
   if (e === void 0) return !1;
@@ -4178,8 +4188,8 @@ function Ue(e, t) {
 }
 function He(e) {
   const t = [
-    M(e.attributes.lastDingTime),
-    M(e.attributes.lastDing)
+    L(e.attributes.lastDingTime),
+    L(e.attributes.lastDing)
   ].filter((i) => i !== void 0);
   return t.length > 0 ? Math.max(...t) : void 0;
 }
@@ -5027,7 +5037,7 @@ let f = class extends E {
       return h`
         <div class="state-layer blocking-state unavailable-state" role="status">
           <div class="state-card">
-            <div class="state-title">${R(r, this.activeEntityId())}</div>
+            <div class="state-title">${T(r, this.activeEntityId())}</div>
             <div class="state-detail">
               ${s(this.hass, "viewer.entity_unavailable")}
             </div>
@@ -5374,7 +5384,7 @@ let f = class extends E {
     return this.hass?.states[this.activeEntityId()];
   }
   dialogTitle() {
-    return this.config?.name ? this.config.name : R(
+    return this.config?.name ? this.config.name : T(
       this.hass?.states[this.config.recording_entity],
       s(this.hass, "common.camera")
     );
@@ -5572,7 +5582,7 @@ const ae = /* @__PURE__ */ new Map(), Tn = /* @__PURE__ */ Object.freeze(/* @__P
     return f;
   }
 }, Symbol.toStringTag, { value: "Module" }));
-var $n = Object.defineProperty, xn = Object.getOwnPropertyDescriptor, P = (e, t, i, r) => {
+var $n = Object.defineProperty, xn = Object.getOwnPropertyDescriptor, C = (e, t, i, r) => {
   for (var n = r > 1 ? void 0 : r ? xn(t, i) : t, o = e.length - 1, a; o >= 0; o--)
     (a = e[o]) && (n = (r ? a(t, i, n) : a(n)) || n);
   return r && n && $n(t, i, n), n;
@@ -5580,9 +5590,9 @@ var $n = Object.defineProperty, xn = Object.getOwnPropertyDescriptor, P = (e, t,
 const En = 1e4, Cn = 640, Mn = 16 / 9, Tt = 16, Ln = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
   Di
 )}`;
-let $ = class extends E {
+let R = class extends E {
   constructor() {
-    super(...arguments), this.preview = !1, this.previewFailed = !1, this.ringAlertVisible = !1, this.previewIntersecting = !1, this.previewVisible = !1, this.previewRequestId = 0, this.lastRingAlertAt = 0, this.previewMarkersInitialized = !1, this.inlinePausedForViewer = !1, this.refreshActivityLabel = () => {
+    super(...arguments), this.preview = !1, this.intrinsicGridHeight = !1, this.previewFailed = !1, this.ringAlertVisible = !1, this.previewIntersecting = !1, this.previewVisible = !1, this.previewRequestId = 0, this.lastRingAlertAt = 0, this.previewMarkersInitialized = !1, this.inlinePausedForViewer = !1, this.refreshActivityLabel = () => {
       this.requestUpdate();
     }, this.openViewer = () => {
       if (this.preview || this.isInCardPicker()) return;
@@ -5640,22 +5650,22 @@ let $ = class extends E {
   }
   setConfig(e) {
     const t = Me(e);
-    t.aspect_ratio !== this.config?.aspect_ratio && (this.autoAspectRatio = void 0), (t.recording_entity !== this.config?.recording_entity || t.snapshot_entity !== this.config?.snapshot_entity) && (this.previewMarkersInitialized = !1, this.recordingMarker = void 0, this.snapshotTimestamp = void 0, this.latestObservedPreviewSource = void 0), this.config = t;
+    this.intrinsicGridHeight = t.grid_options?.rows === "auto" || t.grid_options?.rows === void 0 && t.aspect_ratio === "auto", t.aspect_ratio !== this.config?.aspect_ratio && (this.autoAspectRatio = void 0), (t.recording_entity !== this.config?.recording_entity || t.snapshot_entity !== this.config?.snapshot_entity) && (this.previewMarkersInitialized = !1, this.recordingMarker = void 0, this.snapshotTimestamp = void 0, this.latestObservedPreviewSource = void 0), this.config = t;
   }
   getCardSize() {
     return 3;
   }
   getGridOptions() {
-    const e = this.config?.grid_options;
-    return {
+    const e = this.config?.grid_options, t = e?.rows === "auto" || e?.rows === void 0 && this.config?.aspect_ratio === "auto", i = {
       ...e,
       columns: e?.columns === "full" ? "full" : Math.max(12, e?.columns ?? 12),
-      rows: Math.max(3, e?.rows ?? 3),
       min_columns: 12,
-      min_rows: 3,
-      ...e?.max_columns !== void 0 ? { max_columns: Math.max(12, e.max_columns) } : {},
-      ...e?.max_rows !== void 0 ? { max_rows: Math.max(3, e.max_rows) } : {}
+      ...e?.max_columns !== void 0 ? { max_columns: Math.max(12, e.max_columns) } : {}
     };
+    return t ? (e?.rows === void 0 && delete i.rows, e?.min_rows === void 0 ? delete i.min_rows : i.min_rows = Math.max(3, e.min_rows), e?.max_rows !== void 0 && (i.max_rows = Math.max(3, e.max_rows)), i) : (i.rows = Math.max(
+      3,
+      typeof e?.rows == "number" ? e.rows : 3
+    ), i.min_rows = Math.max(3, e?.min_rows ?? 3), e?.max_rows !== void 0 && (i.max_rows = Math.max(3, e.max_rows)), i);
   }
   connectedCallback() {
     super.connectedCallback(), document.addEventListener("viewer-closed", this.handleViewerClosed), this.updateRingAlert(), this.updateComplete.then(() => {
@@ -5683,7 +5693,7 @@ let $ = class extends E {
   }
   render() {
     if (!this.hass || !this.config) return l;
-    const e = this.previewEntityId(), t = this.hass.states[e], i = this.config.name || R(
+    const e = this.previewEntityId(), t = this.hass.states[e], i = this.config.name || T(
       this.hass.states[this.config.recording_entity],
       s(this.hass, "common.camera")
     ), r = this.ringAlertVisible ? "live" : se(this.config), n = this.isInCardPicker(), o = n || this.preview, a = n ? !1 : y(t), d = {
@@ -5901,34 +5911,41 @@ let $ = class extends E {
     return !1;
   }
 };
-$.styles = qr;
-P([
+R.styles = qr;
+C([
   _({ attribute: !1 })
-], $.prototype, "hass", 2);
-P([
+], R.prototype, "hass", 2);
+C([
   _({ reflect: !0 })
-], $.prototype, "layout", 2);
-P([
+], R.prototype, "layout", 2);
+C([
   _({ type: Boolean })
-], $.prototype, "preview", 2);
-P([
+], R.prototype, "preview", 2);
+C([
+  _({
+    type: Boolean,
+    reflect: !0,
+    attribute: "intrinsic-grid-height"
+  })
+], R.prototype, "intrinsicGridHeight", 2);
+C([
   g()
-], $.prototype, "config", 2);
-P([
+], R.prototype, "config", 2);
+C([
   g()
-], $.prototype, "previewFailed", 2);
-P([
+], R.prototype, "previewFailed", 2);
+C([
   g()
-], $.prototype, "lastPoster", 2);
-P([
+], R.prototype, "lastPoster", 2);
+C([
   g()
-], $.prototype, "autoAspectRatio", 2);
-P([
+], R.prototype, "autoAspectRatio", 2);
+C([
   g()
-], $.prototype, "ringAlertVisible", 2);
-$ = P([
+], R.prototype, "ringAlertVisible", 2);
+R = C([
   G(Ce)
-], $);
+], R);
 window.customCards = window.customCards || [];
 window.customCards.some((e) => e.type === Ce) || window.customCards.push({
   type: Ce,
@@ -6472,5 +6489,5 @@ const Hn = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   }
 }, Symbol.toStringTag, { value: "Module" }));
 export {
-  $ as RingView
+  R as RingView
 };

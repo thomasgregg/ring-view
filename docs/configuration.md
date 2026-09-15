@@ -74,10 +74,11 @@ These are standard Home Assistant card layout fields rather than Ring View behav
 dimensions are available, then follows the current poster or video. It adapts
 again when Recording and Live use different shapes. If a custom player does not
 expose valid image or video dimensions, the loaded poster remains authoritative.
-A Home Assistant Sections layout still controls the card's outer grid slot
-through its configured rows; inside that fixed slot, `fit_mode` continues to
-control cropping or letterboxing. Narrow or very short fullscreen layouts also
-prioritize the available viewport and apply `fit_mode` inside it.
+In a Home Assistant Sections layout, Automatic uses intrinsic row sizing unless
+you explicitly configure a fixed `grid_options.rows` value. Inside an explicitly
+fixed slot, `fit_mode` continues to control cropping or letterboxing. Narrow or
+very short fullscreen layouts also prioritize the available viewport and apply
+`fit_mode` inside it.
 
 ### Complete YAML example
 

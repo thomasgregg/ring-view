@@ -66,6 +66,12 @@ export class RingView extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
   @property({ reflect: true }) public layout?: string;
   @property({ type: Boolean }) public preview = false;
+  @property({
+    type: Boolean,
+    reflect: true,
+    attribute: "intrinsic-grid-height",
+  })
+  public intrinsicGridHeight = false;
   @state() private config?: NormalizedConfig;
   @state() private previewFailed = false;
   @state() private lastPoster?: string;
@@ -137,6 +143,8 @@ export class RingView extends LitElement {
 
   public setConfig(config: RingViewConfig): void {
     const next = normalizeConfig(config);
+    this.intrinsicGridHeight = next.grid_options?.rows === "auto"
+      || (next.grid_options?.rows === undefined && next.aspect_ratio === "auto");
     if (next.aspect_ratio !== this.config?.aspect_ratio) {
       this.autoAspectRatio = undefined;
     }
@@ -158,21 +166,36 @@ export class RingView extends LitElement {
 
   public getGridOptions(): GridOptions {
     const configured = this.config?.grid_options;
-    return {
+    const intrinsicRows = configured?.rows === "auto"
+      || (configured?.rows === undefined && this.config?.aspect_ratio === "auto");
+    const options: GridOptions = {
       ...configured,
       columns: configured?.columns === "full"
         ? "full"
         : Math.max(12, configured?.columns ?? 12),
-      rows: Math.max(3, configured?.rows ?? 3),
       min_columns: 12,
-      min_rows: 3,
       ...(configured?.max_columns !== undefined
         ? { max_columns: Math.max(12, configured.max_columns) }
         : {}),
-      ...(configured?.max_rows !== undefined
-        ? { max_rows: Math.max(3, configured.max_rows) }
-        : {}),
     };
+    if (intrinsicRows) {
+      if (configured?.rows === undefined) delete options.rows;
+      if (configured?.min_rows === undefined) delete options.min_rows;
+      else options.min_rows = Math.max(3, configured.min_rows);
+      if (configured?.max_rows !== undefined) {
+        options.max_rows = Math.max(3, configured.max_rows);
+      }
+      return options;
+    }
+    options.rows = Math.max(
+      3,
+      typeof configured?.rows === "number" ? configured.rows : 3,
+    );
+    options.min_rows = Math.max(3, configured?.min_rows ?? 3);
+    if (configured?.max_rows !== undefined) {
+      options.max_rows = Math.max(3, configured.max_rows);
+    }
+    return options;
   }
 
   public connectedCallback(): void {

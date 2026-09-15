@@ -141,6 +141,46 @@ describe("card stream lifecycle", () => {
     }
   });
 
+  it("lets Automatic determine Sections height unless rows were fixed", async () => {
+    const card = document.createElement("ring-view");
+    document.body.append(card);
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      aspect_ratio: "auto",
+    });
+    await card.updateComplete;
+    expect(card.getGridOptions()).toEqual({
+      columns: 12,
+      min_columns: 12,
+    });
+    expect(card.hasAttribute("intrinsic-grid-height")).toBe(true);
+
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      aspect_ratio: "auto",
+      grid_options: { columns: 12, rows: 4 },
+    });
+    await card.updateComplete;
+    expect(card.getGridOptions()).toMatchObject({ rows: 4, min_rows: 3 });
+    expect(card.hasAttribute("intrinsic-grid-height")).toBe(false);
+
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      aspect_ratio: "4:3",
+      grid_options: { columns: 12, rows: "auto" },
+    });
+    await card.updateComplete;
+    expect(card.getGridOptions()).toEqual({
+      columns: 12,
+      rows: "auto",
+      min_columns: 12,
+    });
+    expect(card.hasAttribute("intrinsic-grid-height")).toBe(true);
+  });
+
   it("restores an interactive card immediately when the same element reconnects", async () => {
     const card = document.createElement("ring-view");
     card.setConfig({

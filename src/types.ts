@@ -71,7 +71,7 @@ export interface HomeAssistant {
 
 export interface GridOptions {
   columns?: number | "full";
-  rows?: number;
+  rows?: number | "auto";
   min_columns?: number;
   min_rows?: number;
   max_columns?: number;

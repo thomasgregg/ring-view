@@ -216,6 +216,11 @@ describe("configuration", () => {
       grid_options: { columns: 9, rows: 4 },
     });
     expect(config.grid_options).toEqual({ columns: 9, rows: 4 });
+    expect(normalizeConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      grid_options: { rows: "auto" },
+    }).grid_options).toEqual({ rows: "auto" });
   });
 
   it("normalizes the optional door-access settings", () => {

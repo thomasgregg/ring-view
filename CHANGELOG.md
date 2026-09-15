@@ -4,6 +4,15 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.1-beta.2] - 2026-09-15
+
+### Fixed
+
+- Let **Automatic (native shape)** determine a Sections-dashboard card's
+  intrinsic height unless the user explicitly configured fixed grid rows. This
+  prevents a correctly detected 16:9 or square image from being letterboxed
+  inside Ring View's former three-row default.
+
 ## [0.12.1-beta.1] - 2026-09-15
 
 ### Fixed

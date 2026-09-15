@@ -1901,6 +1901,9 @@ test("automatic shape follows real image dimensions and keeps an explicit loadin
 }) => {
   await page.setViewportSize({ width: 900, height: 900 });
   await page.goto("/demo/?aspect=auto&fit=contain");
+  const card = page.locator("ring-view");
+  await card.evaluate((element) => element.setAttribute("layout", "grid"));
+  await expect(card).toHaveAttribute("intrinsic-grid-height", "");
   const preview = page.locator("ring-view .preview");
   const initial = await preview.boundingBox();
   if (!initial) throw new Error("Preview was not visible");
