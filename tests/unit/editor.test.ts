@@ -289,7 +289,7 @@ describe("visual editor", () => {
     };
 
     expect(optionsFor("aspect_ratio")).toEqual([
-      { value: "auto", label: "Automatic (native shape)" },
+      { value: "auto", label: "Automatic" },
       { value: "16:9", label: "Widescreen (16:9)" },
       { value: "4:3", label: "Standard (4:3)" },
       { value: "1:1", label: "Square (1:1)" },

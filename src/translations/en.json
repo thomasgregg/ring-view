@@ -85,7 +85,7 @@
   "editor.aspect_widescreen": "Widescreen (16:9)",
   "editor.aspect_standard": "Standard (4:3)",
   "editor.aspect_square": "Square (1:1)",
-  "editor.aspect_auto": "Automatic (native shape)",
+  "editor.aspect_auto": "Automatic",
   "editor.fit_cover": "Crop to fill",
   "editor.fit_contain": "Fit entire image",
   "editor.warnings": "Configuration warnings",

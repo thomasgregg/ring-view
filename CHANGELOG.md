@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.1-beta.6] - 2026-09-15
+
+### Changed
+
+- Simplify **Automatic (native shape)** to **Automatic** (and **Automatisch** in
+  German) while retaining the same `aspect_ratio: auto` configuration value.
+
 ## [0.12.1-beta.5] - 2026-09-15
 
 ### Changed

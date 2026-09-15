@@ -76,9 +76,10 @@ again when Recording and Live use different shapes. If a custom player does not
 expose valid image or video dimensions, the loaded poster remains authoritative.
 Cards without a saved grid-row setting use automatic height. An explicitly
 saved row count, including three rows, remains fixed.
-In a Home Assistant Sections layout, Automatic uses intrinsic row sizing unless
-you explicitly configure a fixed `grid_options.rows` value. Inside an explicitly
-fixed slot, `fit_mode` continues to control cropping or letterboxing. Narrow or
+In a Home Assistant Sections layout, **Automatic** uses intrinsic row sizing
+unless you explicitly configure a fixed `grid_options.rows` value. Inside an
+explicitly fixed slot, `fit_mode` continues to control cropping or letterboxing.
+Narrow or
 very short fullscreen layouts also prioritize the available viewport and apply
 `fit_mode` inside it.
 
