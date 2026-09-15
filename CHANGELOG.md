@@ -4,6 +4,47 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.1] - 2026-09-15
+
+### Added
+
+- Add **Newest event (automatic)** for Ring-MQTT Event Select recording
+  sources. Ring View follows the latest activity category and selects its
+  newest Ding, Motion, Person, or On-demand recording. **Selected event
+  (manual)** remains available for browsing the Event Select history.
+- Add **Card appearance → Show Talk and door button text**. Turning it off
+  provides compact 48-pixel icon buttons in the interactive dashboard card
+  and fullscreen viewer while retaining dynamic accessible names, hover
+  descriptions, status icons, and press-and-hold door feedback.
+
+### Changed
+
+- Make **Automatic**, **Fit entire image**, and automatic grid height the
+  defaults for settings that were not explicitly configured. Automatic image
+  shape now follows valid poster and video dimensions, with a stable 16:9
+  loading shape. Existing explicit image shapes, crop choices, and fixed row
+  counts remain unchanged.
+- Put **Automatic** first in the image-shape menu and **Fit entire image** first
+  in the image-fit menu.
+
+### Fixed
+
+- Refresh repeated Ring-MQTT activity categories and wait for the matching
+  newest recording instead of briefly reusing an earlier recording URL.
+- Keep automatic image sizing consistent across preview posters, native Home
+  Assistant cameras, direct recordings, Ring WebRTC, orientation changes, and
+  height-limited fullscreen viewers.
+- Keep icon-only door hold progress inside its highlighted inner circle from
+  the first frame, with a straight advancing edge and complete reduced-motion
+  feedback.
+
+### Tests
+
+- Expand unit and browser coverage for automatic media dimensions, fixed and
+  automatic grid heights, Ring-MQTT recording selection, icon-only Talk and
+  door states, press-and-hold behavior, reduced motion, short cards, narrow
+  screens, desktop, phone portrait, and phone landscape layouts.
+
 ## [0.12.1-beta.10] - 2026-09-15
 
 ### Fixed
