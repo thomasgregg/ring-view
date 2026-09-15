@@ -105,6 +105,10 @@ const mqttRecording: HassEntity = {
       "Ding 1 (Transcoded)",
       "Motion 1",
       "Motion 1 (Transcoded)",
+      "Person 1",
+      "Person 1 (Transcoded)",
+      "On-demand 1",
+      "On-demand 1 (Transcoded)",
     ],
     eventId: "demo-event-1",
     recordingUrl: query.get("mqtt_recording") === "missing"
@@ -146,6 +150,12 @@ const activity: HassEntity = {
   attributes: {
     friendly_name: "Front Door Last Activity",
     device_class: "timestamp",
+    ...(query.get("activity_category")
+      ? {
+          category: query.get("activity_category"),
+          recording_status: query.get("recording_status") ?? "ready",
+        }
+      : {}),
   },
 };
 const mqttActivity: HassEntity = {
@@ -349,6 +359,8 @@ card.setConfig({
   recording_entity: query.get("recording_source") === "mqtt"
     ? mqttRecording.entity_id
     : recording.entity_id,
+  recording_selection:
+    query.get("recording_selection") === "selected" ? "selected" : "newest",
   live_entity: live.entity_id,
   snapshot_entity: snapshot.entity_id,
   last_activity_entity:

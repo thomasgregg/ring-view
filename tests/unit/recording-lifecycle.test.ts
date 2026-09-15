@@ -120,6 +120,183 @@ describe("recording player lifecycle", () => {
     expect(mqttHass.callService).not.toHaveBeenCalled();
   });
 
+  it("automatically selects the newest Ring-MQTT event category before playback", async () => {
+    const mqttHass = ringMqttHass("https://example.test/ding.mp4");
+    mqttHass.states["select.front_door_events"]!.attributes.options = [
+      "Ding 1",
+      "On-demand 1",
+      "On-demand 1 (Transcoded)",
+    ];
+    mqttHass.states["sensor.last_activity"] = {
+      entity_id: "sensor.last_activity",
+      state: "2026-09-15T10:46:18Z",
+      attributes: {
+        category: "on_demand",
+        recording_status: "ready",
+      },
+    };
+    const dialog = document.createElement("ring-view-dialog");
+    dialog.hass = mqttHass;
+    document.body.append(dialog);
+    dialog.showDialog({
+      mode: "last_recording",
+      config: normalizeConfig({
+        recording_entity: "select.front_door_events",
+        recording_selection: "newest",
+        live_entity: "camera.live",
+        last_activity_entity: "sensor.last_activity",
+      }),
+    });
+    await flush();
+
+    expect(mqttHass.callService).toHaveBeenCalledWith(
+      "select",
+      "select_option",
+      { option: "On-demand 1" },
+      { entity_id: "select.front_door_events" },
+    );
+    expect(dialog.shadowRoot?.querySelector(".video-fallback")).toBeNull();
+
+    dialog.hass = {
+      ...mqttHass,
+      states: {
+        ...mqttHass.states,
+        "select.front_door_events": {
+          ...mqttHass.states["select.front_door_events"]!,
+          state: "On-demand 1",
+          attributes: {
+            ...mqttHass.states["select.front_door_events"]!.attributes,
+            eventId: "event-2",
+            recordingUrl: "https://example.test/on-demand.mp4",
+          },
+        },
+      },
+    };
+    await flush();
+    expect(dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback")?.src)
+      .toBe("https://example.test/on-demand.mp4");
+  });
+
+  it("keeps the current Ring-MQTT event when manual selection is configured", async () => {
+    const mqttHass = ringMqttHass("https://example.test/ding.mp4");
+    mqttHass.states["select.front_door_events"]!.attributes.options = [
+      "Ding 1",
+      "On-demand 1",
+    ];
+    mqttHass.states["sensor.last_activity"] = {
+      entity_id: "sensor.last_activity",
+      state: "2026-09-15T10:46:18Z",
+      attributes: { category: "on_demand", recording_status: "ready" },
+    };
+    const dialog = document.createElement("ring-view-dialog");
+    dialog.hass = mqttHass;
+    document.body.append(dialog);
+    dialog.showDialog({
+      mode: "last_recording",
+      config: normalizeConfig({
+        recording_entity: "select.front_door_events",
+        recording_selection: "selected",
+        live_entity: "camera.live",
+        last_activity_entity: "sensor.last_activity",
+      }),
+    });
+    await flush();
+
+    expect(mqttHass.callService).not.toHaveBeenCalled();
+    expect(dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback")?.src)
+      .toBe("https://example.test/ding.mp4");
+  });
+
+  it("reselects slot 1 when a newer event arrives in the same category", async () => {
+    const mqttHass = ringMqttHass("https://example.test/ding-1.mp4");
+    mqttHass.states["select.front_door_events"]!.attributes.options = ["Ding 1"];
+    mqttHass.states["sensor.last_activity"] = {
+      entity_id: "sensor.last_activity",
+      state: "2026-09-15T10:00:00Z",
+      attributes: { category: "ding", recording_status: "ready" },
+    };
+    const dialog = document.createElement("ring-view-dialog");
+    dialog.hass = mqttHass;
+    document.body.append(dialog);
+    dialog.showDialog({
+      mode: "last_recording",
+      config: normalizeConfig({
+        recording_entity: "select.front_door_events",
+        recording_selection: "newest",
+        live_entity: "camera.live",
+        last_activity_entity: "sensor.last_activity",
+      }),
+    });
+    await flush();
+    await vi.advanceTimersByTimeAsync(1_250);
+    await dialog.updateComplete;
+    expect(mqttHass.callService).toHaveBeenCalledTimes(1);
+    expect(dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback")?.src)
+      .toBe("https://example.test/ding-1.mp4");
+
+    dialog.hass = {
+      ...mqttHass,
+      states: {
+        ...mqttHass.states,
+        "sensor.last_activity": {
+          ...mqttHass.states["sensor.last_activity"]!,
+          state: "2026-09-15T10:01:00Z",
+        },
+      },
+    };
+    await flush();
+    expect(mqttHass.callService).toHaveBeenCalledTimes(2);
+    expect(dialog.shadowRoot?.querySelector(".video-fallback")).toBeNull();
+
+    dialog.hass = {
+      ...dialog.hass,
+      states: {
+        ...dialog.hass!.states,
+        "select.front_door_events": {
+          ...dialog.hass!.states["select.front_door_events"]!,
+          attributes: {
+            ...dialog.hass!.states["select.front_door_events"]!.attributes,
+            eventId: "event-2",
+            recordingUrl: "https://example.test/ding-2.mp4",
+          },
+        },
+      },
+    };
+    await flush();
+    expect(dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback")?.src)
+      .toBe("https://example.test/ding-2.mp4");
+  });
+
+  it("does not accept an unchanged old URL while the newest event is processing", async () => {
+    const mqttHass = ringMqttHass("https://example.test/old-ding.mp4");
+    mqttHass.states["select.front_door_events"]!.attributes.options = ["Ding 1"];
+    mqttHass.states["sensor.last_activity"] = {
+      entity_id: "sensor.last_activity",
+      state: "2026-09-15T10:02:00Z",
+      attributes: { category: "ding", recording_status: "processing" },
+    };
+    const dialog = document.createElement("ring-view-dialog");
+    dialog.hass = mqttHass;
+    document.body.append(dialog);
+    dialog.showDialog({
+      mode: "last_recording",
+      config: normalizeConfig({
+        recording_entity: "select.front_door_events",
+        live_entity: "camera.live",
+        last_activity_entity: "sensor.last_activity",
+      }),
+    });
+    await flush();
+    await vi.advanceTimersByTimeAsync(1_250);
+    await dialog.updateComplete;
+
+    expect(mqttHass.callService).toHaveBeenCalledTimes(1);
+    expect(dialog.shadowRoot?.querySelector(".video-fallback")).toBeNull();
+    expect(dialog.shadowRoot?.textContent).toContain(
+      "Preparing the newest Ring-MQTT recording",
+    );
+  });
+
   it("reloads a stable camera poster URL when the recording event changes", async () => {
     const dialog = document.createElement("ring-view-dialog");
     const initialHass: HomeAssistant = {

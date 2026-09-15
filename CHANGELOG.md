@@ -4,6 +4,23 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.1-beta.7] - 2026-09-15
+
+### Added
+
+- Add **Newest event (automatic)** for Ring-MQTT Event Select recording
+  sources. Ring View follows the latest activity category and selects its
+  newest Ding, Motion, Person, or On-demand recording while retaining
+  compatible transcoded playback when needed.
+- Add **Selected event (manual)** for users who want Ring View to keep the
+  Event Select entity's chosen recording.
+
+### Fixed
+
+- Refresh a repeated Ring-MQTT category when its activity timestamp changes,
+  and wait for the matching event recording to become ready instead of briefly
+  reusing the previous recording URL.
+
 ## [0.12.1-beta.6] - 2026-09-15
 
 ### Changed

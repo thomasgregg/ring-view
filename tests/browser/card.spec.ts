@@ -693,6 +693,36 @@ test("refreshes a Ring-MQTT Event Select before mounting its recording", async (
   )).toBe(1);
 });
 
+test("selects the newest Ring-MQTT event category before playback", async ({
+  page,
+}, testInfo) => {
+  await page.route("**/pending-recording.mp4?event=*", async () => undefined);
+  await page.goto(
+    "/demo/?recording_source=mqtt&activity=1&activity_category=on_demand",
+  );
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+
+  await expect.poll(async () => page.evaluate(() =>
+    (window.demoDoorCalls ?? []).filter(
+      (call) => call.domain === "select" && call.service === "select_option",
+    ).length
+  )).toBe(1);
+  const selectedOption = await page.evaluate(() =>
+    (window.demoDoorCalls ?? []).find(
+      (call) => call.domain === "select" && call.service === "select_option",
+    )?.serviceData.option
+  );
+  expect(selectedOption).toBe(
+    testInfo.project.name === "phone"
+      ? "On-demand 1 (Transcoded)"
+      : "On-demand 1",
+  );
+  await expect(page.locator("video.video-fallback")).toHaveAttribute(
+    "src",
+    /pending-recording\.mp4\?event=/,
+  );
+});
+
 test("uses Ring-MQTT's compatible event delivery path on Apple mobile without changing audio", async ({
   page,
 }, testInfo) => {

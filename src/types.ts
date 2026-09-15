@@ -13,6 +13,7 @@ export type DoorControlVisibility = "live_only" | "all_views";
 export type DoorControlLocation = "viewer_only" | "dashboard_and_viewer";
 export type DashboardBehavior = "open_viewer" | "interactive";
 export type DashboardStart = "on_demand" | "last_recording" | "live";
+export type RecordingSelection = "newest" | "selected";
 
 export interface HassEntity {
   entity_id: string;
@@ -81,6 +82,7 @@ export interface GridOptions {
 export interface RingViewConfig {
   type?: string;
   recording_entity: string;
+  recording_selection?: RecordingSelection;
   live_entity: string;
   snapshot_entity?: string;
   last_activity_entity?: string;

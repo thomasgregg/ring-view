@@ -3,6 +3,7 @@ import { normalizeConfig } from "../../src/config";
 import type { HassEntity, HomeAssistant } from "../../src/types";
 import {
   isRingMqttEventSelect,
+  newestRingMqttRecordingSelection,
   recordingPosterEntityId,
   recordingPosterRevision,
   recordingSourceMarker,
@@ -90,6 +91,93 @@ describe("recording sources", () => {
       "Ding 1 (Transcoded)",
       { options },
     ))).toBeUndefined();
+  });
+
+  it("maps the latest categorized Ring activity to category slot 1", () => {
+    const homeAssistant = hass();
+    homeAssistant.states["sensor.last_activity"] = entity(
+      "sensor.last_activity",
+      "2026-09-15T10:46:18Z",
+      {
+        category: "on_demand",
+        created_at: "2026-09-15T10:46:18.126Z",
+        recording_status: "ready",
+      },
+    );
+    homeAssistant.states["select.renamed_event"]!.attributes.options = [
+      "Ding 1",
+      "On-demand 1",
+      "On-demand 1 (Transcoded)",
+    ];
+
+    expect(newestRingMqttRecordingSelection(
+      homeAssistant,
+      "sensor.last_activity",
+      homeAssistant.states["select.renamed_event"],
+      true,
+    )).toEqual({
+      option: "On-demand 1 (Transcoded)",
+      marker: `on_demand:${Date.parse("2026-09-15T10:46:18.126Z")}`,
+      recordingReady: true,
+    });
+  });
+
+  it("chooses the newest timestamp from same-device Ring-MQTT event sensors", () => {
+    const homeAssistant = hass();
+    homeAssistant.states["binary_sensor.ding"] = entity(
+      "binary_sensor.ding",
+      "off",
+      { lastDingTime: "2026-09-15T10:00:00Z" },
+    );
+    homeAssistant.states["binary_sensor.motion"] = entity(
+      "binary_sensor.motion",
+      "off",
+      {
+        lastMotionTime: "2026-09-15T10:05:00Z",
+        personDetected: true,
+      },
+    );
+    homeAssistant.entities = {
+      ...homeAssistant.entities,
+      "binary_sensor.ding": {
+        entity_id: "binary_sensor.ding",
+        platform: "mqtt",
+        device_id: "front-door",
+      },
+      "binary_sensor.motion": {
+        entity_id: "binary_sensor.motion",
+        platform: "mqtt",
+        device_id: "front-door",
+      },
+    };
+    homeAssistant.states["select.renamed_event"]!.attributes.options = [
+      "Ding 1",
+      "Motion 1",
+      "Person 1",
+    ];
+
+    expect(newestRingMqttRecordingSelection(
+      homeAssistant,
+      "binary_sensor.ding",
+      homeAssistant.states["select.renamed_event"],
+    )?.option).toBe("Person 1");
+  });
+
+  it("does not guess an option when activity has no recognized category", () => {
+    const homeAssistant = hass();
+    homeAssistant.states["sensor.last_activity"] = entity(
+      "sensor.last_activity",
+      "2026-09-15T10:46:18Z",
+      { category: "package_delivery" },
+    );
+    homeAssistant.states["select.renamed_event"]!.attributes.options = [
+      "Motion 1",
+    ];
+    expect(newestRingMqttRecordingSelection(
+      homeAssistant,
+      "sensor.last_activity",
+      homeAssistant.states["select.renamed_event"],
+    )).toBeUndefined();
   });
 
   it("recognizes a renamed Ring-MQTT Event Select by registry identity", () => {

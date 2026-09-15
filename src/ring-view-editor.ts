@@ -23,6 +23,7 @@ import type {
   RingViewConfig,
 } from "./types";
 import { validateEntities } from "./utilities/entity-validation";
+import { isRingMqttEventSelect } from "./utilities/recording-source";
 import { snapshotDirectoryWarning } from "./utilities/snapshot";
 
 function configSchema(
@@ -226,6 +227,27 @@ function configSchema(
         },
       },
     },
+    ...(isRingMqttEventSelect(hass, config.recording_entity)
+      ? [{
+          name: "recording_selection",
+          required: true,
+          selector: {
+            select: {
+              mode: "dropdown",
+              options: [
+                {
+                  value: "newest",
+                  label: localize(hass, "editor.recording_selection_newest"),
+                },
+                {
+                  value: "selected",
+                  label: localize(hass, "editor.recording_selection_selected"),
+                },
+              ],
+            },
+          },
+        } satisfies ConfigFormSchema]
+      : []),
     {
       name: "live_entity",
       required: true,
@@ -399,6 +421,7 @@ function configSchema(
 
 const LABELS: Record<string, TranslationKey> = {
   recording_entity: "editor.recording_entity",
+  recording_selection: "editor.recording_selection",
   live_entity: "editor.live_entity",
   snapshot_entity: "editor.snapshot_entity",
   snapshots: "editor.snapshots",
@@ -437,6 +460,7 @@ const LABELS: Record<string, TranslationKey> = {
 
 const HELPERS: Record<string, TranslationKey> = {
   recording_entity: "editor.helper_recording_entity",
+  recording_selection: "editor.helper_recording_selection",
   live_entity: "editor.helper_live_entity",
   dashboard_behavior: "editor.helper_dashboard_behavior",
   dashboard_start: "editor.helper_dashboard_start",
@@ -575,6 +599,8 @@ export class RingViewEditor extends LitElement {
       Object.entries(next).filter(
         ([key, value]) =>
           value !== undefined
+          && (key !== "recording_selection"
+            || next.recording_entity.startsWith("select."))
           && (Boolean(next.door_entity) || !inactiveDoorOptions.has(key)),
       ),
     ) as unknown as RingViewConfig;

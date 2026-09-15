@@ -3,7 +3,11 @@ import type {
   HomeAssistant,
   NormalizedConfig,
 } from "../types";
-import { resolveEntitySource } from "./entity-sources";
+import { parseTimestampValue } from "./activity-time";
+import {
+  resolveEntitySource,
+  sameDeviceEntityIds,
+} from "./entity-sources";
 
 const RECORDING_URL_ATTRIBUTES = [
   "video_url",
@@ -16,6 +20,27 @@ const RECORDING_EVENT_ID_ATTRIBUTES = [
   "last_video_id",
 ] as const;
 const MINIMUM_SIGNED_URL_LIFETIME_MS = 30_000;
+
+type RingRecordingCategory = "ding" | "motion" | "person" | "on_demand";
+
+export interface RingMqttRecordingSelection {
+  option: string;
+  marker: string;
+  recordingReady: boolean;
+}
+
+interface RingActivityCandidate {
+  category: RingRecordingCategory;
+  timestamp: number;
+  recordingReady: boolean;
+}
+
+const CATEGORY_OPTION_LABELS: Record<RingRecordingCategory, string> = {
+  ding: "Ding",
+  motion: "Motion",
+  person: "Person",
+  on_demand: "On-demand",
+};
 
 function nonPlayableRecordingUrl(value: string): boolean {
   const normalized = value.trim().toLowerCase();
@@ -122,6 +147,139 @@ export function transcodedRecordingOption(entity?: HassEntity): string | undefin
       typeof option === "string" && option.toLowerCase() === candidate,
   );
   return match;
+}
+
+function ringRecordingCategory(value: unknown): RingRecordingCategory | undefined {
+  if (typeof value !== "string") return undefined;
+  switch (value.trim().toLowerCase().replace(/[\s-]+/g, "_")) {
+    case "ding":
+    case "ring":
+    case "doorbell":
+      return "ding";
+    case "motion":
+      return "motion";
+    case "person":
+      return "person";
+    case "on_demand":
+    case "ondemand":
+      return "on_demand";
+    default:
+      return undefined;
+  }
+}
+
+function activityStateTimestamp(entity: HassEntity): number | undefined {
+  for (const value of [
+    entity.attributes.created_at,
+    entity.attributes.timestamp,
+    entity.attributes.event_timestamp,
+    entity.state,
+  ]) {
+    const parsed = parseTimestampValue(value);
+    if (parsed !== undefined) return parsed;
+  }
+  return undefined;
+}
+
+function activityCandidates(entity?: HassEntity): RingActivityCandidate[] {
+  if (!entity || entity.state === "unknown" || entity.state === "unavailable") {
+    return [];
+  }
+  const candidates: RingActivityCandidate[] = [];
+  const directCategory = ringRecordingCategory(
+    entity.attributes.category
+      ?? entity.attributes.event_type
+      ?? entity.attributes.eventType,
+  );
+  const directTimestamp = activityStateTimestamp(entity);
+  if (directCategory && directTimestamp !== undefined) {
+    const status = entity.attributes.recording_status;
+    candidates.push({
+      category: directCategory,
+      timestamp: directTimestamp,
+      recordingReady: typeof status !== "string"
+        || status.trim().toLowerCase() === "ready",
+    });
+  }
+
+  const dingTimestamp = parseTimestampValue(
+    entity.attributes.lastDingTime ?? entity.attributes.lastDing,
+  );
+  if (dingTimestamp !== undefined) {
+    candidates.push({
+      category: "ding",
+      timestamp: dingTimestamp,
+      recordingReady: true,
+    });
+  }
+  const motionTimestamp = parseTimestampValue(
+    entity.attributes.lastMotionTime ?? entity.attributes.lastMotion,
+  );
+  if (motionTimestamp !== undefined) {
+    candidates.push({
+      category: entity.attributes.personDetected === true ? "person" : "motion",
+      timestamp: motionTimestamp,
+      recordingReady: true,
+    });
+  }
+  return candidates;
+}
+
+function newestRingActivity(
+  hass: HomeAssistant,
+  activityEntityId: string,
+): RingActivityCandidate | undefined {
+  const entityIds = new Set([
+    activityEntityId,
+    ...sameDeviceEntityIds(hass, activityEntityId),
+  ]);
+  const candidates = [...entityIds].flatMap((entityId) =>
+    activityCandidates(hass.states[entityId])
+  );
+  return candidates.reduce<RingActivityCandidate | undefined>(
+    (latest, candidate) =>
+      latest === undefined || candidate.timestamp > latest.timestamp
+        ? candidate
+        : latest,
+    undefined,
+  );
+}
+
+/**
+ * Resolve the Event Select option representing the newest Ring activity.
+ * Ring-MQTT numbers each category independently, so the latest activity's
+ * category selects slot 1 while the timestamp provides a stable refresh key.
+ */
+export function newestRingMqttRecordingSelection(
+  hass: HomeAssistant,
+  activityEntityId: string | undefined,
+  selectEntity: HassEntity | undefined,
+  preferTranscoded = false,
+): RingMqttRecordingSelection | undefined {
+  if (!activityEntityId || !selectEntity) return undefined;
+  const activity = newestRingActivity(hass, activityEntityId);
+  const options = selectEntity.attributes.options;
+  if (!activity || !Array.isArray(options)) return undefined;
+
+  const base = `${CATEGORY_OPTION_LABELS[activity.category]} 1`;
+  const direct = options.find(
+    (option): option is string =>
+      typeof option === "string" && option.toLowerCase() === base.toLowerCase(),
+  );
+  const transcoded = options.find(
+    (option): option is string =>
+      typeof option === "string"
+      && option.toLowerCase() === `${base} (transcoded)`.toLowerCase(),
+  );
+  const option = preferTranscoded
+    ? transcoded ?? direct
+    : direct ?? transcoded;
+  if (!option) return undefined;
+  return {
+    option,
+    marker: `${activity.category}:${String(activity.timestamp)}`,
+    recordingReady: activity.recordingReady,
+  };
 }
 
 export function isRingMqttEventSelect(

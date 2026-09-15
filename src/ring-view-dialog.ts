@@ -77,6 +77,7 @@ import {
 } from "./utilities/snapshot";
 import {
   isRingMqttEventSelect,
+  newestRingMqttRecordingSelection,
   recordingPosterRevision,
   recordingPosterEntityId,
   recordingSourceMarker,
@@ -234,6 +235,7 @@ export class RingViewDialog extends LitElement {
   };
   private recordingRefreshAttempted = false;
   private recordingTranscodeFallbackAttempted = false;
+  private newestRecordingMarker?: string;
   private recordingRefreshToken = 0;
   private pendingRecordingUpdate?: {
     entityId: string;
@@ -381,6 +383,7 @@ export class RingViewDialog extends LitElement {
       this.observePendingSnapshotUpdate();
       this.observePendingRecordingUpdate();
       this.detectDoorbellEvent(changed.get("hass") as HomeAssistant | undefined);
+      if (this.prepareNewestRingMqttRecording()) return;
     }
     if (!changed.has("hass")) return;
     if (this.config.door_entity && this.doorActionDisabled()) {
@@ -1691,6 +1694,7 @@ export class RingViewDialog extends LitElement {
     const ringMqttRecording = this.mode === "last_recording"
       && this.hass
       && isRingMqttEventSelect(this.hass, this.activeEntityId());
+    if (ringMqttRecording && this.prepareNewestRingMqttRecording()) return;
     const mobileCompatibleOption = ringMqttRecording
       && isAppleMobileBrowser()
       ? transcodedRecordingOption(this.activeEntity())
@@ -1749,6 +1753,7 @@ export class RingViewDialog extends LitElement {
 
   private resetMediaAttempt(): void {
     this.cancelRecordingPreparation(true);
+    this.newestRecordingMarker = undefined;
     this.cancelTalkPress();
     this.resetRecordingControls();
     this.retryCount = 0;
@@ -1766,6 +1771,52 @@ export class RingViewDialog extends LitElement {
     this.talkbackReady = false;
     this.talkbackRequesting = false;
     this.talkbackTalking = false;
+  }
+
+  private prepareNewestRingMqttRecording(): boolean {
+    if (
+      !this.open
+      || this.suspended
+      || !this.hass
+      || !this.config
+      || this.mode !== "last_recording"
+      || !this.recordingStarted
+      || (this.inline && !this.inlineStarted)
+      || this.config.recording_selection !== "newest"
+      || !isRingMqttEventSelect(this.hass, this.activeEntityId())
+      || this.recordingPreparationActive
+    ) {
+      return false;
+    }
+
+    const entity = this.activeEntity();
+    const preferTranscoded = isAppleMobileBrowser()
+      || /\s\(transcoded\)$/i.test(entity?.state.trim() ?? "");
+    const selection = newestRingMqttRecordingSelection(
+      this.hass,
+      this.config.last_activity_entity,
+      entity,
+      preferTranscoded,
+    );
+    if (
+      !selection
+      || (this.newestRecordingMarker === selection.marker
+        && entity?.state.trim() === selection.option)
+    ) {
+      return false;
+    }
+
+    this.newestRecordingMarker = selection.marker;
+    this.recordingRefreshAttempted = false;
+    this.recordingTranscodeFallbackAttempted = false;
+    this.recordingPlaybackRetriedSource = undefined;
+    this.recordingVideoFailed = false;
+    void this.refreshRingMqttRecording(selection.option, {
+      allowUnchangedReady:
+        selection.recordingReady && entity?.state.trim() === selection.option,
+      statusKey: "viewer.preparing_latest_recording",
+    });
+    return true;
   }
 
   private handlePosterLoad = (event: Event): void => {
@@ -1841,7 +1892,13 @@ export class RingViewDialog extends LitElement {
     }
   }
 
-  private async refreshRingMqttRecording(requestedOption?: string): Promise<void> {
+  private async refreshRingMqttRecording(
+    requestedOption?: string,
+    options: {
+      allowUnchangedReady?: boolean;
+      statusKey?: TranslationKey;
+    } = {},
+  ): Promise<void> {
     const hass = this.hass;
     const entityId = this.activeEntityId();
     const entity = this.activeEntity();
@@ -1864,8 +1921,8 @@ export class RingViewDialog extends LitElement {
     this.finishPendingRecordingUpdate("cancelled");
     const token = ++this.recordingRefreshToken;
     const baseline = recordingSourceMarker(entity);
-    const allowUnchangedReady = this.recordingVideoFailed
-      && recordingUrlIsReady(entity);
+    const allowUnchangedReady = options.allowUnchangedReady
+      ?? (this.recordingVideoFailed && recordingUrlIsReady(entity));
     this.recordingPreparationActive = true;
     this.recordingVideoFailed = false;
     this.recordingFailureDetail = undefined;
@@ -1874,9 +1931,10 @@ export class RingViewDialog extends LitElement {
     this.mediaStatus = "pending";
     this.statusAnnouncement = localize(
       this.hass,
-      requestedOption && requestedOption !== entity?.state.trim()
-        ? "viewer.preparing_compatible_recording"
-        : "viewer.refreshing_recording",
+      options.statusKey
+        ?? (requestedOption && requestedOption !== entity?.state.trim()
+          ? "viewer.preparing_compatible_recording"
+          : "viewer.refreshing_recording"),
     );
     const update = this.waitForRecordingUpdate(
       entityId,

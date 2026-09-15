@@ -84,7 +84,7 @@ const hass: HomeAssistant = {
 };
 
 describe("visual editor", () => {
-  it("keeps the same schema for official Ring and Ring-MQTT source profiles", async () => {
+  it("shows automatic recording selection only for Ring-MQTT", async () => {
     const schemas: ConfigFormSchema[][] = [];
     const profiles = [
       {
@@ -115,7 +115,21 @@ describe("visual editor", () => {
       editor.remove();
     }
 
-    expect(schemas[1]).toEqual(schemas[0]);
+    expect(schemas[0]?.some((field) => field.name === "recording_selection"))
+      .toBe(false);
+    const recordingSelection = schemas[1]?.find(
+      (field) => field.name === "recording_selection",
+    );
+    expect(recordingSelection?.selector).toMatchObject({
+      select: {
+        options: [
+          { value: "newest", label: "Newest event (automatic)" },
+          { value: "selected", label: "Selected event (manual)" },
+        ],
+      },
+    });
+    expect(schemas[1]?.filter((field) => field.name !== "recording_selection"))
+      .toEqual(schemas[0]);
   });
 
   it("emits the compact flat configuration and removes obsolete options", async () => {

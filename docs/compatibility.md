@@ -15,7 +15,7 @@ controls, spacing, or status design.
 
 | Ring View feature | Official Ring source | Ring-MQTT source | User-visible behavior |
 | --- | --- | --- | --- |
-| Last recording | Last recording `camera.*` | `select.*` Event Select | Same Last recording tab and video controls. The Event Select's current option chooses the Ring-MQTT event; Ring View automatically uses its compatible delivery variant where needed. |
+| Last recording | Last recording `camera.*`; Home Assistant follows the newest Ring history event | `select.*` Event Select; Ring View can automatically choose the newest category or preserve a manual selection | Same Last recording tab and video controls. Ring View automatically uses Ring-MQTT's compatible delivery variant where needed. |
 | Live | Live view `camera.*` | Home Assistant Generic Camera or RTSP-to-WebRTC camera configured from Ring-MQTT's `_live` RTSP path | Same Live tab and Home Assistant camera player. Ring-MQTT does not auto-discover this camera entity. |
 | Dashboard still | Last recording or Live camera image | Ring-MQTT snapshot `camera.*` | Same passive card. A snapshot camera is also the poster for Event Select recordings. |
 | Manual snapshot | Configured snapshot camera, otherwise Live camera | Snapshot camera plus its same-device Take Snapshot button | Same camera action and feedback. Ring View waits for Ring-MQTT's timestamp update before saving. |
@@ -31,18 +31,18 @@ camera for Live video and two-way audio. This recommended mix is a choice of
 entities inside the same Ring View editor; it does not create a second card or
 change the design.
 
-Event Select is a persistent Home Assistant menu. The user must open that
-entity and choose the desired slot: **Ding 1** is the newest doorbell event,
-**Motion 1** is the newest motion event, and higher numbers are older. Ring View
-preserves that event choice. On iPhone/iPad it requests the matching
-**(Transcoded)** option before playback; elsewhere it does so only after the
-direct Ring URL fails. This transport change still represents the same Ding,
-Motion, or on-demand event and does not change the viewer design. It is safe to
-leave the **(Transcoded)** option selected because it also works on desktop.
+Event Select is a persistent Home Assistant menu whose slot numbers are scoped
+to a category. In automatic mode, Ring View uses the configured Last activity
+source to select slot 1 from the newest Ding, Motion, Person, or on-demand
+category before playback. In manual mode, Ring View preserves the selected
+historical slot. On iPhone/iPad it requests the matching **(Transcoded)** option
+before playback; elsewhere it does so only after the direct Ring URL fails.
+This transport change still represents the same event and does not change the
+viewer design.
 
-The visual editor always offers the same fields and choices. It never reveals
-or removes design settings based on an entity's integration. The runtime uses
-the selected entity's registry identity only to adapt the transport behind the
+The visual editor keeps provider-independent design settings unchanged and adds
+the recording-selection choice only for a recognized Ring-MQTT Event Select.
+The runtime uses entity registry identity to adapt the transport behind the
 same interface: signed Event Select MP4, snapshot refresh button, activity
 attributes, or normal Home Assistant camera playback. Renamed entities remain
 supported through registry `device_id`, `unique_id`, and original-name data;

@@ -27,6 +27,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | --- | --- | --- | --- | --- |
 | `type` | No — added automatically | Required | `custom:ring-view` | Identifies the custom card. Added automatically by the card picker. |
 | `recording_entity` | Yes — Config tab | Required | `camera.*` or `select.*` entity ID | Official Ring Last recording camera, or the Ring-MQTT Event Select entity whose current option identifies the recording to play. |
+| `recording_selection` | Yes — Ring-MQTT Event Select only | `newest` | `newest`, `selected` | `newest` maps the category from `last_activity_entity` to that category's slot 1 before playback. `selected` preserves the Event Select choice for manual history browsing. It has no effect on camera recording sources. |
 | `live_entity` | Yes — Config tab | Required | `camera.*` entity ID | Camera entity that starts the Ring live view. |
 | `snapshot_entity` | Yes — Snapshots | Not set | `camera.*` entity ID | Device snapshot camera, such as the snapshot entity created by Ring-MQTT. Used by snapshot previews, as the Event Select recording poster, and preferred for manual snapshots when configured and available. |
 | `name` | Yes — Card appearance, when **Show camera name** is enabled | Entity name | Text | Optional label used instead of the recording entity's friendly name. The editor preserves it while name display is disabled. |
@@ -420,17 +421,20 @@ For Ring-MQTT recording playback:
 
 1. Choose the device's **Event Select** entity as **Last recording** in the Ring
    View editor.
-2. Open **Settings → Devices & services → Entities** in Home Assistant.
-3. Search for **Event Select**, open the entity for this Ring camera, and choose
-   the recording you want. **Ding 1** is the newest doorbell press and **Motion
-   1** is the newest motion event; higher numbers are older.
+2. For **Newest event (automatic)**, choose a Ring **Last activity timestamp**
+   entity that reports the event category. Official Ring last-activity sensors
+   and same-device Ring-MQTT Ding/motion timestamps are supported.
+3. For **Selected event (manual)**, open Event Select and choose the recording
+   you want. Slot 1 is newest within a category; higher numbers are older.
 4. Open Ring View and select **Last recording**.
 
-The current Event Select option determines which event Ring View plays. Ring
-View reads the published `recordingUrl` directly. On iPhone/iPad it requests
-the matching **(Transcoded)** option before playback while preserving the same
-Ding, Motion, or on-demand event. Other browsers keep the faster direct URL and
-fall back to the matching compatible option only if playback fails. If a signed
+Automatic mode reads the latest activity category, selects Ding 1, Motion 1,
+Person 1, or On-demand 1, and waits for the Event Select `eventId` and
+`recordingUrl` to update. A newer event in the same category also causes slot 1
+to be reselected. Manual mode leaves the current Event Select option unchanged.
+On iPhone/iPad Ring View requests the matching **(Transcoded)** option before
+playback while preserving the event slot. Other browsers keep the faster direct
+URL and fall back to the compatible option only if playback fails. If a signed
 URL is missing or within 30 seconds of expiry, Ring View refreshes it and waits
 up to 70 seconds for Ring-MQTT to publish a playable URL. The wait is driven by
 Home Assistant state updates; it does not poll. Closing the viewer, changing

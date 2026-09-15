@@ -12,6 +12,7 @@ export const CARD_NAME = "Ring View";
 
 const DEFAULTS = {
   default_mode: "last_recording",
+  recording_selection: "newest",
   remember_last_mode: false,
   autoplay_recording: true,
   recording_muted: false,
@@ -35,6 +36,7 @@ const DEFAULTS = {
 } as const;
 
 const CAMERA_MODES = new Set(["last_recording", "live"]);
+const RECORDING_SELECTIONS = new Set(["newest", "selected"]);
 const PREVIEW_SOURCES = new Set([
   "last_recording",
   "live",
@@ -97,6 +99,12 @@ export function validateConfig(config: RingViewConfig): void {
 
   if (config.default_mode && !CAMERA_MODES.has(config.default_mode)) {
     throw new Error(localize(undefined, "config.default_mode"));
+  }
+  if (
+    config.recording_selection
+    && !RECORDING_SELECTIONS.has(config.recording_selection)
+  ) {
+    throw new Error(localize(undefined, "config.recording_selection"));
   }
   if (config.preview_source && !PREVIEW_SOURCES.has(config.preview_source)) {
     throw new Error(localize(undefined, "config.preview_source"));
@@ -177,6 +185,8 @@ export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
   return {
     type: config.type ?? CARD_TYPE,
     recording_entity: config.recording_entity,
+    recording_selection:
+      config.recording_selection ?? DEFAULTS.recording_selection,
     live_entity: config.live_entity,
     snapshot_entity: config.snapshot_entity || undefined,
     last_activity_entity: config.last_activity_entity || undefined,

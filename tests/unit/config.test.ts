@@ -11,6 +11,7 @@ describe("configuration", () => {
     expect(config).toMatchObject({
       type: "custom:ring-view",
       default_mode: "last_recording",
+      recording_selection: "newest",
       remember_last_mode: false,
       autoplay_recording: true,
       recording_muted: false,
@@ -38,6 +39,13 @@ describe("configuration", () => {
     expect(() =>
       validateConfig({ recording_entity: "light.porch", live_entity: "camera.live" }),
     ).toThrow(/camera or select entity/);
+    expect(() =>
+      validateConfig({
+        recording_entity: "camera.recording",
+        live_entity: "camera.live",
+        recording_selection: "oldest",
+      } as never),
+    ).toThrow(/recording_selection/);
     expect(() =>
       validateConfig({
         recording_entity: "camera.recording",

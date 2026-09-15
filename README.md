@@ -54,7 +54,7 @@ remain the same whichever entities you select.
 
 | Ring View feature | Official Ring integration | Ring-MQTT | Our recommendation |
 | --- | --- | --- | --- |
-| **Last recording** | ✅ Select the **Last recording** camera. It is the simplest option, but [some cameras using 24/7 recording can remain on an old clip](https://github.com/home-assistant/core/issues/176299). | ✅ Select **Event Select**, then choose the event to play. **Ding 1** is the newest doorbell press; **Motion 1** is the newest motion event. Ring View automatically requests the matching **(Transcoded)** option on iPhone/iPad or if the direct Ring URL fails. | Use Event Select if the official camera is stale or missing. The compatible option works on desktop and mobile; Ring View handles that choice automatically. |
+| **Last recording** | ✅ Select the **Last recording** camera. Home Assistant follows the newest Ring history event automatically, but [some cameras using 24/7 recording can remain on an old clip](https://github.com/home-assistant/core/issues/176299). | ✅ Select **Event Select**. Automatic mode uses the configured Last activity source to choose slot 1 from the newest Ding, Motion, Person, or on-demand category; manual mode preserves a chosen historical event. Ring View also requests the matching **(Transcoded)** option when needed. | Start with the official camera. Use Event Select when the official camera is stale or missing, or when manual history selection is useful. |
 | **Live video** | ✅ Select the **Live view** camera. It works directly and is the only source that supports Ring View talkback. A [known upstream cleanup problem](docs/backend-patch.md) can affect repeated Live sessions on some systems. | ✅ Works after a one-time Home Assistant camera setup using Ring-MQTT's Live stream. It provides video and audio from the doorbell, but not talkback. | Use the official Live view camera, especially when you want **Hold to talk**. |
 | **Two-way audio** | ✅ **Hold to talk** is supported. | ❌ Ring-MQTT's Live stream has no microphone return path. This is a source limitation, not a Ring View setting or bug. | Use the official Live view camera. |
 | **Doorbell alert inside the card** | ✅ Works through the Ring Ding event while its realtime listener is healthy. Upstream failures can leave that listener stopped ([#526](https://github.com/python-ring-doorbell/python-ring-doorbell/issues/526), [#537](https://github.com/python-ring-doorbell/python-ring-doorbell/issues/537)). | ✅ Works through the Ding binary sensor. | Prefer the Ring-MQTT Ding sensor for reliability today. |
@@ -119,22 +119,22 @@ appearance.
 
 #### If you use Ring-MQTT Event Select for recordings
 
-Event Select is a Home Assistant menu that decides which recording Ring View
-plays. Choosing it in the card editor is only the first step:
+Event Select is a Home Assistant menu that divides recordings into Ding,
+Motion, Person, and on-demand categories. Ring View offers two behaviors:
 
-1. Open **Settings → Devices & services → Entities** in Home Assistant.
-2. Search for **Event Select**, then open the one belonging to your Ring camera.
-3. Choose **Ding 1** for the newest doorbell press or **Motion 1** for the newest
-   motion event. Higher numbers are older events. You may also choose the
-   matching **(Transcoded)** option. It is safe to leave that option selected:
-   it represents the same event slot and works on both desktop and mobile.
-4. Open Ring View and select **Last recording**.
+- **Newest event (automatic)** is the default. Configure **Last activity
+  timestamp** with a Ring source that reports an event category. Ring View maps
+  that latest category to its slot 1, waits for Ring-MQTT to publish the matching
+  event ID and URL, and then starts playback.
+- **Selected event (manual)** keeps the Event Select choice. Use it to browse
+  older entries such as Ding 3 or Motion 2.
 
-Ring View keeps the selected Ding, Motion, or on-demand event. On iPhone/iPad it
-automatically requests that event's matching **(Transcoded)** delivery path
-before playback; on other browsers it does so only if the direct Ring URL fails.
-This needs no extra card setting. Ring-MQTT can take several seconds to prepare
-that URL, during which Ring View continues to show its normal loading message.
+Automatic mode also reselects slot 1 when a second event arrives in the same
+category, even though the menu text did not change. While Ring is processing a
+new event, the previous URL is not reused. On iPhone/iPad Ring View requests the
+matching **(Transcoded)** delivery path before playback; on other browsers it
+does so only if the direct Ring URL fails. Ring-MQTT can take several seconds to
+prepare that URL, during which Ring View shows its normal loading message.
 
 <p align="center">
   <a href="https://github.com/thomasgregg/ring-view/blob/main/docs/images/configuration-editor.png">
