@@ -85,7 +85,7 @@
   "editor.aspect_widescreen": "Breitbild (16:9)",
   "editor.aspect_standard": "Standard (4:3)",
   "editor.aspect_square": "Quadratisch (1:1)",
-  "editor.aspect_auto": "Automatisch",
+  "editor.aspect_auto": "Automatisch (Originalformat)",
   "editor.fit_cover": "Zuschneiden und ausfüllen",
   "editor.fit_contain": "Gesamtes Bild einpassen",
   "editor.warnings": "Konfigurationswarnungen",

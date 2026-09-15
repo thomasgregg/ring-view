@@ -4,6 +4,24 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.1-beta.1] - 2026-09-15
+
+### Fixed
+
+- Make **Automatic (native shape)** follow the loaded poster, native Home
+  Assistant camera renderer, direct recording video, and Ring WebRTC video.
+  It falls back to a stable 16:9 shell while dimensions are unavailable,
+  requests preview width without manufacturing a height, follows later
+  orientation changes, resets when the source changes, and leaves explicit
+  aspect ratios untouched. Height-limited desktop viewers shrink their width
+  to retain square and portrait media shapes.
+
+### Tests
+
+- Cover square and portrait posters, invalid or changing dimensions, explicit
+  ratio precedence, interactive-card propagation, and metadata from native,
+  direct-video, and Ring WebRTC playback paths.
+
 ## [0.12.0] - 2026-09-14
 
 ### Added

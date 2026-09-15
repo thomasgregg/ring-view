@@ -195,7 +195,11 @@ export const dialogStyles = css`
     position: absolute;
     inset: 50% auto auto 50%;
     display: flex;
-    width: min(1180px, calc(100vw - 32px));
+    width: min(
+      1180px,
+      calc(100vw - 32px),
+      var(--ring-view-dialog-height-limited-width, 1180px)
+    );
     max-height: calc(100dvh - 32px);
     min-width: 0;
     overflow: hidden;
@@ -475,10 +479,6 @@ export const dialogStyles = css`
     aspect-ratio: var(--ring-view-aspect-ratio, 16 / 9);
     overflow: hidden;
     background: #000;
-  }
-
-  .media-frame.auto-ratio {
-    aspect-ratio: 16 / 9;
   }
 
   .poster,

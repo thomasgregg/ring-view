@@ -190,6 +190,25 @@ describe("Ring WebRTC player", () => {
     expect(player.shadowRoot?.textContent).not.toContain("Connected and listening");
   });
 
+  it("reports video dimensions when WebRTC metadata becomes available", async () => {
+    const { player } = await mount(
+      async () => new MockMediaStream([]) as unknown as MediaStream,
+    );
+    const ratios = vi.fn();
+    player.addEventListener("ring-view-media-aspect-ratio", ratios);
+    const video = player.shadowRoot!.querySelector("video")!;
+    Object.defineProperties(video, {
+      videoWidth: { configurable: true, value: 1080 },
+      videoHeight: { configurable: true, value: 1080 },
+    });
+    video.dispatchEvent(new Event("loadedmetadata"));
+
+    expect(ratios).toHaveBeenCalledOnce();
+    expect(ratios.mock.calls[0]?.[0]).toMatchObject({
+      detail: { aspectRatio: 1 },
+    });
+  });
+
   it("waits for video before playback and retries an iOS rejection muted", async () => {
     const play = vi.mocked(HTMLMediaElement.prototype.play);
     play.mockRejectedValueOnce(new DOMException("Gesture required", "NotAllowedError"));

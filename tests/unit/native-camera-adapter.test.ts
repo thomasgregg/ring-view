@@ -90,6 +90,69 @@ describe("native camera adapter", () => {
     });
   });
 
+  it("reports dimensions from native images and nested video players", async () => {
+    TestCameraStream.autoLoad = false;
+    const adapter = document.createElement(
+      "ring-view-native-camera-adapter",
+    ) as RingViewNativeCameraAdapter;
+    adapter.stateObj = recording;
+    const ratios = vi.fn();
+    adapter.addEventListener("ring-view-media-aspect-ratio", ratios);
+    document.body.append(adapter);
+    await adapter.updateComplete;
+    await flush();
+
+    const stream = adapter.shadowRoot!.querySelector("ha-camera-stream")!;
+    const nestedPlayer = document.createElement("span");
+    const nestedRoot = nestedPlayer.attachShadow({ mode: "open" });
+    stream.shadowRoot!.append(nestedPlayer);
+    const image = document.createElement("img");
+    Object.defineProperties(image, {
+      complete: { configurable: true, value: true },
+      naturalWidth: { configurable: true, value: 1080 },
+      naturalHeight: { configurable: true, value: 1080 },
+    });
+    nestedRoot.append(image);
+    await flush();
+    image.dispatchEvent(new Event("load"));
+
+    expect(ratios).toHaveBeenCalledOnce();
+    expect(ratios.mock.calls[0]?.[0]).toMatchObject({
+      detail: { aspectRatio: 1 },
+    });
+
+    const video = document.createElement("video");
+    Object.defineProperties(video, {
+      videoWidth: { configurable: true, value: 1920 },
+      videoHeight: { configurable: true, value: 1080 },
+    });
+    nestedRoot.append(video);
+    await flush();
+    video.dispatchEvent(new Event("loadedmetadata"));
+
+    expect(ratios).toHaveBeenCalledTimes(2);
+    expect(ratios.mock.calls[1]?.[0]).toMatchObject({
+      detail: { aspectRatio: 16 / 9 },
+    });
+
+    Object.defineProperties(image, {
+      naturalWidth: { configurable: true, value: 800 },
+      naturalHeight: { configurable: true, value: 600 },
+    });
+    image.dispatchEvent(new Event("load"));
+    expect(ratios).toHaveBeenCalledTimes(2);
+
+    Object.defineProperty(video, "error", {
+      configurable: true,
+      value: {} as MediaError,
+    });
+    video.dispatchEvent(new Event("error"));
+    expect(ratios).toHaveBeenCalledTimes(3);
+    expect(ratios.mock.calls[2]?.[0]).toMatchObject({
+      detail: { aspectRatio: 4 / 3 },
+    });
+  });
+
   it("forces Home Assistant camera media to fill the overlay surface", async () => {
     const adapter = document.createElement(
       "ring-view-native-camera-adapter",

@@ -53,7 +53,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `snapshot_directory` | Yes — Snapshots | `/media/ring-view` | Absolute directory path | Folder where manual snapshots are saved by Home Assistant. |
 | `preview_source` | Yes — Dashboard card | `last_recording` | `last_recording`, `live`, `default`, `snapshot`, `newest` | Chooses the entity used for the dashboard still. `default` follows the view that will open; `newest` compares the optional snapshot with the latest recording. |
 | `preview_fallback` | Yes — Dashboard card | `last_recording` | `last_recording`, `snapshot` | Chooses the still used by `newest` when capture times or update order cannot be compared. Only shown for `newest`. |
-| `aspect_ratio` | Yes — Card appearance | `16:9` | `auto`, `16:9`, `4:3`, `1:1` | Sets the dashboard image shape. |
+| `aspect_ratio` | Yes — Card appearance | `16:9` | `auto`, `16:9`, `4:3`, `1:1` | Sets the image shape. `auto` follows the loaded poster or video dimensions; explicit values force that shape. |
 | `fit_mode` | Yes — Card appearance | `cover` | `cover`, `contain` | Crops the image to fill the card or fits the entire image inside it. |
 | `grid_options` | Yes — Layout tab | See below | Object | Standard Home Assistant Sections-layout sizing. Configure it in the Layout tab. |
 
@@ -69,6 +69,15 @@ These are standard Home Assistant card layout fields rather than Ring View behav
 | `min_rows` | `3` | Minimum supported height in grid rows in both dashboard modes. |
 | `max_columns` | Not set | Optional maximum width. |
 | `max_rows` | Not set | Optional maximum height. |
+
+`aspect_ratio: auto` uses 16:9 as a stable loading shape until valid media
+dimensions are available, then follows the current poster or video. It adapts
+again when Recording and Live use different shapes. If a custom player does not
+expose valid image or video dimensions, the loaded poster remains authoritative.
+A Home Assistant Sections layout still controls the card's outer grid slot
+through its configured rows; inside that fixed slot, `fit_mode` continues to
+control cropping or letterboxing. Narrow or very short fullscreen layouts also
+prioritize the available viewport and apply `fit_mode` inside it.
 
 ### Complete YAML example
 

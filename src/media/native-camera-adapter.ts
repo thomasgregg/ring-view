@@ -1,6 +1,11 @@
 import { LitElement, css, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import type { HassEntity } from "../types";
+import {
+  aspectRatioFromMedia,
+  aspectRatiosMatch,
+  mediaAspectRatioEvent,
+} from "../utilities/media-aspect-ratio";
 
 export type NativeAdapterFailure = "component-unavailable";
 export interface NativeMediaCapabilities {
@@ -76,6 +81,8 @@ export class RingViewNativeCameraAdapter extends LitElement {
   private eventHost?: HTMLElement;
   private eventRoot?: ShadowRoot;
   private mediaObserver?: MutationObserver;
+  private observedMedia = new Set<HTMLImageElement | HTMLVideoElement>();
+  private lastAspectRatio?: number;
   private handledStreamEvents = new WeakSet<Event>();
   private ready = false;
 
@@ -140,12 +147,38 @@ export class RingViewNativeCameraAdapter extends LitElement {
     root.addEventListener("streams", this.handleStreams as EventListener, true);
     root.addEventListener("load", this.handleShadowLoad, true);
     this.mediaObserver = new MutationObserver(() => {
+      this.observeNativeMedia(root);
       this.prepareNativeRoot(root);
       this.detectReadyMedia(root);
     });
     this.mediaObserver.observe(root, { childList: true, subtree: true });
+    this.observeNativeMedia(root);
     this.prepareNativeRoot(root);
     this.detectReadyMedia(root);
+  }
+
+  private observeNativeMedia(root: ShadowRoot): void {
+    const roots: ShadowRoot[] = [root];
+    const visited = new Set<ShadowRoot>();
+    while (roots.length > 0) {
+      const current = roots.pop()!;
+      if (visited.has(current)) continue;
+      visited.add(current);
+      this.mediaObserver?.observe(current, { childList: true, subtree: true });
+      current.querySelectorAll("*").forEach((element) => {
+        if (
+          (element instanceof HTMLImageElement || element instanceof HTMLVideoElement)
+          && !this.observedMedia.has(element)
+        ) {
+          this.observedMedia.add(element);
+          element.addEventListener("load", this.handleObservedMediaDimensions);
+          element.addEventListener("loadedmetadata", this.handleObservedMediaDimensions);
+          element.addEventListener("resize", this.handleObservedMediaDimensions);
+          element.addEventListener("error", this.handleObservedMediaDimensions);
+        }
+        if (element.shadowRoot) roots.push(element.shadowRoot);
+      });
+    }
   }
 
   private prepareNativeRoot(root: ShadowRoot): void {
@@ -183,6 +216,14 @@ export class RingViewNativeCameraAdapter extends LitElement {
   private detachEventListeners(): void {
     this.mediaObserver?.disconnect();
     this.mediaObserver = undefined;
+    this.observedMedia.forEach((media) => {
+      media.removeEventListener("load", this.handleObservedMediaDimensions);
+      media.removeEventListener("loadedmetadata", this.handleObservedMediaDimensions);
+      media.removeEventListener("resize", this.handleObservedMediaDimensions);
+      media.removeEventListener("error", this.handleObservedMediaDimensions);
+    });
+    this.observedMedia.clear();
+    this.lastAspectRatio = undefined;
     this.eventHost?.removeEventListener("click", this.handleSurfaceClick, true);
     this.eventHost?.removeEventListener("load", this.handleNativeLoad, true);
     this.eventHost?.removeEventListener(
@@ -230,6 +271,10 @@ export class RingViewNativeCameraAdapter extends LitElement {
       }),
     );
     if (detail?.hasVideo === true) this.handleReady();
+    if (this.eventRoot) {
+      this.observeNativeMedia(this.eventRoot);
+      this.detectReadyMedia(this.eventRoot);
+    }
     // A failed HLS/WebRTC candidate is not a final camera failure. Home
     // Assistant may immediately fall back to another native renderer (most
     // importantly MJPEG for Ring recordings). The enclosing
@@ -243,8 +288,59 @@ export class RingViewNativeCameraAdapter extends LitElement {
   };
 
   private detectReadyMedia(root?: ShadowRoot): void {
-    const image = root?.querySelector("img");
-    if (image?.complete && image.naturalWidth > 0) this.handleReady();
+    if (!root) return;
+    this.observeNativeMedia(root);
+    const images: HTMLImageElement[] = [];
+    const videos: HTMLVideoElement[] = [];
+    this.observedMedia.forEach((media) => {
+      if (!media.isConnected) {
+        media.removeEventListener("load", this.handleObservedMediaDimensions);
+        media.removeEventListener("loadedmetadata", this.handleObservedMediaDimensions);
+        media.removeEventListener("resize", this.handleObservedMediaDimensions);
+        media.removeEventListener("error", this.handleObservedMediaDimensions);
+        this.observedMedia.delete(media);
+        return;
+      }
+      if (media instanceof HTMLImageElement && media.complete && media.naturalWidth > 0) {
+        this.handleReady();
+      }
+      if (aspectRatioFromMedia(media) === undefined) return;
+      if (media instanceof HTMLVideoElement) {
+        if (!media.error) videos.push(media);
+      } else {
+        images.push(media);
+      }
+    });
+    // Native players often keep a poster image beside the actual video. Once
+    // video metadata exists it is authoritative; a later poster load must not
+    // pull Automatic back to the poster's shape. The newest candidate wins
+    // during Home Assistant's renderer replacement/fallback transitions.
+    const preferred = videos[videos.length - 1] ?? images[images.length - 1];
+    if (preferred) this.reportMediaAspectRatio(preferred);
+  }
+
+  private handleObservedMediaDimensions = (event: Event): void => {
+    if (
+      (event.currentTarget instanceof HTMLImageElement
+        || event.currentTarget instanceof HTMLVideoElement)
+      && this.observedMedia.has(event.currentTarget)
+    ) {
+      this.detectReadyMedia(this.eventRoot);
+    }
+  };
+
+  private reportMediaAspectRatio(
+    media: HTMLImageElement | HTMLVideoElement,
+  ): void {
+    const aspectRatio = aspectRatioFromMedia(media);
+    if (
+      aspectRatio === undefined
+      || aspectRatiosMatch(this.lastAspectRatio, aspectRatio)
+    ) {
+      return;
+    }
+    this.lastAspectRatio = aspectRatio;
+    this.dispatchEvent(mediaAspectRatioEvent(aspectRatio));
   }
 
   private handleReady = (): void => {

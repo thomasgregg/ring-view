@@ -5,6 +5,11 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { customElement, property, state } from "lit/decorators.js";
 import { localize } from "../localize";
 import type { FitMode, HomeAssistant } from "../types";
+import {
+  aspectRatioFromMedia,
+  aspectRatiosMatch,
+  mediaAspectRatioEvent,
+} from "../utilities/media-aspect-ratio";
 
 type MicrophoneState =
   | "not-requested"
@@ -224,6 +229,7 @@ export class RingViewRingWebRtcPlayer extends LitElement {
   private externalPressed = false;
   private pressToken = 0;
   private statusMessageTimeout?: number;
+  private lastAspectRatio?: number;
 
   public connectedCallback(): void {
     super.connectedCallback();
@@ -309,6 +315,8 @@ export class RingViewRingWebRtcPlayer extends LitElement {
         controls
         poster=${ifDefined(this.poster)}
         .muted=${this.actualMuted}
+        @loadedmetadata=${this.handleVideoDimensions}
+        @resize=${this.handleVideoDimensions}
         @playing=${this.handlePlaying}
       ></video>
       ${this.playbackBlocked ? html`
@@ -759,6 +767,8 @@ export class RingViewRingWebRtcPlayer extends LitElement {
 
   private handlePlaying = (): void => {
     if (!this.peerConnection || !this.isConnected) return;
+    const video = this.renderRoot.querySelector<HTMLVideoElement>("video");
+    if (video) this.reportVideoAspectRatio(video);
     const wasBlocked = this.playbackBlocked;
     if (this.shadowRoot?.activeElement?.classList.contains("playback-resume")) {
       this.renderRoot.querySelector<HTMLVideoElement>("video")?.focus();
@@ -770,6 +780,27 @@ export class RingViewRingWebRtcPlayer extends LitElement {
       new CustomEvent("ring-webrtc-ready", { bubbles: true, composed: true }),
     );
   };
+
+  private handleVideoDimensions = (event: Event): void => {
+    if (
+      event.currentTarget instanceof HTMLVideoElement
+      && event.currentTarget === this.renderRoot.querySelector("video")
+    ) {
+      this.reportVideoAspectRatio(event.currentTarget);
+    }
+  };
+
+  private reportVideoAspectRatio(video: HTMLVideoElement): void {
+    const aspectRatio = aspectRatioFromMedia(video);
+    if (
+      aspectRatio === undefined
+      || aspectRatiosMatch(this.lastAspectRatio, aspectRatio)
+    ) {
+      return;
+    }
+    this.lastAspectRatio = aspectRatio;
+    this.dispatchEvent(mediaAspectRatioEvent(aspectRatio));
+  }
 
   private handleConnectionState(token: number): void {
     if (token !== this.connectionToken || !this.peerConnection) return;

@@ -19,7 +19,7 @@ import { keyed } from "lit/directives/keyed.js";
 import { styleMap } from "lit/directives/style-map.js";
 import { customElement, property, state } from "lit/decorators.js";
 import "./activity-time";
-import { aspectRatioNumber } from "./config";
+import { aspectRatioCss, aspectRatioNumber } from "./config";
 import {
   RING_ALERT_DURATION_MS,
   RING_VIEW_DIALOG_TAG,
@@ -55,6 +55,12 @@ import type {
 } from "./types";
 import { resolveActivityTimestamp } from "./utilities/activity-time";
 import { isDoorbellRingTransition } from "./utilities/doorbell";
+import {
+  aspectRatioFromMedia,
+  aspectRatiosMatch,
+  mediaAspectRatioEvent,
+  type MediaAspectRatioDetail,
+} from "./utilities/media-aspect-ratio";
 import {
   entityIsUnavailable,
   friendlyName,
@@ -192,8 +198,10 @@ export class RingViewDialog extends LitElement {
   @state() private snapshotFeedbackMessage?: string;
   @state() private viewerFeedback?: ViewerFeedback;
   @state() private inlineStarted = true;
+  @state() private autoAspectRatio?: number;
 
   private lifecycle = new StreamLifecycle();
+  private autoAspectRatioSource?: "poster" | "media";
   private opener?: HTMLElement;
   private returnUrl?: string;
   private ringAlertTimer?: number;
@@ -249,6 +257,7 @@ export class RingViewDialog extends LitElement {
     if (this.open) this.finishClose(false, false);
     this.inline = false;
     this.config = params.config;
+    this.resetAutoAspectRatio();
     this.opener = params.opener;
     this.returnUrl = params.returnUrl ?? removeRingViewUrl(currentUrl());
     this.mode = params.mode;
@@ -297,6 +306,7 @@ export class RingViewDialog extends LitElement {
     if (this.open) this.finishClose(false, false);
     this.inline = true;
     this.config = params.config;
+    this.resetAutoAspectRatio(true);
     this.mode = params.start === "live"
       ? "live"
       : params.start === "last_recording"
@@ -396,10 +406,16 @@ export class RingViewDialog extends LitElement {
       ? resolveActivityTimestamp(this.hass, this.config.last_activity_entity)
         !== undefined
       : false;
-    const ratio = this.config.aspect_ratio;
+    const resolvedAspectRatio = aspectRatioNumber(this.config.aspect_ratio)
+      ?? this.autoAspectRatio
+      ?? 16 / 9;
     const style = {
-      "--ring-view-aspect-ratio":
-        ratio === "auto" ? "16 / 9" : ratio.replace(":", " / "),
+      "--ring-view-aspect-ratio": aspectRatioCss(
+        this.config.aspect_ratio,
+        this.autoAspectRatio,
+      ),
+      "--ring-view-dialog-height-limited-width":
+        `calc((100dvh - 32px) * ${resolvedAspectRatio})`,
       "--ring-view-fit-mode": this.config.fit_mode,
     };
     const cameraActionCount = Number(this.ringing)
@@ -1251,9 +1267,7 @@ export class RingViewDialog extends LitElement {
       !this.suspended &&
       (this.mode === "live" || this.recordingStarted);
     const ratio = aspectRatioNumber(this.config!.aspect_ratio);
-    const posterEntityId = this.mode === "last_recording"
-      ? recordingPosterEntityId(this.hass!, this.config!)
-      : entityId;
+    const posterEntityId = this.activePosterEntityId();
     const posterRevision = this.mode === "last_recording"
       ? recordingPosterRevision(entity)
       : undefined;
@@ -1292,16 +1306,21 @@ export class RingViewDialog extends LitElement {
 
     return html`
       <div
-        class=${classMap({
-          "media-frame": true,
-          "auto-ratio": this.config!.aspect_ratio === "auto",
-        })}
+        class="media-frame"
         role="tabpanel"
+        @ring-view-media-aspect-ratio=${this.handlePlayerAspectRatio}
         aria-labelledby=${
           this.mode === "live" ? "ring-view-tab-live" : "ring-view-tab-recording"
         }
       >
-        <img class="poster" src=${poster} alt="" aria-hidden="true" />
+        <img
+          class="poster"
+          data-entity-id=${posterEntityId}
+          src=${poster}
+          alt=""
+          aria-hidden="true"
+          @load=${this.handlePosterLoad}
+        />
         ${waitingForInitialStart
           ? html`
               <button
@@ -1389,6 +1408,8 @@ export class RingViewDialog extends LitElement {
                   ? nothing
                   : localize(this.hass, "viewer.play_recording")}
                 @canplay=${this.handleRecordingCanPlay}
+                @loadedmetadata=${this.handleRecordingDimensions}
+                @resize=${this.handleRecordingDimensions}
                 @error=${this.handleRecordingVideoError}
                 @play=${this.handleRecordingPlay}
                 @volumechange=${this.handleRecordingVolumeChange}
@@ -1628,6 +1649,7 @@ export class RingViewDialog extends LitElement {
     this.lifecycle.dispose();
     this.releaseInlineLive();
     this.automaticLiveRetry = true;
+    this.resetAutoAspectRatio(true);
     this.mode = mode;
     saveMode(this.config, mode);
     this.liveMuted = this.inline
@@ -1744,6 +1766,79 @@ export class RingViewDialog extends LitElement {
     this.talkbackReady = false;
     this.talkbackRequesting = false;
     this.talkbackTalking = false;
+  }
+
+  private handlePosterLoad = (event: Event): void => {
+    if (
+      !(event.currentTarget instanceof HTMLImageElement)
+      || event.currentTarget !== this.renderRoot.querySelector(".media-frame > .poster")
+      || event.currentTarget.dataset.entityId !== this.activePosterEntityId()
+    ) {
+      return;
+    }
+    this.applyAutoAspectRatio(aspectRatioFromMedia(event.currentTarget), "poster");
+  };
+
+  private handleRecordingDimensions = (event: Event): void => {
+    if (
+      !(event.currentTarget instanceof HTMLVideoElement)
+      || this.mode !== "last_recording"
+      || event.currentTarget !== this.renderRoot.querySelector(".video-fallback")
+    ) {
+      return;
+    }
+    this.applyAutoAspectRatio(aspectRatioFromMedia(event.currentTarget), "media");
+  };
+
+  private handlePlayerAspectRatio = (
+    event: CustomEvent<MediaAspectRatioDetail>,
+  ): void => {
+    event.stopPropagation();
+    const target = event.composedPath()[0];
+    const currentPlayer = this.renderRoot.querySelector(
+      "ring-view-native-camera-adapter, ring-view-ring-webrtc-player",
+    );
+    if (!(target instanceof HTMLElement) || target !== currentPlayer) return;
+    if (
+      target.localName === "ring-view-native-camera-adapter"
+      && (target as HTMLElement & { stateObj?: HassEntity }).stateObj?.entity_id
+        !== this.activeEntityId()
+    ) {
+      return;
+    }
+    if (
+      target.localName === "ring-view-ring-webrtc-player"
+      && (target as HTMLElement & { entityId?: string }).entityId
+        !== this.activeEntityId()
+    ) {
+      return;
+    }
+    this.applyAutoAspectRatio(event.detail.aspectRatio, "media");
+  };
+
+  private applyAutoAspectRatio(
+    aspectRatio: number | undefined,
+    source: "poster" | "media",
+  ): void {
+    if (
+      this.config?.aspect_ratio !== "auto"
+      || aspectRatio === undefined
+      || (source === "poster" && this.autoAspectRatioSource === "media")
+    ) {
+      return;
+    }
+    this.autoAspectRatioSource = source;
+    if (aspectRatiosMatch(this.autoAspectRatio, aspectRatio)) return;
+    this.autoAspectRatio = aspectRatio;
+    if (this.inline) this.dispatchEvent(mediaAspectRatioEvent(aspectRatio));
+  }
+
+  private resetAutoAspectRatio(notifyInline = false): void {
+    this.autoAspectRatio = undefined;
+    this.autoAspectRatioSource = undefined;
+    if (notifyInline && this.inline) {
+      this.dispatchEvent(mediaAspectRatioEvent());
+    }
   }
 
   private async refreshRingMqttRecording(requestedOption?: string): Promise<void> {
@@ -2359,6 +2454,12 @@ export class RingViewDialog extends LitElement {
     return this.mode === "live"
       ? this.config!.live_entity
       : this.config!.recording_entity;
+  }
+
+  private activePosterEntityId(): string {
+    return this.mode === "last_recording"
+      ? recordingPosterEntityId(this.hass!, this.config!)
+      : this.activeEntityId();
   }
 
   private activeEntity(): HassEntity | undefined {

@@ -17,7 +17,11 @@ import {
   showRingViewDialog,
 } from "./dialog-controller";
 import { localize } from "./localize";
-import { posterUrl, sizedPosterUrl } from "./media/poster-provider";
+import {
+  posterUrl,
+  sizedPosterUrl,
+  widthSizedPosterUrl,
+} from "./media/poster-provider";
 import { modeLabel } from "./mode-icon";
 import { cardStyles } from "./styles";
 import type { GridOptions, HomeAssistant, NormalizedConfig, RingViewConfig } from "./types";
@@ -30,6 +34,11 @@ import {
   resolveActivityTimestamp,
 } from "./utilities/activity-time";
 import { isDoorbellRingTransition } from "./utilities/doorbell";
+import {
+  aspectRatioFromMedia,
+  aspectRatiosMatch,
+  type MediaAspectRatioDetail,
+} from "./utilities/media-aspect-ratio";
 import {
   decodeRingViewUrl,
   ringViewUrlMatchesConfig,
@@ -60,6 +69,7 @@ export class RingView extends LitElement {
   @state() private config?: NormalizedConfig;
   @state() private previewFailed = false;
   @state() private lastPoster?: string;
+  @state() private autoAspectRatio?: number;
   @state() private ringAlertVisible = false;
   private lastFallbackPoster?: string;
   private activePreviewEntityId?: string;
@@ -127,6 +137,9 @@ export class RingView extends LitElement {
 
   public setConfig(config: RingViewConfig): void {
     const next = normalizeConfig(config);
+    if (next.aspect_ratio !== this.config?.aspect_ratio) {
+      this.autoAspectRatio = undefined;
+    }
     if (
       next.recording_entity !== this.config?.recording_entity
       || next.snapshot_entity !== this.config?.snapshot_entity
@@ -238,6 +251,7 @@ export class RingView extends LitElement {
       this.lastPreviewSize = undefined;
       this.previewRequestId += 1;
       this.previewFailed = false;
+      this.autoAspectRatio = undefined;
     }
   }
 
@@ -257,6 +271,9 @@ export class RingView extends LitElement {
     }
     if (!this.isInCardPicker() && this.hass && this.config) {
       this.scheduleViewerRestore();
+    }
+    if (configChanged && this.config?.aspect_ratio === "auto") {
+      this.readPreviewAspectRatio();
     }
     if (
       !this.isInCardPicker()
@@ -282,7 +299,10 @@ export class RingView extends LitElement {
     const safePreview = pickerPreview || this.preview;
     const unavailable = pickerPreview ? false : entityIsUnavailable(previewEntity);
     const style = {
-      "--ring-view-aspect-ratio": aspectRatioCss(this.config.aspect_ratio),
+      "--ring-view-aspect-ratio": aspectRatioCss(
+        this.config.aspect_ratio,
+        this.autoAspectRatio,
+      ),
       "--ring-view-fit-mode": this.config.fit_mode,
     };
 
@@ -294,6 +314,7 @@ export class RingView extends LitElement {
               inline
               .hass=${this.hass}
               @ring-view-expand=${this.openExpandedViewer}
+              @ring-view-media-aspect-ratio=${this.handleInlineAspectRatio}
             ></ring-view-dialog>
           </div>
         </ha-card>
@@ -336,8 +357,10 @@ export class RingView extends LitElement {
           ${!unavailable && !this.previewFailed
             ? html`
                 <img
+                  data-entity-id=${previewId}
                   src=${pickerPreview ? PICKER_PREVIEW_URL : (this.lastPoster ?? "")}
                   alt=${localize(this.hass, "card.preview_alt", { name })}
+                  @load=${this.handlePreviewLoad}
                   @error=${this.handlePreviewError}
                 />
               `
@@ -547,6 +570,43 @@ export class RingView extends LitElement {
     this.previewFailed = true;
   };
 
+  private handlePreviewLoad = (event: Event): void => {
+    if (
+      !(event.currentTarget instanceof HTMLImageElement)
+      || event.currentTarget.dataset.entityId !== this.previewEntityId()
+    ) {
+      return;
+    }
+    this.applyAutoAspectRatio(aspectRatioFromMedia(event.currentTarget));
+  };
+
+  private handleInlineAspectRatio = (
+    event: CustomEvent<MediaAspectRatioDetail>,
+  ): void => {
+    if (
+      event.currentTarget
+      !== this.renderRoot.querySelector("ring-view-dialog[inline]")
+    ) {
+      return;
+    }
+    this.applyAutoAspectRatio(event.detail.aspectRatio);
+  };
+
+  private readPreviewAspectRatio(): void {
+    const image = this.renderRoot.querySelector<HTMLImageElement>(".preview > img");
+    if (image?.complete) this.applyAutoAspectRatio(aspectRatioFromMedia(image));
+  }
+
+  private applyAutoAspectRatio(aspectRatio?: number): void {
+    if (
+      this.config?.aspect_ratio !== "auto"
+      || aspectRatiosMatch(this.autoAspectRatio, aspectRatio)
+    ) {
+      return;
+    }
+    this.autoAspectRatio = aspectRatio;
+  }
+
   private setupPreviewLifecycle(): void {
     if (this.isInCardPicker()) return;
     if (this.previewIntersectionObserver || this.previewResizeObserver) return;
@@ -662,7 +722,9 @@ export class RingView extends LitElement {
     const hass = this.hass;
     const requestId = ++this.previewRequestId;
     try {
-      const nextPoster = await sizedPosterUrl(hass, entityId, width, height);
+      const nextPoster = this.config.aspect_ratio === "auto"
+        ? await widthSizedPosterUrl(hass, entityId, width)
+        : await sizedPosterUrl(hass, entityId, width, height);
       if (
         requestId !== this.previewRequestId ||
         !this.isConnected ||

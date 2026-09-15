@@ -338,6 +338,12 @@ const previewSource: PreviewSource =
   || requestedPreview === "newest"
     ? requestedPreview
     : "last_recording";
+const requestedAspectRatio = query.get("aspect");
+const aspectRatio = requestedAspectRatio === "auto"
+  || requestedAspectRatio === "4:3"
+  || requestedAspectRatio === "1:1"
+  ? requestedAspectRatio
+  : "16:9";
 card.setConfig({
   type: "custom:ring-view",
   recording_entity: query.get("recording_source") === "mqtt"
@@ -384,6 +390,8 @@ card.setConfig({
       : "viewer_only",
   show_snapshot_button: query.get("snapshot_button") === "1",
   snapshot_directory: query.get("snapshot_directory") || "/media/ring-view",
+  aspect_ratio: aspectRatio,
+  fit_mode: query.get("fit") === "contain" ? "contain" : "cover",
 });
 card.hass = hass;
 document.querySelector("#card-root")!.append(card);

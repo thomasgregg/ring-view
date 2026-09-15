@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { posterUrl, sizedPosterUrl } from "../../src/media/poster-provider";
+import {
+  posterUrl,
+  sizedPosterUrl,
+  widthSizedPosterUrl,
+} from "../../src/media/poster-provider";
 import type { HomeAssistant } from "../../src/types";
 
 describe("sized camera poster", () => {
@@ -40,6 +44,20 @@ describe("sized camera poster", () => {
       path: "/api/camera_proxy/camera.recording",
     });
     expect(url).toContain("&width=782&height=440");
+  });
+
+  it("can constrain width without manufacturing a height for automatic shape", async () => {
+    const hass: HomeAssistant = {
+      states: {},
+      hassUrl: (path = "") => `https://ha.test${path}`,
+      callWS: async () => ({
+        path: "/api/camera_proxy/camera.recording?authSig=temporary",
+      }) as never,
+    };
+
+    await expect(widthSizedPosterUrl(hass, "camera.recording", 781.2)).resolves.toBe(
+      "https://ha.test/api/camera_proxy/camera.recording?authSig=temporary&width=782",
+    );
   });
 
   it("reuses only the short-lived in-memory signed path", async () => {

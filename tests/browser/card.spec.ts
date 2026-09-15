@@ -1896,6 +1896,55 @@ test("shows a stable loading shell on a slow connection", async ({ page }) => {
   expect((await frame.boundingBox())?.height).toBeGreaterThan(150);
 });
 
+test("automatic shape follows real image dimensions and keeps an explicit loading fallback", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 900, height: 900 });
+  await page.goto("/demo/?aspect=auto&fit=contain");
+  const preview = page.locator("ring-view .preview");
+  const initial = await preview.boundingBox();
+  if (!initial) throw new Error("Preview was not visible");
+  expect(initial.width / initial.height).toBeCloseTo(16 / 9, 1);
+
+  await page.locator("ring-view .preview > img").evaluate(async (image) => {
+    await new Promise<void>((resolve, reject) => {
+      image.addEventListener("load", () => resolve(), { once: true });
+      image.addEventListener("error", () => reject(new Error("Square image failed")), {
+        once: true,
+      });
+      image.setAttribute(
+        "src",
+        "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='900' height='1200'/>",
+      );
+    });
+  });
+
+  await expect.poll(async () => {
+    const box = await preview.boundingBox();
+    return box ? box.width / box.height : 0;
+  }).toBeCloseTo(0.75, 1);
+
+  await preview.click();
+  const mediaFrame = page.locator("ring-view-dialog .media-frame");
+  await page.locator("ring-view-dialog .poster").evaluate(async (image) => {
+    await new Promise<void>((resolve, reject) => {
+      image.addEventListener("load", () => resolve(), { once: true });
+      image.addEventListener("error", () => reject(new Error("Portrait image failed")), {
+        once: true,
+      });
+      image.setAttribute(
+        "src",
+        "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='900' height='1200'/>",
+      );
+    });
+  });
+  await expect.poll(async () => {
+    const box = await mediaFrame.boundingBox();
+    return box ? box.width / box.height : 0;
+  }).toBeCloseTo(0.75, 1);
+  expect((await mediaFrame.boundingBox())?.height).toBeLessThanOrEqual(868);
+});
+
 test("uses Home Assistant's German locale throughout the card and viewer", async ({
   page,
 }) => {

@@ -48,6 +48,21 @@ export async function sizedPosterUrl(
   return `${signedUrl}${separator}width=${positiveInteger(width)}&height=${positiveInteger(height)}`;
 }
 
+/**
+ * Request a target width without imposing a height. Home Assistant and camera
+ * integrations can reduce the image when supported, while the returned image
+ * retains its native ratio so Automatic can discover later orientation changes.
+ */
+export async function widthSizedPosterUrl(
+  hass: HomeAssistant,
+  entityId: string,
+  width: number,
+): Promise<string> {
+  const signedUrl = await signedCameraProxyUrl(hass, entityId);
+  const separator = signedUrl.includes("?") ? "&" : "?";
+  return `${signedUrl}${separator}width=${positiveInteger(width)}`;
+}
+
 function positiveInteger(value: number): number {
   return Math.max(1, Math.ceil(Number.isFinite(value) ? value : 1));
 }

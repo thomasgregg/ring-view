@@ -237,6 +237,15 @@ export function aspectRatioNumber(
 
 export function aspectRatioCss(
   ratio: NormalizedConfig["aspect_ratio"],
+  mediaAspectRatio?: number,
 ): string {
-  return ratio === "auto" ? "16 / 9" : ratio.replace(":", " / ");
+  const detectedRatio =
+    mediaAspectRatio !== undefined
+      && Number.isFinite(mediaAspectRatio)
+      && mediaAspectRatio > 0
+      ? mediaAspectRatio
+      : undefined;
+  return ratio === "auto"
+    ? detectedRatio?.toString() ?? "16 / 9"
+    : ratio.replace(":", " / ");
 }
