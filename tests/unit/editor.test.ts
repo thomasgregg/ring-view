@@ -172,8 +172,8 @@ describe("visual editor", () => {
       dashboard_live_muted: true,
       preview_source: "last_recording",
       preview_fallback: "last_recording",
-      aspect_ratio: "16:9",
-      fit_mode: "cover",
+      aspect_ratio: "auto",
+      fit_mode: "contain",
     });
     expect(event.detail.config).not.toHaveProperty("preview");
     expect(event.detail.config).not.toHaveProperty("show_mode_icon");

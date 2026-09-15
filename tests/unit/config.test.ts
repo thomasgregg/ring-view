@@ -29,8 +29,8 @@ describe("configuration", () => {
       preview_fallback: "last_recording",
       show_snapshot_button: false,
       snapshot_directory: "/media/ring-view",
-      aspect_ratio: "16:9",
-      fit_mode: "cover",
+      aspect_ratio: "auto",
+      fit_mode: "contain",
     });
   });
 

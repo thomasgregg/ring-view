@@ -680,7 +680,8 @@ describe("card stream lifecycle", () => {
       path: "/api/camera_proxy/camera.recording",
     });
     const image = card.shadowRoot?.querySelector<HTMLImageElement>("img");
-    expect(image?.getAttribute("src")).toContain("width=640&height=360");
+    expect(image?.getAttribute("src")).toContain("width=640");
+    expect(image?.getAttribute("src")).not.toContain("height=");
     expect(card.shadowRoot?.querySelector("ring-view-native-camera-adapter")).toBeNull();
 
     await vi.advanceTimersByTimeAsync(10_000);

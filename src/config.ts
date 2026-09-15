@@ -30,8 +30,8 @@ const DEFAULTS = {
   preview_fallback: "last_recording",
   show_snapshot_button: false,
   snapshot_directory: DEFAULT_SNAPSHOT_DIRECTORY,
-  aspect_ratio: "16:9",
-  fit_mode: "cover",
+  aspect_ratio: "auto",
+  fit_mode: "contain",
 } as const;
 
 const CAMERA_MODES = new Set(["last_recording", "live"]);

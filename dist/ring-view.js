@@ -1603,8 +1603,8 @@ const Ze = "custom:ring-view", Ce = "ring-view", yr = "Ring View", w = {
   preview_fallback: "last_recording",
   show_snapshot_button: !1,
   snapshot_directory: hr,
-  aspect_ratio: "16:9",
-  fit_mode: "cover"
+  aspect_ratio: "auto",
+  fit_mode: "contain"
 }, kr = /* @__PURE__ */ new Set(["last_recording", "live"]), Ar = /* @__PURE__ */ new Set([
   "last_recording",
   "live",

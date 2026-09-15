@@ -53,8 +53,8 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `snapshot_directory` | Yes — Snapshots | `/media/ring-view` | Absolute directory path | Folder where manual snapshots are saved by Home Assistant. |
 | `preview_source` | Yes — Dashboard card | `last_recording` | `last_recording`, `live`, `default`, `snapshot`, `newest` | Chooses the entity used for the dashboard still. `default` follows the view that will open; `newest` compares the optional snapshot with the latest recording. |
 | `preview_fallback` | Yes — Dashboard card | `last_recording` | `last_recording`, `snapshot` | Chooses the still used by `newest` when capture times or update order cannot be compared. Only shown for `newest`. |
-| `aspect_ratio` | Yes — Card appearance | `16:9` | `auto`, `16:9`, `4:3`, `1:1` | Sets the image shape. `auto` follows the loaded poster or video dimensions; explicit values force that shape. |
-| `fit_mode` | Yes — Card appearance | `cover` | `cover`, `contain` | Crops the image to fill the card or fits the entire image inside it. |
+| `aspect_ratio` | Yes — Card appearance | `auto` | `auto`, `16:9`, `4:3`, `1:1` | Sets the image shape. `auto` follows the loaded poster or video dimensions; explicit values force that shape. |
+| `fit_mode` | Yes — Card appearance | `contain` | `contain`, `cover` | Fits the entire image inside the card or crops it to fill the card. |
 | `grid_options` | Yes — Layout tab | See below | Object | Standard Home Assistant Sections-layout sizing. Configure it in the Layout tab. |
 
 ### Layout options
@@ -74,8 +74,8 @@ These are standard Home Assistant card layout fields rather than Ring View behav
 dimensions are available, then follows the current poster or video. It adapts
 again when Recording and Live use different shapes. If a custom player does not
 expose valid image or video dimensions, the loaded poster remains authoritative.
-Cards newly added through Home Assistant's card picker start with automatic
-height. Existing cards keep an explicitly saved row count, including three rows.
+Cards without a saved grid-row setting use automatic height. An explicitly
+saved row count, including three rows, remains fixed.
 In a Home Assistant Sections layout, Automatic uses intrinsic row sizing unless
 you explicitly configure a fixed `grid_options.rows` value. Inside an explicitly
 fixed slot, `fit_mode` continues to control cropping or letterboxing. Narrow or
@@ -120,14 +120,13 @@ door_control_location: viewer_only
 show_name: true
 preview_source: newest
 preview_fallback: last_recording
-aspect_ratio: "16:9"
-fit_mode: cover
+aspect_ratio: auto
+fit_mode: contain
 
 grid_options:
   columns: 12
-  rows: 3
+  rows: auto
   min_columns: 12
-  min_rows: 3
 ```
 
 For Ring-MQTT, select its Ding binary sensor instead:

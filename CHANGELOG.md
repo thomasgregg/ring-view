@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.1-beta.5] - 2026-09-15
+
+### Changed
+
+- Make **Automatic (native shape)**, **Fit entire image**, and automatic grid
+  height the defaults whenever those settings are omitted. Explicit image
+  shapes, fitting modes, and fixed row counts continue to take precedence.
+
 ## [0.12.1-beta.4] - 2026-09-15
 
 ### Changed
