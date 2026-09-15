@@ -773,6 +773,7 @@ export class RingViewDialog extends LitElement {
     const contactOpen = doorContactState === "open";
     const contactUnknown = doorContactState === "unknown";
     const contactUnknownLabel = localize(this.hass, "door.contact_unknown");
+    const showActionButtonLabels = this.config?.show_action_button_labels ?? true;
     const talkAriaLabel = this.talkbackRequesting
       ? localize(this.hass, "talkback.requesting_microphone")
       : this.talkbackTalking
@@ -783,6 +784,9 @@ export class RingViewDialog extends LitElement {
     const talkVisibleLabel = this.talkbackTalking
       ? localize(this.hass, "talkback.release_short")
       : talkAriaLabel;
+    const doorAccessibleLabel = contactUnknown
+      ? `${doorAriaLabel}. ${contactUnknownLabel}`
+      : doorAriaLabel;
 
     return html`
       <div class="visitor-controls">
@@ -791,6 +795,7 @@ export class RingViewDialog extends LitElement {
             "visitor-action-dock": true,
             "door-only": showDoor && !showTalk,
             "talk-only": showTalk && !showDoor,
+            "icon-only": !showActionButtonLabels,
           })}
           role="group"
           aria-label=${localize(this.hass, "door.actions")}
@@ -805,6 +810,7 @@ export class RingViewDialog extends LitElement {
                   })}
                   type="button"
                   aria-label=${talkAriaLabel}
+                  title=${talkAriaLabel}
                   aria-pressed=${String(this.talkbackTalking)}
                   ?disabled=${!this.talkbackReady}
                   @contextmenu=${(event: Event) => event.preventDefault()}
@@ -816,7 +822,9 @@ export class RingViewDialog extends LitElement {
                   @keyup=${this.handleTalkKeyUp}
                 >
                   ${this.icon(this.talkbackTalking ? mdiMicrophone : mdiMicrophoneOff)}
-                  <span>${talkVisibleLabel}</span>
+                  ${showActionButtonLabels
+                    ? html`<span>${talkVisibleLabel}</span>`
+                    : nothing}
                 </button>
               `
             : nothing}
@@ -834,9 +842,8 @@ export class RingViewDialog extends LitElement {
                     error: !contactOpen && this.doorActionStatus === "error",
                   })}
                   type="button"
-                  aria-label=${contactUnknown
-                    ? `${doorAriaLabel}. ${contactUnknownLabel}`
-                    : doorAriaLabel}
+                  aria-label=${doorAccessibleLabel}
+                  title=${doorAccessibleLabel}
                   aria-busy=${String(this.doorActionStatus === "working")}
                   aria-describedby=${this.viewerFeedback?.source === "door"
                     ? "ring-view-door-feedback"
@@ -852,12 +859,18 @@ export class RingViewDialog extends LitElement {
                   @keyup=${this.handleDoorKeyUp}
                 >
                   ${this.icon(doorIcon)}
-                  <span class="door-action-copy">
-                    <span>${doorLabel}</span>
-                    ${contactUnknown
-                      ? html`<span class="door-contact-state">${contactUnknownLabel}</span>`
-                      : nothing}
-                  </span>
+                  ${showActionButtonLabels
+                    ? html`
+                        <span class="door-action-copy">
+                          <span>${doorLabel}</span>
+                          ${contactUnknown
+                            ? html`<span class="door-contact-state"
+                                >${contactUnknownLabel}</span
+                              >`
+                            : nothing}
+                        </span>
+                      `
+                    : nothing}
                 </button>
               `
             : nothing}

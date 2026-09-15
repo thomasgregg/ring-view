@@ -4,6 +4,22 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.1-beta.8] - 2026-09-15
+
+### Added
+
+- Add **Card appearance → Show Talk and door button text**. Turning it off
+  changes Talk and door actions to compact 48-pixel icon buttons in both the
+  interactive dashboard card and fullscreen viewer, while retaining dynamic
+  accessible names, hover descriptions, status icons, and door hold progress.
+
+### Tests
+
+- Cover the default and icon-only configurations, visual-editor placement,
+  Talk and door state changes, unknown door-contact status, press-and-hold
+  operation, short dashboard cards, narrow screens, desktop, phone portrait,
+  and phone landscape layouts.
+
 ## [0.12.1-beta.7] - 2026-09-15
 
 ### Added

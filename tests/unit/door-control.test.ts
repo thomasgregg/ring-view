@@ -32,6 +32,7 @@ async function mount({
   features = 1,
   configureContact = false,
   contactState = "off",
+  showLabels = true,
 }: {
   mode?: CameraMode;
   visibility?: DoorControlVisibility;
@@ -41,6 +42,7 @@ async function mount({
   features?: number;
   configureContact?: boolean;
   contactState?: string;
+  showLabels?: boolean;
 } = {}) {
   const callService = vi.fn(async () => undefined);
   const hass: HomeAssistant = {
@@ -85,6 +87,7 @@ async function mount({
       door_action: action,
       door_control_visibility: visibility,
       door_hold_to_activate: hold,
+      show_action_button_labels: showLabels,
     }),
   });
   await vi.advanceTimersByTimeAsync(0);
@@ -124,6 +127,39 @@ describe("door control", () => {
     dispatchPointer(button!, "pointerup", 2);
     await vi.advanceTimersByTimeAsync(2_000);
     expect(callService).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps icon-only door actions labelled, discoverable, and operable", async () => {
+    const { dialog, callService } = await mount({
+      action: "unlock",
+      configureContact: true,
+      contactState: "unavailable",
+      showLabels: false,
+    });
+    const dock = dialog.shadowRoot?.querySelector(".visitor-action-dock");
+    const button = dialog.shadowRoot?.querySelector<HTMLButtonElement>(".door-action");
+
+    expect(dock?.classList.contains("icon-only")).toBe(true);
+    expect(button?.querySelector(".door-action-copy")).toBeNull();
+    expect(button?.textContent?.trim()).toBe("");
+    expect(button?.getAttribute("aria-label")).toBe(
+      "Hold to unlock. Status unknown",
+    );
+    expect(button?.title).toBe("Hold to unlock. Status unknown");
+    expect(button?.querySelector("path")?.getAttribute("d"))
+      .toBe(mdiAlertCircleOutline);
+
+    dispatchPointer(button!, "pointerdown");
+    await vi.advanceTimersByTimeAsync(1_600);
+    expect(callService).toHaveBeenCalledWith("lock", "unlock", {
+      entity_id: "lock.front_door",
+    });
+    await dialog.updateComplete;
+    expect(button?.getAttribute("aria-label")).toBe(
+      "Door unlocked. Status unknown",
+    );
+    expect(button?.title).toBe("Door unlocked. Status unknown");
+    expect(button?.querySelector(".door-action-copy")).toBeNull();
   });
 
   it("cancels a nearly complete hold when the pointer is cancelled", async () => {

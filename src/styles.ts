@@ -696,6 +696,14 @@ export const dialogStyles = css`
     max-width: 168px;
   }
 
+  .visitor-action-dock.icon-only .visitor-action {
+    width: var(--ring-view-primary-size);
+    min-width: var(--ring-view-primary-size);
+    max-width: var(--ring-view-primary-size);
+    gap: 0;
+    padding: 0;
+  }
+
   .door-action-copy {
     display: inline-flex;
     min-width: 0;
@@ -743,6 +751,10 @@ export const dialogStyles = css`
       calc((var(--ring-view-primary-size) - 8px) / 2);
     background: rgba(255, 176, 32, 0.58);
     pointer-events: none;
+  }
+
+  .visitor-action-dock.icon-only .door-action::after {
+    border-radius: calc((var(--ring-view-primary-size) - 8px) / 2);
   }
 
   .door-action.holding::after {

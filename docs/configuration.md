@@ -50,6 +50,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `door_hold_to_activate` | Yes — Door access | `true` | `true`, `false` | Requires a 1.6-second press-and-hold confirmation. Disable for one-tap operation. |
 | `door_control_location` | Yes — Door access, interactive only | `viewer_only` | `viewer_only`, `dashboard_and_viewer` | Keeps the door action in fullscreen only, or places it on both the interactive dashboard card and fullscreen viewer. |
 | `show_name` | Yes — Card appearance | `false` | `true`, `false` | Shows the camera name at the top left of both the dashboard card and viewer, and reveals the optional custom-name field. |
+| `show_action_button_labels` | Yes — Card appearance | `true` | `true`, `false` | Shows text beside the Talk and door-action icons. Disable it for compact icon-only controls in both the dashboard card and fullscreen viewer; accessible names and status remain available. |
 | `show_snapshot_button` | Yes — Snapshots | `false` | `true`, `false` | Shows one manual snapshot action while Live is active. |
 | `snapshot_directory` | Yes — Snapshots | `/media/ring-view` | Absolute directory path | Folder where manual snapshots are saved by Home Assistant. |
 | `preview_source` | Yes — Dashboard card | `last_recording` | `last_recording`, `live`, `default`, `snapshot`, `newest` | Chooses the entity used for the dashboard still. `default` follows the view that will open; `newest` compares the optional snapshot with the latest recording. |

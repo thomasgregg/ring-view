@@ -105,6 +105,7 @@ export interface RingViewConfig {
   dashboard_recording_muted?: boolean;
   dashboard_live_muted?: boolean;
   show_name?: boolean;
+  show_action_button_labels?: boolean;
   preview_source?: PreviewSource;
   preview_fallback?: PreviewFallback;
   show_snapshot_button?: boolean;

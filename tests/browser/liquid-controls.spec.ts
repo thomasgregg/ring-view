@@ -180,6 +180,47 @@ test("uses a red Talk state without changing the native video controls", async (
   expect(await video.evaluate((element: HTMLVideoElement) => element.controls)).toBe(true);
 });
 
+test("keeps an icon-only Talk action understandable through every state", async ({
+  page,
+}) => {
+  await page.goto("/tests/fixtures/recovery.html");
+  await page.locator("ring-view").evaluate((element) => {
+    const card = element as HTMLElement & {
+      setConfig(config: Record<string, unknown>): void;
+    };
+    card.setConfig({
+      recording_entity: "camera.latest_recording",
+      live_entity: "camera.live_view",
+      name: "Entrance",
+      show_name: true,
+      default_mode: "live",
+      two_way_audio: true,
+      live_muted: true,
+      show_action_button_labels: false,
+    });
+  });
+  await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
+
+  const talk = page.locator(".talk-action");
+  await expect(talk).toHaveAttribute("aria-label", "Hold to talk");
+  await expect(talk).toHaveAttribute("title", "Hold to talk");
+  await expect(talk.locator("span")).toHaveCount(0);
+  await expect(talk).toBeEnabled();
+  expect((await talk.boundingBox())?.width).toBe(48);
+
+  const box = await talk.boundingBox();
+  if (!box) throw new Error("Icon-only Talk target geometry unavailable");
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await expect(talk).toHaveAttribute("aria-label", "Release to stop");
+  await expect(talk).toHaveAttribute("title", "Release to stop");
+  await expect(talk.locator("span")).toHaveCount(0);
+  await expect(talk).toHaveAttribute("aria-pressed", "true");
+  await page.mouse.up();
+  await expect(talk).toHaveAttribute("aria-label", "Hold to talk");
+  await expect(talk).toHaveAttribute("aria-pressed", "false");
+});
+
 test("keeps portrait, landscape, and desktop controls in distinct stable zones", async ({
   page,
 }) => {
@@ -410,4 +451,82 @@ test("retains accessible touch targets at an exceptionally narrow width", async 
   await expect(talk.locator("span")).toHaveCSS("display", "none");
   await expect(door.locator(".door-action-copy")).toHaveCSS("display", "none");
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(280);
+});
+
+test("uses compact icon-only visitor actions across viewer layouts and the dashboard", async ({
+  page,
+}) => {
+  const viewports = [
+    { width: 1280, height: 800 },
+    { width: 390, height: 844 },
+    { width: 844, height: 390 },
+  ];
+
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
+    await openViewer(
+      page,
+      "mode=live&two_way_audio=1&door=1&action_labels=0",
+    );
+    const dialog = page.locator("ring-view-dialog");
+    const dock = dialog.locator(".visitor-action-dock");
+    const talk = dialog.locator(".talk-action");
+    const door = dialog.locator(".door-action");
+
+    await expect(dock).toHaveClass(/icon-only/);
+    await expect(talk.locator("span")).toHaveCount(0);
+    await expect(door.locator(".door-action-copy")).toHaveCount(0);
+    await expect(talk).toHaveAttribute("title", /Connecting|Hold to talk/);
+    await expect(door).toHaveAttribute(
+      "title",
+      /Unlock available after live video connects|Hold to unlock/,
+    );
+
+    const [talkBox, doorBox, dockBox] = await Promise.all([
+      talk.boundingBox(),
+      door.boundingBox(),
+      dock.boundingBox(),
+    ]);
+    if (!talkBox || !doorBox || !dockBox) {
+      throw new Error("Icon-only visitor-action geometry unavailable");
+    }
+    expect(talkBox.width).toBe(48);
+    expect(talkBox.height).toBe(48);
+    expect(doorBox.width).toBe(48);
+    expect(doorBox.height).toBe(48);
+    expect(dockBox.width).toBe(96);
+    expect(dockBox.x).toBeGreaterThanOrEqual(8);
+    expect(dockBox.x + dockBox.width).toBeLessThanOrEqual(viewport.width - 8);
+    expect(dockBox.y + dockBox.height).toBeLessThanOrEqual(viewport.height);
+    const progress = await pseudoStyle(door, "::after");
+    expect(progress.borderTopLeftRadius).toBe("20px");
+    expect(progress.borderTopRightRadius).toBe("20px");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth))
+      .toBeLessThanOrEqual(viewport.width);
+  }
+
+  await page.setViewportSize({ width: 423, height: 300 });
+  await page.goto(
+    "/demo/?dashboard=interactive&dashboard_start=live"
+      + "&two_way_audio=1&door=1&dashboard_door=1&action_labels=0",
+  );
+  const card = page.locator("ring-view");
+  await card.evaluate((element) => {
+    const host = element as HTMLElement;
+    host.style.height = "184px";
+  });
+  const dock = card.locator(".visitor-action-dock");
+  const [cardBox, dockBox] = await Promise.all([
+    card.boundingBox(),
+    dock.boundingBox(),
+  ]);
+  if (!cardBox || !dockBox) {
+    throw new Error("Icon-only dashboard geometry unavailable");
+  }
+  await expect(dock).toHaveClass(/icon-only/);
+  await expect(card.locator(".talk-action span")).toHaveCount(0);
+  await expect(card.locator(".door-action-copy")).toHaveCount(0);
+  expect(dockBox.width).toBe(96);
+  expect(cardBox.y + cardBox.height - (dockBox.y + dockBox.height)).toBe(8);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(423);
 });

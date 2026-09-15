@@ -396,6 +396,7 @@ card.setConfig({
         : "on_demand",
   dashboard_recording_muted: query.get("dashboard_recording_muted") !== "0",
   dashboard_live_muted: query.get("dashboard_muted") !== "0",
+  show_action_button_labels: query.get("action_labels") !== "0",
   door_control_location:
     query.get("dashboard_door") === "1"
       ? "dashboard_and_viewer"

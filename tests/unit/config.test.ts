@@ -26,6 +26,7 @@ describe("configuration", () => {
       dashboard_recording_muted: true,
       dashboard_live_muted: true,
       show_name: false,
+      show_action_button_labels: true,
       preview_source: "last_recording",
       preview_fallback: "last_recording",
       show_snapshot_button: false,
@@ -33,6 +34,14 @@ describe("configuration", () => {
       aspect_ratio: "auto",
       fit_mode: "contain",
     });
+  });
+
+  it("can opt into compact icon-only visitor actions", () => {
+    expect(normalizeConfig({
+      recording_entity: "camera.latest_recording",
+      live_entity: "camera.live_view",
+      show_action_button_labels: false,
+    }).show_action_button_labels).toBe(false);
   });
 
   it("rejects missing, non-camera, and invalid appearance values", () => {

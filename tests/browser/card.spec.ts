@@ -283,8 +283,19 @@ test("reveals the camera name only when enabled and keeps activity nearby", asyn
   });
 
   expect(appearance).toEqual({
-    hiddenNameFields: ["show_name", "last_activity_entity", ""],
-    visibleNameFields: ["show_name", "name", "last_activity_entity", ""],
+    hiddenNameFields: [
+      "show_name",
+      "last_activity_entity",
+      "show_action_button_labels",
+      "",
+    ],
+    visibleNameFields: [
+      "show_name",
+      "name",
+      "last_activity_entity",
+      "show_action_button_labels",
+      "",
+    ],
     selector: {
       entity: {
         filter: [

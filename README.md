@@ -204,6 +204,10 @@ targets. Talk becomes red only while audio is being transmitted. A door action
 fills from left to right during its 1.6-second confirmation and stays the same
 size throughout the hold.
 
+For a more compact rail, turn off **Card appearance → Show Talk and door button text**.
+Talk and door actions then remain 48-pixel controls with icons, hover labels,
+and screen-reader names in both the dashboard card and fullscreen viewer.
+
 To add a door action, open **Door access** and select a lock. Choose **Unlock**
 or, for a compatible lock such as Nuki, **Open door** to release the latch. An
 optional contact sensor makes the icon show whether the physical door is open

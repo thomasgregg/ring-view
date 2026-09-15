@@ -27,6 +27,7 @@ const DEFAULTS = {
   dashboard_recording_muted: true,
   dashboard_live_muted: true,
   show_name: false,
+  show_action_button_labels: true,
   preview_source: "last_recording",
   preview_fallback: "last_recording",
   show_snapshot_button: false,
@@ -217,6 +218,8 @@ export function normalizeConfig(config: RingViewConfig): NormalizedConfig {
     dashboard_live_muted:
       config.dashboard_live_muted ?? DEFAULTS.dashboard_live_muted,
     show_name: config.show_name ?? DEFAULTS.show_name,
+    show_action_button_labels:
+      config.show_action_button_labels ?? DEFAULTS.show_action_button_labels,
     preview_source: config.preview_source ?? DEFAULTS.preview_source,
     preview_fallback: config.preview_fallback ?? DEFAULTS.preview_fallback,
     show_snapshot_button:

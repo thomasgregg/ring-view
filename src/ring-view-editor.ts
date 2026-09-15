@@ -364,6 +364,7 @@ function configSchema(
             },
           },
         },
+        { name: "show_action_button_labels", selector: { boolean: {} } },
         {
           name: "",
           type: "grid",
@@ -452,6 +453,7 @@ const LABELS: Record<string, TranslationKey> = {
   name: "editor.name",
   show_name: "editor.show_name",
   last_activity_entity: "editor.last_activity_entity",
+  show_action_button_labels: "editor.show_action_button_labels",
   preview_source: "editor.preview_source",
   preview_fallback: "editor.preview_fallback",
   aspect_ratio: "editor.aspect_ratio",
@@ -481,6 +483,7 @@ const HELPERS: Record<string, TranslationKey> = {
   door_control_location: "editor.helper_door_control_location",
   show_name: "editor.helper_show_name",
   last_activity_entity: "editor.helper_last_activity_entity",
+  show_action_button_labels: "editor.helper_show_action_button_labels",
   preview_source: "editor.helper_preview_source",
   snapshot_entity: "editor.helper_snapshot_entity",
   preview_fallback: "editor.helper_preview_fallback",

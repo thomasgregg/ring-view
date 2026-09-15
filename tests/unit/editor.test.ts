@@ -156,6 +156,7 @@ describe("visual editor", () => {
             show_name: true,
             name: "Entrance",
             last_activity_entity: "sensor.front_door_last_activity",
+            show_action_button_labels: false,
           },
         },
         bubbles: true,
@@ -174,6 +175,7 @@ describe("visual editor", () => {
       name: "Entrance",
       show_name: true,
       last_activity_entity: "sensor.front_door_last_activity",
+      show_action_button_labels: false,
       default_mode: "last_recording",
       remember_last_mode: false,
       autoplay_recording: true,
@@ -479,6 +481,9 @@ describe("visual editor", () => {
     expect(form?.computeLabel?.({ name: "last_activity_entity" })).toBe(
       "Zeitstempel der letzten Aktivität (optional)",
     );
+    expect(form?.computeLabel?.({ name: "show_action_button_labels" })).toBe(
+      "Text auf Sprech- und Türtasten anzeigen",
+    );
     expect(form?.computeLabel?.({ name: "dashboard_preview" })).toBe(
       "Dashboard-Karte",
     );
@@ -495,6 +500,9 @@ describe("visual editor", () => {
     expect(form?.computeHelper?.({ name: "last_activity_entity" })).toContain(
       "bei sichtbarem Kameranamen darunter",
     );
+    expect(
+      form?.computeHelper?.({ name: "show_action_button_labels" }),
+    ).toContain("Dashboard-Karte und in der Vollbildansicht");
 
     const viewerBehavior = form?.schema?.find(
       (field) => field.name === "viewer_behavior",
@@ -551,6 +559,7 @@ describe("visual editor", () => {
     expect(cardAppearance?.schema?.map((field) => field.name)).toEqual([
       "show_name",
       "last_activity_entity",
+      "show_action_button_labels",
       "",
     ]);
     expect(
@@ -656,6 +665,7 @@ describe("visual editor", () => {
     expect(appearanceFields()).toEqual([
       "show_name",
       "last_activity_entity",
+      "show_action_button_labels",
       "",
     ]);
 
@@ -678,6 +688,7 @@ describe("visual editor", () => {
       "show_name",
       "name",
       "last_activity_entity",
+      "show_action_button_labels",
       "",
     ]);
     const enabledEvent = listener.mock.calls.at(-1)?.[0] as CustomEvent<{
@@ -703,6 +714,7 @@ describe("visual editor", () => {
     expect(appearanceFields()).toEqual([
       "show_name",
       "last_activity_entity",
+      "show_action_button_labels",
       "",
     ]);
     const disabledEvent = listener.mock.calls.at(-1)?.[0] as CustomEvent<{
