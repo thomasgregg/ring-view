@@ -4,6 +4,29 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.2] - 2026-09-15
+
+### Changed
+
+- Present Talk and door access as separate rounded controls instead of one
+  shared capsule. Labelled actions use independent pills, icon-only actions use
+  independent 48-pixel circles, and narrow layouts hide labels before the
+  controls can overflow.
+- Align the README, configuration examples, door-access guide, and testing guide
+  with automatic image sizing, automatic Sections height, icon-only actions,
+  and the separate Talk and door layout.
+
+### Fixed
+
+- Use the same fixed-surface, straight-edge door hold animation for labelled
+  and icon-only controls.
+
+### Tests
+
+- Verify separate Talk and door controls, labelled and icon-only presentation,
+  narrow-card fallback, hold progress, reduced motion, media shape changes, and
+  fixed versus automatic Sections height across desktop and phone layouts.
+
 ## [0.12.2-beta.1] - 2026-09-15
 
 ### Changed

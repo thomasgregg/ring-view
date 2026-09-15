@@ -34,21 +34,26 @@ snapshot timestamp parsing and freshest-preview fallbacks, official and
 Ring-MQTT last-activity timestamp formats, sibling resolution and localization,
 Ring-MQTT on-demand snapshot discovery and event-driven refresh waits,
 Ring-MQTT Event Select identification, signed-URL expiry, event-driven recording
-refresh and cancellation, camera-poster selection, native editor structure and progressive
-dashboard fields, entity and talkback capability states, unsupported-camera
-fallback, doorbell alerts, timeout invalidation, passive-dashboard privacy,
-single-renderer switching, close teardown, disconnect teardown, single-offer
-two-way audio, press-to-talk muting, interrupted microphone permission, and
-insecure-connection guidance.
+refresh and cancellation, newest-versus-selected recording behavior,
+camera-poster selection, automatic media dimensions, fixed and automatic grid
+height, native editor structure and progressive dashboard fields, labelled and
+icon-only visitor actions, entity and talkback capability states,
+unsupported-camera fallback, doorbell alerts, timeout invalidation,
+passive-dashboard privacy, single-renderer switching, close teardown,
+disconnect teardown, single-offer two-way audio, press-to-talk muting,
+interrupted microphone permission, and insecure-connection guidance.
 
 The browser suite additionally covers the unobstructed on-demand image start
-surface, automatic starts, door-location and Live-readiness gating, fixed inline
-action sizing across card widths, inert edit previews, duplicate inline cards, and inline-to-fullscreen
-handoff without overlapping streams. It also checks activity placement with and
-without a camera name, long and localized relative times, invalid-to-valid
-entity changes, and separation from every header control at responsive widths.
-Existing opening, switching, recovery,
-accessibility, layout, and stream-count checks remain.
+surface, automatic starts, door-location and Live-readiness gating, separate
+Talk and door controls, labelled and icon-only presentation, fixed inline action
+sizing across card widths, narrow-card label removal, door hold progress,
+reduced motion, inert edit previews, duplicate inline cards, and
+inline-to-fullscreen handoff without overlapping streams. It also checks
+activity placement with and without a camera name, long and localized relative
+times, invalid-to-valid entity changes, automatic media dimensions, fixed and
+automatic Sections height, and separation from every header control at
+responsive widths. Existing opening, switching, recovery, accessibility,
+layout, and stream-count checks remain.
 
 Provider-parity coverage builds equivalent official Ring and Ring-MQTT source
 profiles, asserts an identical visual-editor schema, and compares the measured
@@ -128,7 +133,7 @@ Verify each item on current stable Home Assistant and, where practical, the prev
     at the narrowest supported card width.
 25. Force a door-service failure and a microphone-permission failure. Confirm
     both reuse the same centered viewer status display as snapshot failures,
-    remain clear of the visitor-action rail, and disappear without leaving a
+    remain clear of the bottom visitor actions, and disappear without leaving a
     second pill or toast behind.
 26. Set `recording_entity` to a renamed Ring-MQTT Event Select and choose a
     playable event. Confirm desktop Last recording uses the direct MP4 while
@@ -141,6 +146,21 @@ Verify each item on current stable Home Assistant and, where practical, the prev
     in Progress, a service failure, a 70-second timeout, and a desktop browser
     playback error that falls back once to the matching compatible option. No
     signed URL may appear in logs.
+27. Leave **Image shape** on **Automatic**, **Image fit** on **Fit entire image**,
+    and Sections height on automatic. Confirm portrait, square, and widescreen
+    posters and video update the card shape without stretching. Switch between
+    Recording and Live when their media shapes differ, rotate a phone, and
+    confirm the shape updates again. Then set an explicit image shape and a
+    fixed row count such as three rows; both choices must remain fixed, with
+    Image fit controlling cropping or letterboxing inside the saved slot.
+28. Enable Talk and door access together and test **Show Talk and door button
+    text** both on and off in the interactive card and fullscreen viewer. The
+    actions must remain separate, fully rounded, equally high, centered, and
+    eight pixels apart. Icon-only mode must retain 48-pixel targets, tooltips,
+    accessible names, status icons, and the same clipped left-to-right door hold
+    fill. At widths below 320 pixels, visible labels must disappear before the
+    controls overflow even when the text setting is enabled. Repeat the hold
+    with reduced motion and verify complete progress feedback without animation.
 
 ## Visual matrix
 

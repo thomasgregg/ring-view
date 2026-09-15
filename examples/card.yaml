@@ -20,6 +20,7 @@ door_hold_to_activate: true
 # Existing cards default to open_viewer and remain unchanged.
 dashboard_behavior: interactive
 dashboard_start: on_demand
+dashboard_recording_muted: true
 dashboard_live_muted: true
 door_control_location: viewer_only
 
@@ -29,9 +30,12 @@ show_snapshot_button: true
 snapshot_directory: /media/ring-view
 
 show_name: false
-aspect_ratio: "16:9"
-fit_mode: cover
+show_action_button_labels: true
+aspect_ratio: auto
+fit_mode: contain
 
 grid_options:
   columns: 12
-  rows: 3
+  # Automatic height follows the detected media shape. Replace with a number
+  # such as 3 when a deliberately fixed Sections-dashboard height is preferred.
+  rows: auto

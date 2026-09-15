@@ -85,7 +85,7 @@ Narrow or
 very short fullscreen layouts also prioritize the available viewport and apply
 `fit_mode` inside it.
 
-### Complete YAML example
+### Example with common options
 
 ```yaml
 type: custom:ring-view
@@ -121,6 +121,7 @@ door_hold_to_activate: true
 door_control_location: viewer_only
 
 show_name: true
+show_action_button_labels: true
 preview_source: newest
 preview_fallback: last_recording
 aspect_ratio: auto
@@ -352,8 +353,9 @@ current Live player has connected. It hides if Live fails, leaving the compact
 Retry state and the existing mode tabs.
 
 On an exceptionally short interactive card, Ring View temporarily prioritizes
-a connection, Ding, or error message instead of stacking it over the visitor
-rail. The rail returns when the message clears or the card has enough height.
+a connection, Ding, or error message instead of stacking it over the bottom
+actions. The actions return when the message clears or the card has enough
+height.
 
 ## Door access
 
@@ -366,7 +368,7 @@ from the saved visual configuration.
 door is open and `off` means it is closed, following Home Assistant's binary
 sensor convention. The icon then follows the physical state: closed door for
 `off`, open door for `on`, and a warning for an unknown or unavailable state.
-While open, the door segment reads **Door open** and cannot be activated. A
+While open, the door control reads **Door open** and cannot be activated. A
 closed contact leaves the configured Unlock or Open action available. If the
 contact is unknown or unavailable, the action remains usable and shows
 **Status unknown**; only a positive open state blocks it. Without a contact
@@ -384,10 +386,10 @@ tap, click, Space, or Enter activation.
 
 **Live view only** is the recommended default. **Live and recordings** is
 available for users who intentionally want door access while viewing historical
-footage. When Talk and door access are both visible, they share one borderless
-rail with separate inset interaction states. If Talk is disabled or unsupported
-by the configured camera, the rail automatically collapses to the door-only
-action.
+footage. When Talk and door access are both visible, they appear next to each
+other as separate, fully rounded controls with an eight-pixel gap. If Talk is
+disabled or unsupported by the configured camera, the door action remains
+centered on its own.
 
 [Full door-access guide](door-access.md)
 

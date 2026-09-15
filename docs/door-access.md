@@ -15,37 +15,42 @@ The design has three priorities:
 
 1. Keep the visitor and the door action in the same visual context.
 2. Make an accidental door operation difficult without slowing down routine use.
-3. Keep Talk and door access visually related without adding decorative chrome.
+3. Keep Talk and door access visually related while making each action clearly
+   independent.
 
 ## Viewer design
 
-### One visitor-action rail
+### Separate visitor actions
 
-When Talk and door access are both available, they share one compact glass rail
-at the bottom of the viewer:
+When Talk and door access are both available, they appear side by side as
+separate controls at the bottom of the viewer:
 
 ```text
-╭────────────────────────────────────────────────╮
-│   microphone  Talk       door  Hold to open    │
-╰────────────────────────────────────────────────╯
+╭──────────────────────╮  ╭──────────────────────╮
+│  microphone  Talk    │  │  door  Hold to open  │
+╰──────────────────────╯  ╰──────────────────────╯
 ```
 
-- Both actions use the same height, corner radius, typography, and translucent
-  surface, so they read as one visitor interaction.
-- The rail has no outline, divider, or nested shadow. Its shared glass surface
-  uses a restrained backdrop blur and neutral lift so it remains visible over
-  both camera imagery and black letterboxing. Each action uses an inset state
-  surface, so hover, keyboard focus, active Talk, and door progress remain
-  clearly associated with the correct action without drawing nested pills.
+- Both actions use the same 48-pixel height, fully rounded shape, typography,
+  and translucent surface, with an eight-pixel gap between them.
+- Each control owns its complete glass surface and inset interaction state, so
+  hover, keyboard focus, active Talk, and door progress remain clearly
+  associated with the correct action.
 - Talk remains neutral and becomes red only while audio is transmitted. Door
-  progress uses a warm left-to-right fill with a rounded starting edge and a
-  straight moving edge, then briefly becomes green on success.
+  progress reveals a fixed warm surface from left to right with a straight
+  moving edge, then briefly becomes green on success.
 - Both actions keep a 48-pixel target in desktop, landscape, and portrait views.
   Their outer geometry never changes during a press or hold.
-- If only one action is shown, the rail collapses to a balanced single action.
-  There is no empty segment or decorative separator.
-- The rail respects phone safe areas and stays reachable in portrait and
+- If only one action is shown, it remains centered as one independent control.
+  There is no empty placeholder or decorative separator.
+- The controls respect phone safe areas and stay reachable in portrait and
   landscape layouts.
+
+**Card appearance → Show Talk and door button text** is enabled by default.
+Turning it off changes both actions to independent 48-pixel icon buttons in the
+dashboard card and fullscreen viewer. Tooltips, accessible names, status icons,
+and door hold progress remain available. Exceptionally narrow layouts also hide
+visible labels automatically before the controls can overflow.
 
 ### Availability and layout
 
@@ -59,16 +64,17 @@ Door access appears only when `door_entity` is configured.
   Live…** until the current Live picture is ready and hides if Live fails.
 - On an exceptionally short interactive card, a central connection, Ding, or
   error message temporarily takes visual priority instead of overlapping the
-  visitor rail. The rail returns when the message clears or more height is
+  bottom actions. The actions return when the message clears or more height is
   available.
 - **Live and recordings** is an explicit option for households that need the
   action in both modes.
-- When Talk is available, both controls always appear in the shared rail.
-- When Talk is disabled or unsupported, the rail automatically collapses to the
-  door-only pill. No separate layout setting is needed.
+- When Talk is available, it appears beside the door action as a separate
+  control.
+- When Talk is disabled or unsupported, the door action remains centered on its
+  own. No separate layout setting is needed.
 - Talk itself remains a Live-only action because it depends on the live WebRTC
   session.
-- An optional `door_contact_entity` makes the door segment aware of the physical
+- An optional `door_contact_entity` makes the door control aware of the physical
   door state. It has no effect unless explicitly configured.
 
 ### Safe activation
@@ -131,7 +137,7 @@ temporarily suggesting that the door has physically moved.
 Success is intentionally shown in the control itself rather than in a second
 toast, keeping the interface calm and avoiding duplicate feedback.
 Failures use the same temporary centered message as snapshot and talkback
-failures. The action rail remains visible and immediately retryable.
+failures. The action control remains visible and immediately retryable.
 
 ## Home Assistant behavior
 
@@ -194,6 +200,7 @@ way, and presents dependent choices only when they can affect the viewer.
 | Show control in | `door_control_visibility` | `live_only` | `live_only`, `all_views` | Keeps the control in Live only, or explicitly also shows it over recordings. |
 | Require hold to activate | `door_hold_to_activate` | `true` | `true`, `false` | Requires the 1.6-second hold confirmation; `false` enables one-tap operation. |
 | Door control location | `door_control_location` | `viewer_only` | `viewer_only`, `dashboard_and_viewer` | Keeps the action in fullscreen only, or places it on both the interactive dashboard card and fullscreen viewer. |
+| Show Talk and door button text | `show_action_button_labels` | `true` | `true`, `false` | Shows text inside both visitor actions, or uses compact icon-only controls while retaining tooltips and accessible names. This setting is in **Card appearance**. |
 
 Example:
 
@@ -209,12 +216,14 @@ door_action: open
 door_control_visibility: live_only
 door_hold_to_activate: true
 door_control_location: viewer_only
+show_action_button_labels: true
 ```
 
 ## Accessibility and motion
 
-- All controls have visible text and accessible names; meaning is never conveyed
-  by color alone.
+- All controls retain accessible names and tooltips. Visible text is enabled by
+  default and can be hidden with `show_action_button_labels`; meaning is never
+  conveyed by color alone.
 - State changes use a polite screen-reader announcement. Errors use an alert.
 - Disabled states remain legible and explain why the action cannot run.
 - Touch targets meet the existing Ring View mobile sizing.
@@ -230,17 +239,19 @@ door_control_location: viewer_only
 - A configured contact reporting closed shows a closed-door icon and keeps the configured action available.
 - A configured contact reporting open shows an open-door icon, disables the action, and displays **Door open**.
 - An unknown or unavailable contact shows a warning icon and never blocks the configured action.
-- Talk and door access form one dock with a visible divider when both are shown.
-- A single remaining action renders as one centered pill without a divider.
+- Talk and door access render as separate, fully rounded controls with an
+  eight-pixel gap when both are shown.
+- A single remaining action renders as one centered control.
 - A short hold never calls a lock service; a completed hold calls it once.
 - One-tap mode calls once per deliberate activation.
-- Talk appears beside the door action whenever it is supported, and the dock
-  collapses automatically when Talk is unavailable.
+- Talk appears beside the door action whenever it is supported, and the door
+  action remains centered when Talk is unavailable.
 - `open` is blocked when the lock does not advertise support.
 - Unavailable and jammed locks cannot be operated.
 - Live-only and Live-plus-recordings visibility work independently of the opening
   view.
 - Pointer, touch, and keyboard interaction receive equivalent feedback.
 - English and German labels, errors, and announcements are included.
-- Desktop and phone browser tests cover the merged dock, cancellation, service
-  call, visibility, and automatic door-only fallback.
+- Desktop and phone browser tests cover separate labelled and icon-only
+  controls, narrow-card label removal, cancellation, service calls, visibility,
+  hold progress, and automatic door-only fallback.

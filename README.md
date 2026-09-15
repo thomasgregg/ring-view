@@ -34,7 +34,7 @@ See what happened, check what is happening, save the moment, and answer the door
 
 - **Go from recording to Live in one tap.** Switch views inside the same viewer, with familiar playback and sound controls.
 - **Listen and talk to visitors.** Optional **Hold to talk** adds push-to-talk to the official Ring live camera, using the same connection as the video.
-- **Operate the door while you watch.** Door access adds a configurable Home Assistant lock action, with a safe hold gesture, optional physical-door status, and a shared Talk/door control rail.
+- **Operate the door while you watch.** Door access adds a configurable Home Assistant lock action, with a safe hold gesture, optional physical-door status, and separate Talk and door controls.
 - **Choose a calm or hands-on dashboard.** Keep the lightweight still-image card, or opt into direct Recording, Live, Talk, and door controls for a wall tablet.
 - **Show the freshest view.** Optionally combine the latest recording with a Ring-MQTT snapshot camera for the dashboard preview.
 - **Save a moment from Live.** Optionally show one snapshot button that saves a timestamped image through Home Assistant, with no custom automation.
@@ -164,8 +164,9 @@ waits for your tap, but no player is loaded yet. You can instead start the last
 recording or Live automatically. The two nearby sound switches independently
 choose whether dashboard recordings and dashboard Live start muted. This keeps
 the choice visible and predictable instead of letting the card decide from the
-device type. The card requires at least **12 columns × 3 rows** in a Sections
-dashboard.
+device type. In a Sections dashboard, the card requires at least **12 columns**.
+New cards use automatic height; an explicitly selected row count, including
+three rows, remains fixed.
 
 Common starting points:
 
@@ -204,7 +205,7 @@ Talk and door access sit together as independent, fully rounded controls with
 A door action fills from left to right during its 1.6-second confirmation and
 stays the same size throughout the hold.
 
-For a more compact rail, turn off **Card appearance → Show Talk and door button text**.
+For more compact buttons, turn off **Card appearance → Show Talk and door button text**.
 Talk and door actions then remain 48-pixel controls with icons, hover labels,
 and screen-reader names in both the dashboard card and fullscreen viewer.
 
