@@ -64,9 +64,9 @@ These are standard Home Assistant card layout fields rather than Ring View behav
 | Field | Card default | Purpose |
 | --- | --- | --- |
 | `columns` | `12` | Preferred number of grid columns, or `full`. |
-| `rows` | `3` | Preferred number of grid rows. |
+| `rows` | `auto` for newly added cards | Preferred number of grid rows. Existing fixed-height cards keep their saved value. |
 | `min_columns` | `12` | Minimum supported width in grid columns in both dashboard modes. |
-| `min_rows` | `3` | Minimum supported height in grid rows in both dashboard modes. |
+| `min_rows` | `3` with fixed height; not set for auto height | Minimum supported height in grid rows in both dashboard modes. |
 | `max_columns` | Not set | Optional maximum width. |
 | `max_rows` | Not set | Optional maximum height. |
 
@@ -74,6 +74,8 @@ These are standard Home Assistant card layout fields rather than Ring View behav
 dimensions are available, then follows the current poster or video. It adapts
 again when Recording and Live use different shapes. If a custom player does not
 expose valid image or video dimensions, the loaded poster remains authoritative.
+Cards newly added through Home Assistant's card picker start with automatic
+height. Existing cards keep an explicitly saved row count, including three rows.
 In a Home Assistant Sections layout, Automatic uses intrinsic row sizing unless
 you explicitly configure a fixed `grid_options.rows` value. Inside an explicitly
 fixed slot, `fit_mode` continues to control cropping or letterboxing. Narrow or

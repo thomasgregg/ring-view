@@ -138,6 +138,7 @@ export class RingView extends LitElement {
       recording_entity: recording,
       live_entity: live,
       ...(snapshot ? { snapshot_entity: snapshot } : {}),
+      grid_options: { rows: "auto" },
     };
   }
 

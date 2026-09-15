@@ -107,10 +107,12 @@ describe("card stream lifecycle", () => {
       recording_entity: "select.renamed_events",
       live_entity: "camera.front_door_stream",
       snapshot_entity: "camera.renamed_snapshot",
+      grid_options: { rows: "auto" },
     });
     expect(cardClass.getStubConfig(hass)).toMatchObject({
       recording_entity: "camera.recording",
       live_entity: "camera.live",
+      grid_options: { rows: "auto" },
     });
   });
 

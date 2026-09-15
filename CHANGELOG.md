@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.1-beta.4] - 2026-09-15
+
+### Changed
+
+- Start newly added cards with Home Assistant's automatic grid height. Existing
+  cards retain any saved fixed row count, so a deliberate three-row layout
+  remains unchanged.
+
 ## [0.12.1-beta.3] - 2026-09-15
 
 ### Changed

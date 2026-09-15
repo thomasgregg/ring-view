@@ -5645,7 +5645,8 @@ let R = class extends E {
       type: Ze,
       recording_entity: o,
       live_entity: i,
-      ...a ? { snapshot_entity: a } : {}
+      ...a ? { snapshot_entity: a } : {},
+      grid_options: { rows: "auto" }
     };
   }
   setConfig(e) {
