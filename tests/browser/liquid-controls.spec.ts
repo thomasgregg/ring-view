@@ -500,7 +500,7 @@ test("uses compact icon-only visitor actions across viewer layouts and the dashb
     expect(dockBox.y + dockBox.height).toBeLessThanOrEqual(viewport.height);
     const progress = await pseudoStyle(door, "::after");
     expect(progress.borderTopLeftRadius).toBe("20px");
-    expect(progress.borderTopRightRadius).toBe("20px");
+    expect(progress.borderTopRightRadius).toBe("0px");
     expect(await page.evaluate(() => document.documentElement.scrollWidth))
       .toBeLessThanOrEqual(viewport.width);
   }

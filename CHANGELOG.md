@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.1-beta.9] - 2026-09-15
+
+### Fixed
+
+- Restore the clean, straight advancing edge of the press-and-hold door
+  progress indicator for icon-only controls instead of rounding it into a
+  growing bubble.
+
 ## [0.12.1-beta.8] - 2026-09-15
 
 ### Added

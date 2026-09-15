@@ -753,10 +753,6 @@ export const dialogStyles = css`
     pointer-events: none;
   }
 
-  .visitor-action-dock.icon-only .door-action::after {
-    border-radius: calc((var(--ring-view-primary-size) - 8px) / 2);
-  }
-
   .door-action.holding::after {
     animation: door-hold 1600ms linear forwards;
   }
