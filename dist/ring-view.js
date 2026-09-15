@@ -2708,8 +2708,19 @@ const Yr = Z`
     pointer-events: none;
   }
 
+  .visitor-action-dock.icon-only .door-action::after {
+    right: 4px;
+    width: auto;
+    border-radius: calc((var(--ring-view-primary-size) - 8px) / 2);
+    clip-path: inset(0 100% 0 0);
+  }
+
   .door-action.holding::after {
     animation: door-hold 1600ms linear forwards;
+  }
+
+  .visitor-action-dock.icon-only .door-action.holding::after {
+    animation-name: door-hold-icon-only;
   }
 
   .door-action.working {
@@ -2915,6 +2926,15 @@ const Yr = Z`
     }
     to {
       width: calc(100% - 8px);
+    }
+  }
+
+  @keyframes door-hold-icon-only {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0);
     }
   }
 
@@ -3173,6 +3193,12 @@ const Yr = Z`
 
     .door-action.holding::after {
       width: calc(100% - 8px);
+    }
+
+    .visitor-action-dock.icon-only .door-action.holding::after {
+      width: auto;
+      animation: none;
+      clip-path: inset(0);
     }
   }
 

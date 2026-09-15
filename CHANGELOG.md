@@ -4,6 +4,17 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.1-beta.10] - 2026-09-15
+
+### Fixed
+
+- Keep icon-only door hold progress inside the highlighted inner circle from
+  its first frame. The fixed circular surface is now revealed with a straight
+  advancing edge, avoiding both an outside-starting sliver and a growing
+  bubble shape.
+- Preserve complete hold feedback without animation when reduced motion is
+  enabled.
+
 ## [0.12.1-beta.9] - 2026-09-15
 
 ### Fixed

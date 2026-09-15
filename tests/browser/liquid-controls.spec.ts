@@ -13,6 +13,7 @@ async function pseudoStyle(
       borderTopRightRadius: style.borderTopRightRadius,
       bottom: style.bottom,
       boxShadow: style.boxShadow,
+      clipPath: style.clipPath,
       left: style.left,
       right: style.right,
       top: style.top,
@@ -147,6 +148,38 @@ test("keeps the door target stable while a straight-edged hold fill advances", a
   expect(progress.borderTopLeftRadius).toBe("20px");
   expect(progress.borderTopRightRadius).toBe("0px");
   expect((await door.boundingBox())?.width).toBe(168);
+  await page.mouse.up();
+  expect(await page.evaluate(() => window.demoDoorCalls ?? [])).toHaveLength(0);
+});
+
+test("reveals icon-only door progress inside its fixed inner circle", async ({
+  page,
+}) => {
+  await openViewer(
+    page,
+    "mode=live&door=1&door_action=open&live_platform=generic&action_labels=0",
+  );
+  const door = page.getByRole("button", { name: "Hold to open" });
+  await expect(door).toBeEnabled();
+
+  const box = await door.boundingBox();
+  if (!box) throw new Error("Icon-only door target geometry unavailable");
+  expect(box.width).toBe(48);
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.waitForTimeout(650);
+
+  const progress = await pseudoStyle(door, "::after");
+  expect(progress.width).toBe("40px");
+  expect(progress.borderTopLeftRadius).toBe("20px");
+  expect(progress.borderTopRightRadius).toBe("20px");
+  const clipped = (progress.clipPath ?? "").match(
+    /^inset\(0px ([0-9.]+)% 0px 0px\)$/,
+  );
+  expect(clipped).not.toBeNull();
+  expect(Number(clipped?.[1])).toBeGreaterThan(10);
+  expect(Number(clipped?.[1])).toBeLessThan(90);
+  expect((await door.boundingBox())?.width).toBe(48);
   await page.mouse.up();
   expect(await page.evaluate(() => window.demoDoorCalls ?? [])).toHaveLength(0);
 });
@@ -377,17 +410,24 @@ test("wraps long transient feedback in one calm left-aligned message surface", a
 
 test("honors reduced motion while preserving complete hold feedback", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await openViewer(page, "mode=live&door=1&door_action=open&live_platform=generic");
-  const door = page.getByRole("button", { name: "Hold to open" });
-  const box = await door.boundingBox();
-  if (!box) throw new Error("Reduced-motion door target unavailable");
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await page.mouse.down();
-  const progress = await pseudoStyle(door, "::after");
-  expect(progress.animationName).toBe("none");
-  expect(Number.parseFloat(progress.width ?? "0")).toBe(160);
-  await page.mouse.up();
-  expect(await page.evaluate(() => window.demoDoorCalls ?? [])).toHaveLength(0);
+  for (const iconOnly of [false, true]) {
+    await openViewer(
+      page,
+      "mode=live&door=1&door_action=open&live_platform=generic"
+        + (iconOnly ? "&action_labels=0" : ""),
+    );
+    const door = page.getByRole("button", { name: "Hold to open" });
+    const box = await door.boundingBox();
+    if (!box) throw new Error("Reduced-motion door target unavailable");
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    const progress = await pseudoStyle(door, "::after");
+    expect(progress.animationName).toBe("none");
+    expect(Number.parseFloat(progress.width ?? "0")).toBe(iconOnly ? 40 : 160);
+    expect(progress.clipPath).toBe(iconOnly ? "inset(0px)" : "none");
+    await page.mouse.up();
+    expect(await page.evaluate(() => window.demoDoorCalls ?? [])).toHaveLength(0);
+  }
 });
 
 test("keeps controls distinguishable in forced-colour mode", async ({ page }) => {
@@ -500,7 +540,8 @@ test("uses compact icon-only visitor actions across viewer layouts and the dashb
     expect(dockBox.y + dockBox.height).toBeLessThanOrEqual(viewport.height);
     const progress = await pseudoStyle(door, "::after");
     expect(progress.borderTopLeftRadius).toBe("20px");
-    expect(progress.borderTopRightRadius).toBe("0px");
+    expect(progress.borderTopRightRadius).toBe("20px");
+    expect(progress.clipPath).toBe("inset(0px 100% 0px 0px)");
     expect(await page.evaluate(() => document.documentElement.scrollWidth))
       .toBeLessThanOrEqual(viewport.width);
   }
