@@ -4,6 +4,15 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.1-beta.3] - 2026-09-15
+
+### Changed
+
+- Put **Automatic (native shape)** first in the image-shape menu, followed by
+  the fixed shapes, and put the non-cropping **Fit entire image** choice first
+  in the renamed **Image fit** menu. All existing values and defaults remain
+  compatible.
+
 ## [0.12.1-beta.2] - 2026-09-15
 
 ### Fixed

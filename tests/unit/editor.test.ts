@@ -263,6 +263,43 @@ describe("visual editor", () => {
     ]);
   });
 
+  it("orders adaptive and non-cropping appearance choices first", async () => {
+    const editor = document.createElement("ring-view-editor");
+    editor.hass = hass;
+    editor.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+    });
+    document.body.append(editor);
+    await editor.updateComplete;
+
+    const form = editor.shadowRoot?.querySelector("ha-form") as
+      | (HTMLElement & { schema?: ConfigFormSchema[] })
+      | null;
+    const appearanceGrid = form?.schema
+      ?.find((field) => field.name === "card_appearance")
+      ?.schema?.find((field) => field.type === "grid");
+    const optionsFor = (name: string) => {
+      const selector = appearanceGrid?.schema?.find(
+        (field) => field.name === name,
+      )?.selector as
+        | { select?: { options?: Array<{ value: string; label: string }> } }
+        | undefined;
+      return selector?.select?.options;
+    };
+
+    expect(optionsFor("aspect_ratio")).toEqual([
+      { value: "auto", label: "Automatic (native shape)" },
+      { value: "16:9", label: "Widescreen (16:9)" },
+      { value: "4:3", label: "Standard (4:3)" },
+      { value: "1:1", label: "Square (1:1)" },
+    ]);
+    expect(optionsFor("fit_mode")).toEqual([
+      { value: "contain", label: "Fit entire image" },
+      { value: "cover", label: "Crop to fill" },
+    ]);
+  });
+
   it("reveals only the save folder when manual snapshots are enabled", async () => {
     const editor = document.createElement("ring-view-editor");
     editor.hass = hass;

@@ -878,7 +878,7 @@ const Di = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role=
   "editor.preview_source": "Image source",
   "editor.preview_fallback": "If capture times cannot be compared",
   "editor.aspect_ratio": "Image shape",
-  "editor.fit_mode": "Image crop",
+  "editor.fit_mode": "Image fit",
   "editor.helper_dashboard_behavior": "Keep the familiar preview, or put camera controls directly on the dashboard.",
   "editor.helper_recording_entity": "Choose the official Ring Last recording camera or Ring-MQTT Event Select. For Ring-MQTT, the selected event option determines which recording is shown.",
   "editor.helper_live_entity": "Choose the official Ring Live view camera or a Home Assistant camera configured from Ring-MQTT’s live RTSP path.",
@@ -6269,6 +6269,10 @@ function In(e, t) {
                   mode: "dropdown",
                   options: [
                     {
+                      value: "auto",
+                      label: s(e, "editor.aspect_auto")
+                    },
+                    {
                       value: "16:9",
                       label: s(e, "editor.aspect_widescreen")
                     },
@@ -6279,10 +6283,6 @@ function In(e, t) {
                     {
                       value: "1:1",
                       label: s(e, "editor.aspect_square")
-                    },
-                    {
-                      value: "auto",
-                      label: s(e, "editor.aspect_auto")
                     }
                   ]
                 }
@@ -6295,12 +6295,12 @@ function In(e, t) {
                   mode: "dropdown",
                   options: [
                     {
-                      value: "cover",
-                      label: s(e, "editor.fit_cover")
-                    },
-                    {
                       value: "contain",
                       label: s(e, "editor.fit_contain")
+                    },
+                    {
+                      value: "cover",
+                      label: s(e, "editor.fit_cover")
                     }
                   ]
                 }

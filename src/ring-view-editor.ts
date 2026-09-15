@@ -353,6 +353,10 @@ function configSchema(
                   mode: "dropdown",
                   options: [
                     {
+                      value: "auto",
+                      label: localize(hass, "editor.aspect_auto"),
+                    },
+                    {
                       value: "16:9",
                       label: localize(hass, "editor.aspect_widescreen"),
                     },
@@ -363,10 +367,6 @@ function configSchema(
                     {
                       value: "1:1",
                       label: localize(hass, "editor.aspect_square"),
-                    },
-                    {
-                      value: "auto",
-                      label: localize(hass, "editor.aspect_auto"),
                     },
                   ],
                 },
@@ -379,12 +379,12 @@ function configSchema(
                   mode: "dropdown",
                   options: [
                     {
-                      value: "cover",
-                      label: localize(hass, "editor.fit_cover"),
-                    },
-                    {
                       value: "contain",
                       label: localize(hass, "editor.fit_contain"),
+                    },
+                    {
+                      value: "cover",
+                      label: localize(hass, "editor.fit_cover"),
                     },
                   ],
                 },

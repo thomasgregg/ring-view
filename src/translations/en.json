@@ -50,7 +50,7 @@
   "editor.preview_source": "Image source",
   "editor.preview_fallback": "If capture times cannot be compared",
   "editor.aspect_ratio": "Image shape",
-  "editor.fit_mode": "Image crop",
+  "editor.fit_mode": "Image fit",
   "editor.helper_dashboard_behavior": "Keep the familiar preview, or put camera controls directly on the dashboard.",
   "editor.helper_recording_entity": "Choose the official Ring Last recording camera or Ring-MQTT Event Select. For Ring-MQTT, the selected event option determines which recording is shown.",
   "editor.helper_live_entity": "Choose the official Ring Live view camera or a Home Assistant camera configured from Ring-MQTT’s live RTSP path.",
