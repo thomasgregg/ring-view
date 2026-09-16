@@ -18,6 +18,7 @@ import {
 } from "./dialog-controller";
 import { localize } from "./localize";
 import {
+  cameraProxyTokenIsOnlyUrlChange,
   posterUrl,
   sizedPosterUrl,
   widthSizedPosterUrl,
@@ -265,17 +266,18 @@ export class RingView extends LitElement {
     if (this.isInCardPicker()) return;
     const entityId = this.previewEntityId();
     const fallbackPoster = posterUrl(this.hass, this.hass.states[entityId], entityId);
-    if (
-      entityId !== this.activePreviewEntityId ||
-      fallbackPoster !== this.lastFallbackPoster
-    ) {
+    const entityChanged = entityId !== this.activePreviewEntityId;
+    const posterChanged = fallbackPoster !== this.lastFallbackPoster;
+    const tokenOnlyRefresh = !entityChanged
+      && cameraProxyTokenIsOnlyUrlChange(this.lastFallbackPoster, fallbackPoster);
+    if (entityChanged || posterChanged) {
       this.activePreviewEntityId = entityId;
       this.lastFallbackPoster = fallbackPoster;
       this.lastPoster = fallbackPoster;
       this.lastPreviewSize = undefined;
       this.previewRequestId += 1;
       this.previewFailed = false;
-      this.autoAspectRatio = undefined;
+      if (!tokenOnlyRefresh) this.autoAspectRatio = undefined;
     }
   }
 

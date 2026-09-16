@@ -5,6 +5,7 @@ import type { HomeAssistant } from "../../src/types";
 import {
   aspectRatioFromDimensions,
   aspectRatiosMatch,
+  mediaAspectRatioEvent,
 } from "../../src/utilities/media-aspect-ratio";
 import type { RingView } from "../../src/ring-view";
 import type { RingViewDialog } from "../../src/ring-view-dialog";
@@ -166,6 +167,88 @@ describe("automatic media aspect ratio", () => {
       card.shadowRoot!.querySelector<HTMLElement>(".inline-shell")!.style
         .getPropertyValue("--ring-view-aspect-ratio"),
     ).toBe("16 / 9");
+  });
+
+  it("preserves an interactive card ratio across camera token rotation only", async () => {
+    const recording = hass.states["camera.recording"]!;
+    const tokenHass: HomeAssistant = {
+      ...hass,
+      states: {
+        ...hass.states,
+        "camera.recording": {
+          ...recording,
+          attributes: {
+            ...recording.attributes,
+            entity_picture: "/api/camera_proxy/camera.recording?token=first",
+          },
+        },
+      },
+    };
+    const card = document.createElement("ring-view") as RingView;
+    card.setConfig({
+      recording_entity: "camera.recording",
+      live_entity: "camera.live",
+      dashboard_behavior: "interactive",
+      dashboard_start: "live",
+      aspect_ratio: "auto",
+    });
+    card.hass = tokenHass;
+    document.body.append(card);
+    await flush();
+
+    const dialog = card.shadowRoot!.querySelector<RingViewDialog>(
+      "ring-view-dialog[inline]",
+    )!;
+    const player = dialog.shadowRoot!.querySelector<HTMLElement>(
+      "ring-view-native-camera-adapter",
+    )!;
+    player.dispatchEvent(mediaAspectRatioEvent(1));
+    await flush();
+
+    const outerRatio = () =>
+      card.shadowRoot!.querySelector<HTMLElement>(".inline-shell")!.style
+        .getPropertyValue("--ring-view-aspect-ratio");
+    const innerRatio = () =>
+      dialog.shadowRoot!.querySelector<HTMLElement>(".dialog")!.style
+        .getPropertyValue("--ring-view-aspect-ratio");
+    expect(outerRatio()).toBe("1");
+    expect(innerRatio()).toBe("1");
+
+    const rotatedHass: HomeAssistant = {
+      ...tokenHass,
+      states: {
+        ...tokenHass.states,
+        "camera.recording": {
+          ...tokenHass.states["camera.recording"]!,
+          last_updated: "2026-09-17T10:05:00Z",
+          attributes: {
+            ...tokenHass.states["camera.recording"]!.attributes,
+            entity_picture: "/api/camera_proxy/camera.recording?token=second",
+          },
+        },
+      },
+    };
+    card.hass = rotatedHass;
+    await flush();
+    expect(innerRatio()).toBe("1");
+    expect(outerRatio()).toBe("1");
+
+    card.hass = {
+      ...rotatedHass,
+      states: {
+        ...rotatedHass.states,
+        "camera.recording": {
+          ...rotatedHass.states["camera.recording"]!,
+          attributes: {
+            ...rotatedHass.states["camera.recording"]!.attributes,
+            entity_picture: "/api/camera_proxy/camera.replacement?token=second",
+          },
+        },
+      },
+    };
+    await flush();
+    expect(innerRatio()).toBe("1");
+    expect(outerRatio()).toBe("16 / 9");
   });
 
   it("lets playable media override its poster without a late poster load winning", async () => {

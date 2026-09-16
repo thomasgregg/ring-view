@@ -2019,6 +2019,116 @@ test("automatic shape follows real image dimensions and keeps an explicit loadin
   expect((await mediaFrame.boundingBox())?.height).toBeLessThanOrEqual(868);
 });
 
+test("keeps an automatic interactive shape through camera token rotation only", async ({
+  page,
+}) => {
+  await page.goto(
+    "/demo/?dashboard=interactive&dashboard_start=live&aspect=auto&fit=contain",
+  );
+  await expect(page.locator("ring-view")).toBeAttached();
+  await page.evaluate(async () => {
+    type TestCard = HTMLElement & {
+      hass: HomeAssistant;
+      updateComplete: Promise<unknown>;
+    };
+    type TestDialog = HTMLElement & { updateComplete: Promise<unknown> };
+    const card = document.querySelector("ring-view") as TestCard;
+    const recording = card.hass.states["camera.latest_recording"]!;
+    card.hass = {
+      ...card.hass,
+      states: {
+        ...card.hass.states,
+        [recording.entity_id]: {
+          ...recording,
+          attributes: {
+            ...recording.attributes,
+            entity_picture:
+              "/api/camera_proxy/camera.latest_recording?token=first",
+          },
+        },
+      },
+    };
+    await card.updateComplete;
+
+    const dialog = card.shadowRoot?.querySelector(
+      "ring-view-dialog[inline]",
+    ) as TestDialog | null;
+    await dialog?.updateComplete;
+    const player = dialog?.shadowRoot?.querySelector(
+      "ring-view-native-camera-adapter",
+    );
+    if (!player) throw new Error("Inline live player was not mounted");
+    player.dispatchEvent(
+      new CustomEvent("ring-view-media-aspect-ratio", {
+        detail: { aspectRatio: 1 },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+    await card.updateComplete;
+  });
+
+  const shell = page.locator("ring-view .inline-shell");
+  const dialog = page.locator("ring-view ring-view-dialog .dialog");
+  const ratio = (element: typeof shell) =>
+    element.evaluate((node) =>
+      (node as HTMLElement).style.getPropertyValue("--ring-view-aspect-ratio")
+    );
+  await expect.poll(() => ratio(shell)).toBe("1");
+  await expect.poll(() => ratio(dialog)).toBe("1");
+
+  await page.evaluate(async () => {
+    const card = document.querySelector("ring-view") as HTMLElement & {
+      hass: HomeAssistant;
+      updateComplete: Promise<unknown>;
+    };
+    const recording = card.hass.states["camera.latest_recording"]!;
+    card.hass = {
+      ...card.hass,
+      states: {
+        ...card.hass.states,
+        [recording.entity_id]: {
+          ...recording,
+          last_updated: "2026-09-17T10:05:00Z",
+          attributes: {
+            ...recording.attributes,
+            entity_picture:
+              "/api/camera_proxy/camera.latest_recording?token=second",
+          },
+        },
+      },
+    };
+    await card.updateComplete;
+  });
+  await expect.poll(() => ratio(dialog)).toBe("1");
+  await expect.poll(() => ratio(shell)).toBe("1");
+
+  await page.evaluate(async () => {
+    const card = document.querySelector("ring-view") as HTMLElement & {
+      hass: HomeAssistant;
+      updateComplete: Promise<unknown>;
+    };
+    const recording = card.hass.states["camera.latest_recording"]!;
+    card.hass = {
+      ...card.hass,
+      states: {
+        ...card.hass.states,
+        [recording.entity_id]: {
+          ...recording,
+          attributes: {
+            ...recording.attributes,
+            entity_picture:
+              "/api/camera_proxy/camera.replacement?token=second",
+          },
+        },
+      },
+    };
+    await card.updateComplete;
+  });
+  await expect.poll(() => ratio(dialog)).toBe("1");
+  await expect.poll(() => ratio(shell)).toBe("16 / 9");
+});
+
 test("uses Home Assistant's German locale throughout the card and viewer", async ({
   page,
 }) => {

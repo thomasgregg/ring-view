@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.3-beta.1] - 2026-09-17
+
+### Fixed
+
+- Preserve an interactive card's automatically detected media shape when Home
+  Assistant rotates only the access token in a camera-proxy poster URL. Actual
+  entity, poster path, and other query changes continue to reset automatic
+  sizing normally.
+
+### Tests
+
+- Cover camera-proxy token identity, token-only interactive-card updates, and
+  the boundary where a genuine poster resource change must still reset the
+  outer card shape.
+
 ## [0.12.2] - 2026-09-15
 
 ### Changed

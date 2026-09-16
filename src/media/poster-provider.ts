@@ -1,6 +1,7 @@
 import type { HassEntity, HomeAssistant } from "../types";
 
 const SIGNED_PATH_CACHE_MS = 9_000;
+const URL_COMPARISON_BASE = "http://ring-view.invalid";
 
 interface SignedPathResponse {
   path: string;
@@ -29,6 +30,37 @@ export function posterUrl(
   if (!revision) return url;
   const separator = url.includes("?") ? "&" : "?";
   return `${url}${separator}ring_view_media=${encodeURIComponent(revision)}`;
+}
+
+/**
+ * Home Assistant changes the access token in camera-proxy entity pictures on a
+ * timer. Treat that authentication refresh as the same poster resource while
+ * retaining strict URL identity for every other path and query change.
+ */
+export function cameraProxyTokenIsOnlyUrlChange(
+  previousUrl: string | undefined,
+  nextUrl: string | undefined,
+): boolean {
+  if (!previousUrl || !nextUrl || previousUrl === nextUrl) return false;
+  const previousResource = cameraProxyResourceWithoutToken(previousUrl);
+  const nextResource = cameraProxyResourceWithoutToken(nextUrl);
+  return previousResource !== undefined && previousResource === nextResource;
+}
+
+function cameraProxyResourceWithoutToken(url: string): string | undefined {
+  try {
+    const parsed = new URL(url, URL_COMPARISON_BASE);
+    if (
+      !parsed.pathname.includes("/api/camera_proxy/")
+      || !parsed.searchParams.has("token")
+    ) {
+      return undefined;
+    }
+    parsed.searchParams.delete("token");
+    return parsed.href;
+  } catch {
+    return undefined;
+  }
 }
 
 /**

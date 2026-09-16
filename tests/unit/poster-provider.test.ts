@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  cameraProxyTokenIsOnlyUrlChange,
   posterUrl,
   sizedPosterUrl,
   widthSizedPosterUrl,
@@ -7,6 +8,33 @@ import {
 import type { HomeAssistant } from "../../src/types";
 
 describe("sized camera poster", () => {
+  it("recognizes only a Home Assistant camera-proxy token rotation", () => {
+    expect(
+      cameraProxyTokenIsOnlyUrlChange(
+        "https://ha.test/api/camera_proxy/camera.recording?token=first",
+        "https://ha.test/api/camera_proxy/camera.recording?token=second",
+      ),
+    ).toBe(true);
+    expect(
+      cameraProxyTokenIsOnlyUrlChange(
+        "https://ha.test/api/camera_proxy/camera.recording?token=first&width=640",
+        "https://ha.test/api/camera_proxy/camera.recording?token=second&width=1280",
+      ),
+    ).toBe(false);
+    expect(
+      cameraProxyTokenIsOnlyUrlChange(
+        "https://ha.test/api/camera_proxy/camera.recording?token=first",
+        "https://ha.test/api/camera_proxy/camera.live?token=second",
+      ),
+    ).toBe(false);
+    expect(
+      cameraProxyTokenIsOnlyUrlChange(
+        "https://cdn.test/poster.jpg?token=first",
+        "https://cdn.test/poster.jpg?token=second",
+      ),
+    ).toBe(false);
+  });
+
   it("adds an event revision without replacing an existing camera token", () => {
     const hass: HomeAssistant = {
       states: {},
