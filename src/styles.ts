@@ -521,15 +521,6 @@ export const dialogStyles = css`
     opacity: 0;
   }
 
-  .video-fallback.controls-hidden {
-    cursor: pointer;
-  }
-
-  .video-fallback.controls-hidden:focus-visible {
-    outline: 3px solid var(--ring-view-focus-color);
-    outline-offset: -3px;
-  }
-
   .initial-start-surface {
     position: absolute;
     inset: 0;

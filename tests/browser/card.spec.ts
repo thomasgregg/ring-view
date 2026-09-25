@@ -874,7 +874,7 @@ test("keeps card and viewer geometry identical across provider profiles", async 
   expect(measurements[1]).toEqual(measurements[0]);
 });
 
-test("dismisses idle direct-recording controls and resumes or replays from the video", async ({
+test("keeps direct-recording controls visible while paused or ended", async ({
   page,
 }) => {
   await page.route("**/pending-recording.mp4", async () => undefined);
@@ -901,18 +901,12 @@ test("dismisses idle direct-recording controls and resumes or replays from the v
   await expect(recording).not.toHaveClass(/pending/);
 
   await recording.evaluate((element) => (element as HTMLVideoElement).pause());
+  await page.waitForTimeout(3_000);
   await expect.poll(
     () => recording.evaluate((element) => (element as HTMLVideoElement).controls),
     { timeout: 5_000 },
-  ).toBe(false);
-  await expect(recording).toHaveClass(/controls-hidden/);
-  await expect(recording).toHaveAttribute("aria-label", "Play last recording");
-
-  await recording.click({ position: { x: 30, y: 30 } });
-  await expect.poll(
-    () => recording.evaluate((element) => (element as HTMLVideoElement).controls),
   ).toBe(true);
-  await expect(recording).toHaveAttribute("data-play-count", "2");
+  await expect(recording).not.toHaveClass(/controls-hidden/);
 
   await recording.evaluate((element) => {
     const video = element as HTMLVideoElement;
@@ -922,16 +916,8 @@ test("dismisses idle direct-recording controls and resumes or replays from the v
   await expect.poll(
     () => recording.evaluate((element) => (element as HTMLVideoElement).controls),
     { timeout: 5_000 },
-  ).toBe(false);
-  await recording.focus();
-  await page.keyboard.press("Space");
-  await expect(recording).toHaveAttribute("data-play-count", "3");
-  await expect.poll(
-    () => recording.evaluate((element) => (element as HTMLVideoElement).currentTime),
-  ).toBe(0);
-  await expect.poll(
-    () => recording.evaluate((element) => (element as HTMLVideoElement).controls),
   ).toBe(true);
+  await expect(recording).not.toHaveClass(/controls-hidden/);
 });
 
 test("renders labelled Talk and door access as independent action pills", async ({ page }) => {

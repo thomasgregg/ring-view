@@ -783,48 +783,19 @@ describe("recording player lifecycle", () => {
     ).toBe("https://example.test/while-hidden.mp4");
   });
 
-  it("dismisses paused recording controls after inactivity and resumes from the video surface", async () => {
+  it("keeps paused recording controls visible", async () => {
     const { dialog, video } = await mount();
     video().dispatchEvent(new Event("canplay"));
     await flush();
 
     video().dispatchEvent(new Event("pause"));
-    await vi.advanceTimersByTimeAsync(2_499);
-    expect(video().controls).toBe(true);
-
-    await vi.advanceTimersByTimeAsync(1);
-    await dialog.updateComplete;
-    expect(video().controls).toBe(false);
-    expect(video().classList.contains("controls-hidden")).toBe(true);
-    expect(video().getAttribute("aria-label")).toBe("Play last recording");
-
-    video().click();
+    await vi.advanceTimersByTimeAsync(5_000);
     await dialog.updateComplete;
     expect(video().controls).toBe(true);
     expect(video().classList.contains("controls-hidden")).toBe(false);
-    expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(2);
-
-    await vi.advanceTimersByTimeAsync(3_000);
-    expect(video().controls).toBe(true);
   });
 
-  it("keeps paused controls available while the user is interacting with them", async () => {
-    const { dialog, video } = await mount();
-    video().dispatchEvent(new Event("canplay"));
-    await flush();
-    video().dispatchEvent(new Event("pause"));
-
-    await vi.advanceTimersByTimeAsync(2_000);
-    video().dispatchEvent(new Event("pointermove"));
-    await vi.advanceTimersByTimeAsync(2_000);
-    expect(video().controls).toBe(true);
-
-    await vi.advanceTimersByTimeAsync(500);
-    await dialog.updateComplete;
-    expect(video().controls).toBe(false);
-  });
-
-  it("dismisses ended recording controls and restarts from the beginning", async () => {
+  it("keeps ended recording controls visible", async () => {
     const { dialog, video } = await mount();
     video().dispatchEvent(new Event("canplay"));
     await flush();
@@ -835,32 +806,10 @@ describe("recording player lifecycle", () => {
     expect(
       dialog.shadowRoot!.querySelector("#ring-view-tab-recording")?.getAttribute("aria-selected"),
     ).toBe("true");
-    await vi.advanceTimersByTimeAsync(2_500);
+    await vi.advanceTimersByTimeAsync(5_000);
     await dialog.updateComplete;
-    expect(video().controls).toBe(false);
-
-    video().dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
-    await dialog.updateComplete;
-    expect(video().currentTime).toBe(0);
     expect(video().controls).toBe(true);
-    expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(2);
-  });
-
-  it("cannot let an old pause timer hide controls after changing modes", async () => {
-    const { dialog, video } = await mount();
-    video().dispatchEvent(new Event("canplay"));
-    await flush();
-    const previous = video();
-    previous.dispatchEvent(new Event("pause"));
-
-    dialog.shadowRoot!.querySelector<HTMLButtonElement>("#ring-view-tab-live")!.click();
-    await vi.advanceTimersByTimeAsync(3_000);
-    dialog.shadowRoot!.querySelector<HTMLButtonElement>("#ring-view-tab-recording")!.click();
-    await flush();
-
-    expect(previous.isConnected).toBe(false);
-    expect(video()).not.toBe(previous);
-    expect(video().controls).toBe(true);
+    expect(video().classList.contains("controls-hidden")).toBe(false);
   });
 
   it("recognizes each replacement recording after repeated app backgrounding", async () => {

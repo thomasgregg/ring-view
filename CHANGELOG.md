@@ -4,6 +4,19 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.4] - 2026-09-25
+
+### Fixed
+
+- Keep the native recording controls available while direct recordings are
+  paused and after playback finishes. Browsers continue to manage their normal
+  idle control visibility while a recording is actively playing.
+
+### Tests
+
+- Verify paused and completed direct recordings retain their controls on unit,
+  desktop browser, phone browser, and live Home Assistant playback paths.
+
 ## [0.12.3] - 2026-09-20
 
 ### Fixed
