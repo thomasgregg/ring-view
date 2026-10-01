@@ -169,6 +169,7 @@ export class RingViewDialog extends LitElement {
   @property({ type: Boolean, reflect: true }) public inline = false;
 
   @state() private ringing = false;
+  @state() private loadedPoster?: string;
   @state() private mode: CameraMode = "last_recording";
   @state() private mediaStatus: MediaStatus = "idle";
   @state() private session = 0;
@@ -1321,11 +1322,13 @@ export class RingViewDialog extends LitElement {
       >
         <img
           class="poster"
+          style=${styleMap({ visibility: this.loadedPoster === poster ? "visible" : "hidden" })}
           data-entity-id=${posterEntityId}
           src=${poster}
           alt=""
           aria-hidden="true"
           @load=${this.handlePosterLoad}
+          @error=${this.handlePosterError}
         />
         ${waitingForInitialStart
           ? html`
@@ -1802,7 +1805,13 @@ export class RingViewDialog extends LitElement {
     ) {
       return;
     }
+    this.loadedPoster = event.currentTarget.getAttribute("src") ?? undefined;
     this.applyAutoAspectRatio(aspectRatioFromMedia(event.currentTarget), "poster");
+  };
+
+  private handlePosterError = (event: Event): void => {
+    if (event.currentTarget !== this.renderRoot.querySelector(".media-frame > .poster")) return;
+    this.loadedPoster = undefined;
   };
 
   private handleRecordingDimensions = (event: Event): void => {

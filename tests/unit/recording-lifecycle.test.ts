@@ -83,6 +83,33 @@ async function mountRingMqtt(recordingUrl?: string) {
 }
 
 describe("recording player lifecycle", () => {
+  it("hides pending and failed posters and recovers when a replacement loads", async () => {
+    const { dialog } = await mount();
+    const poster = dialog.shadowRoot!.querySelector<HTMLImageElement>(".poster")!;
+    expect(poster.style.visibility).toBe("hidden");
+    poster.dispatchEvent(new Event("load"));
+    await dialog.updateComplete;
+    expect(poster.style.visibility).toBe("visible");
+    poster.dispatchEvent(new Event("error"));
+    await dialog.updateComplete;
+    expect(poster.style.visibility).toBe("hidden");
+    expect(dialog.shadowRoot!.querySelector(".video-fallback")).not.toBeNull();
+    dialog.hass = {
+      ...hass,
+      states: {
+        ...hass.states,
+        "camera.recording": {
+          ...hass.states["camera.recording"]!,
+          attributes: { ...hass.states["camera.recording"]!.attributes, entity_picture: "/replacement.jpg" },
+        },
+      },
+    };
+    await dialog.updateComplete;
+    expect(poster.style.visibility).toBe("hidden");
+    poster.dispatchEvent(new Event("load"));
+    await dialog.updateComplete;
+    expect(poster.style.visibility).toBe("visible");
+  });
   beforeEach(() => {
     vi.useFakeTimers();
     TestCameraStream.autoLoad = false;

@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.6] - 2026-10-01
+
+### Fixed
+
+- Hide pending and failed background preview images in the interactive card and
+  fullscreen viewer so missing camera images cannot display a broken image icon.
+  Show the preview again when a replacement image loads, keeping media controls
+  available throughout.
+
+### Tests
+
+- Cover pending previews, failed images, replacement image recovery, and continued
+  recording player availability.
+
 ## [0.12.5] - 2026-10-01
 
 ### Added
