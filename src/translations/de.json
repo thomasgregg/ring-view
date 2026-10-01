@@ -76,7 +76,7 @@
   "editor.helper_door_hold_to_activate": "Vor Ablauf der 1,6 Sekunden loslassen, um abzubrechen. Wenn deaktiviert, betätigt ein einzelnes Tippen die Tür.",
   "editor.helper_door_control_location": "Lege fest, wo die Türaktion erscheint. Nur Vollbild ist für gemeinsam genutzte Dashboards sicherer.",
   "editor.helper_show_name": "Wird oben links auf der Karte und in der Kameraansicht angezeigt.",
-  "editor.helper_last_activity_entity": "Zeigt oben links eine relative Zeit an, bei sichtbarem Kameranamen darunter. Wähle einen Zeitstempel-Sensor, eine Ereignis-Entität, einen Datum-und-Uhrzeit-Helfer oder einen Ring-MQTT-Klingel- oder Bewegungssensor.",
+  "editor.helper_last_activity_entity": "Leer lassen, um automatisch den aktivierten Ring-Sensor Letzte Aufnahme am Gerät der Aufnahmekamera zu verwenden (ab Home Assistant 2026.10). Eine ausgewählte Quelle hat Vorrang. Aufnahmesensoren zeigen das Aufnahmealter; Zeitstempel, Ereignisse, Helfer und Ring-MQTT-Klingel-/Bewegungsquellen zeigen die Aktivitätszeit. Die Zeit erscheint oben links, bei sichtbarem Kameranamen darunter.",
   "editor.helper_show_action_button_labels": "Deaktivieren, um auf der Dashboard-Karte und in der Vollbildansicht nur Symbole für Sprechen und Tür anzuzeigen. Barrierefreie Bezeichnungen und Status bleiben verfügbar.",
   "editor.helper_preview_source": "Verwendet immer ein Standbild und bindet auf dem Dashboard keinen Livestream ein.",
   "editor.helper_snapshot_entity": "Wähle die von Ring-MQTT oder einer anderen Integration bereitgestellte Schnappschuss-Kamera.",
@@ -223,5 +223,9 @@
   "door.open_when_ready_aria": "Tür kann geöffnet werden, sobald das Live-Video verbunden ist",
   "door.unlock_when_ready_aria": "Tür kann entriegelt werden, sobald das Live-Video verbunden ist",
   "door.unlock_failed": "Die Tür konnte nicht entriegelt werden.",
-  "door.open_failed": "Die Tür konnte nicht geöffnet werden."
+  "door.open_failed": "Die Tür konnte nicht geöffnet werden.",
+  "recording_time.relative": "Aufgenommen {time}",
+  "recording_time.accessible": "Aufgenommen {time}",
+  "recording_time.title": "Aufgenommen: {time}",
+  "editor.enable_recording_timestamp": "Aktiviere den Ring-Sensor Letzte Aufnahme unter Einstellungen → Geräte & Dienste → Entitäten, um das Aufnahmealter automatisch anzuzeigen. Verfügbar ab Home Assistant 2026.10."
 }

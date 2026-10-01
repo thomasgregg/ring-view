@@ -308,7 +308,7 @@ test("reveals the camera name only when enabled and keeps activity nearby", asyn
     },
     label: "Last activity timestamp (optional)",
     helper:
-      "Shows relative time at the top left, below the camera name when it is visible. Choose a timestamp sensor, event entity, Date and/or time helper, or a Ring-MQTT Ding or motion sensor.",
+      "Leave empty to automatically use the enabled official Ring Last recording sensor on the recording camera’s device (Home Assistant 2026.10+). Select a source to override this. Recording sensors show recording age; timestamp, event, helper and Ring-MQTT Ding/motion sources show activity time. Shows time at the top left, below the camera name when visible.",
   });
 });
 
@@ -726,7 +726,7 @@ test("refreshes a Ring-MQTT Event Select before mounting its recording", async (
 
 test("selects the newest Ring-MQTT event category before playback", async ({
   page,
-}, testInfo) => {
+}) => {
   await page.route("**/pending-recording.mp4?event=*", async () => undefined);
   await page.goto(
     "/demo/?recording_source=mqtt&activity=1&activity_category=on_demand",
@@ -743,20 +743,16 @@ test("selects the newest Ring-MQTT event category before playback", async ({
       (call) => call.domain === "select" && call.service === "select_option",
     )?.serviceData.option
   );
-  expect(selectedOption).toBe(
-    testInfo.project.name === "phone"
-      ? "On-demand 1 (Transcoded)"
-      : "On-demand 1",
-  );
+  expect(selectedOption).toBe("On-demand 1");
   await expect(page.locator("video.video-fallback")).toHaveAttribute(
     "src",
     /pending-recording\.mp4\?event=/,
   );
 });
 
-test("uses Ring-MQTT's compatible event delivery path on Apple mobile without changing audio", async ({
+test("tries Ring-MQTT's direct event delivery path first on every browser without changing audio", async ({
   page,
-}, testInfo) => {
+}) => {
   await page.route("**/pending-recording.mp4?event=*", async () => undefined);
   await page.goto("/demo/?recording_source=mqtt");
   await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
@@ -768,11 +764,7 @@ test("uses Ring-MQTT's compatible event delivery path on Apple mobile without ch
       (call) => call.domain === "select" && call.service === "select_option",
     )
   );
-  const phone = testInfo.project.name === "phone";
-  expect(calls).toHaveLength(phone ? 1 : 0);
-  if (phone) {
-    expect(calls[0]?.serviceData.option).toBe("Ding 1 (Transcoded)");
-  }
+  expect(calls).toHaveLength(0);
   await expect.poll(() => recording.evaluate(
     (element) => (element as HTMLVideoElement).muted,
   )).toBe(false);
@@ -882,6 +874,16 @@ test("keeps direct-recording controls visible while paused or ended", async ({
   await page.getByRole("button", { name: /Open Entrance viewer/ }).click();
 
   const recording = page.locator("video.video-fallback");
+  await recording.evaluate((element) => {
+    const video = element as HTMLVideoElement;
+    video.defaultPlaybackRate = 2;
+    video.playbackRate = 2;
+    video.dispatchEvent(new Event("ratechange"));
+  });
+  await expect.poll(() => recording.evaluate((element) => ({
+    defaultPlaybackRate: (element as HTMLVideoElement).defaultPlaybackRate,
+    playbackRate: (element as HTMLVideoElement).playbackRate,
+  }))).toEqual({ defaultPlaybackRate: 1, playbackRate: 1 });
   await recording.evaluate((element) => {
     const video = element as HTMLVideoElement;
     let currentTime = 0;
@@ -2130,4 +2132,31 @@ test("uses Home Assistant's German locale throughout the card and viewer", async
   ).toBeVisible();
   await page.getByRole("tab", { name: "Live" }).click();
   await expect(page.getByText("Ring-Live-Ansicht wird verbunden…")).toBeVisible();
+});
+
+test("automatically shows official recording age in the card and fullscreen viewer", async ({ page }) => {
+  await page.locator("ring-view").evaluate((element) => {
+    const card = element as HTMLElement & { hass: HomeAssistant; setConfig: (config: RingViewConfig) => void };
+    const timestampId = "sensor.renamed_recording_time";
+    card.hass = {
+      ...card.hass,
+      entities: {
+        ...card.hass.entities,
+        "camera.latest_recording": { entity_id: "camera.latest_recording", platform: "ring", device_id: "door" },
+        [timestampId]: { entity_id: timestampId, platform: "ring", device_id: "door", translation_key: "last_recording" },
+      },
+      states: { ...card.hass.states, [timestampId]: { entity_id: timestampId, state: new Date(Date.now() - 480000).toISOString(), attributes: { device_class: "timestamp" } } },
+    };
+    card.setConfig({ recording_entity: "camera.latest_recording", live_entity: "camera.live_view", autoplay_recording: false });
+  });
+  await expect(page.locator("ring-view > ha-card ring-view-activity-time span")).toContainText("Recorded 8 min ago");
+  await page.locator("ring-view .preview").click();
+  // The demo manager retains its original fixture; supply the updated registry
+  // as Home Assistant's application manager would in a real installation.
+  await expect(page.locator("ring-view-dialog[open]")).toBeAttached();
+  await page.locator("ring-view-dialog[open]").evaluate((element) => {
+    (element as HTMLElement & { hass: HomeAssistant }).hass =
+      (document.querySelector("ring-view") as HTMLElement & { hass: HomeAssistant }).hass;
+  });
+  await expect(page.locator("ring-view-dialog ring-view-activity-time span")).toContainText("Recorded 8 min ago");
 });

@@ -53,7 +53,7 @@ import type {
   HomeAssistant,
   NormalizedConfig,
 } from "./types";
-import { resolveActivityTimestamp } from "./utilities/activity-time";
+import { activityEntityId, resolveActivityTimestamp } from "./utilities/activity-time";
 import { isDoorbellRingTransition } from "./utilities/doorbell";
 import {
   aspectRatioFromMedia,
@@ -125,12 +125,6 @@ const SNAPSHOT_REFRESH_TIMEOUT_MS = 15_000;
 // newly selected/transcoding event one complete refresh cycle before failing.
 const RECORDING_REFRESH_TIMEOUT_MS = 70_000;
 const RECORDING_UNCHANGED_SETTLE_MS = 1_250;
-
-function isAppleMobileBrowser(): boolean {
-  if (typeof navigator === "undefined") return false;
-  if (/iPad|iPhone|iPod/i.test(navigator.userAgent)) return true;
-  return navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
-}
 
 type SnapshotUpdateResult = "updated" | "timeout" | "cancelled";
 type RecordingUpdateResult =
@@ -400,8 +394,9 @@ export class RingViewDialog extends LitElement {
     if (!this.open || !this.hass || !this.config) return nothing;
     const title = this.dialogTitle();
     const showTitle = this.config.show_name;
-    const showActivity = this.config.last_activity_entity
-      ? resolveActivityTimestamp(this.hass, this.config.last_activity_entity)
+    const activityId = activityEntityId(this.hass, this.config);
+    const showActivity = activityId
+      ? resolveActivityTimestamp(this.hass, activityId)
         !== undefined
       : false;
     const resolvedAspectRatio = aspectRatioNumber(this.config.aspect_ratio)
@@ -453,7 +448,7 @@ export class RingViewDialog extends LitElement {
                       ? html`
                           <ring-view-activity-time
                             .hass=${this.hass}
-                            .entityId=${this.config.last_activity_entity}
+                            .entityId=${activityId}
                           ></ring-view-activity-time>
                         `
                       : nothing}
@@ -1403,6 +1398,8 @@ export class RingViewDialog extends LitElement {
               <video
                 .defaultMuted=${this.recordingMuted}
                 .muted=${this.recordingMuted}
+                .defaultPlaybackRate=${1}
+                .playbackRate=${1}
                 .src=${fallbackUrl}
                 class=${classMap({
                   "video-fallback": true,
@@ -1419,6 +1416,7 @@ export class RingViewDialog extends LitElement {
                 @resize=${this.handleRecordingDimensions}
                 @error=${this.handleRecordingVideoError}
                 @play=${this.handleRecordingPlay}
+                @ratechange=${this.handleRecordingRateChange}
                 @volumechange=${this.handleRecordingVolumeChange}
                 @pause=${this.handleRecordingPause}
                 @ended=${this.handleRecordingEnded}
@@ -1694,23 +1692,6 @@ export class RingViewDialog extends LitElement {
       && this.hass
       && isRingMqttEventSelect(this.hass, this.activeEntityId());
     if (ringMqttRecording && this.prepareNewestRingMqttRecording()) return;
-    const mobileCompatibleOption = ringMqttRecording
-      && isAppleMobileBrowser()
-      ? transcodedRecordingOption(this.activeEntity())
-      : undefined;
-    if (
-      mobileCompatibleOption !== undefined
-      && !this.recordingTranscodeFallbackAttempted
-    ) {
-      // Ring's direct download URL can fail in iPhone/iPad WebKit even when
-      // the media itself is compatible. Ring-MQTT's matching transcoded option
-      // serves the same event through its more broadly compatible delivery
-      // path, so select it before mounting the direct URL on Apple mobile.
-      this.recordingTranscodeFallbackAttempted = true;
-      this.recordingRefreshAttempted = true;
-      void this.refreshRingMqttRecording(mobileCompatibleOption);
-      return;
-    }
     if (
       this.mode === "last_recording"
       && ringMqttRecording
@@ -1787,13 +1768,10 @@ export class RingViewDialog extends LitElement {
     }
 
     const entity = this.activeEntity();
-    const preferTranscoded = isAppleMobileBrowser()
-      || /\s\(transcoded\)$/i.test(entity?.state.trim() ?? "");
     const selection = newestRingMqttRecordingSelection(
       this.hass,
       this.config.last_activity_entity,
       entity,
-      preferTranscoded,
     );
     if (
       !selection
@@ -2158,6 +2136,7 @@ export class RingViewDialog extends LitElement {
       return;
     }
 
+    this.enforceNormalRecordingRate(video);
     this.recordingPlayback.add(video);
     void this.playRecording(video, session);
   };
@@ -2167,6 +2146,7 @@ export class RingViewDialog extends LitElement {
     if (!(video instanceof HTMLVideoElement) || !this.isCurrentRecording(video, this.session)) {
       return;
     }
+    this.enforceNormalRecordingRate(video);
     video.controls = true;
     this.statusAnnouncement = localize(
       this.hass,
@@ -2175,6 +2155,19 @@ export class RingViewDialog extends LitElement {
         : "viewer.recording_loaded_audio",
     );
   };
+
+  private handleRecordingRateChange = (event: Event): void => {
+    const video = event.currentTarget;
+    if (!(video instanceof HTMLVideoElement) || !this.isCurrentRecording(video, this.session)) {
+      return;
+    }
+    this.enforceNormalRecordingRate(video);
+  };
+
+  private enforceNormalRecordingRate(video: HTMLVideoElement): void {
+    if (video.defaultPlaybackRate !== 1) video.defaultPlaybackRate = 1;
+    if (video.playbackRate !== 1) video.playbackRate = 1;
+  }
 
   private handleRecordingVolumeChange = (event: Event): void => {
     const video = event.currentTarget;

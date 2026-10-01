@@ -35,10 +35,10 @@ Event Select is a persistent Home Assistant menu whose slot numbers are scoped
 to a category. In automatic mode, Ring View uses the configured Last activity
 source to select slot 1 from the newest Ding, Motion, Person, or on-demand
 category before playback. In manual mode, Ring View preserves the selected
-historical slot. On iPhone/iPad it requests the matching **(Transcoded)** option
-before playback; elsewhere it does so only after the direct Ring URL fails.
-This transport change still represents the same event and does not change the
-viewer design.
+historical slot. Ring View tries the direct recording first on every browser,
+including iPhone and iPad. If playback fails, it requests the matching
+**(Transcoded)** option. This transport change still represents the same event
+and does not change the viewer design.
 
 The visual editor keeps provider-independent design settings unchanged and adds
 the recording-selection choice only for a recognized Ring-MQTT Event Select.

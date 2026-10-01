@@ -154,6 +154,7 @@ export function formatActivityTime(
   hass: HomeAssistant | undefined,
   timestamp: number,
   now = Date.now(),
+  recording = false,
 ): ActivityTimeDisplay {
   const locale = languageCode(hass);
   const deltaSeconds = (timestamp - now) / 1_000;
@@ -175,10 +176,36 @@ export function formatActivityTime(
     timeStyle: "short",
   }).format(timestamp);
   return {
-    relative: localize(hass, "activity.relative", { time: relative }),
-    accessible: localize(hass, "activity.accessible", {
+    relative: localize(hass, recording ? "recording_time.relative" : "activity.relative", { time: relative }),
+    accessible: localize(hass, recording ? "recording_time.accessible" : "activity.accessible", {
       time: spokenRelative,
     }),
-    title: localize(hass, "activity.title", { time: absolute }),
+    title: localize(hass, recording ? "recording_time.title" : "activity.title", { time: absolute }),
   };
+}
+
+/** Identify the upstream sensor by registry metadata, never its editable name. */
+export function isRecordingTimestamp(hass: HomeAssistant, entityId: string): boolean {
+  const entry = hass.entities?.[entityId];
+  return entityId.startsWith("sensor.") && entry?.platform === "ring"
+    && (entry.translation_key === "last_recording"
+      || Boolean(entry.unique_id?.endsWith("-last_recording")));
+}
+
+export function recordingTimestampSensor(
+  hass: HomeAssistant, recordingEntityId: string, includeDisabled = false,
+): string | undefined {
+  const anchor = hass.entities?.[recordingEntityId];
+  if (anchor?.platform !== "ring" || !anchor.device_id) return undefined;
+  const matches = Object.values(hass.entities ?? {}).filter((entry) =>
+    entry.device_id === anchor?.device_id
+    && isRecordingTimestamp(hass, entry.entity_id)
+    && (includeDisabled || (entry.disabled_by == null && Boolean(hass.states[entry.entity_id]))));
+  return matches.length === 1 ? matches[0]?.entity_id : undefined;
+}
+
+export function activityEntityId(
+  hass: HomeAssistant, config: { last_activity_entity?: string; recording_entity: string },
+): string | undefined {
+  return config.last_activity_entity || recordingTimestampSensor(hass, config.recording_entity);
 }

@@ -4,6 +4,37 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.5] - 2026-10-01
+
+### Added
+
+- Automatically use an enabled Home Assistant 2026.10 Ring recording timestamp
+  sensor from the same camera device, with “Recorded … ago” in the card and
+  viewer. Explicit activity entities continue to take priority.
+- Show an editor hint when the matching recording timestamp sensor needs enabling.
+- Add an optional recording timestamp input to the notification blueprint to
+  reject stale recordings during the existing wait, without delaying the first
+  doorbell notification or Live action.
+
+### Changed
+
+- Try direct Ring-MQTT recordings first on all browsers, including iPhone and
+  iPad; use the matching transcoded recording if direct playback fails.
+- Update the README and configuration, notification, compatibility, playback,
+  and testing documentation for these behaviors and Home Assistant 2026.10.
+
+### Fixed
+
+- Keep direct recordings playing at normal speed.
+
+### Tests
+
+- Cover recording timestamp discovery, overrides, unavailable values, age labels,
+  card updates, and the editor hint.
+- Validate the blueprint's actual timestamp template and immediate notification
+  order automatically, and add that check to CI.
+- Extend browser and unit coverage for recording ages and playback behavior.
+
 ## [0.12.4] - 2026-09-25
 
 ### Fixed

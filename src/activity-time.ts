@@ -3,6 +3,7 @@ import { customElement, property } from "lit/decorators.js";
 import type { HomeAssistant } from "./types";
 import {
   formatActivityTime,
+  isRecordingTimestamp,
   resolveActivityTimestamp,
 } from "./utilities/activity-time";
 
@@ -47,7 +48,7 @@ export class RingViewActivityTime extends LitElement {
       ? resolveActivityTimestamp(this.hass, this.entityId)
       : undefined;
     if (timestamp === undefined) return nothing;
-    const display = formatActivityTime(this.hass, timestamp);
+    const display = formatActivityTime(this.hass, timestamp, Date.now(), Boolean(this.hass && this.entityId && isRecordingTimestamp(this.hass, this.entityId)));
     return html`
       <span aria-label=${display.accessible} title=${display.title}>
         ${display.relative}

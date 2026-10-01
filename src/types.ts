@@ -36,6 +36,7 @@ export interface HassEntityRegistryEntry {
   device_id?: string | null;
   disabled_by?: string | null;
   original_name?: string | null;
+  translation_key?: string;
   unique_id?: string;
 }
 

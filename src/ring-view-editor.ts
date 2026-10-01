@@ -1,3 +1,4 @@
+import { recordingTimestampSensor } from "./utilities/activity-time";
 import {
   mdiCameraControl,
   mdiCameraOutline,
@@ -519,7 +520,11 @@ export class RingViewEditor extends LitElement {
         (this.nativeChecked && !this.nativeAvailable),
     );
 
+    const recordingSensor = !this.config.last_activity_entity
+      ? recordingTimestampSensor(this.hass, this.config.recording_entity, true) : undefined;
+    const disabledRecordingSensor = recordingSensor && this.hass.entities?.[recordingSensor]?.disabled_by != null;
     return html`
+      ${disabledRecordingSensor ? html`<ha-alert alert-type="info">${localize(this.hass, "editor.enable_recording_timestamp")}</ha-alert>` : nothing}
       ${warnings.length
         ? html`
             <div

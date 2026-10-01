@@ -31,6 +31,8 @@ import { loadMode } from "./utilities/mode-storage";
 import "./ring-view-dialog";
 import type { RingViewDialog } from "./ring-view-dialog";
 import {
+  activityEntityId,
+  isRecordingTimestamp,
   formatActivityTime,
   resolveActivityTimestamp,
 } from "./utilities/activity-time";
@@ -242,9 +244,9 @@ export class RingView extends LitElement {
       (this.config.snapshot_entity !== undefined &&
         previous.states[this.config.snapshot_entity] !==
           this.hass.states[this.config.snapshot_entity]) ||
-      (this.config.last_activity_entity !== undefined &&
-        resolveActivityTimestamp(previous, this.config.last_activity_entity) !==
-          resolveActivityTimestamp(this.hass, this.config.last_activity_entity)) ||
+      (previous.entities !== this.hass.entities ||
+        resolveActivityTimestamp(previous, activityEntityId(previous, this.config) ?? "") !==
+          resolveActivityTimestamp(this.hass, activityEntityId(this.hass, this.config) ?? "")) ||
       (this.config.doorbell_entity !== undefined &&
         previous.states[this.config.doorbell_entity] !==
           this.hass.states[this.config.doorbell_entity]) ||
@@ -348,12 +350,13 @@ export class RingView extends LitElement {
     }
 
     const previewInteractive = !safePreview;
-    const activityAt = this.config.last_activity_entity
-      ? resolveActivityTimestamp(this.hass, this.config.last_activity_entity)
+    const activityId = activityEntityId(this.hass, this.config);
+    const activityAt = activityId
+      ? resolveActivityTimestamp(this.hass, activityId)
       : undefined;
     const activity = activityAt === undefined
       ? undefined
-      : formatActivityTime(this.hass, activityAt);
+      : formatActivityTime(this.hass, activityAt, Date.now(), Boolean(activityId && isRecordingTimestamp(this.hass, activityId)));
     const previewLabel = previewInteractive
       ? localize(this.hass, "card.open_viewer", {
           name,
@@ -404,7 +407,7 @@ export class RingView extends LitElement {
                         <ring-view-activity-time
                           aria-hidden="true"
                           .hass=${this.hass}
-                          .entityId=${this.config.last_activity_entity}
+                          .entityId=${activityId}
                           @ring-view-activity-tick=${this.refreshActivityLabel}
                         ></ring-view-activity-time>
                       `

@@ -39,6 +39,20 @@ blueprint:
             entity:
               filter:
                 - domain: camera
+        recording_timestamp:
+          name: Last recording timestamp (optional)
+          description: >-
+            For an official Ring preview camera, select its enabled Last
+            recording sensor (Home Assistant 2026.10+). This checks recording
+            age during the existing preview wait and adds no fixed delay.
+            Leave empty for Ring-MQTT or older Home Assistant versions.
+          default: ""
+          selector:
+            entity:
+              filter:
+                - domain: sensor
+                  integration: ring
+                  device_class: timestamp
     delivery:
       name: Notification delivery
       icon: mdi:cellphone-message
@@ -184,6 +198,8 @@ conditions:
       {% endif %}
 
 variables:
+  recording_timestamp_id: !input recording_timestamp
+  doorbell_pressed_at: "{{ as_timestamp(trigger.to_state.state, none) if trigger.to_state.entity_id.startswith('event.') else as_timestamp(trigger.to_state.last_updated) }}"
   preview_camera_id: !input recording_camera
   dashboard_path_value: !input dashboard_path
   viewer_live_camera_id: !input viewer_live_camera
@@ -251,7 +267,11 @@ actions:
       {% if preview_kind == 'recording' %}
         {% set current = preview.attributes.last_video_id | default(none) %}
         {{ current is not none
-          and (current ~ '') != (preview_marker_before ~ '') }}
+          and (current ~ '') != (preview_marker_before ~ '')
+          and (recording_timestamp_id == ''
+            or (as_timestamp(states(recording_timestamp_id), none) is not none
+              and as_timestamp(states(recording_timestamp_id)) >= (doorbell_pressed_at | float) - 5
+              and as_timestamp(states(recording_timestamp_id)) <= now().timestamp() + 5)) }}
       {% elif preview_kind == 'snapshot' %}
         {% set raw = preview.attributes.timestamp | default(none) %}
         {% set numeric = raw | float(none) %}

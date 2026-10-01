@@ -21,6 +21,11 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm test
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -r tests/requirements-blueprint.txt
+      - run: python tests/notification_timestamp_test.py
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser -- --project=desktop
       - run: npm run build

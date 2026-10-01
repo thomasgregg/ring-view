@@ -31,7 +31,7 @@ Every Ring View setting is available through Home Assistant's visual card config
 | `live_entity` | Yes — Config tab | Required | `camera.*` entity ID | Camera entity that starts the Ring live view. |
 | `snapshot_entity` | Yes — Snapshots | Not set | `camera.*` entity ID | Device snapshot camera, such as the snapshot entity created by Ring-MQTT. Used by snapshot previews, as the Event Select recording poster, and preferred for manual snapshots when configured and available. |
 | `name` | Yes — Card appearance, when **Show camera name** is enabled | Entity name | Text | Optional label used instead of the recording entity's friendly name. The editor preserves it while name display is disabled. |
-| `last_activity_entity` | Yes — Card appearance | Not set | `sensor.*`, `event.*`, `input_datetime.*`, or `binary_sensor.*` entity ID | Shows a localized relative activity timestamp at the top left. Ring-MQTT Ding and motion sensors are supported directly. |
+| `last_activity_entity` | Yes — Card appearance | Auto-discover enabled official Ring recording timestamp | `sensor.*`, `event.*`, `input_datetime.*`, or `binary_sensor.*` entity ID | Shows recording age for official Ring Last recording sensors, otherwise relative activity time. An explicit source overrides automatic discovery. Ring-MQTT Ding and motion sensors are supported directly. |
 | `default_mode` | Yes — Fullscreen viewer | `last_recording` | `last_recording`, `live` | View selected when the viewer opens. |
 | `remember_last_mode` | Yes — Fullscreen viewer | `false` | `true`, `false` | Remembers the most recent view in the current browser and uses it instead of `default_mode`. |
 | `autoplay_recording` | Yes — Fullscreen viewer | `true` | `true`, `false` | Starts the latest recording immediately; when disabled, the viewer waits for Play. |
@@ -147,6 +147,16 @@ updates, and the later `on` to `off` reset do not create duplicate alerts.
 Ring View 0.2 and newer use this flat configuration only. Earlier nested `preview`, `appearance`, `viewer`, and `performance` structures are not supported.
 
 ### Last activity timestamp
+
+With Home Assistant 2026.10+, Ring View automatically uses the enabled official
+Ring **Last recording** timestamp sensor on the selected recording camera's
+device when `last_activity_entity` is unset. Enable that sensor in Home
+Assistant's entity settings; it is disabled by default. Discovery uses registry
+metadata and requires a single matching sensor, so renamed entities work.
+An explicit source always takes precedence. Recording sensors show **Recorded …
+ago**; activity sources retain their activity wording. Older versions and
+Ring-MQTT continue to work without this sensor.
+
 
 Open **Card appearance** and choose **Last activity timestamp** to show compact
 relative text such as **2 min. ago**. When the camera name is visible, the time
@@ -435,14 +445,13 @@ Automatic mode reads the latest activity category, selects Ding 1, Motion 1,
 Person 1, or On-demand 1, and waits for the Event Select `eventId` and
 `recordingUrl` to update. A newer event in the same category also causes slot 1
 to be reselected. Manual mode leaves the current Event Select option unchanged.
-On iPhone/iPad Ring View requests the matching **(Transcoded)** option before
-playback while preserving the event slot. Other browsers keep the faster direct
-URL and fall back to the compatible option only if playback fails. If a signed
-URL is missing or within 30 seconds of expiry, Ring View refreshes it and waits
-up to 70 seconds for Ring-MQTT to publish a playable URL. The wait is driven by
-Home Assistant state updates; it does not poll. Closing the viewer, changing
-modes, hiding the page, or suspending an inline card cancels the wait and cannot
-start a late recording.
+Ring View tries the direct recording first on every browser, including iPhone
+and iPad, while preserving the event slot. If direct playback fails, it requests
+the matching **(Transcoded)** option. If a signed URL is missing or within 30
+seconds of expiry, Ring View refreshes it and waits up to 70 seconds for
+Ring-MQTT to publish a playable URL. The wait is driven by Home Assistant state
+updates; it does not poll. Closing the viewer, changing modes, hiding the page,
+or suspending an inline card cancels the wait and cannot start a late recording.
 
 Ring-MQTT can report **Recording Not Found** or **Transcoding in Progress**
 instead of a URL. Ring View treats both as unavailable media and shows Retry

@@ -132,3 +132,17 @@ automations. Neither the blueprint nor a notification grants microphone
 permission or starts transmitting audio.
 
 [Card configuration](configuration.md) · [Talkback help](playback-and-troubleshooting.md)
+
+### Optional recording-age check (Home Assistant 2026.10+)
+
+For an official Ring recording preview, enable and select the same device's
+**Last recording** timestamp sensor in the blueprint's optional timestamp field.
+A changed recording ID must then also have a valid recording timestamp no
+more than five seconds before the doorbell press or ahead of the current time.
+The five seconds are a comparison tolerance, not a delay. The immediate alert
+and Live action are sent first; the check runs within the existing preview
+wait. If the selected sensor is unavailable, no recording preview is attached
+until it becomes valid within that wait. Leave the field empty to retain the
+recording-ID check alone; Ring-MQTT snapshot previews retain their existing
+checks. The timestamp does not prove that the camera serves the corresponding
+clip, so the recording-ID check remains in place.

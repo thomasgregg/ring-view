@@ -38,7 +38,7 @@ See what happened, check what is happening, save the moment, and answer the door
 - **Choose a calm or hands-on dashboard.** Keep the lightweight still-image card, or opt into direct Recording, Live, Talk, and door controls for a wall tablet.
 - **Show the freshest view.** Optionally combine the latest recording with a Ring-MQTT snapshot camera for the dashboard preview.
 - **Save a moment from Live.** Optionally show one snapshot button that saves a timestamped image through Home Assistant, with no custom automation.
-- **See when something last happened.** Optionally show a localized relative time from a timestamp sensor, event entity, or date-and-time helper.
+- **See how old the recording is.** Automatically show recording age with the enabled official Ring Last recording sensor on Home Assistant 2026.10+. You can instead select an activity timestamp, event, date-and-time helper, or Ring-MQTT Ding/motion source.
 - **Know when someone rings.** A temporary doorbell alert works with official Ring event entities and Ring-MQTT Ding binary sensors. Tap it to open Live.
 - **Take the doorbell beyond the dashboard.** The included notification blueprint works with official Ring and Ring-MQTT, sends a phone alert, then adds a fresh camera preview when it is ready.
 - **Make it yours without YAML.** Choose cameras, opening behavior, layout, and doorbell features in the visual editor.
@@ -62,6 +62,36 @@ remain the same whichever entities you select.
 | **Dashboard image and saved snapshots** | ⚠️ A Ring camera may provide a still image, but the official Live camera does not always expose the current Live frame for saving. | ✅ The snapshot camera provides the dashboard image. For a manual save, Ring View asks **Take Snapshot** for a new image first. | Use the Ring-MQTT snapshot camera for the freshest and most dependable image. |
 | **Phone-notification blueprint** | ✅ Select the Ding event, Last recording camera for both the preview and recording action, and Live view camera. The alert opens Live immediately; a fresh recording preview and playback action follow. | ✅ Select the Ding binary sensor, Snapshot camera for the preview, Event Select for the recording action, and the Live camera used by Ring View. Repeated presses are detected while Ding remains on. | Prefer Ring-MQTT Ding and Snapshot for reliable detection and previews, with the card's normal recording and Live sources for the viewer actions. Set Snapshot Mode to an option that includes **Ding**. |
 | **Door access** | ✅ Any Home Assistant lock and optional contact sensor. | ✅ The same—door access is independent of the camera provider. | Use whichever lock is already connected to Home Assistant. |
+
+### Home Assistant 2026.10: recording age and Ring authentication
+
+With the official Ring integration, enable the **Last recording** timestamp
+sensor under **Settings → Devices & services → Entities**. It is disabled by
+default and is available for supported cameras with a Ring subscription.
+Ring View automatically finds the enabled sensor on the recording camera's
+Home Assistant device and shows **Recorded … ago** in the card and viewer.
+An explicitly selected **Last activity timestamp** source takes precedence;
+Ding and motion sources keep their activity label. Ring-MQTT setups continue
+to use their existing sources.
+
+The new sensor reports the creation time of the newest ready recording, not
+when processing finished. It does not make recordings arrive sooner or fix
+cameras serving an older clip. If discovery is ambiguous, select the sensor
+explicitly under **Card appearance → Last activity timestamp**.
+
+The notification blueprint also offers an optional **Last recording timestamp**
+source for official Ring. Select the sensor belonging to the preview camera.
+It checks the timestamp alongside a changed recording ID during the existing
+preview wait. The phone alert and **View Live** action remain immediate, with
+no added fixed delay. Leave the field empty for the previous behaviour or a
+Ring-MQTT snapshot preview. Reimport the blueprint with **Overwrite** to get
+this option.
+
+Home Assistant 2026.10 also preserves Ring push-listener credentials during
+reauthentication and reconfiguration. This prevents those actions from
+unnecessarily replacing the push identity; Ring View benefits automatically.
+It does not resolve all listener failures or the separate Live-session cleanup
+problem, so the mixed setup and optional backend-patch guidance still apply.
 
 ### Recommended mixed setup
 
@@ -131,10 +161,11 @@ Motion, Person, and on-demand categories. Ring View offers two behaviors:
 
 Automatic mode also reselects slot 1 when a second event arrives in the same
 category, even though the menu text did not change. While Ring is processing a
-new event, the previous URL is not reused. On iPhone/iPad Ring View requests the
-matching **(Transcoded)** delivery path before playback; on other browsers it
-does so only if the direct Ring URL fails. Ring-MQTT can take several seconds to
-prepare that URL, during which Ring View shows its normal loading message.
+new event, the previous URL is not reused. Ring View tries the direct recording
+first on every browser, including iPhone and iPad. If the browser rejects that
+recording, Ring View requests the matching **(Transcoded)** delivery path.
+Ring-MQTT can take several seconds to prepare that URL, during which Ring View
+shows its normal loading message.
 
 <p align="center">
   <a href="https://github.com/thomasgregg/ring-view/blob/main/docs/images/configuration-editor.png">

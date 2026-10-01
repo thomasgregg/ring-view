@@ -453,7 +453,7 @@ describe("recording player lifecycle", () => {
     );
   });
 
-  it("selects the matching compatible recording on iPhone without overriding fullscreen audio", async () => {
+  it("starts the direct recording on iPhone without overriding fullscreen audio", async () => {
     vi.spyOn(window.navigator, "userAgent", "get").mockReturnValue(
       "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)",
     );
@@ -475,35 +475,9 @@ describe("recording player lifecycle", () => {
     });
     await flush();
 
-    expect(mqttHass.callService).toHaveBeenCalledWith(
-      "select",
-      "select_option",
-      { option: "Ding 1 (Transcoded)" },
-      { entity_id: "select.front_door_events" },
-    );
-    expect(dialog.shadowRoot?.querySelector(".video-fallback")).toBeNull();
-    expect(dialog.shadowRoot?.textContent).toContain(
-      "Preparing a compatible Ring-MQTT recording",
-    );
-
-    dialog.hass = {
-      ...mqttHass,
-      states: {
-        ...mqttHass.states,
-        "select.front_door_events": {
-          ...mqttHass.states["select.front_door_events"]!,
-          state: "Ding 1 (Transcoded)",
-          attributes: {
-            ...mqttHass.states["select.front_door_events"]!.attributes,
-            recordingUrl: "https://example.test/compatible-recording.mp4",
-          },
-        },
-      },
-    };
-    await flush();
-
+    expect(mqttHass.callService).not.toHaveBeenCalled();
     const video = dialog.shadowRoot?.querySelector<HTMLVideoElement>(".video-fallback");
-    expect(video?.src).toBe("https://example.test/compatible-recording.mp4");
+    expect(video?.src).toBe("https://example.test/direct-recording.mp4");
     expect(video?.muted).toBe(false);
     video!.dispatchEvent(new Event("canplay"));
     await flush();
@@ -592,6 +566,19 @@ describe("recording player lifecycle", () => {
     await flush();
     expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1);
     expect(video?.muted).toBe(false);
+  });
+
+  it("locks direct recording playback to normal speed", async () => {
+    const { video } = await mount();
+    const recording = video();
+
+    recording.defaultPlaybackRate = 2;
+    recording.playbackRate = 2;
+    recording.dispatchEvent(new Event("ratechange"));
+    await flush();
+
+    expect(recording.defaultPlaybackRate).toBe(1);
+    expect(recording.playbackRate).toBe(1);
   });
 
   it("falls back from a rejected direct Ring URL to the matching transcoded event", async () => {

@@ -76,7 +76,7 @@
   "editor.helper_door_hold_to_activate": "Release before the 1.6-second hold completes to cancel. Turning this off makes a single tap operate the door.",
   "editor.helper_door_control_location": "Choose where the door action appears. Fullscreen only is safer for shared dashboards.",
   "editor.helper_show_name": "Shown at the top left of both the card and viewer.",
-  "editor.helper_last_activity_entity": "Shows relative time at the top left, below the camera name when it is visible. Choose a timestamp sensor, event entity, Date and/or time helper, or a Ring-MQTT Ding or motion sensor.",
+  "editor.helper_last_activity_entity": "Leave empty to automatically use the enabled official Ring Last recording sensor on the recording camera’s device (Home Assistant 2026.10+). Select a source to override this. Recording sensors show recording age; timestamp, event, helper and Ring-MQTT Ding/motion sources show activity time. Shows time at the top left, below the camera name when visible.",
   "editor.helper_show_action_button_labels": "Turn off to show icon-only Talk and door buttons in both the dashboard card and fullscreen viewer. Accessible names and status remain available.",
   "editor.helper_preview_source": "Always uses a still image and never mounts a live stream on the dashboard.",
   "editor.helper_snapshot_entity": "Choose the snapshot camera provided by Ring-MQTT or another integration.",
@@ -223,5 +223,9 @@
   "door.open_when_ready_aria": "Open door available after live video connects",
   "door.unlock_when_ready_aria": "Unlock available after live video connects",
   "door.unlock_failed": "Couldn’t unlock the door.",
-  "door.open_failed": "Couldn’t open the door."
+  "door.open_failed": "Couldn’t open the door.",
+  "recording_time.relative": "Recorded {time}",
+  "recording_time.accessible": "Recorded {time}",
+  "recording_time.title": "Recorded: {time}",
+  "editor.enable_recording_timestamp": "Enable the Ring Last recording sensor in Settings → Devices & services → Entities to show recording age automatically. Available in Home Assistant 2026.10 and newer."
 }

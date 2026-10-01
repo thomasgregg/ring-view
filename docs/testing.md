@@ -136,16 +136,16 @@ Verify each item on current stable Home Assistant and, where practical, the prev
     remain clear of the bottom visitor actions, and disappear without leaving a
     second pill or toast behind.
 26. Set `recording_entity` to a renamed Ring-MQTT Event Select and choose a
-    playable event. Confirm desktop Last recording uses the direct MP4 while
-    iPhone/iPad requests the same event's matching **(Transcoded)** option before
-    mounting playback. Both must use the configured snapshot camera as poster
-    without mounting Home Assistant's camera renderer. Test a missing and an
-    expired `recordingUrl`: Ring View must call `select.select_option`, wait for
-    a playable URL, and cancel cleanly when switching to Live, closing, hiding
-    the page, or suspending the card. Also test Recording Not Found, Transcoding
-    in Progress, a service failure, a 70-second timeout, and a desktop browser
-    playback error that falls back once to the matching compatible option. No
-    signed URL may appear in logs.
+    playable event. Confirm desktop and iPhone/iPad Last recording both try the
+    direct MP4 before requesting the same event's matching **(Transcoded)**
+    option after a playback failure. Both must use the configured snapshot
+    camera as poster without mounting Home Assistant's camera renderer. Test a
+    missing and an expired `recordingUrl`: Ring View must call
+    `select.select_option`, wait for a playable URL, and cancel cleanly when
+    switching to Live, closing, hiding the page, or suspending the card. Also
+    test Recording Not Found, Transcoding in Progress, a service failure, a
+    70-second timeout, and a browser playback error that falls back once to the
+    matching compatible option. No signed URL may appear in logs.
 27. Leave **Image shape** on **Automatic**, **Image fit** on **Fit entire image**,
     and Sections height on automatic. Confirm portrait, square, and widescreen
     posters and video update the card shape without stretching. Switch between
@@ -176,3 +176,20 @@ Check light and dark themes at:
 - 200% browser zoom
 
 There must be no horizontal page scroll, clipped safe-area controls, double dialog scrollbar, media layout jump, touch target under 44px, or persistent black/empty region after resize.
+
+### Recording timestamps and notification freshness
+
+`npm test` covers same-device recording timestamp discovery, renamed sensors,
+explicit overrides, disabled and ambiguous sensors, older setups, recording
+labels and the editor enablement hint. The notification template tests execute
+the actual blueprint Jinja template for fresh, stale, future, unavailable and
+unchanged recordings, its optional-source fallback, and immediate-alert ordering.
+Run them in a Python environment with the dependencies in
+`tests/requirements-blueprint.txt` installed:
+
+```sh
+python tests/notification_timestamp_test.py
+```
+
+Both suites run in the Validate workflow. Template tests do not replace checking
+notifications against an actual Home Assistant installation.
