@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import "../../src/activity-time";
 import "../../src/ring-view-editor";
 import "../../src/ring-view";
+import "../../src/ring-view-dialog";
+import { normalizeConfig } from "../../src/config";
 import { activityEntityId, recordingTimestampSensor, formatActivityTime } from "../../src/utilities/activity-time";
 import type { HomeAssistant } from "../../src/types";
 
@@ -80,5 +82,23 @@ describe("official Ring recording age", () => {
     document.body.append(editor); await editor.updateComplete;
     expect(editor.shadowRoot?.textContent).toContain("Enable the Ring Last recording sensor");
     editor.remove();
+  });
+
+  it("keeps recording age in Recording mode and hides it in idle Live mode", async () => {
+    const dialog = document.createElement("ring-view-dialog");
+    dialog.hass = fixture();
+    document.body.append(dialog);
+    const config = normalizeConfig({ recording_entity: "camera.clip", live_entity: "camera.clip" });
+    dialog.showInline({ config, mode: "last_recording", start: "on_demand" });
+    await dialog.updateComplete;
+    expect(dialog.shadowRoot?.querySelector("ring-view-activity-time")?.entityId).toBe("sensor.renamed");
+    expect(dialog.shadowRoot?.querySelector(".live-subtitle")).toBeNull();
+    dialog.stopInline();
+    dialog.showInline({ config, mode: "live", start: "on_demand" });
+    await dialog.updateComplete;
+    expect(dialog.shadowRoot?.querySelector("ring-view-activity-time")).toBeNull();
+    expect(dialog.shadowRoot?.querySelector(".live-subtitle")).toBeNull();
+    dialog.stopInline();
+    dialog.remove();
   });
 });

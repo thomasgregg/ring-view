@@ -248,7 +248,24 @@ export const dialogStyles = css`
     --ring-view-activity-line-height: 18px;
   }
 
+  .subtitle-slot {
+    display: grid;
+    height: var(--ring-view-activity-line-height, 18px);
+    line-height: var(--ring-view-activity-line-height, 18px);
+  }
+
+  .live-subtitle {
+    display: block;
+    color: var(--ring-view-activity-color, rgba(255, 255, 255, 0.84));
+    font-size: var(--ring-view-activity-font-size, 13px);
+    font-weight: 500;
+    line-height: var(--ring-view-activity-line-height, 18px);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.82);
+  }
+
   h2 {
+    /* Keep glyph rasterization stable when live media changes compositing. */
+    transform: translateZ(0);
     min-width: 0;
     margin: 0;
     max-width: 100%;

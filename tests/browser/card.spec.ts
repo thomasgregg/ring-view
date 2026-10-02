@@ -1735,7 +1735,7 @@ test("uses the top-left activity position when the camera name is hidden", async
   );
 });
 
-test("keeps name, activity, modes, and fullscreen action separate at responsive widths", async ({
+test("keeps name, Live subtitle, modes, and fullscreen action separate at responsive widths", async ({
   page,
 }) => {
   const cameraName = "Thomas Gregg Front Door Camera With A Long Name";
@@ -1745,13 +1745,13 @@ test("keeps name, activity, modes, and fullscreen action separate at responsive 
   const root = page.locator("#card-root");
   const card = page.locator("ring-view");
   const heading = card.getByRole("heading", { name: cameraName });
-  const activity = card.locator("ring-view-activity-time span");
+  const activity = card.locator(".live-subtitle");
   const modeSwitch = card.getByRole("tablist", { name: "Camera view" });
   const expand = card.getByRole("button", {
     name: "Open fullscreen camera viewer",
   });
   const snapshot = card.getByRole("button", { name: "Take snapshot" });
-  await expect(activity).toHaveText(/2 hr.*ago/i);
+  await expect(activity).toHaveText("Live");
   await expect(activity).toHaveCSS("font-size", "12px");
 
   for (const width of [320, 340, 360, 480, 720]) {

@@ -396,7 +396,8 @@ export class RingViewDialog extends LitElement {
     const title = this.dialogTitle();
     const showTitle = this.config.show_name;
     const activityId = activityEntityId(this.hass, this.config);
-    const showActivity = activityId
+    const showLive = this.mode === "live" && this.mediaStatus === "ready";
+    const showActivity = this.mode === "last_recording" && activityId
       ? resolveActivityTimestamp(this.hass, activityId)
         !== undefined
       : false;
@@ -439,12 +440,13 @@ export class RingViewDialog extends LitElement {
               "camera-actions-two": cameraActionCount === 2,
             })}
           >
-            ${showTitle || showActivity
+            ${showTitle || showActivity || showLive
               ? html`
                   <div class="header-copy">
                     ${showTitle
                       ? html`<h2 id="ring-view-dialog-title">${title}</h2>`
                       : nothing}
+                    <div class="subtitle-slot">
                     ${showActivity
                       ? html`
                           <ring-view-activity-time
@@ -453,6 +455,10 @@ export class RingViewDialog extends LitElement {
                           ></ring-view-activity-time>
                         `
                       : nothing}
+                    ${showLive
+                      ? html`<span class="live-subtitle">${localize(this.hass, "common.live")}</span>`
+                      : nothing}
+                    </div>
                   </div>
                 `
               : nothing}

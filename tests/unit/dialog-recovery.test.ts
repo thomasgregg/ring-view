@@ -26,7 +26,7 @@ async function restore({ hidden = false, connected = true } = {}) {
   dialog.hass = hass;
   document.body.append(dialog);
   dialog.showDialog({
-    config: normalizeConfig({ live_entity: "camera.live", recording_entity: "camera.recording", live_muted: false }),
+    config: normalizeConfig({ live_entity: "camera.live", recording_entity: "camera.recording", live_muted: false, show_name: true }),
     mode: "live", restored: true,
   });
   await vi.advanceTimersByTimeAsync(0);
@@ -53,6 +53,22 @@ describe("automatic restored live recovery", () => {
     expect(TestCameraStream.active).toBe(1);
     expect(resume()).toBeNull();
     expect(dialog.shadowRoot?.querySelector(".state-layer")).toBeNull();
+  });
+
+  it("shows Live only after readiness and removes it when the player becomes unavailable", async () => {
+    const { dialog, adapter } = await restore();
+    const subtitleSlot = dialog.shadowRoot?.querySelector(".subtitle-slot");
+    expect(subtitleSlot).not.toBeNull();
+    expect(dialog.shadowRoot?.querySelector(".live-subtitle")).toBeNull();
+    expect(dialog.shadowRoot?.querySelector("ring-view-activity-time")).toBeNull();
+    adapter()?.dispatchEvent(new CustomEvent("native-media-ready"));
+    await dialog.updateComplete;
+    expect(dialog.shadowRoot?.querySelector(".live-subtitle")?.textContent).toBe("Live");
+    expect(dialog.shadowRoot?.querySelector(".subtitle-slot")).toBe(subtitleSlot);
+    adapter()?.dispatchEvent(new CustomEvent("native-media-error", { detail: "component-unavailable" }));
+    await dialog.updateComplete;
+    expect(dialog.shadowRoot?.querySelector(".live-subtitle")).toBeNull();
+    expect(dialog.shadowRoot?.querySelector(".subtitle-slot")).toBe(subtitleSlot);
   });
 
   it("falls back to manual Resume after one automatic native playback timeout", async () => {

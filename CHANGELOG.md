@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.7] - 2026-10-03
+
+### Fixed
+
+- Show “Live” only when live video is ready, and keep recording timestamps in
+  Recording mode and dashboard previews.
+- Keep camera names at the exact same position while switching between
+  Recording, connecting, and Live, with matching subtitle spacing and typography.
+
+### Tests
+
+- Cover idle, connecting, ready, and unavailable Live subtitles and recording age.
+- Compare title pixels, exact coordinates, and subtitle spacing on desktop and
+  phone in both inline and fullscreen viewers.
+
 ## [0.12.6] - 2026-10-01
 
 ### Fixed

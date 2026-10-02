@@ -2237,7 +2237,24 @@ const nr = Z`
     --ring-view-activity-line-height: 18px;
   }
 
+  .subtitle-slot {
+    display: grid;
+    height: var(--ring-view-activity-line-height, 18px);
+    line-height: var(--ring-view-activity-line-height, 18px);
+  }
+
+  .live-subtitle {
+    display: block;
+    color: var(--ring-view-activity-color, rgba(255, 255, 255, 0.84));
+    font-size: var(--ring-view-activity-font-size, 13px);
+    font-weight: 500;
+    line-height: var(--ring-view-activity-line-height, 18px);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.82);
+  }
+
   h2 {
+    /* Keep glyph rasterization stable when live media changes compositing. */
+    transform: translateZ(0);
     min-width: 0;
     margin: 0;
     max-width: 100%;
@@ -4673,19 +4690,19 @@ let m = class extends M {
   }
   render() {
     if (!this.open || !this.hass || !this.config) return l;
-    const e = this.dialogTitle(), t = this.config.show_name, i = he(this.hass, this.config), n = i ? H(this.hass, i) !== void 0 : !1, r = Pe(this.config.aspect_ratio) ?? this.autoAspectRatio ?? 16 / 9, o = {
+    const e = this.dialogTitle(), t = this.config.show_name, i = he(this.hass, this.config), n = this.mode === "live" && this.mediaStatus === "ready", r = this.mode === "last_recording" && i ? H(this.hass, i) !== void 0 : !1, o = Pe(this.config.aspect_ratio) ?? this.autoAspectRatio ?? 16 / 9, a = {
       "--ring-view-aspect-ratio": Qt(
         this.config.aspect_ratio,
         this.autoAspectRatio
       ),
-      "--ring-view-dialog-height-limited-width": `calc((100dvh - 32px) * ${r})`,
+      "--ring-view-dialog-height-limited-width": `calc((100dvh - 32px) * ${o})`,
       "--ring-view-fit-mode": this.config.fit_mode
-    }, a = Number(this.ringing) + Number(this.shouldShowSnapshotAction());
+    }, d = Number(this.ringing) + Number(this.shouldShowSnapshotAction());
     return h`
       ${this.inline ? l : h`<div class="backdrop" @pointerdown=${this.handleBackdrop}></div>`}
       <section
         class="dialog"
-        style=${me(o)}
+        style=${me(a)}
         role=${this.inline ? "region" : "dialog"}
         aria-modal=${this.inline ? l : "true"}
         aria-labelledby=${t ? "ring-view-dialog-title" : l}
@@ -4697,23 +4714,26 @@ let m = class extends M {
           <header
             class=${C({
       header: !0,
-      "camera-actions-one": a === 1,
-      "camera-actions-two": a === 2
+      "camera-actions-one": d === 1,
+      "camera-actions-two": d === 2
     })}
           >
-            ${t || n ? h`
+            ${t || r || n ? h`
                   <div class="header-copy">
                     ${t ? h`<h2 id="ring-view-dialog-title">${e}</h2>` : l}
-                    ${n ? h`
+                    <div class="subtitle-slot">
+                    ${r ? h`
                           <ring-view-activity-time
                             .hass=${this.hass}
                             .entityId=${i}
                           ></ring-view-activity-time>
                         ` : l}
+                    ${n ? h`<span class="live-subtitle">${s(this.hass, "common.live")}</span>` : l}
+                    </div>
                   </div>
                 ` : l}
             <div class="header-actions">
-              ${a > 0 ? h`
+              ${d > 0 ? h`
                     <div class="camera-actions">
                       ${this.renderRingIndicator()} ${this.renderSnapshotAction()}
                     </div>
