@@ -288,7 +288,10 @@ who knows their URL.
 Already using an older version? Import it again and choose **Overwrite**. Your
 automation must then be updated with the Ring View Live camera and recording
 source used by the card. You can also switch its Ding and preview entities
-between official Ring and Ring-MQTT in the normal visual editor.
+between official Ring and Ring-MQTT in the normal visual editor. Choose English
+or German notification text and optionally name the entrance. Tapping always
+opens Live; a fresh recording adds a separate Watch Recording action. Snapshot
+updates are labeled as new images, and each doorbell gets its own alert tag.
 
 Use the same doorbell signal in your own Home Assistant automations for porch
 lights, announcements, or presence-aware alerts. Those are ideas for

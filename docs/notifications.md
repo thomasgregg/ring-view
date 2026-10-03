@@ -51,7 +51,10 @@ runs in Home Assistant instead.
    `https://example.ui.nabu.casa`. Ring View then saves the fresh frame under
    `/config/www` and gives iOS an absolute `/local/...` image URL. Leave this
    field empty when authenticated camera-proxy thumbnails already work.
-8. Save, then test with a real doorbell press. Confirm phone notification
+8. Choose **Notification language** (**English** or **Deutsch**) and optionally
+   enter a **Doorbell name** to identify the entrance in the title. Existing
+   automations default to English when these new inputs are not set.
+9. Save, then test with a real doorbell press. Confirm phone notification
    permission is enabled.
 
 ### What happens
@@ -65,22 +68,33 @@ runs in Home Assistant instead.
   official Ring Live view camera and two-way audio are configured.
 - The automation waits up to **two minutes** for a new official recording ID or
   a newer Ring-MQTT Ding snapshot timestamp.
-- When the chosen preview camera updates, the automation updates the same
-  tagged notification to say **Recording ready**, adds its fresh image, and
-  offers **View Live** and **Watch Recording**. Tapping the updated notification
-  opens that recording. The notification preview does not start an extra Ring
-  live session.
+- When a new recording is detected, the same notification says **Recording
+  ready** and offers **View Live** and **Watch Recording**. A fresh snapshot or
+  generic camera update instead says **New image available** and offers only
+  **View Live**: an image alone does not confirm a recording is ready.
+- Tapping the notification always opens Live, before and after its image update.
+  **Watch Recording** opens recording mode separately when offered. The preview
+  does not start an extra Ring live session.
+- German notifications use **Jemand ist an der Tür**, **Live ansehen**, and
+  **Aufnahme ansehen**, with **Aufnahme verfügbar** for recordings and
+  **Neues Bild verfügbar** for other images. An optional doorbell name is
+  appended to the title in either language.
 - By default the preview uses Home Assistant's authenticated camera proxy. If
   **External image address** is configured, the blueprint instead writes one
   current JPEG per selected camera to `/config/www` and sends its absolute
   HTTPS `/local/...` URL. This works around iOS notification-extension setups
   that can open the expanded camera view but cannot resolve an authenticated or
-  relative compact thumbnail.
+  relative compact thumbnail. If saving the public snapshot fails with a
+  handled Home Assistant service error, the update continues using the
+  authenticated camera proxy. This fallback may retain the original iOS
+  thumbnail limitation, but the text and Live/recording actions remain useful.
 - If the camera does not publish a new image within two minutes, the immediate
   notification remains unchanged; an older image is never attached as if it
   were current.
-- Another ring restarts the wait. The shared notification tag updates the same
-  alert rather than creating a separate notification for every stage.
+- Another ring restarts that automation's wait. Both stages use a tag derived
+  from the doorbell entity, so separate doorbells do not overwrite each other's
+  notifications. Automations for the same doorbell still share its tag.
+  After upgrading, dismiss any old alert using the previous shared tag once.
 
 On iOS and macOS, the Companion app automatically appends its configured Snooze
 actions to notifications. To show only the Ring View actions, open **Settings →

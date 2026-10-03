@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.9] - 2026-10-03
+
+### Added
+
+- English/German notification language selection and an optional doorbell name.
+
+### Fixed
+
+- Distinguish fresh snapshots from ready recordings in blueprint notifications;
+  offer Watch Recording only when a new recording is detected.
+- Keep notification taps opening Live before and after preview updates.
+- Use a separate notification tag for each doorbell entity.
+- Keep the authenticated camera image as a fallback when the optional public
+  snapshot save fails with a handled Home Assistant service error.
+
 ## [0.12.8] - 2026-10-03
 
 ### Fixed

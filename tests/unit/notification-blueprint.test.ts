@@ -20,7 +20,7 @@ describe("doorbell notification blueprint", () => {
   it("supports an opt-in absolute public snapshot for iOS thumbnails", () => {
     expect(blueprint).toContain("/config/www/ring-view-");
     expect(blueprint).toContain("action: camera.snapshot");
-    expect(blueprint).toContain("{{ base.rstrip('/') }}/local/ring-view-");
+    expect(blueprint).toContain("{{ (notification_image_base_url_value | trim).rstrip('/') }}/local/ring-view-");
     expect(blueprint).toMatch(
       /publicly\s+accessible to anyone who knows its URL/,
     );
@@ -31,15 +31,15 @@ describe("doorbell notification blueprint", () => {
     expect(blueprint).toContain("viewer_recording_source:");
     expect(blueprint).toContain("ring-view-mode=live");
     expect(blueprint).toContain("ring-view-mode=last_recording");
-    expect(blueprint).toContain("title: View Live");
-    expect(blueprint).toContain("message: Recording ready");
-    expect(blueprint).toContain("title: Watch Recording");
+    expect(blueprint).toContain("notification_language:");
+    expect(blueprint).toContain("Recording ready");
+    expect(blueprint).toContain("Watch Recording");
   });
 
   it("requires viewer sources and has no dashboard-only fallback", () => {
     const viewerInputs = blueprint.slice(
       blueprint.indexOf("viewer_live_camera:"),
-      blueprint.indexOf("notification_image_base_url:"),
+      blueprint.indexOf("notification_language:"),
     );
     expect(viewerInputs).not.toContain("default:");
     expect(blueprint).not.toContain("viewer_actions_enabled");

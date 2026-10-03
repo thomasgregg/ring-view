@@ -6,7 +6,9 @@ blueprint:
     open the matching Ring View fullscreen mode directly. When the
     selected preview camera publishes a new recording or snapshot, the same
     notification is updated with that image. The preview itself does not start
-    an additional Ring live-view session.
+    an additional Ring live-view session. Notification text supports English
+    and German. Tapping always opens Live; Watch Recording is offered only
+    after a new recording is detected. Each doorbell has its own notification.
   domain: automation
   author: Thomas Gregg
   source_url: >-
@@ -85,12 +87,30 @@ blueprint:
           description: >-
             Select the same Last recording camera or Ring-MQTT Event Select
             used by the Ring View card. Together with the Live camera above,
-            this adds Watch Recording after fresh media is ready.
+            this adds Watch Recording after a fresh recording is detected. A new
+            snapshot alone does not confirm recording availability.
           selector:
             entity:
               filter:
                 - domain: camera
                 - domain: select
+        notification_language:
+          name: Notification language
+          description: Language used for notification messages and action buttons.
+          default: en
+          selector:
+            select:
+              options:
+                - label: English
+                  value: en
+                - label: Deutsch
+                  value: de
+        doorbell_name:
+          name: Doorbell name (optional)
+          description: Add a name such as Front door to the notification title.
+          default: ""
+          selector:
+            text: {}
         notification_image_base_url:
           name: External image address (optional)
           description: >-
@@ -198,6 +218,18 @@ conditions:
       {% endif %}
 
 variables:
+  doorbell_entity_id: !input doorbell_event
+  notification_language_value: !input notification_language
+  doorbell_name_value: !input doorbell_name
+  notification_tag: "{{ 'ring-view-doorbell-' ~ doorbell_entity_id }}"
+  notification_title: >-
+    {{ 'Jemand ist an der Tür' if notification_language_value == 'de' else 'Someone is at the door' }}{{ ' · ' ~ (doorbell_name_value | trim) if doorbell_name_value | trim else '' }}
+  live_message: >-
+    {{ 'Tippe, um die Live-Ansicht zu öffnen' if notification_language_value == 'de' else 'Tap to view Live' }}
+  live_action_title: >-
+    {{ 'Live ansehen' if notification_language_value == 'de' else 'View Live' }}
+  recording_action_title: >-
+    {{ 'Aufnahme ansehen' if notification_language_value == 'de' else 'Watch Recording' }}
   recording_timestamp_id: !input recording_timestamp
   doorbell_pressed_at: "{{ as_timestamp(trigger.to_state.state, none) if trigger.to_state.entity_id.startswith('event.') else as_timestamp(trigger.to_state.last_updated) }}"
   preview_camera_id: !input recording_camera
@@ -247,16 +279,16 @@ actions:
     device_id: !input notification_device
     domain: mobile_app
     type: notify
-    title: Someone is at the door
-    message: Tap to view Live
+    title: "{{ notification_title }}"
+    message: "{{ live_message }}"
     data:
-      tag: ring-view-doorbell
+      tag: "{{ notification_tag }}"
       group: ring-view
       url: "{{ live_view_url }}"
       clickAction: "{{ live_view_url }}"
       actions:
         - action: URI
-          title: View Live
+          title: "{{ live_action_title }}"
           uri: "{{ live_view_url }}"
           icon: sfsymbols:video
   - alias: Wait for a genuinely new preview
@@ -287,7 +319,21 @@ actions:
       {% endif %}
     timeout: "00:02:00"
     continue_on_timeout: false
+  - alias: Prepare fresh preview notification
+    variables:
+      recording_ready: "{{ preview_kind == 'recording' }}"
+      preview_message: >-
+        {% if preview_kind == 'recording' %}
+          {{ 'Aufnahme verfügbar' if notification_language_value == 'de' else 'Recording ready' }}
+        {% else %}
+          {{ 'Neues Bild verfügbar' if notification_language_value == 'de' else 'New image available' }}
+        {% endif %}
+      notification_image_url: >-
+        /api/camera_proxy/{{ preview_camera_id }}?v={{ now().timestamp() | int }}
   - alias: Prepare the optional public notification image
+    # Catch failure of the entire sequence. The public URL is selected only
+    # after camera.snapshot succeeds; otherwise the authenticated URL remains.
+    continue_on_error: true
     if:
       - condition: template
         value_template: >-
@@ -299,36 +345,29 @@ actions:
           entity_id: "{{ preview_camera_id }}"
         data:
           filename: "{{ notification_image_filename }}"
+      - variables:
+          notification_image_url: >-
+            {{ (notification_image_base_url_value | trim).rstrip('/') }}/local/ring-view-{{
+            notification_image_file_key }}.jpg?v={{ now().timestamp() | int }}
   - alias: Add the fresh preview to the existing notification
     device_id: !input notification_device
     domain: mobile_app
     type: notify
-    title: Someone is at the door
-    message: Recording ready
+    title: "{{ notification_title }}"
+    message: "{{ preview_message }}"
     data:
-      tag: ring-view-doorbell
+      tag: "{{ notification_tag }}"
       group: ring-view
-      url: "{{ recording_view_url }}"
-      clickAction: "{{ recording_view_url }}"
+      url: "{{ live_view_url }}"
+      clickAction: "{{ live_view_url }}"
       entity_id: "{{ preview_camera_id }}"
-      image: >-
-        {% set base = notification_image_base_url_value | trim %}
-        {% if base %}
-          {{ base.rstrip('/') }}/local/ring-view-{{
-          notification_image_file_key }}.jpg?v={{ now().timestamp() | int }}
-        {% else %}
-          /api/camera_proxy/{{ preview_camera_id }}?v={{
-          now().timestamp() | int }}
-        {% endif %}
-      actions:
-        - action: URI
-          title: View Live
-          uri: "{{ live_view_url }}"
-          icon: sfsymbols:video
-        - action: URI
-          title: Watch Recording
-          uri: "{{ recording_view_url }}"
-          icon: sfsymbols:play.rectangle
+      image: "{{ notification_image_url }}"
+      actions: >-
+        {% set live = dict(action='URI', title=live_action_title,
+          uri=live_view_url, icon='sfsymbols:video') %}
+        {% set recording = dict(action='URI', title=recording_action_title,
+          uri=recording_view_url, icon='sfsymbols:play.rectangle') %}
+        {{ [live, recording] if recording_ready else [live] }}
 
 mode: restart
 max_exceeded: silent
