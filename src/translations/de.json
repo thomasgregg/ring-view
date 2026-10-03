@@ -177,7 +177,7 @@
   "snapshot.permission_failed": "Du bist nicht berechtigt, diesen Schnappschuss aufzunehmen.",
   "snapshot.timeout": "Zeitüberschreitung bei der Schnappschuss-Anfrage.",
   "snapshot.failed": "Der Schnappschuss konnte nicht gespeichert werden.",
-  "viewer.recording_loaded_muted": "Letzte Aufnahme stummgeladen. Aktiviere den Ton über die Videosteuerung.",
+  "viewer.recording_loaded_muted": "Die Aufnahme ist bereit. Aktiviere den Ton bei Bedarf über die Videosteuerung.",
   "viewer.recording_loaded_audio": "Letzte Aufnahme geladen. Audio ist verfügbar.",
   "viewer.live_connected_audio": "Live-Ansicht verbunden. Audio ist verfügbar.",
   "viewer.live_connected_no_audio": "Live-Ansicht verbunden. Keine Audiospur erkannt.",

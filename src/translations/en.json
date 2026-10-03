@@ -177,7 +177,7 @@
   "snapshot.permission_failed": "You do not have permission to take this snapshot.",
   "snapshot.timeout": "The snapshot request timed out.",
   "snapshot.failed": "The snapshot could not be saved.",
-  "viewer.recording_loaded_muted": "Last recording loaded muted. Use the video controls for sound.",
+  "viewer.recording_loaded_muted": "The recording is ready. Enable sound in the video controls if needed.",
   "viewer.recording_loaded_audio": "Last recording loaded. Audio is available.",
   "viewer.live_connected_audio": "Live view connected. Audio is available.",
   "viewer.live_connected_no_audio": "Live view connected. No audio track was detected.",

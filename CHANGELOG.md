@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.8] - 2026-10-03
+
+### Fixed
+
+- Clarify the German and English screen-reader announcement when a recording
+  is ready with audio muted, without implying playback has already started.
+
 ## [0.12.7] - 2026-10-03
 
 ### Fixed

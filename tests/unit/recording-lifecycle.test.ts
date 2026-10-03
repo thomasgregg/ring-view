@@ -535,7 +535,7 @@ describe("recording player lifecycle", () => {
     video!.dispatchEvent(new Event("canplay"));
     await flush();
     expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1);
-    expect(dialog.shadowRoot?.textContent).toContain("Last recording loaded muted");
+    expect(dialog.shadowRoot?.textContent).toContain("The recording is ready. Enable sound in the video controls if needed.");
   });
 
   it.each([
