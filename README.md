@@ -2,7 +2,7 @@
 
 [![Latest release](https://img.shields.io/github/v/release/thomasgregg/ring-view?display_name=tag&sort=semver)](https://github.com/thomasgregg/ring-view/releases/latest)
 [![Validate](https://github.com/thomasgregg/ring-view/actions/workflows/validate.yml/badge.svg)](https://github.com/thomasgregg/ring-view/actions/workflows/validate.yml)
-[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://www.hacs.xyz/)
+[![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://www.hacs.xyz/)
 [![License: MIT](https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/license-mit.svg)](https://github.com/thomasgregg/ring-view/blob/main/LICENSE)
 
 ## Your Ring camera. One card. Recording, Live, snapshots, talkback, and door access.
@@ -126,6 +126,8 @@ Ring Live view camera. [The provider parity guide](docs/compatibility.md#officia
 shows the exact source for every feature.
 
 [![Open Ring View in HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=thomasgregg&repository=ring-view&category=plugin)
+
+Ring View is included in the HACS default repository list; no custom repository setup is needed. Existing installations continue to receive updates through HACS without reinstalling.
 
 1. Open Ring View in HACS using the button above and download the latest release.
 2. Refresh Home Assistant.
