@@ -9,7 +9,7 @@
 3. Add `/local/ring-view.js` as a **JavaScript module** under **Settings → Dashboards → Resources**.
 4. Refresh the browser. After upgrades, a hard refresh may be necessary.
 
-For the recommended HACS installation, see [Get started](../README.md#get-started).
+For installation through the Home Assistant Marketplace, see [Get started](../README.md#get-started).
 
 ## Configuration reference
 

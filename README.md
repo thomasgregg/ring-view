@@ -2,7 +2,7 @@
 
 [![Latest release](https://img.shields.io/github/v/release/thomasgregg/ring-view?display_name=tag&sort=semver)](https://github.com/thomasgregg/ring-view/releases/latest)
 [![Validate](https://github.com/thomasgregg/ring-view/actions/workflows/validate.yml/badge.svg)](https://github.com/thomasgregg/ring-view/actions/workflows/validate.yml)
-[![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://www.hacs.xyz/)
+[![Home Assistant Marketplace](https://img.shields.io/badge/Home%20Assistant-Marketplace-41BDF5.svg)](https://www.home-assistant.io/integrations/marketplace/)
 [![License: MIT](https://raw.githubusercontent.com/thomasgregg/ring-view/main/docs/images/license-mit.svg)](https://github.com/thomasgregg/ring-view/blob/main/LICENSE)
 
 ## Your Ring camera. One card. Recording, Live, snapshots, talkback, and door access.
@@ -125,15 +125,15 @@ Two-way audio and the optional backend patch remain specific to the official
 Ring Live view camera. [The provider parity guide](docs/compatibility.md#official-ring-and-ring-mqtt-sources)
 shows the exact source for every feature.
 
-[![Open Ring View in HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=thomasgregg&repository=ring-view&category=plugin)
+[![Open Ring View in the Home Assistant Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=thomasgregg&repository=ring-view&category=plugin)
 
-Ring View is included in the HACS default repository list; no custom repository setup is needed. Existing installations continue to receive updates through HACS without reinstalling.
+Ring View is included in the default Home Assistant Marketplace catalog. On Home Assistant 2026.11 or newer, existing HACS installations migrate to the Marketplace automatically. On earlier supported versions, find Ring View in HACS.
 
-1. Open Ring View in HACS using the button above and download the latest release.
+1. Use the button above or search for **Ring View** under **Settings → Marketplace**, then select **Install**.
 2. Refresh Home Assistant.
 3. Edit your dashboard, select **Add card → Ring View**, and choose a recording source and Live camera.
 
-HACS registers the JavaScript module automatically. Prefer manual installation? See the [installation and configuration guide](docs/configuration.md#manual-installation).
+The Marketplace and HACS register the JavaScript module automatically when dashboard resources are managed in the UI. For manual installation, see the [installation and configuration guide](docs/configuration.md#manual-installation).
 
 The minimal YAML equivalent is:
 

@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.12.10] - 2026-11-21
+
+### Fixed
+
+- Keep the inline Ring View card behind Home Assistant’s dashboard tabs when scrolling. Keyboard focus scrolls obscured camera controls into view.
+
+### Changed
+
+- Update the README badges and installation steps for the Home Assistant Marketplace.
+
+### Tests
+
+- Cover dashboard tab clicks, keyboard focus, fullscreen handoff, and offscreen Live suspension and recovery in Chromium and WebKit.
+
 ## [0.12.9] - 2026-10-03
 
 ### Added

@@ -2023,6 +2023,7 @@ const nr = Z`
 
   .inline-shell {
     position: relative;
+    isolation: isolate;
     width: 100%;
     height: 100%;
     min-height: 120px;
@@ -3311,6 +3312,10 @@ const nr = Z`
       minmax(var(--ring-view-header-actions-width), 1fr);
     min-height: 64px;
     padding: 10px 10px 14px 16px;
+  }
+
+  :host([inline]) button {
+    scroll-margin-block-start: calc(var(--header-height, 0px) + var(--safe-area-inset-top, 0px));
   }
 
   :host([inline]) .header.camera-actions-one {

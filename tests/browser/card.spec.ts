@@ -2013,7 +2013,7 @@ test("keeps an automatic interactive shape through camera token rotation only", 
   await page.goto(
     "/demo/?dashboard=interactive&dashboard_start=live&aspect=auto&fit=contain",
   );
-  await expect(page.locator("ring-view")).toBeAttached();
+  await expect(page.locator("ring-view ring-view-native-camera-adapter")).toBeAttached();
   await page.evaluate(async () => {
     type TestCard = HTMLElement & {
       hass: HomeAssistant;
